@@ -3,7 +3,7 @@
 use Filament\Enums\ThemeMode;
 
 return [
-    'defaultCurrency' => 'usd',
+    'defaultCurrency' => 'brl',
     'defaultDateDisplayFormat' => 'M j, Y',
     'defaultIsoDateDisplayFormat' => 'L',
     'defaultDateTimeDisplayFormat' => 'M j, Y H:i:s',
@@ -18,7 +18,7 @@ return [
     'favicon' => [
         'enabled' => true,
         'manifest' => [
-            'name' => env('APP_NAME', 'Filakit'),
+            'name' => env('APP_NAME', 'Jefferson Gonçalves — Full Stack PHP Developer'),
             'icons' => [
                 '36' => '0.75',
                 '48' => '1.0',

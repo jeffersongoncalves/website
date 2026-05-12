@@ -1,7 +1,6 @@
 /.phpunit.cache
 /build
 /node_modules
-/public/build
 /public/hot
 /public/storage
 /storage/*.key
@@ -26,5 +25,4 @@ phpstan.neon
 /nbproject
 .rnd
 .output.txt
-
-.claude/settings.local.json
+.claude

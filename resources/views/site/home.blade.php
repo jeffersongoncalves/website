@@ -111,9 +111,12 @@
                 </template>
             </div>
 
-            <div class="mt-12" x-data="heatmap()">
+            <div class="mt-12" x-data='heatmap({ cells: @json($contributions["cells"]) })'>
                 <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
-                    <div class="mono-meta-sm text-ink-400">@lang('site.home.heatmap_title')</div>
+                    <div class="mono-meta-sm text-ink-400">
+                        @lang('site.home.heatmap_title')
+                        <span class="text-ink-100">· {{ number_format($contributions['total'], 0, ',', '.') }}</span>
+                    </div>
                     <div class="flex items-center gap-2 mono-meta">
                         <span>@lang('site.common.less')</span>
                         <span class="hm-cell"></span>

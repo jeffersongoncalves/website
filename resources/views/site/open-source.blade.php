@@ -37,13 +37,13 @@
 
     <div class="divider"></div>
 
-    <section class="section" x-data="heatmap()">
+    <section class="section" x-data='heatmap({ cells: @json($contributions["cells"]) })'>
         <div class="wrap">
             <x-site.eyebrow num="03" label="contribuições"/>
             <div class="flex items-end justify-between flex-wrap gap-4 mb-6">
                 <h2 class="h-section">
                     @lang('site.os.contributions')<br>
-                    <span class="h-sub">@lang('site.os.contributions_2')</span>
+                    <span class="h-sub">{{ number_format($contributions['total'], 0, ',', '.') }} @lang('site.os.contributions_2')</span>
                 </h2>
                 <div class="flex items-center gap-2 mono-meta">
                     <span>@lang('site.common.less')</span>

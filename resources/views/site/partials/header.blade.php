@@ -19,7 +19,6 @@
             <a href="{{ route('about',         ['locale' => $locale]) }}" class="nav-link">@lang('site.nav.about')</a>
             <a href="{{ route('projects.index',['locale' => $locale]) }}" class="nav-link">@lang('site.nav.projects')</a>
             <a href="{{ route('open-source',   ['locale' => $locale]) }}" class="nav-link">@lang('site.nav.open_source')</a>
-            <a href="{{ route('blog.index',    ['locale' => $locale]) }}" class="nav-link">@lang('site.nav.blog')</a>
             <a href="{{ route('sponsors',      ['locale' => $locale]) }}" class="nav-link">@lang('site.nav.sponsors')</a>
         </nav>
 

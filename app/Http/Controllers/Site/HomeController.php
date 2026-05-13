@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Site;
 
 use App\Models\Project;
+use App\Support\GithubContributions;
 use App\Support\SiteStats;
 use Illuminate\Contracts\View\View;
 
@@ -18,9 +19,10 @@ class HomeController
             ->get();
 
         return view('site.home', [
-            'featured'   => $featured,
-            'homeStats'  => SiteStats::homeCards(),
-            'stack'      => config('site.stack'),
+            'featured'      => $featured,
+            'homeStats'     => SiteStats::homeCards(),
+            'stack'         => config('site.stack'),
+            'contributions' => GithubContributions::calendar('jeffersongoncalves'),
         ]);
     }
 }

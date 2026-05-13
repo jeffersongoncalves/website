@@ -115,15 +115,15 @@
 
     <section class="section">
         <div class="wrap">
-            <x-site.eyebrow num="04" :label="__('site.nav.contact')"/>
+            <x-site.eyebrow num="04" :label="__('site.nav.projects')"/>
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
                 <div class="lg:col-span-7">
                     <h2 class="h-section">@lang('site.about.cta_title')</h2>
                     <p class="body-text mt-6 max-w-[60ch]">@lang('site.about.cta_body')</p>
                 </div>
                 <div class="lg:col-span-5 flex flex-wrap gap-3 lg:justify-end">
-                    <a href="{{ route('contact', ['locale' => $locale]) }}" class="btn btn-primary">@lang('site.about.cta_send')</a>
-                    <a href="{{ route('projects.index', ['locale' => $locale]) }}" class="btn btn-secondary">@lang('site.common.view_projects')</a>
+                    <a href="{{ route('projects.index', ['locale' => $locale]) }}" class="btn btn-primary">@lang('site.common.view_projects')</a>
+                    <a href="{{ config('site.social.github') }}" rel="noopener" target="_blank" class="btn btn-secondary">@lang('site.common.view_github')</a>
                 </div>
             </div>
         </div>

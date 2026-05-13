@@ -17,24 +17,8 @@ Alpine.data('terminalTyping', ({ target = '', delay = 600, speed = 60 } = {}) =>
     },
 }));
 
-Alpine.data('heatmap', ({ weeks = 53, days = 7 } = {}) => ({
-    cells: [],
-    init() {
-        const cells = [];
-        for (let w = 0; w < weeks; w++) {
-            for (let d = 0; d < days; d++) {
-                const r = Math.random();
-                let v = 0;
-                if (r > 0.78) v = 4;
-                else if (r > 0.55) v = 3;
-                else if (r > 0.32) v = 2;
-                else if (r > 0.15) v = 1;
-                if (w < 6 && r < 0.7) v = Math.max(0, v - 2);
-                cells.push(v);
-            }
-        }
-        this.cells = cells;
-    },
+Alpine.data('heatmap', ({ cells = [] } = {}) => ({
+    cells,
     bgFor(v) {
         return v === 0
             ? 'var(--ink-850)'

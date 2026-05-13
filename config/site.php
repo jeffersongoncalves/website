@@ -135,15 +135,4 @@ return [
         ],
     ],
 
-    'contact_kinds' => [
-        'consultoria' => ['pt' => 'Consultoria',    'en' => 'Consulting'],
-        'parceria'    => ['pt' => 'Parceria SaaS',  'en' => 'SaaS Partnership'],
-        'oss'         => ['pt' => 'Open Source',    'en' => 'Open Source'],
-        'sponsor'     => ['pt' => 'Sponsorship',    'en' => 'Sponsorship'],
-        'outro'       => ['pt' => 'Outro',          'en' => 'Other'],
-    ],
-
-    'budget_options' => [
-        'até R$ 5k', 'R$ 5–15k', 'R$ 15–30k', 'R$ 30k+', 'a definir',
-    ],
 ];

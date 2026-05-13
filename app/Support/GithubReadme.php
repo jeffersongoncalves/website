@@ -23,13 +23,13 @@ class GithubReadme
         $cacheKey = "readme.html.{$repo}." . ($ref ?: 'default');
 
         return Cache::remember($cacheKey, now()->addMinutes($ttlMinutes), function () use ($repo, $ref) {
-            $markdown = self::fetchMarkdown($repo, $ref);
+            $result = self::fetchMarkdown($repo, $ref);
 
-            if ($markdown === null) {
+            if ($result === null) {
                 return null;
             }
 
-            $markdown = self::rewriteRelativeAssets($markdown, $repo, $ref);
+            $markdown = self::rewriteRelativeAssets($result['body'], $repo, $result['ref']);
 
             return self::renderMarkdown($markdown);
         });
@@ -68,36 +68,77 @@ class GithubReadme
         return rtrim($m[1], '/');
     }
 
-    private static function fetchMarkdown(string $repo, ?string $ref = null): ?string
+    /**
+     * @return array{body:string,ref:?string}|null
+     */
+    private static function fetchMarkdown(string $repo, ?string $ref = null): ?array
     {
-        $token   = config('services.github.token');
-        $headers = ['Accept' => 'application/vnd.github.raw', 'User-Agent' => 'jeffersongoncalves-site'];
-
-        if ($token) {
-            $headers['Authorization'] = "Bearer {$token}";
+        if ($ref && ($body = self::fetchReadmeForRef($repo, $ref)) !== null) {
+            return ['body' => $body, 'ref' => $ref];
         }
 
-        $url   = "https://api.github.com/repos/{$repo}/readme";
-        $query = $ref ? ['ref' => $ref] : [];
+        $default = self::fetchDefaultBranch($repo);
 
+        if ($default !== null && ($body = self::fetchReadmeForRef($repo, $default)) !== null) {
+            return ['body' => $body, 'ref' => $default];
+        }
+
+        if (($body = self::fetchReadmeForRef($repo, null)) !== null) {
+            return ['body' => $body, 'ref' => $default];
+        }
+
+        return null;
+    }
+
+    private static function fetchReadmeForRef(string $repo, ?string $ref): ?string
+    {
         $response = Http::timeout(8)
-            ->withHeaders($headers)
-            ->get($url, $query);
+            ->withHeaders(self::githubHeaders(['Accept' => 'application/vnd.github.raw']))
+            ->get("https://api.github.com/repos/{$repo}/readme", $ref ? ['ref' => $ref] : []);
 
         if ($response->successful()) {
             return $response->body();
         }
 
-        $branches = $ref ? [$ref] : ['main', 'master'];
-
-        foreach ($branches as $branch) {
-            $raw = Http::timeout(8)->get("https://raw.githubusercontent.com/{$repo}/{$branch}/README.md");
-            if ($raw->successful()) {
-                return $raw->body();
-            }
+        if ($ref === null) {
+            return null;
         }
 
-        return null;
+        $raw = Http::timeout(8)
+            ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
+            ->get("https://raw.githubusercontent.com/{$repo}/{$ref}/README.md");
+
+        return $raw->successful() ? $raw->body() : null;
+    }
+
+    private static function fetchDefaultBranch(string $repo): ?string
+    {
+        return Cache::remember(
+            "github.default_branch.{$repo}",
+            now()->addHours(24),
+            function () use ($repo) {
+                $response = Http::timeout(8)
+                    ->withHeaders(self::githubHeaders(['Accept' => 'application/vnd.github+json']))
+                    ->get("https://api.github.com/repos/{$repo}");
+
+                if (! $response->successful()) {
+                    return null;
+                }
+
+                return $response->json('default_branch');
+            }
+        );
+    }
+
+    private static function githubHeaders(array $extra = []): array
+    {
+        $headers = array_merge(['User-Agent' => 'jeffersongoncalves-site'], $extra);
+
+        if ($token = config('services.github.token')) {
+            $headers['Authorization'] = "Bearer {$token}";
+        }
+
+        return $headers;
     }
 
     private static function rewriteRelativeAssets(string $markdown, string $repo, ?string $ref = null): string

@@ -19,9 +19,7 @@
                     <li><a href="{{ route('about',          ['locale' => $locale]) }}">@lang('site.nav.about')</a></li>
                     <li><a href="{{ route('projects.index', ['locale' => $locale]) }}">@lang('site.nav.projects')</a></li>
                     <li><a href="{{ route('open-source',    ['locale' => $locale]) }}">@lang('site.nav.open_source')</a></li>
-                    <li><a href="{{ route('blog.index',     ['locale' => $locale]) }}">@lang('site.nav.blog')</a></li>
                     <li><a href="{{ route('sponsors',       ['locale' => $locale]) }}">@lang('site.nav.sponsors')</a></li>
-                    <li><a href="{{ route('contact',        ['locale' => $locale]) }}">@lang('site.nav.contact')</a></li>
                 </ul>
             </div>
 
@@ -38,7 +36,7 @@
 
         <div class="site-footer-bottom">
             <span>© {{ date('Y') }} Jefferson Gonçalves · @lang('site.footer.copyright')</span>
-            <span>v1.0.0 · @lang('site.footer.location')</span>
+            <span>@lang('site.footer.location')</span>
         </div>
     </div>
 </footer>

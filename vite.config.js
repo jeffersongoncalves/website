@@ -8,9 +8,9 @@ export default defineConfig({
             input: [
                 'resources/css/filament/admin/theme.css',
                 'resources/css/filament/app/theme.css',
-                'resources/css/app.css',
-                'resources/css/site/app.css',
+                'resources/css/site.css',
                 'resources/js/app.js',
+                'resources/js/site.js',
             ],
             refresh: true,
         }),

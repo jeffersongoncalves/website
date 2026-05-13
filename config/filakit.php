@@ -12,9 +12,7 @@ return [
     'defaultTimeDisplayFormat' => 'H:i:s',
     'defaultIsoTimeDisplayFormat' => 'LT',
     'theme_mode' => ThemeMode::Light,
-    'guest_panel_enabled' => false,
     'admin_panel_enabled' => true,
-    'app_panel_enabled' => true,
     'favicon' => [
         'enabled' => true,
         'manifest' => [

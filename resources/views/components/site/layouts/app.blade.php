@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ ($title ?? '') ? ($title . ' · ') : '' }}{{ config('app.name') }}</title>
-    @if(isset($description))
-        <meta name="description" content="{{ $description }}">
-    @endif
     <x-favicon/>
-    @vite(['resources/css/site/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/site.css', 'resources/js/site.js'])
     @stack('head')
 </head>
 <body>

@@ -10,23 +10,7 @@ return [
         'sponsors'  => 'https://github.com/sponsors/jeffersongoncalves',
     ],
 
-    'home_stats' => [
-        ['label_key' => 'os.repos',         'target' => 81,  'suffix' => ''],
-        ['label_key' => 'os.followers',     'target' => 5.4, 'suffix' => 'k',  'decimals' => 1],
-        ['label_key' => 'os.downloads',     'target' => 2.3, 'suffix' => 'M+', 'decimals' => 1],
-        ['label_key' => 'os.plugins',       'target' => 20,  'suffix' => '+'],
-    ],
-
-    'os_stats' => [
-        ['label_key' => 'os.repos',         'target' => 81],
-        ['label_key' => 'os.followers',     'target' => 5.4, 'suffix' => 'k',  'decimals' => 1],
-        ['label_key' => 'os.downloads',     'target' => 2.3, 'suffix' => 'M+', 'decimals' => 1],
-        ['label_key' => 'os.plugins_filament', 'target' => 26, 'suffix' => '+'],
-        ['label_key' => 'os.packages_laravel', 'target' => 15, 'suffix' => '+'],
-        ['label_key' => 'os.starter_kits',  'target' => 7],
-        ['label_key' => 'os.stars',         'target' => 1.8, 'suffix' => 'k',  'decimals' => 1],
-        ['label_key' => 'os.public_sponsors', 'target' => 4],
-    ],
+    // home_stats and os_stats are now computed dynamically by App\Support\SiteStats.
 
     'stack' => [
         ['label' => 'Laravel'],

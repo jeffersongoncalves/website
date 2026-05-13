@@ -70,6 +70,41 @@
     <div class="divider"></div>
 
     <section class="section">
+        <div class="wrap" style="max-width:880px;">
+            <x-site.eyebrow num="02" label="readme"/>
+
+            @if(!empty($versions))
+                <div class="flex items-center flex-wrap gap-2 mb-6 mono-meta">
+                    <span>@lang('site.projects.version_label')</span>
+                    @foreach($versions as $v)
+                        <a href="{{ route('projects.show', ['locale' => $locale, 'slug' => $project->slug, 'v' => $v]) }}#top"
+                           class="chip {{ $activeVersion === $v ? 'chip-active' : '' }}">
+                            {{ $v }}
+                        </a>
+                    @endforeach
+                    @if($ref)
+                        <span class="text-ink-500">·</span>
+                        <span>branch: <code class="inline">{{ $ref }}</code></span>
+                    @endif
+                </div>
+            @endif
+
+            @if($readmeHtml)
+                <div class="markdown-body" x-data="markdownCopy" x-init="enhance()">
+                    {!! $readmeHtml !!}
+                </div>
+            @else
+                <p class="body-text" style="color:var(--ink-400);">
+                    @lang('site.projects.readme_unavailable')
+                    <a href="{{ $project->github_url }}" rel="noopener" target="_blank" class="text-amber">{{ $project->github_url }}</a>
+                </p>
+            @endif
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section class="section">
         <div class="wrap" style="max-width:760px;">
             <a href="{{ route('projects.index', ['locale' => $locale]) }}"
                class="btn-ghost" style="font-family:var(--font-mono);font-size:0.9375rem;color:var(--ink-200);">

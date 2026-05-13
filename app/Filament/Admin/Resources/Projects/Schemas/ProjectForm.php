@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Projects\Schemas;
 
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -40,7 +41,8 @@ class ProjectForm
                             ->helperText(__('GitHub repo name (defaults to slug).')),
                         Select::make('category')
                             ->options(ProjectCategory::class)
-                            ->required(),
+                            ->required()
+                            ->live(),
                     ]),
 
                 Section::make(__('Publication'))
@@ -72,8 +74,18 @@ class ProjectForm
                     ->columnSpan(2)
                     ->columns(2)
                     ->schema([
+                        CheckboxList::make('versions')
+                            ->options([
+                                'v3' => 'Filament v3',
+                                'v4' => 'Filament v4',
+                                'v5' => 'Filament v5',
+                            ])
+                            ->columns(3)
+                            ->helperText(__('Branch maps by index: lowest version = 1.x, next = 2.x, etc.'))
+                            ->visible(fn ($get) => $get('category') === ProjectCategory::FilamentPlugin->value),
                         TagsInput::make('versions')
-                            ->placeholder(__('v3, v4, v5')),
+                            ->placeholder(__('Laravel 10/11/12, Filament v5'))
+                            ->visible(fn ($get) => $get('category') !== ProjectCategory::FilamentPlugin->value),
                         TagsInput::make('stack')
                             ->placeholder(__('Laravel, Filament, Livewire')),
                     ]),

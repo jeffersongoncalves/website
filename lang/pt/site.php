@@ -86,6 +86,8 @@ return [
         'cta_body'          => 'Todos os pacotes têm CI, testes Pest e issues abertas marcadas com :code. Documentação em inglês, mas mantenedor responde em português.',
         'good_first_issue'  => 'good first issue',
         'back_to_list'      => '← Voltar para projetos',
+        'readme_unavailable' => 'README indisponível no momento. Veja direto no GitHub:',
+        'version_label'      => 'Versão:',
     ],
 
     'about' => [

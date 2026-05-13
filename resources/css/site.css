@@ -528,4 +528,129 @@
     font-size: 0.7rem;
   }
   .stack-tile:hover { color: var(--amber-400); border-color: var(--ink-700); }
+
+  /* Markdown body (rendered README) */
+  .markdown-body {
+    color: var(--ink-300);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+  .markdown-body > *:first-child { margin-top: 0; }
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3,
+  .markdown-body h4,
+  .markdown-body h5,
+  .markdown-body h6 {
+    font-family: var(--font-display);
+    color: var(--ink-100);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin: var(--s-7) 0 var(--s-3);
+  }
+  .markdown-body h1 { font-size: 2rem;     font-weight: 500; }
+  .markdown-body h2 { font-size: 1.625rem; font-weight: 500; padding-bottom: var(--s-2); border-bottom: 1px solid var(--ink-800); }
+  .markdown-body h3 { font-size: 1.25rem;  font-weight: 500; }
+  .markdown-body h4 { font-size: 1.0625rem;font-weight: 500; }
+  .markdown-body p { margin: var(--s-4) 0; max-width: none; color: var(--ink-300); }
+  .markdown-body a { color: var(--amber-400); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(251,191,36,0.4); }
+  .markdown-body a:hover { text-decoration-color: var(--amber-400); }
+  .markdown-body ul,
+  .markdown-body ol { margin: var(--s-4) 0; padding-left: var(--s-6); color: var(--ink-300); }
+  .markdown-body li { margin: var(--s-1) 0; }
+  .markdown-body li > p { margin: var(--s-1) 0; }
+  .markdown-body blockquote {
+    margin: var(--s-5) 0;
+    padding: var(--s-1) var(--s-5);
+    border-left: 3px solid var(--amber-400);
+    color: var(--ink-400);
+    background: var(--ink-900);
+    border-radius: var(--r-xs);
+  }
+  .markdown-body img { max-width: 100%; height: auto; border-radius: var(--r-sm); margin: var(--s-3) 0; }
+  .markdown-body hr { border: 0; border-top: 1px solid var(--ink-800); margin: var(--s-7) 0; }
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--s-5) 0;
+    font-size: 0.9375rem;
+  }
+  .markdown-body th,
+  .markdown-body td {
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--ink-800);
+    text-align: left;
+  }
+  .markdown-body th { background: var(--ink-900); color: var(--ink-100); font-weight: 500; }
+  .markdown-body :not(pre) > code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background: var(--ink-850);
+    padding: 2px 6px;
+    border-radius: var(--r-xs);
+    color: var(--amber-400);
+  }
+  .markdown-body pre {
+    background: var(--ink-950);
+    padding: var(--s-4) var(--s-5);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--ink-200);
+    margin: 0;
+  }
+  .markdown-body pre code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+  .markdown-body .md-anchor {
+    margin-left: var(--s-2);
+    color: var(--ink-700);
+    text-decoration: none;
+    font-weight: 400;
+    opacity: 0;
+    transition: opacity 150ms var(--ease-out);
+  }
+  .markdown-body h1:hover .md-anchor,
+  .markdown-body h2:hover .md-anchor,
+  .markdown-body h3:hover .md-anchor,
+  .markdown-body h4:hover .md-anchor { opacity: 1; }
+
+  /* Code block wrapper with copy bar */
+  .code-block {
+    margin: var(--s-5) 0;
+    border: 1px solid var(--ink-800);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    background: var(--ink-950);
+  }
+  .code-block__bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--s-2) var(--s-4);
+    background: var(--ink-900);
+    border-bottom: 1px solid var(--ink-800);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .code-block__lang { color: var(--ink-500); }
+  .code-block__copy {
+    background: transparent;
+    border: 1px solid var(--ink-800);
+    border-radius: var(--r-xs);
+    color: var(--ink-300);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all 150ms var(--ease-out);
+  }
+  .code-block__copy:hover { border-color: var(--amber-400); color: var(--amber-400); }
+  .code-block__copy.is-copied { color: var(--success); border-color: var(--success); }
 }

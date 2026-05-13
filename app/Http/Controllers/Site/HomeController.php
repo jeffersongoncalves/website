@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Site;
 
 use App\Models\Project;
+use App\Support\SiteStats;
 use Illuminate\Contracts\View\View;
 
 class HomeController
@@ -18,7 +19,7 @@ class HomeController
 
         return view('site.home', [
             'featured'   => $featured,
-            'homeStats'  => config('site.home_stats'),
+            'homeStats'  => SiteStats::homeCards(),
             'stack'      => config('site.stack'),
         ]);
     }

@@ -79,6 +79,54 @@ Alpine.data('countUp', (initial = []) => ({
     },
 }));
 
+Alpine.data('markdownCopy', () => ({
+    enhance() {
+        const root = this.$el;
+        const blocks = root.querySelectorAll('pre > code');
+        blocks.forEach((code) => {
+            const pre = code.parentElement;
+            if (pre.dataset.copyEnhanced) return;
+            pre.dataset.copyEnhanced = '1';
+
+            const wrap = document.createElement('div');
+            wrap.className = 'code-block';
+
+            const bar = document.createElement('div');
+            bar.className = 'code-block__bar';
+
+            const lang = (Array.from(code.classList).find(c => c.startsWith('language-')) || '').replace('language-', '');
+            const label = document.createElement('span');
+            label.className = 'code-block__lang';
+            label.textContent = lang || 'code';
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'code-block__copy';
+            btn.textContent = 'copy';
+            btn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(code.innerText);
+                    btn.textContent = 'copied';
+                    btn.classList.add('is-copied');
+                    setTimeout(() => {
+                        btn.textContent = 'copy';
+                        btn.classList.remove('is-copied');
+                    }, 1500);
+                } catch (e) {
+                    btn.textContent = 'error';
+                }
+            });
+
+            bar.appendChild(label);
+            bar.appendChild(btn);
+
+            pre.parentNode.insertBefore(wrap, pre);
+            wrap.appendChild(bar);
+            wrap.appendChild(pre);
+        });
+    },
+}));
+
 Alpine.data('stickyHeader', () => ({
     scrolled: false,
     init() {

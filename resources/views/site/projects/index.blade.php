@@ -9,15 +9,15 @@
             <p class="lede mt-6">@lang('site.projects.sub')</p>
 
             @php
-                $counts = [
-                    ['v' => 81, 'label' => __('site.os.repos')],
-                    ['v' => 26, 'label' => __('site.os.plugins_filament')],
-                    ['v' => 15, 'label' => __('site.os.packages_laravel')],
-                    ['v' => 7,  'label' => __('site.os.starter_kits')],
+                $countItems = [
+                    ['v' => $counts['total'],    'label' => __('site.os.repos')],
+                    ['v' => $counts['filament'], 'label' => __('site.os.plugins_filament')],
+                    ['v' => $counts['laravel'],  'label' => __('site.os.packages_laravel')],
+                    ['v' => $counts['starter'],  'label' => __('site.os.starter_kits')],
                 ];
             @endphp
             <div class="flex flex-wrap gap-8 mt-8 mono-meta-sm">
-                @foreach($counts as $c)
+                @foreach($countItems as $c)
                     <span><span class="text-ink-100">{{ $c['v'] }}</span> {{ $c['label'] }}</span>
                 @endforeach
             </div>

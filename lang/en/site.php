@@ -86,6 +86,8 @@ return [
         'cta_body'          => 'All packages have CI, Pest tests and open issues tagged :code. Docs are in English, but the maintainer replies in Portuguese.',
         'good_first_issue'  => 'good first issue',
         'back_to_list'      => '← Back to projects',
+        'readme_unavailable' => 'README is currently unavailable. View it directly on GitHub:',
+        'version_label'      => 'Version:',
     ],
 
     'about' => [

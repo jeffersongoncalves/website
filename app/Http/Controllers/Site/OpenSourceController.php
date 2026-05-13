@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Site;
 
 use App\Models\Project;
+use App\Support\SiteStats;
 use Illuminate\Contracts\View\View;
 
 class OpenSourceController
@@ -16,7 +17,7 @@ class OpenSourceController
             ->get();
 
         return view('site.open-source', [
-            'osStats'  => config('site.os_stats'),
+            'osStats'  => SiteStats::osCards(),
             'topRepos' => $topRepos,
         ]);
     }

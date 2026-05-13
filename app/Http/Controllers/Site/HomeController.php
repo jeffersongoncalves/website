@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Http\Controllers\Site;
+
+use App\Models\Project;
+use Illuminate\Contracts\View\View;
+
+class HomeController
+{
+    public function index(): View
+    {
+        $featured = Project::query()
+            ->published()
+            ->featured()
+            ->orderByDesc('stars')
+            ->take(6)
+            ->get();
+
+        return view('site.home', [
+            'featured'   => $featured,
+            'homeStats'  => config('site.home_stats'),
+            'stack'      => config('site.stack'),
+        ]);
+    }
+}

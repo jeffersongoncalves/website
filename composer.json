@@ -23,7 +23,9 @@
         "joaopaulolndev/filament-edit-profile": "^3.0",
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
-        "livewire/livewire": "^4.0"
+        "livewire/livewire": "^4.0",
+        "spatie/laravel-sluggable": "^4.0",
+        "spatie/laravel-translatable": "^6.14"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^4.0",

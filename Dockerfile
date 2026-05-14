@@ -23,6 +23,7 @@ RUN install-php-extensions \
         curl \
         xml \
         pdo_mysql \
+        pdo_pgsql \
         pdo_sqlite \
         redis \
         sodium
@@ -61,7 +62,8 @@ LABEL org.opencontainers.image.source=${IMAGE_SOURCE}
 RUN apk add --no-cache \
         nginx \
         supervisor \
-        mysql-client
+        mysql-client \
+        postgresql-client
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -106,7 +108,7 @@ RUN set -eux; \
     php -r 'if (!function_exists("pcntl_fork")) { fwrite(STDERR, "FAIL: pcntl_fork missing\n"); exit(1); }'; \
     php -r 'if (!function_exists("posix_getpwuid")) { fwrite(STDERR, "FAIL: posix missing\n"); exit(1); }'; \
     php -r 'if (!function_exists("curl_exec")) { fwrite(STDERR, "FAIL: curl_exec disabled\n"); exit(1); }'; \
-    php -r 'foreach (["redis","pdo_mysql","pcntl"] as $e) if (!extension_loaded($e)) { fwrite(STDERR, "FAIL: ext $e missing\n"); exit(1); }'; \
+    php -r 'foreach (["redis","pdo_mysql","pdo_pgsql","pcntl"] as $e) if (!extension_loaded($e)) { fwrite(STDERR, "FAIL: ext $e missing\n"); exit(1); }'; \
     php -r 'if (!extension_loaded("Zend OPcache")) { fwrite(STDERR, "FAIL: Zend OPcache not loaded\n"); exit(1); }'; \
     php artisan --version; \
     php artisan list --raw | grep -q "^horizon " || { echo "FAIL: horizon commands not registered"; exit 1; }; \

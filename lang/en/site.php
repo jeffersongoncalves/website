@@ -45,7 +45,7 @@ return [
     'home' => [
         'badge_available' => 'Available for consulting',
         'hero_l1' => 'Building the Filament ecosystem',
-        'hero_l2' => 'in Portuguese.',
+        'hero_l2' => 'from Brazil.',
         'hero_sub' => 'Full Stack PHP Developer for 18 years. Maintainer of 20+ Filament plugins and Laravel packages focused on the Brazilian SaaS market.',
         'how_title' => 'How I work.',
         'how_body' => 'Focused on long-term PHP products: modular architecture, tests, multi-tenancy and impeccable DX. I contribute back with Filament plugins and Laravel packages that solve concrete problems in the Brazilian market — tax invoicing, PIX integrations, admin panels, recurring billing.',

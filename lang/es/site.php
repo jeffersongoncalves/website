@@ -45,7 +45,7 @@ return [
     'home' => [
         'badge_available' => 'Disponible para consultoría',
         'hero_l1' => 'Construyendo el ecosistema Filament',
-        'hero_l2' => 'en español.',
+        'hero_l2' => 'desde Brasil.',
         'hero_sub' => 'Full Stack PHP Developer desde hace 18 años. Mantenedor de 20+ plugins Filament y paquetes Laravel enfocados en el mercado SaaS latino.',
         'how_title' => 'Cómo trabajo.',
         'how_body' => 'Foco en productos PHP de largo plazo: arquitectura modular, tests, multi-tenancy y DX impecable. Contribuyo con plugins Filament y paquetes Laravel que resuelven problemas concretos del mercado latinoamericano — facturación electrónica, integraciones con pasarelas de pago, paneles administrativos, billing recurrente.',

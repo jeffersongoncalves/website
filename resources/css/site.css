@@ -419,6 +419,44 @@
   }
   .lang-dropdown-item:hover { background: var(--ink-850); color: var(--ink-100); }
   .lang-dropdown-item.is-active { color: var(--amber-400); }
+
+  /* Mobile navigation */
+  .mobile-nav { position: relative; }
+  .mobile-nav-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px;
+    background: transparent;
+    border: 1px solid var(--ink-800);
+    border-radius: var(--r-sm);
+    color: var(--ink-200);
+    cursor: pointer;
+    transition: border-color 150ms var(--ease-out), color 150ms var(--ease-out);
+  }
+  .mobile-nav-toggle:hover { border-color: var(--ink-700); color: var(--ink-100); }
+  .mobile-nav-toggle[aria-expanded="true"] { border-color: var(--amber-400); color: var(--amber-400); }
+  .mobile-nav-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 220px;
+    display: flex; flex-direction: column;
+    background: var(--ink-900);
+    border: 1px solid var(--ink-800);
+    border-radius: var(--r-md);
+    padding: 6px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    z-index: 100;
+  }
+  .mobile-nav-link {
+    padding: 11px 12px;
+    border-radius: var(--r-xs);
+    font-size: 0.9375rem;
+    color: var(--ink-300);
+    text-decoration: none;
+    transition: background 120ms var(--ease-out), color 120ms var(--ease-out);
+  }
+  .mobile-nav-link:hover { background: var(--ink-850); color: var(--ink-100); }
+
   [x-cloak] { display: none !important; }
 
   /* Project & post card */
@@ -698,4 +736,30 @@
   }
   .code-block__copy:hover { border-color: var(--amber-400); color: var(--amber-400); }
   .code-block__copy.is-copied { color: var(--success); border-color: var(--success); }
+}
+
+/* ============================================================================
+   Mobile — tighten spacing and scale down the type for small screens.
+   ============================================================================ */
+@media (max-width: 640px) {
+  .wrap,
+  .wrap-narrow,
+  .wrap-prose    { padding-inline: var(--s-5); }   /* 32px -> 24px */
+
+  .section       { padding: var(--s-8) 0; }        /* 96px -> 64px */
+  .section-first { padding-top: var(--s-7); }      /* 96px -> 48px */
+
+  h1, .h-hero    { font-size: clamp(34px, 11vw, 48px); }
+  h2, .h-section { font-size: clamp(28px, 8vw, 38px); }
+  .h-page        { font-size: clamp(32px, 10vw, 46px); }
+  h3             { font-size: clamp(22px, 6vw, 28px); }
+
+  .lede          { font-size: 1.0625rem; }
+  .body-text     { font-size: 1rem; }
+
+  .card          { padding: var(--s-4); }
+  .card-pad-lg   { padding: var(--s-5); }
+
+  /* Timeline stacks vertically — year above the entry, not beside it */
+  .tl-row        { grid-template-columns: 1fr; gap: var(--s-2); }
 }

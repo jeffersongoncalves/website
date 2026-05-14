@@ -1,0 +1,83 @@
+# Version control
+.git
+.github
+.gitignore
+.gitattributes
+
+# Dependencies (copiadas dos build stages)
+vendor
+node_modules
+npm-debug.log*
+yarn-error.log
+
+# Laravel runtime data (preserva so a estrutura de diretorios)
+storage/app/*
+!storage/app/.gitkeep
+!storage/app/public/.gitkeep
+storage/framework/cache/*
+!storage/framework/cache/.gitkeep
+storage/framework/sessions/*
+!storage/framework/sessions/.gitkeep
+storage/framework/views/*
+!storage/framework/views/.gitkeep
+storage/logs/*
+!storage/logs/.gitkeep
+bootstrap/cache/*.php
+!bootstrap/cache/.gitignore
+
+# SQLite local DB (prod usa MySQL via env)
+database/database.sqlite
+
+# Tests (nao precisam na imagem de producao)
+tests/
+phpunit.xml
+.phpunit.result.cache
+.phpunit.cache
+
+# Env e secrets
+.env
+.env.*
+!.env.example
+auth.json
+
+# Dev tooling / quality
+phpstan.neon
+phpstan.neon.dist
+phpstan-baseline.neon
+pint.json
+.php-cs-fixer.cache
+_ide_helper.php
+.phpstorm.meta.php
+
+# Claude / IDE / OS / hosting helpers
+.ai/
+.claude/
+.idea/
+.vscode/
+.zed/
+.nova/
+.fleet/
+herd.yml
+devhub.yml
+.devhub.json
+.DS_Store
+*.swp
+*.swo
+Thumbs.db
+
+# Logs
+*.log
+
+# Frontend runtime artefacts (public/build E versionado no git -> entra via COPY . .)
+public/hot
+public/storage
+
+# Docs (nao precisam no runtime)
+README.md
+CHANGELOG.md
+CLAUDE.md
+
+# Docker files (nao precisam dentro do container)
+docker-compose*.yml
+Dockerfile
+.dockerignore

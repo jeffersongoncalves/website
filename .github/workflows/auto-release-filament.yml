@@ -60,12 +60,14 @@ jobs:
             echo "updated=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create GitHub Release
+      - name: Create and push release tag
+        # Empurra a tag release-X.Y.Z. O push da tag dispara docker-build.yml,
+        # que builda/publica a imagem e cria a GitHub Release. Aqui criamos
+        # apenas a tag para nao duplicar a release.
         if: steps.check.outputs.updated == 'true'
         run: |
-          gh release create "${{ steps.current.outputs.version }}" \
-            --target main \
-            --title "${{ steps.current.outputs.version }}" \
-            --notes "Bump Filament to v${{ steps.current.outputs.version }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG="release-${{ steps.current.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push origin "$TAG"

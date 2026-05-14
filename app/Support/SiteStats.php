@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 class SiteStats
 {
     private const CACHE_KEY = 'site.stats';
+
     private const TTL_HOURS = 6;
 
     /**
@@ -70,20 +71,20 @@ class SiteStats
     {
         $base = Project::query()->published();
 
-        $stars     = (int) (clone $base)->sum('stars');
+        $stars = (int) (clone $base)->sum('stars');
         $downloads = (int) (clone $base)->sum('downloads');
 
         $github = self::fetchGithubUser('jeffersongoncalves');
 
         return [
-            'repos'           => (int) (clone $base)->count(),
-            'filament'        => (int) (clone $base)->byCategory(ProjectCategory::FilamentPlugin)->count(),
-            'laravel'         => (int) (clone $base)->byCategory(ProjectCategory::LaravelPackage)->count(),
-            'starter'         => (int) (clone $base)->byCategory(ProjectCategory::StarterKit)->count(),
-            'tool'            => (int) (clone $base)->byCategory(ProjectCategory::Tool)->count(),
-            'stars'           => $stars,
-            'downloads'       => $downloads,
-            'followers'       => $github['followers'] ?? 0,
+            'repos' => (int) (clone $base)->count(),
+            'filament' => (int) (clone $base)->byCategory(ProjectCategory::FilamentPlugin)->count(),
+            'laravel' => (int) (clone $base)->byCategory(ProjectCategory::LaravelPackage)->count(),
+            'starter' => (int) (clone $base)->byCategory(ProjectCategory::StarterKit)->count(),
+            'tool' => (int) (clone $base)->byCategory(ProjectCategory::Tool)->count(),
+            'stars' => $stars,
+            'downloads' => $downloads,
+            'followers' => $github['followers'] ?? 0,
             'public_sponsors' => self::fetchSponsorCount('jeffersongoncalves'),
         ];
     }
@@ -106,7 +107,7 @@ class SiteStats
         }
 
         return [
-            'followers'    => (int) ($response->json('followers') ?? 0),
+            'followers' => (int) ($response->json('followers') ?? 0),
             'public_repos' => (int) ($response->json('public_repos') ?? 0),
         ];
     }
@@ -132,10 +133,10 @@ class SiteStats
         $response = Http::timeout(8)
             ->withHeaders([
                 'Authorization' => "Bearer {$token}",
-                'User-Agent'    => 'jeffersongoncalves-site',
+                'User-Agent' => 'jeffersongoncalves-site',
             ])
             ->post('https://api.github.com/graphql', [
-                'query'     => $query,
+                'query' => $query,
                 'variables' => ['login' => $login],
             ]);
 

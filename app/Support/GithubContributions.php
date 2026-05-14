@@ -54,10 +54,10 @@ class GithubContributions
         $response = Http::timeout(8)
             ->withHeaders([
                 'Authorization' => "Bearer {$token}",
-                'User-Agent'    => 'jeffersongoncalves-site',
+                'User-Agent' => 'jeffersongoncalves-site',
             ])
             ->post('https://api.github.com/graphql', [
-                'query'     => $query,
+                'query' => $query,
                 'variables' => ['login' => $login],
             ]);
 
@@ -94,11 +94,11 @@ class GithubContributions
     private static function levelFromEnum(string $enum): int
     {
         return match ($enum) {
-            'FIRST_QUARTILE'  => 1,
+            'FIRST_QUARTILE' => 1,
             'SECOND_QUARTILE' => 2,
-            'THIRD_QUARTILE'  => 3,
+            'THIRD_QUARTILE' => 3,
             'FOURTH_QUARTILE' => 4,
-            default           => 0,
+            default => 0,
         };
     }
 }

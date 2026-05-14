@@ -6,7 +6,7 @@ use Illuminate\Contracts\View\View;
 
 class SponsorsController
 {
-    public function index(): View
+    public function __invoke(): View
     {
         return view('site.sponsors');
     }

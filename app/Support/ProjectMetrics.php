@@ -20,7 +20,7 @@ class ProjectMetrics
 
         $downloads = self::fetchDownloads($project);
         if ($downloads !== null && $downloads !== $project->downloads) {
-            $project->downloads       = $downloads;
+            $project->downloads = $downloads;
             $project->downloads_label = self::formatDownloads($downloads);
             $changed = true;
         }
@@ -53,6 +53,7 @@ class ProjectMetrics
 
         if (! $response->successful()) {
             Log::warning('GitHub API failed', ['repo' => $repo, 'status' => $response->status()]);
+
             return null;
         }
 
@@ -131,10 +132,10 @@ class ProjectMetrics
     public static function formatDownloads(int $n): string
     {
         if ($n >= 1_000_000) {
-            return rtrim(rtrim(number_format($n / 1_000_000, 1, '.', ''), '0'), '.') . 'M';
+            return rtrim(rtrim(number_format($n / 1_000_000, 1, '.', ''), '0'), '.').'M';
         }
         if ($n >= 1_000) {
-            return rtrim(rtrim(number_format($n / 1_000, 1, '.', ''), '0'), '.') . 'k';
+            return rtrim(rtrim(number_format($n / 1_000, 1, '.', ''), '0'), '.').'k';
         }
 
         return (string) $n;

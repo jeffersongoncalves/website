@@ -22,7 +22,7 @@ class SyncProjectMetrics extends Command
         }
 
         $projects = $query->get();
-        $bar      = $this->output->createProgressBar($projects->count());
+        $bar = $this->output->createProgressBar($projects->count());
         $bar->start();
 
         $changed = 0;

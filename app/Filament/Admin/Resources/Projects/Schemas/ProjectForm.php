@@ -67,6 +67,7 @@ class ProjectForm
                             ->tabs([
                                 Tab::make('PT')->schema(self::translatableFields('pt')),
                                 Tab::make('EN')->schema(self::translatableFields('en')),
+                                Tab::make('ES')->schema(self::translatableFields('es')),
                             ]),
                     ]),
 

@@ -25,6 +25,7 @@ class ProjectSeeder extends Seeder
 
         if ($data === null) {
             $this->command?->warn('plugins.json not found — skipping ProjectSeeder.');
+
             return;
         }
 
@@ -42,56 +43,56 @@ class ProjectSeeder extends Seeder
     {
         foreach (array_merge($data['startkit']['featured'] ?? [], $data['startkit']['legacy'] ?? []) as $row) {
             yield [
-                'package'  => $row['package'],
-                'title'    => $row['title'],
+                'package' => $row['package'],
+                'title' => $row['title'],
                 'category' => ProjectCategory::StarterKit,
                 'versions' => $this->starterKitVersions($row['package']),
-                'stack'    => ['Laravel', 'Filament'],
-                'extra'    => [],
+                'stack' => ['Laravel', 'Filament'],
+                'extra' => [],
             ];
         }
 
         foreach (array_merge($data['filament']['plugins'] ?? [], $data['filament']['collaborator'] ?? []) as $row) {
             yield [
-                'package'  => $row['package'],
-                'title'    => $row['title'],
+                'package' => $row['package'],
+                'title' => $row['title'],
                 'category' => ProjectCategory::FilamentPlugin,
                 'versions' => $this->filamentVersions($row),
-                'stack'    => ['Filament'],
-                'extra'    => [],
+                'stack' => ['Filament'],
+                'extra' => [],
             ];
         }
 
         foreach ($data['laravel'] ?? [] as $row) {
             yield [
-                'package'  => $row['package'],
-                'title'    => $row['title'],
+                'package' => $row['package'],
+                'title' => $row['title'],
                 'category' => ProjectCategory::LaravelPackage,
                 'versions' => ['Laravel 10/11/12'],
-                'stack'    => ['Laravel'],
-                'extra'    => [],
+                'stack' => ['Laravel'],
+                'extra' => [],
             ];
         }
 
         foreach ($data['cli'] ?? [] as $row) {
             yield [
-                'package'  => $row['package'],
-                'title'    => $row['title'],
+                'package' => $row['package'],
+                'title' => $row['title'],
                 'category' => ProjectCategory::Tool,
                 'versions' => [],
-                'stack'    => ['CLI', 'PHP'],
-                'extra'    => [],
+                'stack' => ['CLI', 'PHP'],
+                'extra' => [],
             ];
         }
 
         foreach ($data['jetbrains'] ?? [] as $row) {
             yield [
-                'package'  => $row['package'],
-                'title'    => $row['title'],
+                'package' => $row['package'],
+                'title' => $row['title'],
                 'category' => ProjectCategory::Tool,
                 'versions' => [],
-                'stack'    => ['JetBrains', 'IDE'],
-                'extra'    => ['jetbrainsId' => $row['jetbrainsId'] ?? null],
+                'stack' => ['JetBrains', 'IDE'],
+                'extra' => ['jetbrainsId' => $row['jetbrainsId'] ?? null],
             ];
         }
     }
@@ -99,19 +100,19 @@ class ProjectSeeder extends Seeder
     private function upsert(array $entry, int $order): void
     {
         [$vendor, $repoName] = explode('/', $entry['package'], 2);
-        $githubUrl    = "https://github.com/{$vendor}/{$repoName}";
-        $isJetBrains  = ! empty($entry['extra']['jetbrainsId']);
+        $githubUrl = "https://github.com/{$vendor}/{$repoName}";
+        $isJetBrains = ! empty($entry['extra']['jetbrainsId']);
         $packagistUrl = $isJetBrains ? null : "https://packagist.org/packages/{$entry['package']}";
 
         $project = Project::query()->firstOrNew(['slug' => $repoName]);
 
         // Structural fields (always synced from plugins.json — source of truth)
-        $project->name          = $repoName;
-        $project->repo          = $repoName;
-        $project->category      = $entry['category']->value;
-        $project->versions      = $entry['versions'];
-        $project->stack         = $entry['stack'];
-        $project->github_url    = $githubUrl;
+        $project->name = $repoName;
+        $project->repo = $repoName;
+        $project->category = $entry['category']->value;
+        $project->versions = $entry['versions'];
+        $project->stack = $entry['stack'];
+        $project->github_url = $githubUrl;
         $project->packagist_url = $packagistUrl;
 
         if ($isJetBrains) {
@@ -120,14 +121,14 @@ class ProjectSeeder extends Seeder
 
         // Default-only fields (set on insert; never overwrite editor changes)
         if (! $project->exists) {
-            $project->title        = ['pt' => $entry['title'], 'en' => $entry['title']];
-            $project->description  = ['pt' => $entry['title'], 'en' => $entry['title']];
-            $project->stars        = 0;
-            $project->downloads    = 0;
-            $project->license      = 'MIT';
-            $project->status       = ProjectStatus::Published->value;
-            $project->featured     = in_array($repoName, self::FEATURED_REPOS, true);
-            $project->sort_order   = $order;
+            $project->title = ['pt' => $entry['title'], 'en' => $entry['title']];
+            $project->description = ['pt' => $entry['title'], 'en' => $entry['title']];
+            $project->stars = 0;
+            $project->downloads = 0;
+            $project->license = 'MIT';
+            $project->status = ProjectStatus::Published->value;
+            $project->featured = in_array($repoName, self::FEATURED_REPOS, true);
+            $project->sort_order = $order;
             $project->published_at = now();
         }
 

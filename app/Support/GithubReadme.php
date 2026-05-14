@@ -20,7 +20,7 @@ class GithubReadme
             return null;
         }
 
-        $cacheKey = "readme.html.{$repo}." . ($ref ?: 'default');
+        $cacheKey = "readme.html.{$repo}.".($ref ?: 'default');
 
         return Cache::remember($cacheKey, now()->addMinutes($ttlMinutes), function () use ($repo, $ref) {
             $result = self::fetchMarkdown($repo, $ref);
@@ -52,7 +52,7 @@ class GithubReadme
             return null;
         }
 
-        return ($idx + 1) . '.x';
+        return ($idx + 1).'.x';
     }
 
     public static function repoFromUrl(?string $url): ?string
@@ -144,7 +144,7 @@ class GithubReadme
     private static function rewriteRelativeAssets(string $markdown, string $repo, ?string $ref = null): string
     {
         $branch = $ref ?: 'HEAD';
-        $base   = "https://raw.githubusercontent.com/{$repo}/{$branch}/";
+        $base = "https://raw.githubusercontent.com/{$repo}/{$branch}/";
 
         return preg_replace_callback(
             '~(!\[[^\]]*\]\()([^)]+)(\))~',
@@ -155,7 +155,7 @@ class GithubReadme
                     return $m[0];
                 }
 
-                return $m[1] . $base . ltrim($src, './') . $m[3];
+                return $m[1].$base.ltrim($src, './').$m[3];
             },
             $markdown
         );
@@ -164,10 +164,10 @@ class GithubReadme
     private static function renderMarkdown(string $markdown): string
     {
         $environment = new Environment([
-            'html_input'         => 'allow',
+            'html_input' => 'allow',
             'allow_unsafe_links' => false,
-            'heading_permalink'  => [
-                'symbol'   => '#',
+            'heading_permalink' => [
+                'symbol' => '#',
                 'html_class' => 'md-anchor',
             ],
         ]);

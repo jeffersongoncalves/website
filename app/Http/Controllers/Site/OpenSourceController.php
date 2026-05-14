@@ -9,7 +9,7 @@ use Illuminate\Contracts\View\View;
 
 class OpenSourceController
 {
-    public function index(): View
+    public function __invoke(): View
     {
         $topRepos = Project::query()
             ->published()
@@ -18,8 +18,8 @@ class OpenSourceController
             ->get();
 
         return view('site.open-source', [
-            'osStats'       => SiteStats::osCards(),
-            'topRepos'      => $topRepos,
+            'osStats' => SiteStats::osCards(),
+            'topRepos' => $topRepos,
             'contributions' => GithubContributions::calendar('jeffersongoncalves'),
         ]);
     }

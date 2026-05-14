@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
 {
-    public const SUPPORTED = ['pt', 'en'];
+    public const SUPPORTED = ['pt', 'en', 'es'];
 
     public const COOKIE_NAME = 'locale';
 

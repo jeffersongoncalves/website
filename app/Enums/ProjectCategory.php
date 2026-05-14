@@ -18,9 +18,9 @@ enum ProjectCategory: string implements HasColor, HasLabel
         return match ($this) {
             self::FilamentPlugin => __('Filament Plugin'),
             self::LaravelPackage => __('Laravel Package'),
-            self::StarterKit     => __('Starter Kit'),
-            self::Saas           => __('SaaS'),
-            self::Tool           => __('Tool'),
+            self::StarterKit => __('Starter Kit'),
+            self::Saas => __('SaaS'),
+            self::Tool => __('Tool'),
         };
     }
 
@@ -29,9 +29,9 @@ enum ProjectCategory: string implements HasColor, HasLabel
         return match ($this) {
             self::FilamentPlugin => 'warning',
             self::LaravelPackage => 'danger',
-            self::StarterKit     => 'success',
-            self::Saas           => 'info',
-            self::Tool           => 'gray',
+            self::StarterKit => 'success',
+            self::Saas => 'info',
+            self::Tool => 'gray',
         };
     }
 }

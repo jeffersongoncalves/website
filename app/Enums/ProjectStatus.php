@@ -17,27 +17,27 @@ enum ProjectStatus: string implements HasColor, HasIcon, HasLabel
     public function getLabel(): string
     {
         return match ($this) {
-            self::Draft     => __('Draft'),
+            self::Draft => __('Draft'),
             self::Published => __('Published'),
-            self::Archived  => __('Archived'),
+            self::Archived => __('Archived'),
         };
     }
 
     public function getColor(): string
     {
         return match ($this) {
-            self::Draft     => 'gray',
+            self::Draft => 'gray',
             self::Published => 'success',
-            self::Archived  => 'warning',
+            self::Archived => 'warning',
         };
     }
 
     public function getIcon(): BackedEnum
     {
         return match ($this) {
-            self::Draft     => Heroicon::PencilSquare,
+            self::Draft => Heroicon::PencilSquare,
             self::Published => Heroicon::CheckBadge,
-            self::Archived  => Heroicon::ArchiveBox,
+            self::Archived => Heroicon::ArchiveBox,
         };
     }
 }

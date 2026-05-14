@@ -4,13 +4,14 @@
 .gitignore
 .gitattributes
 
-# Dependencies (copiadas dos build stages)
+# Dependencies (copied from build stages)
 vendor
 node_modules
+packages/*/vendor
 npm-debug.log*
 yarn-error.log
 
-# Laravel runtime data (preserva so a estrutura de diretorios)
+# Laravel runtime data (preserve directory structure only)
 storage/app/*
 !storage/app/.gitkeep
 !storage/app/public/.gitkeep
@@ -25,41 +26,27 @@ storage/logs/*
 bootstrap/cache/*.php
 !bootstrap/cache/.gitignore
 
-# SQLite local DB (prod usa PostgreSQL via env)
-database/database.sqlite
-
-# Tests (nao precisam na imagem de producao)
+# Tests (not needed in production image)
 tests/
 phpunit.xml
 .phpunit.result.cache
-.phpunit.cache
 
-# Env e secrets
+# Env and secrets
 .env
 .env.*
 !.env.example
-auth.json
+secrets.txt
 
 # Dev tooling / quality
 phpstan.neon
 phpstan.neon.dist
-phpstan-baseline.neon
-pint.json
 .php-cs-fixer.cache
-_ide_helper.php
-.phpstorm.meta.php
 
-# Claude / IDE / OS / hosting helpers
+# Claude / IDE / OS
 .ai/
 .claude/
 .idea/
 .vscode/
-.zed/
-.nova/
-.fleet/
-herd.yml
-devhub.yml
-.devhub.json
 .DS_Store
 *.swp
 *.swo
@@ -68,16 +55,16 @@ Thumbs.db
 # Logs
 *.log
 
-# Frontend runtime artefacts (public/build E versionado no git -> entra via COPY . .)
+# Frontend runtime artefacts (public/build é versionado no git -> entra via COPY . .)
 public/hot
 public/storage
 
-# Docs (nao precisam no runtime)
+# Docs (not needed in runtime)
 README.md
 CHANGELOG.md
 CLAUDE.md
 
-# Docker files (nao precisam dentro do container)
+# Docker files (not needed inside container)
 docker-compose*.yml
 Dockerfile
 .dockerignore

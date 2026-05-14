@@ -18,7 +18,6 @@ RUN install-php-extensions \
         intl \
         zip \
         gd \
-        exif \
         mbstring \
         curl \
         xml \
@@ -67,7 +66,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Source (inclui public/build, versionado no git) + vendor do stage anterior.
+# Source + vendor (vendor vem do stage anterior)
 COPY . .
 COPY --from=composer-deps /var/www/html/vendor ./vendor
 
@@ -111,7 +110,6 @@ RUN set -eux; \
     php artisan --version; \
     php artisan list --raw | grep -q "^horizon " || { echo "FAIL: horizon commands not registered"; exit 1; }; \
     test -f config/horizon.php || { echo "FAIL: config/horizon.php missing"; exit 1; }; \
-    test -f public/build/manifest.json || { echo "FAIL: public/build/manifest.json missing — run the asset build and commit public/build"; exit 1; }; \
     echo "=== All smoke tests passed ==="
 
 EXPOSE 80

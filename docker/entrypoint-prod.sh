@@ -24,9 +24,6 @@ php artisan route:clear || true
 php artisan view:clear || true
 php artisan event:clear || true
 
-# Symlink public/storage -> storage/app/public (uploads do Filament).
-php artisan storage:link || true
-
 php artisan migrate --force || true
 
 exec supervisord -c /etc/supervisor/conf.d/supervisord.conf

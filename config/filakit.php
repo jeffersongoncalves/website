@@ -26,7 +26,6 @@ return [
                 '192' => '4.0',
             ],
         ],
-        'logo' => 'resources/images/logo-filakit.png',
         'favicon' => 'resources/favicon/favicon.ico',
     ],
 ];

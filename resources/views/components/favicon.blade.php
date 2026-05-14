@@ -22,4 +22,4 @@
 <meta property="og:type" content="website" data-rh="true"/>
 <meta property="og:title" content="{{ config('filakit.favicon.manifest.name') }}" data-rh="true"/>
 <meta property="og:description" content="{{ config('filakit.favicon.manifest.name') }}" data-rh="true"/>
-<meta property="og:image" content="{{ Vite::asset(config('filakit.favicon.logo')) }}" data-rh="true"/>
+<meta property="og:image" content="{{ Vite::asset('resources/images/github-og-'.app()->getLocale().'.png') }}" data-rh="true"/>

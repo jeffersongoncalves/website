@@ -14,9 +14,6 @@ abstract class FaviconSupport
         if (config('filakit.favicon.enabled', false)) {
             Route::any('manifest.json', fn () => self::getManifestJson());
             Route::any('browserconfig.xml', fn () => self::getBrowserConfigXml());
-            if (! empty(config('filakit.favicon.logo'))) {
-                Route::any('logo.png', fn () => self::getLogo());
-            }
             if (! empty(config('filakit.favicon.favicon'))) {
                 Route::any('favicon.ico', fn () => self::getFavicon());
             }
@@ -69,11 +66,6 @@ abstract class FaviconSupport
 </browserconfig>";
 
         return response($xml, 200, ['Content-Type' => 'application/xml']);
-    }
-
-    private static function getLogo(): Response
-    {
-        return response(Vite::content(config('filakit.logo')), 200, ['Content-Type' => 'image/png']);
     }
 
     private static function getFavicon(): Response

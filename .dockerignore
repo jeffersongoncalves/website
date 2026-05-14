@@ -25,7 +25,7 @@ storage/logs/*
 bootstrap/cache/*.php
 !bootstrap/cache/.gitignore
 
-# SQLite local DB (prod usa MySQL via env)
+# SQLite local DB (prod usa PostgreSQL via env)
 database/database.sqlite
 
 # Tests (nao precisam na imagem de producao)

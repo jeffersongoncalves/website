@@ -1,6 +1,15 @@
 <?php
 
 return [
+    'seo' => [
+        'default_description' => 'Jefferson Gonçalves — Full Stack PHP Developer. 18 years building with Laravel, Filament and the TALL stack. Maintainer of 20+ Filament plugins and Laravel packages.',
+        'home' => 'Full Stack PHP Developer for 18 years. Maintainer of 20+ Filament plugins and Laravel packages focused on the Brazilian SaaS market.',
+        'about' => 'Jefferson Gonçalves — 18 years as a Full Stack PHP Developer. Trajectory, principles and the stack behind 20+ open source Filament plugins and Laravel packages.',
+        'projects' => 'Filament plugins, Laravel packages and open source starter kits actively maintained — all MIT-licensed, with CI, tests and regular releases.',
+        'open_source' => '20+ Filament plugins, 15 Laravel packages, 7 starter kits. Open source contributions by the numbers — stars, downloads and followers.',
+        'sponsors' => 'Sponsor the work — fund new releases, Portuguese documentation and support for the Brazilian Laravel and Filament community.',
+    ],
+
     'nav' => [
         'about' => 'About',
         'projects' => 'Projects',

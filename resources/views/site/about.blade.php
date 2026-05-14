@@ -1,6 +1,6 @@
 @php $locale = app()->getLocale(); @endphp
 
-<x-site.layouts.app :title="__('site.about.title_1') . ' ' . __('site.about.title_2')">
+<x-site.layouts.app :title="__('site.about.title_1') . ' ' . __('site.about.title_2')" :description="__('site.seo.about')">
 
     <section class="section section-first">
         <div class="wrap">

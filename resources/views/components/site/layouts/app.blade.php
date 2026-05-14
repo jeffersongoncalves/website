@@ -1,3 +1,8 @@
+@props([
+    'title' => null,
+    'description' => null,
+    'breadcrumbs' => null,
+])
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
@@ -6,6 +11,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ ($title ?? '') ? ($title . ' · ') : '' }}{{ config('app.name') }}</title>
     <x-favicon/>
+    <x-site.seo :title="$title" :description="$description" :breadcrumbs="$breadcrumbs"/>
     @vite(['resources/css/site.css', 'resources/js/site.js'])
     @stack('head')
 </head>

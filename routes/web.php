@@ -6,6 +6,7 @@ use App\Http\Controllers\Site\OpenSourceController;
 use App\Http\Controllers\Site\ProjectController;
 use App\Http\Controllers\Site\ProjectViewController;
 use App\Http\Controllers\Site\SponsorsController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,8 @@ Route::get('/', function () {
 
     return redirect("/{$locale}");
 });
+
+Route::get('sitemap.xml', SitemapController::class)->name('sitemap');
 
 Route::prefix('{locale}')
     ->where(['locale' => implode('|', SetLocale::SUPPORTED)])

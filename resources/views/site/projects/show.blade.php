@@ -3,9 +3,14 @@
     $title   = $project->getTranslation('title', $locale, false) ?: $project->name;
     $desc    = $project->getTranslation('description', $locale, false) ?: $project->getTranslation('description', 'pt', false);
     $content = $project->getTranslation('content', $locale, false) ?: $project->getTranslation('content', 'pt', false);
+
+    $breadcrumbs = [
+        ['name' => __('site.nav.projects'), 'url' => route('projects.index', ['locale' => $locale])],
+        ['name' => $title, 'url' => route('projects.show', ['locale' => $locale, 'slug' => $project->slug])],
+    ];
 @endphp
 
-<x-site.layouts.app :title="$project->name" :description="$desc">
+<x-site.layouts.app :title="$project->name" :description="$desc" :breadcrumbs="$breadcrumbs">
 
     <article class="section" style="border-top:none;padding-top:var(--s-9);">
         <div class="wrap" style="max-width:880px;">

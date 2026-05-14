@@ -3,7 +3,7 @@
     $statsJson = collect($osStats)->map(fn ($s) => array_merge($s, ['label' => __('site.' . $s['label_key'])]))->values()->toJson();
 @endphp
 
-<x-site.layouts.app :title="__('site.os.page_title')">
+<x-site.layouts.app :title="__('site.os.page_title')" :description="__('site.seo.open_source')">
 
     <section class="section section-first">
         <div class="wrap">

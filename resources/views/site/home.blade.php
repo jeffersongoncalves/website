@@ -3,7 +3,7 @@
     $statsJson = collect($homeStats)->map(fn ($s) => array_merge($s, ['label' => __('site.' . $s['label_key'])]))->values()->toJson();
 @endphp
 
-<x-site.layouts.app :title="__('site.home.hero_l1')">
+<x-site.layouts.app :title="__('site.home.hero_l1')" :description="__('site.seo.home')">
 
     <section class="section section-first" id="hero">
         <div class="wrap">

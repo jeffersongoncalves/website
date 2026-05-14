@@ -11,18 +11,32 @@ class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
+     *
+     * Test Admin / Test User are local/dev fixtures only — never seeded in
+     * production. Model::create() is used instead of factories: factories
+     * depend on fakerphp/faker (require-dev), absent from the production image.
      */
     public function run(): void
     {
-        Admin::factory()->create([
-            'name' => 'Test Admin',
-            'email' => 'admin@filakit.com',
-        ]);
+        if (! app()->isProduction()) {
+            $admin = Admin::query()->create([
+                'name' => 'Test Admin',
+                'email' => 'admin@filakit.com',
+                'password' => 'password',
+                'status' => true,
+            ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'user@filakit.com',
-        ]);
+            $admin->markEmailAsVerified();
+
+            $user = User::query()->create([
+                'name' => 'Test User',
+                'email' => 'user@filakit.com',
+                'password' => 'password',
+                'status' => true,
+            ]);
+
+            $user->markEmailAsVerified();
+        }
 
         $this->call([
             ProjectSeeder::class,

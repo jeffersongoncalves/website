@@ -6,11 +6,10 @@
 
 @php
     $locale = app()->getLocale();
-    $shortLocale = \App\Support\LocaleSupport::short($locale);
     $description = $description ?: __('site.seo.default_description');
     $fullTitle = ($title ? $title . ' · ' : '') . config('app.name');
     $canonical = url()->current();
-    $ogImage = \Illuminate\Support\Facades\Vite::asset('resources/images/github-og-' . $shortLocale . '.png');
+    $ogImage = \Illuminate\Support\Facades\Vite::asset('resources/images/github-og-' . \App\Support\LocaleSupport::short() . '.png');
 
     $routeName = request()->route()?->getName();
     $routeParams = request()->route()?->parameters() ?? [];

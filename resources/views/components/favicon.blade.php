@@ -19,4 +19,4 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
 <meta content="{{ config('filakit.favicon.manifest.name') }}" property="og:site_name"/>
 <meta property="og:type" content="website" data-rh="true"/>
-<meta property="og:image" content="{{ Vite::asset('resources/images/github-og-'.app()->getLocale().'.png') }}" data-rh="true"/>
+<meta property="og:image" content="{{ Vite::asset('resources/images/github-og-'.explode('_', app()->getLocale())[0].'.png') }}" data-rh="true"/>

@@ -11,6 +11,13 @@ return [
         'title' => 'My Profile',
     ],
 
+    'login' => [
+        'eyebrow' => 'restricted access',
+        'whoami_unauth' => 'guest · not authenticated',
+        'secure_connection' => 'secure connection',
+        'back_to_site' => 'back to site',
+    ],
+
     'status' => [
         'label' => 'status',
         'production' => 'production',

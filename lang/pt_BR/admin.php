@@ -11,6 +11,13 @@ return [
         'title' => 'Meu Perfil',
     ],
 
+    'login' => [
+        'eyebrow' => 'acesso restrito',
+        'whoami_unauth' => 'guest · não autenticado',
+        'secure_connection' => 'conexão segura',
+        'back_to_site' => 'voltar ao site',
+    ],
+
     'status' => [
         'label' => 'status',
         'production' => 'produção',

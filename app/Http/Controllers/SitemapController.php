@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Middleware\SetLocale;
 use App\Models\Project;
 use Illuminate\Http\Response;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\Tags\Url;
 
 class SitemapController
 {
@@ -17,45 +18,26 @@ class SitemapController
 
     public function __invoke(): Response
     {
-        $entries = [];
+        $sitemap = Sitemap::create();
 
         foreach (['home', 'about', 'projects.index', 'open-source', 'sponsors'] as $name) {
-            $entries[] = $this->alternates($name, []);
+            $this->addAlternates($sitemap, $name);
         }
 
-        foreach (Project::query()->published()->orderBy('slug')->pluck('slug') as $slug) {
-            $entries[] = $this->alternates('projects.show', ['slug' => $slug]);
-        }
+        Project::query()->published()->orderBy('slug')->pluck('slug')->each(
+            fn (string $slug) => $this->addAlternates($sitemap, 'projects.show', ['slug' => $slug])
+        );
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
-            .'xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
-
-        foreach ($entries as $alternates) {
-            foreach ($alternates as $loc) {
-                $xml .= "  <url>\n";
-                $xml .= '    <loc>'.e($loc)."</loc>\n";
-                foreach ($alternates as $code => $href) {
-                    $xml .= '    <xhtml:link rel="alternate" hreflang="'.self::HREFLANGS[$code]
-                        .'" href="'.e($href).'"/>'."\n";
-                }
-                $xml .= '    <xhtml:link rel="alternate" hreflang="x-default" href="'.e($alternates['en']).'"/>'."\n";
-                $xml .= "  </url>\n";
-            }
-        }
-
-        $xml .= '</urlset>';
-
-        return response($xml, 200, ['Content-Type' => 'application/xml']);
+        return response($sitemap->render(), 200, ['Content-Type' => 'application/xml']);
     }
 
     /**
-     * Build the locale => absolute URL map for one route.
+     * Add one localized URL per supported locale, each carrying the full
+     * `<xhtml:link rel="alternate">` set + x-default for `en`.
      *
      * @param  array<string, string>  $params
-     * @return array<string, string>
      */
-    private function alternates(string $routeName, array $params): array
+    private function addAlternates(Sitemap $sitemap, string $routeName, array $params = []): void
     {
         $alternates = [];
 
@@ -63,6 +45,16 @@ class SitemapController
             $alternates[$locale] = route($routeName, array_merge($params, ['locale' => $locale]));
         }
 
-        return $alternates;
+        foreach ($alternates as $locale => $loc) {
+            $url = Url::create($loc);
+
+            foreach ($alternates as $code => $href) {
+                $url->addAlternate($href, self::HREFLANGS[$code]);
+            }
+
+            $url->addAlternate($alternates['en'], 'x-default');
+
+            $sitemap->add($url);
+        }
     }
 }

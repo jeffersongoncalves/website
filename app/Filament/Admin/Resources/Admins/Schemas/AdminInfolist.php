@@ -19,9 +19,12 @@ class AdminInfolist
                     ->schema([
                         TextEntry::make('id'),
                         IconEntry::make('status')
+                            ->label(__('admin.fields.status'))
                             ->boolean(),
-                        TextEntry::make('name'),
+                        TextEntry::make('name')
+                            ->label(__('admin.fields.name')),
                         TextEntry::make('email')
+                            ->label(__('admin.fields.email'))
                             ->copyable()
                             ->copyMessage('Email copied successfully!')
                             ->copyMessageDuration(1500),

@@ -14,8 +14,8 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
-use Filament\Widgets;
+use Filament\Support\Enums\Width;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -36,7 +36,19 @@ class AdminPanelProvider extends PanelProvider
             ->login(Login::class)
             ->authGuard('admin')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => [
+                    50 => '#FFFBEB',
+                    100 => '#FEF3C7',
+                    200 => '#FDE68A',
+                    300 => '#FCD34D',
+                    400 => '#FBBF24',
+                    500 => '#F59E0B',
+                    600 => '#D97706',
+                    700 => '#B45309',
+                    800 => '#92400E',
+                    900 => '#78350F',
+                    950 => '#451A03',
+                ],
                 'gray' => [
                     50 => '#F8F5EE',
                     100 => '#F0EBDF',
@@ -52,19 +64,30 @@ class AdminPanelProvider extends PanelProvider
                 ],
             ])
             ->brandLogo(fn () => view('filament.admin.logo'))
+            ->favicon(asset('favicon.ico'))
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->defaultThemeMode(ThemeMode::Dark)
             ->darkMode(true, isForced: true)
+            ->maxContentWidth(Width::ScreenTwoExtraLarge)
+            ->sidebarCollapsibleOnDesktop()
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn () => view('filament.partials.fonts'),
+            )
+            ->renderHook(
+                PanelsRenderHook::SIDEBAR_NAV_END,
+                fn () => view('filament.partials.sidebar-status'),
+            )
+            ->renderHook(
+                PanelsRenderHook::FOOTER,
+                fn () => view('filament.partials.footer'),
+            )
             ->discoverClusters(in: app_path('Filament/Admin/Clusters'), for: 'App\\Filament\\Admin\\Clusters')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->pages([
                 Pages\Dashboard::class,
-            ])
-            ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

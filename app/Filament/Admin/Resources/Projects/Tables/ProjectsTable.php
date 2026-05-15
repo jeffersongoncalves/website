@@ -21,41 +21,55 @@ class ProjectsTable
             ->defaultSort('sort_order')
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('admin.fields.name'))
                     ->searchable()
                     ->sortable()
                     ->weight('medium'),
                 TextColumn::make('category')
+                    ->label(__('admin.fields.category'))
                     ->badge()
                     ->sortable(),
                 TextColumn::make('status')
+                    ->label(__('admin.fields.status'))
                     ->badge()
                     ->sortable(),
                 IconColumn::make('featured')
+                    ->label(__('admin.fields.featured'))
                     ->boolean()
                     ->sortable(),
                 TextColumn::make('stars')
+                    ->label(__('admin.fields.stars'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('downloads_label')
+                    ->label(__('admin.fields.downloads'))
                     ->placeholder('—')
                     ->toggleable(),
                 TextColumn::make('sort_order')
+                    ->label(__('admin.fields.sort_order'))
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('published_at')
+                    ->label(__('admin.fields.published_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
+                    ->label(__('admin.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('category')->options(ProjectCategory::class),
-                SelectFilter::make('status')->options(ProjectStatus::class),
-                TernaryFilter::make('featured'),
+                SelectFilter::make('category')
+                    ->label(__('admin.fields.category'))
+                    ->options(ProjectCategory::class),
+                SelectFilter::make('status')
+                    ->label(__('admin.fields.status'))
+                    ->options(ProjectStatus::class),
+                TernaryFilter::make('featured')
+                    ->label(__('admin.fields.featured')),
             ])
             ->recordActions([
                 ViewAction::make(),

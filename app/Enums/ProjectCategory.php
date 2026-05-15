@@ -16,11 +16,11 @@ enum ProjectCategory: string implements HasColor, HasLabel
     public function getLabel(): string
     {
         return match ($this) {
-            self::FilamentPlugin => __('Filament Plugin'),
-            self::LaravelPackage => __('Laravel Package'),
-            self::StarterKit => __('Starter Kit'),
-            self::Saas => __('SaaS'),
-            self::Tool => __('Tool'),
+            self::FilamentPlugin => __('admin.enums.category.filament_plugin'),
+            self::LaravelPackage => __('admin.enums.category.laravel_package'),
+            self::StarterKit => __('admin.enums.category.starter_kit'),
+            self::Saas => __('admin.enums.category.saas'),
+            self::Tool => __('admin.enums.category.tool'),
         };
     }
 

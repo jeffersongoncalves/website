@@ -1,6 +1,473 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
-@import '../_shared.css';
 
-@source '../../../../app/Filament/Admin/**/*';
-@source '../../../../resources/views/components/**/*';
-@source '../../../../resources/views/filament/admin/**/*';
+@source '../../../../app/Filament';
+@source '../../../../resources/views/filament';
+@source '../../../../resources/views/components';
+@source '../../../../resources/views/vendor/filament';
+@source '../../../../resources/views/vendor/filament-*';
+
+/* ============================================================
+   EDITORIAL TERMINAL · Filament v5 admin theme
+   ============================================================ */
+
+@theme {
+    --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-serif: 'Fraunces', 'Times New Roman', serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+
+    --color-ink-50:  #F8F5EE;
+    --color-ink-100: #F0EBDF;
+    --color-ink-200: #D9D2C5;
+    --color-ink-300: #B8B0A4;
+    --color-ink-400: #8B8377;
+    --color-ink-500: #5C5349;
+    --color-ink-600: #3D362F;
+    --color-ink-700: #2A2620;
+    --color-ink-800: #1F1B17;
+    --color-ink-850: #181612;
+    --color-ink-900: #13110E;
+    --color-ink-950: #0B0A09;
+
+    --color-primary-50:  #FEF3C7;
+    --color-primary-100: #FEF3C7;
+    --color-primary-200: #FDE68A;
+    --color-primary-300: #FCD34D;
+    --color-primary-400: #FBBF24;
+    --color-primary-500: #FBBF24;
+    --color-primary-600: #F59E0B;
+    --color-primary-700: #D97706;
+    --color-primary-800: #B45309;
+    --color-primary-900: #B45309;
+    --color-primary-950: #78350F;
+
+    --color-moss-400: #A3B86A;
+    --color-moss-500: #84A07C;
+}
+
+:root, .fi-body {
+    --amber-glow: rgba(251, 191, 36, 0.18);
+    --paper-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.92 0 0 0 0 0.85 0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+html.dark, html {
+    color-scheme: dark;
+}
+
+.fi-body {
+    background: var(--color-ink-950);
+    color: var(--color-ink-200);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    background-image:
+        radial-gradient(at 12% 6%,  rgba(251, 191, 36, 0.06), transparent 45%),
+        radial-gradient(at 92% 100%, rgba(132, 160, 124, 0.05), transparent 50%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    position: relative;
+}
+
+.fi-body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.06;
+    background-image: var(--paper-grain);
+    mix-blend-mode: overlay;
+}
+
+.fi-main, .fi-sidebar, .fi-topbar, .fi-modal {
+    position: relative;
+    z-index: 2;
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+.fi-header-heading,
+.fi-section-header-heading,
+.fi-modal-heading,
+.fi-page-header-heading {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    color: var(--color-ink-100);
+    line-height: 1.1;
+}
+
+.fi-header-heading { font-size: clamp(28px, 3.5vw, 40px); font-weight: 300; }
+.fi-section-header-heading { font-size: 20px; font-weight: 500; }
+
+.fi-header-subheading,
+.fi-section-header-description {
+    color: var(--color-ink-400);
+    font-family: var(--font-sans);
+}
+
+.editorial-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-primary-400);
+    font-weight: 500;
+}
+.editorial-eyebrow::before {
+    content: "§ ";
+    color: var(--color-ink-500);
+}
+
+/* ============================================================
+   TOPBAR
+   ============================================================ */
+.fi-topbar {
+    background: rgba(11, 10, 9, 0.85) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--color-ink-800);
+}
+.fi-topbar nav { font-family: var(--font-mono); font-size: 12px; }
+.fi-topbar a { transition: color 120ms; }
+.fi-topbar a:hover { color: var(--color-primary-400); }
+
+.fi-logo {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    font-size: 18px;
+    color: var(--color-ink-100);
+}
+.fi-logo em { font-style: italic; color: var(--color-primary-400); }
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.fi-sidebar {
+    background: var(--color-ink-900) !important;
+    border-right: 1px solid var(--color-ink-800);
+}
+.fi-sidebar-nav-groups { gap: 8px; }
+.fi-sidebar-group { border-top: 1px dashed var(--color-ink-700); padding-top: 16px; }
+.fi-sidebar-group:first-child { border-top: none; }
+.fi-sidebar-group-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink-500) !important;
+}
+
+.fi-sidebar-item-button {
+    border-radius: 4px !important;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--color-ink-300) !important;
+    transition: all 120ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.fi-sidebar-item-button:hover {
+    background: var(--color-ink-850) !important;
+    color: var(--color-ink-100) !important;
+}
+.fi-sidebar-item.fi-active .fi-sidebar-item-button {
+    background: var(--color-ink-850) !important;
+    color: var(--color-primary-400) !important;
+    box-shadow: inset 2px 0 0 var(--color-primary-400);
+}
+
+/* ============================================================
+   CARDS / SECTIONS
+   ============================================================ */
+.fi-section,
+.fi-wi-stats-overview-stat,
+.fi-wi-chart,
+.fi-fo-section,
+.fi-ta-ctn {
+    background: var(--color-ink-900) !important;
+    border: 1px solid var(--color-ink-800) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    position: relative;
+    overflow: hidden;
+}
+
+.fi-section,
+.fi-fo-section {
+    padding: 24px !important;
+}
+
+.fi-section-header {
+    margin-bottom: 16px;
+}
+
+.fi-wi-stats-overview-stat {
+    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 240ms;
+}
+.fi-wi-stats-overview-stat:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-ink-700) !important;
+}
+
+.fi-section::after {
+    content: "";
+    position: absolute;
+    left: 0; top: 0;
+    height: 1px; width: 0;
+    background: var(--color-primary-400);
+    transition: width 480ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.fi-section:hover::after { width: 100%; }
+
+.fi-wi-stats-overview-stat-value {
+    font-family: var(--font-serif) !important;
+    font-weight: 300 !important;
+    font-size: 48px !important;
+    letter-spacing: -0.04em;
+    color: var(--color-ink-100) !important;
+    line-height: 1;
+}
+.fi-wi-stats-overview-stat-label {
+    font-family: var(--font-mono) !important;
+    font-size: 11px !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase;
+    color: var(--color-ink-500) !important;
+}
+.fi-wi-stats-overview-stat-description {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-ink-400);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.fi-btn-color-primary {
+    background: var(--color-primary-400) !important;
+    color: var(--color-ink-950) !important;
+    border: 1px solid var(--color-primary-400) !important;
+    font-weight: 500;
+    transition: all 120ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.fi-btn-color-primary:hover {
+    background: var(--color-primary-300) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px var(--amber-glow);
+}
+.fi-btn-color-gray {
+    background: var(--color-ink-800) !important;
+    color: var(--color-ink-100) !important;
+    border: 1px solid var(--color-ink-700) !important;
+}
+.fi-btn-color-gray:hover {
+    background: var(--color-ink-700) !important;
+    border-color: var(--color-ink-600) !important;
+}
+
+/* ============================================================
+   INPUTS
+   ============================================================ */
+.fi-input,
+.fi-select-input,
+.fi-textarea,
+.fi-fo-text-input input,
+.fi-fo-textarea textarea,
+.fi-fo-select select {
+    background: var(--color-ink-850) !important;
+    color: var(--color-ink-100) !important;
+    border: 1px solid var(--color-ink-700) !important;
+    border-radius: 4px !important;
+    font-family: var(--font-sans);
+    transition: border-color 120ms, box-shadow 120ms;
+}
+
+/* When input is inside .fi-input-wrp (icon/prefix wrapper), the wrapper owns the
+   border — strip the inner input border to avoid double-border */
+.fi-input-wrp .fi-input,
+.fi-input-wrp input,
+.fi-input-wrp textarea,
+.fi-input-wrp select {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+.fi-input-wrp .fi-input:focus,
+.fi-input-wrp input:focus,
+.fi-input-wrp textarea:focus,
+.fi-input-wrp select:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
+.fi-input:focus,
+.fi-select-input:focus,
+.fi-textarea:focus,
+.fi-fo-text-input input:focus,
+.fi-fo-textarea textarea:focus {
+    outline: none !important;
+    border-color: var(--color-primary-400) !important;
+    box-shadow: 0 0 0 3px var(--amber-glow) !important;
+}
+.fi-fo-field-wrp-label,
+.fi-fo-field-wrp .fi-fo-field-wrp-hint {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-400) !important;
+}
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+.fi-ta-header-cell {
+    font-family: var(--font-mono) !important;
+    font-size: 11px !important;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-500) !important;
+    background: var(--color-ink-850) !important;
+    border-bottom: 1px solid var(--color-ink-800) !important;
+}
+.fi-ta-row {
+    border-bottom: 1px solid var(--color-ink-800);
+    transition: background 120ms;
+}
+.fi-ta-row:hover { background: var(--color-ink-850) !important; }
+.fi-ta-text-item-label,
+.fi-ta-text {
+    color: var(--color-ink-200) !important;
+    font-size: 14px;
+}
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+.fi-badge {
+    font-family: var(--font-mono) !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.02em;
+    border-radius: 999px !important;
+    border: 1px solid;
+    padding: 4px 10px !important;
+}
+.fi-badge.fi-color-primary {
+    background: rgba(251, 191, 36, 0.1);
+    color: var(--color-primary-300);
+    border-color: rgba(251, 191, 36, 0.2);
+}
+.fi-badge.fi-color-success {
+    background: rgba(134, 198, 130, 0.1);
+    color: var(--color-moss-400);
+    border-color: rgba(134, 198, 130, 0.25);
+}
+.fi-badge.fi-color-danger {
+    background: rgba(226, 107, 92, 0.1);
+    color: #E26B5C;
+    border-color: rgba(226, 107, 92, 0.25);
+}
+
+/* ============================================================
+   MODALS / DROPDOWNS
+   ============================================================ */
+.fi-modal-window,
+.fi-dropdown-panel {
+    background: var(--color-ink-850) !important;
+    border: 1px solid var(--color-ink-800) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================================
+   NOTIFICATIONS
+   ============================================================ */
+.fi-no-notification {
+    background: var(--color-ink-900) !important;
+    border: 1px solid var(--color-ink-800) !important;
+    border-left: 3px solid var(--color-primary-400) !important;
+    border-radius: 6px !important;
+    font-family: var(--font-sans);
+}
+.fi-no-notification.fi-color-success { border-left-color: var(--color-moss-400) !important; }
+.fi-no-notification.fi-color-danger  { border-left-color: #E26B5C !important; }
+.fi-no-notification-body { font-family: var(--font-mono); font-size: 12px; }
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+.fi-pagination-item-button {
+    font-family: var(--font-mono);
+    color: var(--color-ink-400);
+}
+.fi-pagination-item-button.fi-active {
+    background: var(--color-primary-400) !important;
+    color: var(--color-ink-950) !important;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+.fi-body ::-webkit-scrollbar { width: 8px; height: 8px; }
+.fi-body ::-webkit-scrollbar-track { background: var(--color-ink-950); }
+.fi-body ::-webkit-scrollbar-thumb {
+    background: var(--color-ink-700);
+    border-radius: 4px;
+}
+.fi-body ::-webkit-scrollbar-thumb:hover { background: var(--color-ink-600); }
+
+/* ============================================================
+   PULSE
+   ============================================================ */
+@keyframes editorial-pulse {
+    0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 var(--amber-glow); }
+    50%      { opacity: 0.7; box-shadow: 0 0 0 6px transparent; }
+}
+.editorial-pulse {
+    display: inline-block;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--color-primary-400);
+    animation: editorial-pulse 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+/* Sidebar: relative positioned, stretches with main height, min full viewport */
+@media (min-width: 64rem) {
+    .fi-body-has-topbar .fi-sidebar {
+        position: relative !important;
+        inset-block: auto !important;
+        top: 0 !important;
+        bottom: auto !important;
+        height: auto !important;
+        min-height: calc(100dvh - 64px) !important;
+        align-self: stretch !important;
+    }
+}
+
+/* Livewire wrapper around the sidebar — make it a flex container */
+div:has(> aside.fi-sidebar) {
+    display: flex !important;
+}
+
+/* Hide sidebar status block when sidebar is collapsed (no `fi-sidebar-open` class) */
+.fi-sidebar:not(.fi-sidebar-open) .editorial-sidebar-status {
+    display: none !important;
+}
+
+/* Brand logo wrapper */
+.site-brand {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    white-space: nowrap;
+}

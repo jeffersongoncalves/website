@@ -11,6 +11,38 @@ return [
         'title' => 'My Profile',
     ],
 
+    'status' => [
+        'label' => 'status',
+        'production' => 'production',
+        'local' => 'local',
+    ],
+
+    'widgets' => [
+        'site_metrics' => [
+            'heading' => 'Site metrics',
+            'repos' => 'Repositories',
+            'repos_desc' => 'published projects',
+            'stars' => 'Stars',
+            'stars_desc' => 'total GitHub stars',
+            'downloads' => 'Downloads',
+            'downloads_desc' => 'Packagist',
+            'filament' => 'Filament plugins',
+            'filament_desc' => 'category',
+            'laravel' => 'Laravel packages',
+            'laravel_desc' => 'category',
+            'starter' => 'Starter Kits',
+            'starter_desc' => 'category',
+            'maintained' => 'Maintainer',
+            'maintained_desc' => 'projects I maintain but did not create',
+            'followers' => 'Followers',
+            'followers_desc' => 'on GitHub',
+            'sponsors' => 'Sponsors',
+            'sponsors_desc' => 'public',
+            'contributions' => 'Contributions',
+            'contributions_desc' => 'last 12 months',
+        ],
+    ],
+
     'sections' => [
         'identity' => 'Identity',
         'publication' => 'Publication',
@@ -53,6 +85,8 @@ return [
         'demo_url' => 'Demo URL',
         'cover_image' => 'Cover image',
         'is_maintainer' => 'Maintainer only',
+        'created_at' => 'Created at',
+        'updated_at' => 'Updated at',
     ],
 
     'helpers' => [

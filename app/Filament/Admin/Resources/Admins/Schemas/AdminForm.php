@@ -20,18 +20,22 @@ class AdminForm
                     ->columns()
                     ->schema([
                         Toggle::make('status')
+                            ->label(__('admin.fields.status'))
                             ->required()
                             ->autofocus(),
                         TextInput::make('name')
+                            ->label(__('admin.fields.name'))
                             ->required()
                             ->string()
                             ->autofocus(),
                         TextInput::make('email')
+                            ->label(__('admin.fields.email'))
                             ->required()
                             ->string()
                             ->unique('admins', 'email', ignoreRecord: true)
                             ->email(),
                         TextInput::make('password')
+                            ->label(__('admin.fields.password'))
                             ->password()
                             ->required(fn (string $context): bool => $context === 'create')
                             ->dehydrated(fn ($state) => filled($state))

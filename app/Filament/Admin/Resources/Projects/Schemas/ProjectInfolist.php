@@ -21,25 +21,26 @@ class ProjectInfolist
                     ->columnSpan(2)
                     ->columns(2)
                     ->schema([
-                        TextEntry::make('name'),
-                        TextEntry::make('slug')->copyable(),
-                        TextEntry::make('repo')->placeholder('—'),
-                        TextEntry::make('category')->badge(),
+                        TextEntry::make('name')->label(__('admin.fields.name')),
+                        TextEntry::make('slug')->label(__('admin.fields.slug'))->copyable(),
+                        TextEntry::make('repo')->label(__('admin.fields.repo'))->placeholder('—'),
+                        TextEntry::make('category')->label(__('admin.fields.category'))->badge(),
                     ]),
 
                 Section::make(__('admin.sections.publication'))
                     ->columnSpan(1)
                     ->schema([
-                        TextEntry::make('status')->badge(),
-                        IconEntry::make('featured')->boolean(),
-                        TextEntry::make('sort_order'),
-                        TextEntry::make('published_at')->dateTime(),
+                        TextEntry::make('status')->label(__('admin.fields.status'))->badge(),
+                        IconEntry::make('featured')->label(__('admin.fields.featured'))->boolean(),
+                        TextEntry::make('sort_order')->label(__('admin.fields.sort_order')),
+                        TextEntry::make('published_at')->label(__('admin.fields.published_at'))->dateTime(),
                     ]),
 
                 Section::make(__('admin.sections.description'))
                     ->columnSpanFull()
                     ->schema([
                         TextEntry::make('description')
+                            ->label(__('admin.fields.description'))
                             ->getStateUsing(fn ($record) => $record->getTranslation('description', LocaleSupport::short(), false))
                             ->html(),
                     ]),
@@ -48,34 +49,34 @@ class ProjectInfolist
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
-                        TextEntry::make('versions')->badge()->separator(','),
-                        TextEntry::make('stack')->badge()->separator(','),
+                        TextEntry::make('versions')->label(__('admin.fields.versions'))->badge()->separator(','),
+                        TextEntry::make('stack')->label(__('admin.fields.stack'))->badge()->separator(','),
                     ]),
 
                 Section::make(__('admin.sections.metrics'))
                     ->columnSpan(2)
                     ->columns(4)
                     ->schema([
-                        TextEntry::make('stars')->numeric(),
-                        TextEntry::make('downloads')->numeric(),
-                        TextEntry::make('downloads_label')->placeholder('—'),
-                        TextEntry::make('license'),
+                        TextEntry::make('stars')->label(__('admin.fields.stars'))->numeric(),
+                        TextEntry::make('downloads')->label(__('admin.fields.downloads'))->numeric(),
+                        TextEntry::make('downloads_label')->label(__('admin.fields.downloads_label'))->placeholder('—'),
+                        TextEntry::make('license')->label(__('admin.fields.license')),
                     ]),
 
                 Section::make(__('admin.sections.cover'))
                     ->columnSpan(1)
                     ->schema([
-                        ImageEntry::make('cover_image')->placeholder('—'),
+                        ImageEntry::make('cover_image')->label(__('admin.fields.cover_image'))->placeholder('—'),
                     ]),
 
                 Section::make(__('admin.sections.links'))
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
-                        TextEntry::make('github_url')->url(fn ($state) => $state)->placeholder('—'),
-                        TextEntry::make('packagist_url')->url(fn ($state) => $state)->placeholder('—'),
-                        TextEntry::make('docs_url')->url(fn ($state) => $state)->placeholder('—'),
-                        TextEntry::make('demo_url')->url(fn ($state) => $state)->placeholder('—'),
+                        TextEntry::make('github_url')->label(__('admin.fields.github_url'))->url(fn ($state) => $state)->placeholder('—'),
+                        TextEntry::make('packagist_url')->label(__('admin.fields.packagist_url'))->url(fn ($state) => $state)->placeholder('—'),
+                        TextEntry::make('docs_url')->label(__('admin.fields.docs_url'))->url(fn ($state) => $state)->placeholder('—'),
+                        TextEntry::make('demo_url')->label(__('admin.fields.demo_url'))->url(fn ($state) => $state)->placeholder('—'),
                     ]),
 
                 AdditionalInformation::make([

@@ -13,9 +13,10 @@ class SiteStats
 
     /**
      * Read the persisted site stats. The values are written by the scheduled
-     * `projects:sync-metrics` command — the request path never recomputes or
-     * hits an external API. If the row is missing (first deploy), it is
-     * computed and persisted once on demand.
+     * `projects:sync-metrics` command — the request path never recomputes nor
+     * hits an external API. If the row is missing (e.g. before the first sync,
+     * or while GitHub is unavailable) a zeroed set is returned so the site
+     * still renders; views hide GitHub-dependent pieces when the data is empty.
      *
      * @return array{
      *   repos:int, filament:int, laravel:int, starter:int, tool:int,
@@ -28,10 +29,35 @@ class SiteStats
         $stat = SiteStat::query()->first();
 
         if (! $stat) {
-            return self::persist();
+            return self::empty();
         }
 
         return self::toArray($stat);
+    }
+
+    /**
+     * Zeroed stats — the safe fallback when nothing has been synced yet.
+     *
+     * @return array{
+     *   repos:int, filament:int, laravel:int, starter:int, tool:int,
+     *   stars:int, downloads:int, followers:int, public_sponsors:int,
+     *   contributions:array{cells:list<int>,total:int}
+     * }
+     */
+    private static function empty(): array
+    {
+        return [
+            'repos' => 0,
+            'filament' => 0,
+            'laravel' => 0,
+            'starter' => 0,
+            'tool' => 0,
+            'stars' => 0,
+            'downloads' => 0,
+            'followers' => 0,
+            'public_sponsors' => 0,
+            'contributions' => ['cells' => [], 'total' => 0],
+        ];
     }
 
     /**

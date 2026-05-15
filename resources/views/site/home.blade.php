@@ -111,6 +111,8 @@
                 </template>
             </div>
 
+            {{-- Heatmap depends on the GitHub API — hidden until contribution data is available. --}}
+            @if (! empty($contributions['cells']))
             <div class="mt-12" x-data='heatmap({ cells: @json($contributions["cells"]) })'>
                 <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
                     <div class="mono-meta-sm text-ink-400">
@@ -135,6 +137,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
     </section>
 

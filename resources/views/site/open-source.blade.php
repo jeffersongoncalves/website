@@ -35,6 +35,8 @@
         </div>
     </section>
 
+    {{-- Heatmap depends on the GitHub API — section hidden until contribution data is available. --}}
+    @if (! empty($contributions['cells']))
     <div class="divider"></div>
 
     <section class="section" x-data='heatmap({ cells: @json($contributions["cells"]) })'>
@@ -64,6 +66,7 @@
             </div>
         </div>
     </section>
+    @endif
 
     <div class="divider"></div>
 

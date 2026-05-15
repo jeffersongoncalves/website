@@ -6,7 +6,7 @@
 
 @php
     $locale = app()->getLocale();
-    $shortLocale = explode('_', $locale)[0];
+    $shortLocale = \App\Support\LocaleSupport::short($locale);
     $description = $description ?: __('site.seo.default_description');
     $fullTitle = ($title ? $title . ' · ' : '') . config('app.name');
     $canonical = url()->current();

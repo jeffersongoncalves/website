@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Site;
 
 use App\Models\Project;
-use App\Support\GithubContributions;
 use App\Support\SiteStats;
 use Illuminate\Contracts\View\View;
 
@@ -22,7 +21,7 @@ class HomeController
             'featured' => $featured,
             'homeStats' => SiteStats::homeCards(),
             'stack' => config('site.stack'),
-            'contributions' => GithubContributions::calendar('jeffersongoncalves'),
+            'contributions' => SiteStats::contributions(),
         ]);
     }
 }

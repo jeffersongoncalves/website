@@ -5,6 +5,7 @@ cd /var/www/html
 
 mkdir -p \
     storage/app/public \
+    storage/app/github \
     storage/framework/cache/data \
     storage/framework/sessions \
     storage/framework/testing \

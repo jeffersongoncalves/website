@@ -4,31 +4,72 @@ namespace App\Support;
 
 use App\Enums\ProjectCategory;
 use App\Models\Project;
-use Illuminate\Support\Facades\Cache;
+use App\Models\SiteStat;
 use Illuminate\Support\Facades\Http;
 
 class SiteStats
 {
-    private const CACHE_KEY = 'site.stats';
-
-    private const TTL_HOURS = 6;
+    private const GITHUB_LOGIN = 'jeffersongoncalves';
 
     /**
+     * Read the persisted site stats. The values are written by the scheduled
+     * `projects:sync-metrics` command — the request path never recomputes or
+     * hits an external API. If the row is missing (first deploy), it is
+     * computed and persisted once on demand.
+     *
      * @return array{
      *   repos:int, filament:int, laravel:int, starter:int, tool:int,
-     *   stars:int, downloads:int, followers:int, public_sponsors:int
+     *   stars:int, downloads:int, followers:int, public_sponsors:int,
+     *   contributions:array{cells:list<int>,total:int}
      * }
      */
     public static function all(): array
     {
-        return Cache::remember(self::CACHE_KEY, now()->addHours(self::TTL_HOURS), fn () => self::compute());
+        $stat = SiteStat::query()->first();
+
+        if (! $stat) {
+            return self::persist();
+        }
+
+        return self::toArray($stat);
     }
 
-    public static function refresh(): array
+    /**
+     * Recompute every stat and upsert the singleton row. Called by the
+     * scheduled sync command, not by the request path.
+     *
+     * @return array{
+     *   repos:int, filament:int, laravel:int, starter:int, tool:int,
+     *   stars:int, downloads:int, followers:int, public_sponsors:int,
+     *   contributions:array{cells:list<int>,total:int}
+     * }
+     */
+    public static function persist(): array
     {
-        Cache::forget(self::CACHE_KEY);
+        $data = self::compute();
 
-        return self::all();
+        $stat = SiteStat::query()->firstOrNew([]);
+        $stat->fill($data);
+        $stat->synced_at = now();
+        $stat->save();
+
+        return self::toArray($stat);
+    }
+
+    /**
+     * Contribution calendar for the heatmap, read from the persisted row.
+     *
+     * @return array{cells:list<int>,total:int}
+     */
+    public static function contributions(): array
+    {
+        $stat = SiteStat::query()->first();
+
+        if (! $stat) {
+            return ['cells' => [], 'total' => 0];
+        }
+
+        return $stat->contributions ?? ['cells' => [], 'total' => 0];
     }
 
     /**
@@ -67,6 +108,36 @@ class SiteStats
         ];
     }
 
+    /**
+     * @return array{
+     *   repos:int, filament:int, laravel:int, starter:int, tool:int,
+     *   stars:int, downloads:int, followers:int, public_sponsors:int,
+     *   contributions:array{cells:list<int>,total:int}
+     * }
+     */
+    private static function toArray(SiteStat $stat): array
+    {
+        return [
+            'repos' => $stat->repos,
+            'filament' => $stat->filament,
+            'laravel' => $stat->laravel,
+            'starter' => $stat->starter,
+            'tool' => $stat->tool,
+            'stars' => $stat->stars,
+            'downloads' => $stat->downloads,
+            'followers' => $stat->followers,
+            'public_sponsors' => $stat->public_sponsors,
+            'contributions' => $stat->contributions ?? ['cells' => [], 'total' => 0],
+        ];
+    }
+
+    /**
+     * @return array{
+     *   repos:int, filament:int, laravel:int, starter:int, tool:int,
+     *   stars:int, downloads:int, followers:int, public_sponsors:int,
+     *   contributions:array{cells:list<int>,total:int}
+     * }
+     */
     private static function compute(): array
     {
         $base = Project::query()->published();
@@ -74,7 +145,7 @@ class SiteStats
         $stars = (int) (clone $base)->sum('stars');
         $downloads = (int) (clone $base)->sum('downloads');
 
-        $github = self::fetchGithubUser('jeffersongoncalves');
+        $github = self::fetchGithubUser(self::GITHUB_LOGIN);
 
         return [
             'repos' => (int) (clone $base)->count(),
@@ -85,7 +156,8 @@ class SiteStats
             'stars' => $stars,
             'downloads' => $downloads,
             'followers' => $github['followers'] ?? 0,
-            'public_sponsors' => self::fetchSponsorCount('jeffersongoncalves'),
+            'public_sponsors' => self::fetchSponsorCount(self::GITHUB_LOGIN),
+            'contributions' => GithubContributions::fetch(self::GITHUB_LOGIN),
         ];
     }
 

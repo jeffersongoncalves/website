@@ -45,8 +45,8 @@ class SyncProjectMetrics extends Command
         $this->newLine();
         $this->info("Synced {$changed}/{$projects->count()} projects.");
 
-        SiteStats::refresh();
-        $this->info('Site stats cache refreshed.');
+        SiteStats::persist();
+        $this->info('Site stats persisted to the database.');
 
         return self::SUCCESS;
     }

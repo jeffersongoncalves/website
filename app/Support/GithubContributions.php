@@ -2,29 +2,23 @@
 
 namespace App\Support;
 
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class GithubContributions
 {
-    private const TTL_HOURS = 6;
-
     /**
+     * Fetch the contribution calendar from the GitHub GraphQL API.
+     *
      * Returns a flat list of contribution levels (0-4) ordered the same way
      * GitHub renders the calendar: column-major (week-by-week, top→bottom).
      *
+     * This is called by the scheduled sync command, not by the request path —
+     * the rendered result is persisted on the `site_stats` row and read back
+     * via SiteStats::contributions().
+     *
      * @return array{cells: list<int>, total: int}
      */
-    public static function calendar(string $login): array
-    {
-        return Cache::remember(
-            "github.contributions.{$login}",
-            now()->addHours(self::TTL_HOURS),
-            fn () => self::fetch($login)
-        );
-    }
-
-    private static function fetch(string $login): array
+    public static function fetch(string $login): array
     {
         $token = config('services.github.token');
 

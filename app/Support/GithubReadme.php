@@ -2,8 +2,9 @@
 
 namespace App\Support;
 
-use Illuminate\Support\Facades\Cache;
+use App\Models\ReadmeCache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
@@ -12,7 +13,24 @@ use League\CommonMark\MarkdownConverter;
 
 class GithubReadme
 {
-    public static function fetchHtml(string $githubUrl, ?string $ref = null, int $ttlMinutes = 60): ?string
+    /**
+     * Minutes during which a freshly verified README is served straight from
+     * disk without issuing even a conditional request to GitHub.
+     */
+    private const CHECK_INTERVAL_MINUTES = 10;
+
+    private const DISK = 'github';
+
+    /**
+     * Return the rendered README HTML for a repo, backed by a disk cache.
+     *
+     * Flow: within the check window the cached file is served with no GitHub
+     * call at all. Otherwise a conditional request (`If-None-Match`) is made —
+     * a `304 Not Modified` reuses the cached file (and does not count against
+     * the rate limit), a `200` re-renders and rewrites the disk file. On a
+     * network/API error the stale file is served if present.
+     */
+    public static function fetchHtml(string $githubUrl, ?string $ref = null): ?string
     {
         $repo = self::repoFromUrl($githubUrl);
 
@@ -20,19 +38,57 @@ class GithubReadme
             return null;
         }
 
-        $cacheKey = "readme.html.{$repo}.".($ref ?: 'default');
+        $refKey = $ref ?: 'default';
+        $cache = ReadmeCache::query()->firstOrNew(['repo' => $repo, 'ref' => $refKey]);
+        $disk = Storage::disk(self::DISK);
 
-        return Cache::remember($cacheKey, now()->addMinutes($ttlMinutes), function () use ($repo, $ref) {
-            $result = self::fetchMarkdown($repo, $ref);
+        $hasFile = $cache->html_path !== null && $disk->exists($cache->html_path);
 
-            if ($result === null) {
-                return null;
-            }
+        // Skip window — recently verified, serve the file without touching GitHub.
+        if ($hasFile && $cache->checked_at !== null
+            && $cache->checked_at->gt(now()->subMinutes(self::CHECK_INTERVAL_MINUTES))) {
+            return $disk->get($cache->html_path);
+        }
 
-            $markdown = self::rewriteRelativeAssets($result['body'], $repo, $result['ref']);
+        $result = self::fetchConditional($repo, $ref, $cache->etag);
 
-            return self::renderMarkdown($markdown);
-        });
+        // 304 Not Modified — README unchanged, reuse the cached file.
+        if ($result['status'] === 304 && $hasFile) {
+            $cache->checked_at = now();
+            $cache->save();
+
+            return $disk->get($cache->html_path);
+        }
+
+        // 200 — content changed (or first fetch): re-render and store on disk.
+        if ($result['status'] === 200 && $result['body'] !== null) {
+            $branch = $ref ?: self::defaultBranch($repo, $cache);
+            $markdown = self::rewriteRelativeAssets($result['body'], $repo, $branch);
+            $html = self::renderMarkdown($markdown);
+
+            $path = 'readme/'.str_replace('/', '__', $repo).'/'.$refKey.'.html';
+            $disk->put($path, $html);
+
+            $cache->fill([
+                'etag' => $result['etag'],
+                'default_branch' => $branch,
+                'html_path' => $path,
+                'fetched_at' => now(),
+                'checked_at' => now(),
+            ])->save();
+
+            return $html;
+        }
+
+        // Network/API error — fall back to the stale cached file if present.
+        if ($hasFile) {
+            $cache->checked_at = now();
+            $cache->save();
+
+            return $disk->get($cache->html_path);
+        }
+
+        return null;
     }
 
     /**
@@ -69,67 +125,56 @@ class GithubReadme
     }
 
     /**
-     * @return array{body:string,ref:?string}|null
+     * Issue a conditional request for the repo README.
+     *
+     * @return array{status:int, body:?string, etag:?string}
      */
-    private static function fetchMarkdown(string $repo, ?string $ref = null): ?array
+    private static function fetchConditional(string $repo, ?string $ref, ?string $etag): array
     {
-        if ($ref && ($body = self::fetchReadmeForRef($repo, $ref)) !== null) {
-            return ['body' => $body, 'ref' => $ref];
+        $headers = self::githubHeaders(['Accept' => 'application/vnd.github.raw']);
+
+        if ($etag !== null && $etag !== '') {
+            $headers['If-None-Match'] = $etag;
         }
 
-        $default = self::fetchDefaultBranch($repo);
-
-        if ($default !== null && ($body = self::fetchReadmeForRef($repo, $default)) !== null) {
-            return ['body' => $body, 'ref' => $default];
-        }
-
-        if (($body = self::fetchReadmeForRef($repo, null)) !== null) {
-            return ['body' => $body, 'ref' => $default];
-        }
-
-        return null;
-    }
-
-    private static function fetchReadmeForRef(string $repo, ?string $ref): ?string
-    {
         $response = Http::timeout(8)
-            ->withHeaders(self::githubHeaders(['Accept' => 'application/vnd.github.raw']))
+            ->withHeaders($headers)
             ->get("https://api.github.com/repos/{$repo}/readme", $ref ? ['ref' => $ref] : []);
 
+        if ($response->status() === 304) {
+            return ['status' => 304, 'body' => null, 'etag' => $etag];
+        }
+
         if ($response->successful()) {
-            return $response->body();
+            $newEtag = $response->header('ETag');
+
+            return [
+                'status' => 200,
+                'body' => $response->body(),
+                'etag' => $newEtag !== '' ? $newEtag : $etag,
+            ];
         }
 
-        if ($ref === null) {
-            return null;
-        }
-
-        $raw = Http::timeout(8)
-            ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
-            ->get("https://raw.githubusercontent.com/{$repo}/{$ref}/README.md");
-
-        return $raw->successful() ? $raw->body() : null;
+        return ['status' => $response->status(), 'body' => null, 'etag' => $etag];
     }
 
-    private static function fetchDefaultBranch(string $repo): ?string
+    private static function defaultBranch(string $repo, ReadmeCache $cache): ?string
     {
-        return Cache::remember(
-            "github.default_branch.{$repo}",
-            now()->addHours(24),
-            function () use ($repo) {
-                $response = Http::timeout(8)
-                    ->withHeaders(self::githubHeaders(['Accept' => 'application/vnd.github+json']))
-                    ->get("https://api.github.com/repos/{$repo}");
+        if ($cache->default_branch !== null && $cache->default_branch !== '') {
+            return $cache->default_branch;
+        }
 
-                if (! $response->successful()) {
-                    return null;
-                }
+        $response = Http::timeout(8)
+            ->withHeaders(self::githubHeaders(['Accept' => 'application/vnd.github+json']))
+            ->get("https://api.github.com/repos/{$repo}");
 
-                return $response->json('default_branch');
-            }
-        );
+        return $response->successful() ? $response->json('default_branch') : null;
     }
 
+    /**
+     * @param  array<string, string>  $extra
+     * @return array<string, string>
+     */
     private static function githubHeaders(array $extra = []): array
     {
         $headers = array_merge(['User-Agent' => 'jeffersongoncalves-site'], $extra);

@@ -47,6 +47,15 @@ return [
             'report' => false,
         ],
 
+        // Specialized cache for fetched GitHub artefacts (rendered README HTML).
+        // Backed by a persistent volume in production — see docker-compose.
+        'github' => [
+            'driver' => 'local',
+            'root' => storage_path('app/github'),
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

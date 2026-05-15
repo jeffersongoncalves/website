@@ -16,7 +16,11 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+
+use function App\Support\enum_equals;
 
 class ProjectForm
 {
@@ -84,25 +88,50 @@ class ProjectForm
                             ])
                             ->columns(3)
                             ->helperText(__('Default branch maps by index: lowest version = 1.x, next = 2.x, etc. Override per version below.'))
-                            ->visible(fn ($get) => $get('category') === ProjectCategory::FilamentPlugin->value),
+                            ->live()
+                            ->afterStateUpdated(function ($state, Set $set, Get $get): void {
+                                $current = (array) ($get('branch_overrides') ?? []);
+                                $next = [];
+                                foreach (array_values((array) $state) as $i => $_) {
+                                    $branch = ($i + 1).'.x';
+                                    $next[$branch] = $current[$branch] ?? $branch;
+                                }
+                                $set('branch_overrides', $next);
+                            })
+                            ->visible(fn (Get $get) => enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
                         TagsInput::make('versions')
                             ->placeholder(__('Laravel 10/11/12, Filament v5'))
-                            ->visible(fn ($get) => $get('category') !== ProjectCategory::FilamentPlugin->value),
+                            ->visible(fn (Get $get) => ! enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
                         TagsInput::make('stack')
                             ->placeholder(__('Laravel, Filament, Livewire')),
-                        KeyValue::make('version_branches')
-                            ->keyLabel(__('Version'))
-                            ->valueLabel(__('GitHub branch'))
-                            ->keyPlaceholder('v4')
-                            ->valuePlaceholder('2.x')
-                            ->helperText(__('Override the auto-mapped branch for each version. Leave blank to use default index mapping.'))
+                        KeyValue::make('branch_overrides')
+                            ->keyLabel(__('Auto branch'))
+                            ->valueLabel(__('Real GitHub branch'))
+                            ->keyPlaceholder('1.x')
+                            ->valuePlaceholder('main')
+                            ->helperText(__('Remap auto-mapped branches to the real ones in the repo, e.g. `1.x → main`, `2.x → 2.x`. Leave blank to use the auto branch as-is.'))
                             ->columnSpanFull()
-                            ->visible(fn ($get) => $get('category') === ProjectCategory::FilamentPlugin->value),
+                            ->afterStateHydrated(function (KeyValue $component, $state, Get $get): void {
+                                if (! empty($state)) {
+                                    return;
+                                }
+                                $versions = $get('versions');
+                                if (! is_array($versions) || $versions === []) {
+                                    return;
+                                }
+                                $map = [];
+                                foreach (array_values($versions) as $i => $_) {
+                                    $branch = ($i + 1).'.x';
+                                    $map[$branch] = $branch;
+                                }
+                                $component->state($map);
+                            })
+                            ->visible(fn (Get $get) => enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
                         TextInput::make('readme_branch')
                             ->maxLength(255)
                             ->placeholder('main')
                             ->helperText(__('GitHub branch used to fetch the README. Leave blank to use the repository default branch.'))
-                            ->visible(fn ($get) => $get('category') !== ProjectCategory::FilamentPlugin->value),
+                            ->visible(fn (Get $get) => ! enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
                     ]),
 
                 Section::make(__('Metrics'))

@@ -27,11 +27,12 @@ class ProjectViewController
         if ($versions !== []) {
             $requested = $request->string('v')->toString();
             $activeVersion = in_array($requested, $versions, true) ? $requested : (string) end($versions);
-            $overrides = is_array($project->version_branches) ? $project->version_branches : [];
-            $override = isset($overrides[$activeVersion]) ? trim((string) $overrides[$activeVersion]) : '';
-            $ref = $override !== ''
-                ? $override
-                : GithubReadme::branchForFilamentVersion($activeVersion, $versions);
+            $autoBranch = GithubReadme::branchForFilamentVersion($activeVersion, $versions);
+            $overrides = is_array($project->branch_overrides) ? $project->branch_overrides : [];
+            $override = ($autoBranch !== null && isset($overrides[$autoBranch]))
+                ? trim((string) $overrides[$autoBranch])
+                : '';
+            $ref = $override !== '' ? $override : $autoBranch;
         } elseif (! empty($project->readme_branch)) {
             $ref = $project->readme_branch;
         }

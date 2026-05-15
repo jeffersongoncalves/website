@@ -1,12 +1,12 @@
 @php
-    $locale  = app()->getLocale();
+    $locale  = \App\Support\LocaleSupport::short();
     $title   = $project->getTranslation('title', $locale, false) ?: $project->name;
     $desc    = $project->getTranslation('description', $locale, false) ?: $project->getTranslation('description', 'pt', false);
     $content = $project->getTranslation('content', $locale, false) ?: $project->getTranslation('content', 'pt', false);
 
     $breadcrumbs = [
-        ['name' => __('site.nav.projects'), 'url' => route('projects.index', ['locale' => $locale])],
-        ['name' => $title, 'url' => route('projects.show', ['locale' => $locale, 'slug' => $project->slug])],
+        ['name' => __('site.nav.projects'), 'url' => route('projects.index')],
+        ['name' => $title, 'url' => route('projects.show', ['slug' => $project->slug])],
     ];
 @endphp
 
@@ -85,7 +85,7 @@
                 <div class="flex items-center flex-wrap gap-2 mb-6 mono-meta">
                     <span>@lang('site.projects.version_label')</span>
                     @foreach($versions as $v)
-                        <a href="{{ route('projects.show', ['locale' => $locale, 'slug' => $project->slug, 'v' => $v]) }}#top"
+                        <a href="{{ route('projects.show', ['slug' => $project->slug, 'v' => $v]) }}#top"
                            class="chip {{ $activeVersion === $v ? 'chip-active' : '' }}">
                             {{ $v }}
                         </a>
@@ -114,7 +114,7 @@
 
     <section class="section">
         <div class="wrap" style="max-width:760px;">
-            <a href="{{ route('projects.index', ['locale' => $locale]) }}"
+            <a href="{{ route('projects.index') }}"
                class="btn-ghost" style="font-family:var(--font-mono);font-size:0.9375rem;color:var(--ink-200);">
                 @lang('site.projects.back_to_list')
             </a>

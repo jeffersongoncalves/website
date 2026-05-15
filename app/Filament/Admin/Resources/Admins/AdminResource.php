@@ -41,22 +41,22 @@ class AdminResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('Admin');
+        return __('resources/admin.singular');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Admins');
+        return __('resources/admin.plural');
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Admins');
+        return __('resources/admin.navigation_label');
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Management');
+        return __('admin.navigation.user');
     }
 
     public static function getNavigationBadge(): ?string

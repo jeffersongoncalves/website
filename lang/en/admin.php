@@ -1,0 +1,88 @@
+<?php
+
+return [
+    'navigation' => [
+        'management' => 'Management',
+        'user' => 'User',
+        'settings' => 'Settings',
+    ],
+
+    'profile' => [
+        'title' => 'My Profile',
+    ],
+
+    'sections' => [
+        'identity' => 'Identity',
+        'publication' => 'Publication',
+        'content' => 'Content',
+        'stack_versions' => 'Stack & versions',
+        'metrics' => 'Metrics',
+        'links' => 'Links',
+        'cover' => 'Cover',
+        'description' => 'Description',
+        'stack' => 'Stack',
+    ],
+
+    'fields' => [
+        'name' => 'Name',
+        'email' => 'Email',
+        'password' => 'Password',
+        'slug' => 'Slug',
+        'repo' => 'Repository',
+        'category' => 'Category',
+        'status' => 'Status',
+        'featured' => 'Featured',
+        'sort_order' => 'Sort order',
+        'published_at' => 'Published at',
+        'title' => 'Title',
+        'description' => 'Description',
+        'content_markdown' => 'Content (Markdown)',
+        'versions' => 'Versions',
+        'stack' => 'Stack',
+        'branch_overrides' => 'Branches',
+        'auto_branch' => 'Auto branch',
+        'real_branch' => 'Real GitHub branch',
+        'readme_branch' => 'README branch',
+        'stars' => 'Stars',
+        'downloads' => 'Downloads',
+        'downloads_label' => 'Downloads label',
+        'license' => 'License',
+        'github_url' => 'GitHub URL',
+        'packagist_url' => 'Packagist URL',
+        'docs_url' => 'Docs URL',
+        'demo_url' => 'Demo URL',
+        'cover_image' => 'Cover image',
+        'is_maintainer' => 'Maintainer only',
+    ],
+
+    'helpers' => [
+        'slug' => 'Leave empty to auto-generate from name.',
+        'repo' => 'GitHub repo name (defaults to slug).',
+        'featured' => 'Show on home page.',
+        'is_maintainer' => 'Plugin I maintain but did not create. Shows a "maintainer" badge on the frontend.',
+        'versions' => 'Default branch maps by index: lowest version = 1.x, next = 2.x, etc. Override per version below.',
+        'branch_overrides' => 'Remap auto-mapped branches to the real ones in the repo, e.g. `1.x → main`, `2.x → 2.x`. Leave blank to use the auto branch as-is.',
+        'readme_branch' => 'GitHub branch used to fetch the README. Leave blank to use the repository default branch.',
+        'downloads_label' => 'Display value: 21k, 1.2M, —',
+    ],
+
+    'placeholders' => [
+        'stack' => 'Laravel, Filament, Livewire',
+        'versions_free' => 'Laravel 10/11/12, Filament v5',
+    ],
+
+    'enums' => [
+        'category' => [
+            'filament_plugin' => 'Filament Plugin',
+            'laravel_package' => 'Laravel Package',
+            'starter_kit' => 'Starter Kit',
+            'saas' => 'SaaS',
+            'tool' => 'Tool',
+        ],
+        'status' => [
+            'draft' => 'Draft',
+            'published' => 'Published',
+            'archived' => 'Archived',
+        ],
+    ],
+];

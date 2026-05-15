@@ -1,7 +1,7 @@
 @props(['project'])
 
 @php
-    $locale = app()->getLocale();
+    $locale = \App\Support\LocaleSupport::short();
     $description = $project->getTranslation('description', $locale, false) ?: $project->getTranslation('description', 'pt', false);
 @endphp
 
@@ -11,7 +11,7 @@
     </svg>
 
     <div class="flex items-start justify-between gap-4 pr-6">
-        <a href="{{ route('projects.show', ['locale' => $locale, 'slug' => $project->slug]) }}"
+        <a href="{{ route('projects.show', ['slug' => $project->slug]) }}"
            class="mono text-[0.95rem] font-semibold text-ink-100">{{ $project->name }}</a>
         <div class="flex items-center gap-2">
             @if($project->is_maintainer)

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Observers\ProjectObserver;
+use App\Support\LocaleSupport;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -193,7 +194,7 @@ class Project extends Model
 
     public function getDynamicSEOData(): SEOData
     {
-        $locale = app()->getLocale();
+        $locale = LocaleSupport::short();
         $title = $this->getTranslation('title', $locale, false) ?: $this->name;
         $description = $this->getTranslation('description', $locale, false)
             ?: $this->getTranslation('description', 'pt', false);

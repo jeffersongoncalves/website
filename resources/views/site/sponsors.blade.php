@@ -1,4 +1,4 @@
-@php $locale = app()->getLocale(); @endphp
+@php $locale = \App\Support\LocaleSupport::short(); @endphp
 
 <x-site.layouts.app :title="__('site.nav.sponsors')" :description="__('site.seo.sponsors')">
 

@@ -41,22 +41,22 @@ class UserResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('User');
+        return __('resources/user.singular');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Users');
+        return __('resources/user.plural');
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Users');
+        return __('resources/user.navigation_label');
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return __('User');
+        return __('admin.navigation.user');
     }
 
     public static function getNavigationBadge(): ?string

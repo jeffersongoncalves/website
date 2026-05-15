@@ -29,7 +29,7 @@ class ProjectForm
         return $schema
             ->columns(3)
             ->components([
-                Section::make(__('Identity'))
+                Section::make(__('admin.sections.identity'))
                     ->columnSpan(2)
                     ->columns(2)
                     ->schema([
@@ -40,17 +40,17 @@ class ProjectForm
                         TextInput::make('slug')
                             ->maxLength(255)
                             ->unique('projects', 'slug', ignoreRecord: true)
-                            ->helperText(__('Leave empty to auto-generate from name.')),
+                            ->helperText(__('admin.helpers.slug')),
                         TextInput::make('repo')
                             ->maxLength(255)
-                            ->helperText(__('GitHub repo name (defaults to slug).')),
+                            ->helperText(__('admin.helpers.repo')),
                         Select::make('category')
                             ->options(ProjectCategory::class)
                             ->required()
                             ->live(),
                     ]),
 
-                Section::make(__('Publication'))
+                Section::make(__('admin.sections.publication'))
                     ->columnSpan(1)
                     ->schema([
                         Select::make('status')
@@ -58,10 +58,10 @@ class ProjectForm
                             ->default(ProjectStatus::Draft)
                             ->required(),
                         Toggle::make('featured')
-                            ->helperText(__('Show on home page.')),
+                            ->helperText(__('admin.helpers.featured')),
                         Toggle::make('is_maintainer')
-                            ->label(__('Maintainer only'))
-                            ->helperText(__('Plugin I maintain but did not create. Shows a "maintainer" badge on the frontend.'))
+                            ->label(__('admin.fields.is_maintainer'))
+                            ->helperText(__('admin.helpers.is_maintainer'))
                             ->visible(fn (Get $get) => enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
                         TextInput::make('sort_order')
                             ->integer()
@@ -69,7 +69,7 @@ class ProjectForm
                         DateTimePicker::make('published_at'),
                     ]),
 
-                Section::make(__('Content'))
+                Section::make(__('admin.sections.content'))
                     ->columnSpanFull()
                     ->schema([
                         Tabs::make()
@@ -80,7 +80,7 @@ class ProjectForm
                             ]),
                     ]),
 
-                Section::make(__('Stack & versions'))
+                Section::make(__('admin.sections.stack_versions'))
                     ->columnSpan(2)
                     ->columns(2)
                     ->schema([
@@ -91,7 +91,7 @@ class ProjectForm
                                 'v5' => 'Filament v5',
                             ])
                             ->columns(3)
-                            ->helperText(__('Default branch maps by index: lowest version = 1.x, next = 2.x, etc. Override per version below.'))
+                            ->helperText(__('admin.helpers.versions'))
                             ->live()
                             ->afterStateUpdated(function ($state, Set $set, Get $get): void {
                                 $current = (array) ($get('branch_overrides') ?? []);
@@ -104,16 +104,16 @@ class ProjectForm
                             })
                             ->visible(fn (Get $get) => enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
                         TagsInput::make('versions')
-                            ->placeholder(__('Laravel 10/11/12, Filament v5'))
+                            ->placeholder(__('admin.placeholders.versions_free'))
                             ->visible(fn (Get $get) => ! enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
                         TagsInput::make('stack')
-                            ->placeholder(__('Laravel, Filament, Livewire')),
+                            ->placeholder(__('admin.placeholders.stack')),
                         KeyValue::make('branch_overrides')
-                            ->keyLabel(__('Auto branch'))
-                            ->valueLabel(__('Real GitHub branch'))
+                            ->keyLabel(__('admin.fields.auto_branch'))
+                            ->valueLabel(__('admin.fields.real_branch'))
                             ->keyPlaceholder('1.x')
                             ->valuePlaceholder('main')
-                            ->helperText(__('Remap auto-mapped branches to the real ones in the repo, e.g. `1.x → main`, `2.x → 2.x`. Leave blank to use the auto branch as-is.'))
+                            ->helperText(__('admin.helpers.branch_overrides'))
                             ->columnSpanFull()
                             ->afterStateHydrated(function (KeyValue $component, $state, Get $get): void {
                                 if (! empty($state)) {
@@ -134,11 +134,11 @@ class ProjectForm
                         TextInput::make('readme_branch')
                             ->maxLength(255)
                             ->placeholder('main')
-                            ->helperText(__('GitHub branch used to fetch the README. Leave blank to use the repository default branch.'))
+                            ->helperText(__('admin.helpers.readme_branch'))
                             ->visible(fn (Get $get) => ! enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
                     ]),
 
-                Section::make(__('Metrics'))
+                Section::make(__('admin.sections.metrics'))
                     ->columnSpan(1)
                     ->schema([
                         TextInput::make('stars')
@@ -149,13 +149,13 @@ class ProjectForm
                             ->default(0),
                         TextInput::make('downloads_label')
                             ->maxLength(32)
-                            ->helperText(__('Display value: 21k, 1.2M, —')),
+                            ->helperText(__('admin.helpers.downloads_label')),
                         TextInput::make('license')
                             ->default('MIT')
                             ->maxLength(64),
                     ]),
 
-                Section::make(__('Links'))
+                Section::make(__('admin.sections.links'))
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
@@ -173,7 +173,7 @@ class ProjectForm
                             ->maxLength(500),
                     ]),
 
-                Section::make(__('Cover'))
+                Section::make(__('admin.sections.cover'))
                     ->columnSpanFull()
                     ->schema([
                         FileUpload::make('cover_image')
@@ -188,15 +188,15 @@ class ProjectForm
     {
         return [
             TextInput::make("title.$locale")
-                ->label(__('Title'))
+                ->label(__('admin.fields.title'))
                 ->maxLength(255),
             Textarea::make("description.$locale")
-                ->label(__('Description'))
+                ->label(__('admin.fields.description'))
                 ->rows(3)
                 ->required($locale === 'pt')
                 ->maxLength(1000),
             Textarea::make("content.$locale")
-                ->label(__('Content (Markdown)'))
+                ->label(__('admin.fields.content_markdown'))
                 ->rows(10),
         ];
     }

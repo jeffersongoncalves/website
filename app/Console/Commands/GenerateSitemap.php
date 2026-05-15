@@ -14,13 +14,6 @@ class GenerateSitemap extends Command
 
     protected $description = 'Write public/sitemap.xml (index) and public/sitemap-{pages,projects}.xml';
 
-    /**
-     * SetLocale URL segment => hreflang attribute value.
-     *
-     * @var array<string, string>
-     */
-    private const HREFLANGS = ['pt' => 'pt-BR', 'en' => 'en', 'es' => 'es'];
-
     public function handle(): int
     {
         $this->writePages();
@@ -34,11 +27,12 @@ class GenerateSitemap extends Command
 
     private function writePages(): void
     {
-        $sitemap = Sitemap::create();
-
-        foreach (['home', 'about', 'projects.index', 'open-source', 'sponsors'] as $name) {
-            $this->addAlternates($sitemap, $name);
-        }
+        $sitemap = Sitemap::create()
+            ->add(Url::create(route('home')))
+            ->add(Url::create(route('about')))
+            ->add(Url::create(route('projects.index')))
+            ->add(Url::create(route('open-source')))
+            ->add(Url::create(route('sponsors')));
 
         $sitemap->writeToFile(public_path('sitemap-pages.xml'));
     }
@@ -48,7 +42,7 @@ class GenerateSitemap extends Command
         $sitemap = Sitemap::create();
 
         Project::query()->published()->orderBy('slug')->pluck('slug')->each(
-            fn (string $slug) => $this->addAlternates($sitemap, 'projects.show', ['slug' => $slug])
+            fn (string $slug) => $sitemap->add(Url::create(route('projects.show', ['slug' => $slug])))
         );
 
         $sitemap->writeToFile(public_path('sitemap-projects.xml'));
@@ -62,29 +56,5 @@ class GenerateSitemap extends Command
             ->add($base.'/sitemap-pages.xml')
             ->add($base.'/sitemap-projects.xml')
             ->writeToFile(public_path('sitemap.xml'));
-    }
-
-    /**
-     * @param  array<string, string>  $params
-     */
-    private function addAlternates(Sitemap $sitemap, string $routeName, array $params = []): void
-    {
-        $alternates = [];
-
-        foreach (array_keys(self::HREFLANGS) as $locale) {
-            $alternates[$locale] = route($routeName, array_merge($params, ['locale' => $locale]));
-        }
-
-        foreach ($alternates as $loc) {
-            $url = Url::create($loc);
-
-            foreach ($alternates as $code => $href) {
-                $url->addAlternate($href, self::HREFLANGS[$code]);
-            }
-
-            $url->addAlternate($alternates['en'], 'x-default');
-
-            $sitemap->add($url);
-        }
     }
 }

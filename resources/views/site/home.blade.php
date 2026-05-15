@@ -1,5 +1,5 @@
 @php
-    $locale = app()->getLocale();
+    $locale = \App\Support\LocaleSupport::short();
     $statsJson = collect($homeStats)->map(fn ($s) => array_merge($s, ['label' => __('site.' . $s['label_key'])]))->values()->toJson();
 @endphp
 
@@ -24,11 +24,11 @@
                     <p class="lede mt-6">@lang('site.home.hero_sub')</p>
 
                     <div class="flex flex-wrap gap-3 mt-8">
-                        <a href="{{ route('projects.index', ['locale' => $locale]) }}" class="btn btn-primary">
+                        <a href="{{ route('projects.index') }}" class="btn btn-primary">
                             @lang('site.common.view_projects')
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                         </a>
-                        <a href="{{ route('sponsors', ['locale' => $locale]) }}" class="btn btn-secondary">@lang('site.common.sponsor_btn')</a>
+                        <a href="{{ route('sponsors') }}" class="btn btn-secondary">@lang('site.common.sponsor_btn')</a>
                     </div>
 
                     <div class="meta-strip">
@@ -159,7 +159,7 @@
             </div>
 
             <div class="flex justify-center mt-12">
-                <a href="{{ route('projects.index', ['locale' => $locale]) }}" class="btn-ghost mono text-[0.9375rem] text-ink-200">
+                <a href="{{ route('projects.index') }}" class="btn-ghost mono text-[0.9375rem] text-ink-200">
                     @lang('site.home.view_all')
                 </a>
             </div>

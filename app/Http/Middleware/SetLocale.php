@@ -5,30 +5,31 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
 {
     public const SUPPORTED = ['pt', 'en', 'es'];
 
+    /** URL/cookie segment => internal locale */
+    public const URL_TO_LOCALE = [
+        'pt' => 'pt_BR',
+        'en' => 'en',
+        'es' => 'es',
+    ];
+
     public const COOKIE_NAME = 'locale';
 
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = $request->route('locale');
+        $segment = $request->cookie(self::COOKIE_NAME, 'pt');
 
-        if (! in_array($locale, self::SUPPORTED, true)) {
-            $locale = $request->cookie(self::COOKIE_NAME, config('app.locale', 'pt'));
-            $locale = in_array($locale, self::SUPPORTED, true) ? $locale : 'pt';
+        if (! in_array($segment, self::SUPPORTED, true)) {
+            $segment = 'pt';
         }
 
-        App::setLocale($locale);
+        App::setLocale(self::URL_TO_LOCALE[$segment]);
 
-        $response = $next($request);
-
-        Cookie::queue(self::COOKIE_NAME, $locale, 60 * 24 * 365);
-
-        return $response;
+        return $next($request);
     }
 }

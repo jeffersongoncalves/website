@@ -1,4 +1,4 @@
-@php $locale = app()->getLocale(); @endphp
+@php $locale = \App\Support\LocaleSupport::short(); @endphp
 
 <x-site.layouts.app :title="__('site.projects.title')" :description="__('site.seo.projects')">
 
@@ -34,9 +34,9 @@
             @php
                 $catParam = $activeCat === 'all' ? null : $activeCat;
                 $roleParam = $activeRole === 'all' ? null : $activeRole;
-                $catLink = fn ($c) => route('projects.index', array_filter(['locale' => $locale, 'cat' => $c, 'role' => $roleParam, 'sort' => $activeSort === 'stars' ? null : $activeSort]));
-                $roleLink = fn ($r) => route('projects.index', array_filter(['locale' => $locale, 'cat' => $catParam, 'role' => $r, 'sort' => $activeSort === 'stars' ? null : $activeSort]));
-                $sortLink = fn ($s) => route('projects.index', array_filter(['locale' => $locale, 'cat' => $catParam, 'role' => $roleParam, 'sort' => $s]));
+                $catLink = fn ($c) => route('projects.index', array_filter(['cat' => $c, 'role' => $roleParam, 'sort' => $activeSort === 'stars' ? null : $activeSort]));
+                $roleLink = fn ($r) => route('projects.index', array_filter(['cat' => $catParam, 'role' => $r, 'sort' => $activeSort === 'stars' ? null : $activeSort]));
+                $sortLink = fn ($s) => route('projects.index', array_filter(['cat' => $catParam, 'role' => $roleParam, 'sort' => $s]));
             @endphp
 
             <div class="flex flex-wrap items-center gap-3 mb-8">
@@ -113,7 +113,7 @@
                         @lang('site.common.view_github')
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                     </a>
-                    <a href="{{ route('sponsors', ['locale' => $locale]) }}" class="btn btn-secondary">@lang('site.common.sponsor_btn')</a>
+                    <a href="{{ route('sponsors') }}" class="btn btn-secondary">@lang('site.common.sponsor_btn')</a>
                 </div>
             </div>
         </div>

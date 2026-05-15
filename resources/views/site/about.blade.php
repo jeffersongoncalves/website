@@ -1,4 +1,4 @@
-@php $locale = app()->getLocale(); @endphp
+@php $locale = \App\Support\LocaleSupport::short(); @endphp
 
 <x-site.layouts.app :title="__('site.about.title_1') . ' ' . __('site.about.title_2')" :description="__('site.seo.about')">
 
@@ -122,7 +122,7 @@
                     <p class="body-text mt-6 max-w-[60ch]">@lang('site.about.cta_body')</p>
                 </div>
                 <div class="lg:col-span-5 flex flex-wrap gap-3 lg:justify-end">
-                    <a href="{{ route('projects.index', ['locale' => $locale]) }}" class="btn btn-primary">@lang('site.common.view_projects')</a>
+                    <a href="{{ route('projects.index') }}" class="btn btn-primary">@lang('site.common.view_projects')</a>
                     <a href="{{ config('site.social.github') }}" rel="noopener" target="_blank" class="btn btn-secondary">@lang('site.common.view_github')</a>
                 </div>
             </div>

@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Projects\Schemas;
 
 use App\Filament\Schemas\Components\AdditionalInformation;
+use App\Support\LocaleSupport;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -16,7 +17,7 @@ class ProjectInfolist
         return $schema
             ->columns(3)
             ->components([
-                Section::make(__('Identity'))
+                Section::make(__('admin.sections.identity'))
                     ->columnSpan(2)
                     ->columns(2)
                     ->schema([
@@ -26,7 +27,7 @@ class ProjectInfolist
                         TextEntry::make('category')->badge(),
                     ]),
 
-                Section::make(__('Publication'))
+                Section::make(__('admin.sections.publication'))
                     ->columnSpan(1)
                     ->schema([
                         TextEntry::make('status')->badge(),
@@ -35,15 +36,15 @@ class ProjectInfolist
                         TextEntry::make('published_at')->dateTime(),
                     ]),
 
-                Section::make(__('Description'))
+                Section::make(__('admin.sections.description'))
                     ->columnSpanFull()
                     ->schema([
                         TextEntry::make('description')
-                            ->getStateUsing(fn ($record) => $record->getTranslation('description', app()->getLocale(), false))
+                            ->getStateUsing(fn ($record) => $record->getTranslation('description', LocaleSupport::short(), false))
                             ->html(),
                     ]),
 
-                Section::make(__('Stack'))
+                Section::make(__('admin.sections.stack'))
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
@@ -51,7 +52,7 @@ class ProjectInfolist
                         TextEntry::make('stack')->badge()->separator(','),
                     ]),
 
-                Section::make(__('Metrics'))
+                Section::make(__('admin.sections.metrics'))
                     ->columnSpan(2)
                     ->columns(4)
                     ->schema([
@@ -61,13 +62,13 @@ class ProjectInfolist
                         TextEntry::make('license'),
                     ]),
 
-                Section::make(__('Cover'))
+                Section::make(__('admin.sections.cover'))
                     ->columnSpan(1)
                     ->schema([
                         ImageEntry::make('cover_image')->placeholder('—'),
                     ]),
 
-                Section::make(__('Links'))
+                Section::make(__('admin.sections.links'))
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([

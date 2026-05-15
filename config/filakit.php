@@ -1,7 +1,5 @@
 <?php
 
-use Filament\Enums\ThemeMode;
-
 return [
     'defaultCurrency' => 'brl',
     'defaultDateDisplayFormat' => 'M j, Y',
@@ -11,7 +9,6 @@ return [
     'defaultNumberLocale' => null,
     'defaultTimeDisplayFormat' => 'H:i:s',
     'defaultIsoTimeDisplayFormat' => 'LT',
-    'theme_mode' => ThemeMode::Light,
     'admin_panel_enabled' => true,
     'logo' => 'resources/images/admin-logo.png',
     'favicon' => [

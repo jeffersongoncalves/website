@@ -1,16 +1,12 @@
 @php
-    $locale = app()->getLocale();
+    $locale = \App\Support\LocaleSupport::short();
     $locales = \App\Http\Middleware\SetLocale::SUPPORTED;
-    $currentName = \Illuminate\Support\Facades\Route::currentRouteName();
-    $localeUrl = function (string $target) use ($currentName) {
-        $params = array_merge(request()->route()?->parameters() ?? [], ['locale' => $target]);
-        return $currentName ? route($currentName, $params) : url('/' . $target);
-    };
+    $localeUrl = fn (string $target) => route('locale.switch', ['locale' => $target]);
 @endphp
 
 <header class="site-header" x-data="stickyHeader()" :class="{ 'scrolled': scrolled }">
     <div class="wrap site-header-inner">
-        <a href="{{ route('home', ['locale' => $locale]) }}" class="site-brand" aria-label="Jefferson Gonçalves — Home">
+        <a href="{{ route('home') }}" class="site-brand" aria-label="Jefferson Gonçalves — Home">
             <img src="{{ Vite::asset('resources/images/icon-32.png') }}"
                  srcset="{{ Vite::asset('resources/images/icon-32.png') }} 1x, {{ Vite::asset('resources/images/icon-64.png') }} 2x"
                  alt="" width="22" height="22" class="jg-mark-img">
@@ -80,10 +76,10 @@
                      x-transition:leave-start="opacity-100"
                      x-transition:leave-end="opacity-0"
                      x-cloak>
-                    <a href="{{ route('about',          ['locale' => $locale]) }}" class="mobile-nav-link">@lang('site.nav.about')</a>
-                    <a href="{{ route('projects.index', ['locale' => $locale]) }}" class="mobile-nav-link">@lang('site.nav.projects')</a>
-                    <a href="{{ route('open-source',    ['locale' => $locale]) }}" class="mobile-nav-link">@lang('site.nav.open_source')</a>
-                    <a href="{{ route('sponsors',       ['locale' => $locale]) }}" class="mobile-nav-link">@lang('site.nav.sponsors')</a>
+                    <a href="{{ route('about') }}" class="mobile-nav-link">@lang('site.nav.about')</a>
+                    <a href="{{ route('projects.index') }}" class="mobile-nav-link">@lang('site.nav.projects')</a>
+                    <a href="{{ route('open-source') }}" class="mobile-nav-link">@lang('site.nav.open_source')</a>
+                    <a href="{{ route('sponsors') }}" class="mobile-nav-link">@lang('site.nav.sponsors')</a>
                 </nav>
             </div>
         </div>

@@ -1,5 +1,5 @@
 @php
-    $locale = app()->getLocale();
+    $locale = \App\Support\LocaleSupport::short();
     $statsJson = collect($osStats)->map(fn ($s) => array_merge($s, ['label' => __('site.' . $s['label_key'])]))->values()->toJson();
 @endphp
 
@@ -80,7 +80,7 @@
                 @endforeach
             </div>
             <div class="flex justify-center mt-12">
-                <a href="{{ route('projects.index', ['locale' => $locale]) }}" class="btn-ghost mono text-[0.9375rem] text-ink-200">
+                <a href="{{ route('projects.index') }}" class="btn-ghost mono text-[0.9375rem] text-ink-200">
                     @lang('site.os.view_all_repos')
                 </a>
             </div>
@@ -101,7 +101,7 @@
                     <p class="body-text mt-6 max-w-[60ch]">@lang('site.home.sponsors_body')</p>
                 </div>
                 <div class="lg:col-span-5 flex flex-wrap gap-3 lg:justify-end">
-                    <a href="{{ route('sponsors', ['locale' => $locale]) }}" class="btn btn-primary">Ver tiers →</a>
+                    <a href="{{ route('sponsors') }}" class="btn btn-primary">Ver tiers →</a>
                     <a href="{{ config('site.social.sponsors') }}" rel="noopener" target="_blank" class="btn btn-secondary">GitHub Sponsors ↗</a>
                 </div>
             </div>

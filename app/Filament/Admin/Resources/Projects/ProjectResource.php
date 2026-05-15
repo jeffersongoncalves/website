@@ -41,22 +41,22 @@ class ProjectResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('Project');
+        return __('resources/project.singular');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Projects');
+        return __('resources/project.plural');
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Projects');
+        return __('resources/project.navigation_label');
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Content');
+        return __('admin.navigation.management');
     }
 
     public static function getNavigationBadge(): ?string

@@ -12,6 +12,7 @@ use Illuminate\Support\Carbon;
  * @property int $laravel
  * @property int $starter
  * @property int $tool
+ * @property int $maintained
  * @property int $stars
  * @property int $downloads
  * @property int $followers
@@ -31,6 +32,7 @@ class SiteStat extends Model
         'laravel',
         'starter',
         'tool',
+        'maintained',
         'stars',
         'downloads',
         'followers',
@@ -47,6 +49,7 @@ class SiteStat extends Model
             'laravel' => 'integer',
             'starter' => 'integer',
             'tool' => 'integer',
+            'maintained' => 'integer',
             'stars' => 'integer',
             'downloads' => 'integer',
             'followers' => 'integer',

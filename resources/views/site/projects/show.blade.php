@@ -20,7 +20,7 @@
                  style="gap:var(--s-3);font-family:var(--font-mono);font-size:0.8125rem;color:var(--ink-500);">
                 <span class="badge">{{ $project->category->getLabel() }}</span>
                 @if($project->is_maintainer)
-                    <span class="badge" title="{{ __('Maintainer, not original author') }}">{{ __('maintainer') }}</span>
+                    <span class="badge badge-success" title="{{ __('Maintainer, not original author') }}">{{ __('maintainer') }}</span>
                 @endif
                 <span>★ {{ $project->stars }}</span>
                 <span>·</span>

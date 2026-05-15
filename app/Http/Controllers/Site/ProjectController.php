@@ -14,6 +14,7 @@ class ProjectController
     {
         $cat = $request->string('cat')->toString();
         $sort = $request->string('sort', 'stars')->toString();
+        $role = $request->string('role')->toString();
 
         $query = Project::query()->published();
 
@@ -22,13 +23,20 @@ class ProjectController
             $query->byCategory($category);
         }
 
+        $activeRole = in_array($role, ['authored', 'maintainer'], true) ? $role : 'all';
+        if ($activeRole === 'maintainer') {
+            $query->maintained();
+        } elseif ($activeRole === 'authored') {
+            $query->authored();
+        }
+
         match ($sort) {
             'downloads' => $query->orderByDesc('downloads'),
             'name' => $query->orderBy('name'),
             default => $query->orderByDesc('stars'),
         };
 
-        $projects = $query->get();
+        $projects = $query->paginate(10)->withQueryString();
 
         $stats = SiteStats::all();
         $counts = [
@@ -37,12 +45,14 @@ class ProjectController
             'laravel' => $stats['laravel'],
             'starter' => $stats['starter'],
             'tool' => $stats['tool'],
+            'maintained' => $stats['maintained'],
         ];
 
         return view('site.projects.index', [
             'projects' => $projects,
             'activeCat' => $category ? $category->value : 'all',
             'activeSort' => $sort,
+            'activeRole' => $activeRole,
             'categories' => ProjectCategory::cases(),
             'counts' => $counts,
         ]);

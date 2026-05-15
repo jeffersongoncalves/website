@@ -47,8 +47,10 @@ use Spatie\Translatable\HasTranslations;
  * @property-read array $translatable_columns_from
  * @property-read mixed $translations
  *
+ * @method static Builder<static>|Project authored()
  * @method static Builder<static>|Project byCategory(\App\Enums\ProjectCategory|string $category)
  * @method static Builder<static>|Project featured()
+ * @method static Builder<static>|Project maintained()
  * @method static Builder<static>|Project newModelQuery()
  * @method static Builder<static>|Project newQuery()
  * @method static Builder<static>|Project published()
@@ -173,6 +175,16 @@ class Project extends Model
         $value = $category instanceof ProjectCategory ? $category->value : $category;
 
         return $query->where('category', $value);
+    }
+
+    public function scopeMaintained(Builder $query): Builder
+    {
+        return $query->where('is_maintainer', true);
+    }
+
+    public function scopeAuthored(Builder $query): Builder
+    {
+        return $query->where('is_maintainer', false);
     }
 
     public function getGithubUrlAttribute(?string $value): ?string

@@ -15,7 +15,7 @@
            class="mono text-[0.95rem] font-semibold text-ink-100">{{ $project->name }}</a>
         <div class="flex items-center gap-2">
             @if($project->is_maintainer)
-                <span class="badge" title="{{ __('Maintainer, not original author') }}">{{ __('maintainer') }}</span>
+                <span class="badge badge-success" title="{{ __('Maintainer, not original author') }}">{{ __('maintainer') }}</span>
             @endif
             <span class="badge">{{ $project->category->getLabel() }}</span>
         </div>

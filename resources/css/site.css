@@ -3,6 +3,7 @@
 
 @source '../../views/site/**/*.blade.php';
 @source '../../views/components/**/*.blade.php';
+@source '../../views/pagination/**/*.blade.php';
 @source '../../js/site/**/*.js';
 
 /* ============================================================================

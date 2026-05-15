@@ -15,6 +15,7 @@ use Filament\Tables;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -46,6 +47,9 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Model::automaticallyEagerLoadRelationships();
+
+        Paginator::defaultView('pagination.site');
+        Paginator::defaultSimpleView('pagination.site-simple');
 
         $this->configureActions();
         $this->configureSchema();

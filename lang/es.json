@@ -17,5 +17,10 @@
     "Group Profile": "Perfil del Grupo",
     "🇧🇷 Portuguese": "🇧🇷 Portugués",
     "🇺🇸 English": "🇺🇸 Inglés",
-    "🇪🇸 Spanish": "🇪🇸 Español"
+    "🇪🇸 Spanish": "🇪🇸 Español",
+    "maintainer": "mantenedor",
+    "Maintainer only": "Solo mantenedor",
+    "Maintainer, not original author": "Mantenedor, no autor original",
+    "Plugin I maintain but did not create. Shows a \"maintainer\" badge on the frontend.": "Plugin que mantengo pero no creé. Muestra una insignia \"mantenedor\" en el frontend.",
+    "Pagination Navigation": "Navegación de páginas"
 }

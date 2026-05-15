@@ -10,6 +10,23 @@ return [
         'sponsors' => 'Sponsor the work — fund new releases, Portuguese documentation and support for the Brazilian Laravel and Filament community.',
     ],
 
+    'errors' => [
+        'label' => 'Error',
+        'home' => 'Back to home',
+        'e404_title' => 'Page not found',
+        'e404_message' => 'The page you are looking for does not exist or has been moved.',
+        'e403_title' => 'Forbidden',
+        'e403_message' => 'You do not have permission to access this page.',
+        'e419_title' => 'Page expired',
+        'e419_message' => 'Your session has expired. Reload the page and try again.',
+        'e429_title' => 'Too many requests',
+        'e429_message' => 'You are sending requests too quickly. Wait a moment and try again.',
+        'e500_title' => 'Something went wrong',
+        'e500_message' => 'An unexpected error occurred on our side. Please try again shortly.',
+        'e503_title' => 'Be right back',
+        'e503_message' => 'The site is briefly down for maintenance. Please check back soon.',
+    ],
+
     'nav' => [
         'about' => 'About',
         'projects' => 'Projects',

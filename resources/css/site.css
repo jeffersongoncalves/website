@@ -459,6 +459,27 @@
 
   [x-cloak] { display: none !important; }
 
+  /* Error pages */
+  .error-page {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: var(--s-7) var(--s-6);
+    position: relative; z-index: 2;
+  }
+  .error-inner { max-width: 540px; text-align: center; }
+  .error-code {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: clamp(96px, 22vw, 180px);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--amber-400);
+    margin: var(--s-4) 0 var(--s-3);
+  }
+  .error-message { margin: var(--s-4) auto var(--s-6); }
+  .error-home { display: inline-block; color: var(--ink-200); }
+
   /* Project & post card */
   .project-card { position: relative; display: flex; flex-direction: column; }
   .arrow-tr {

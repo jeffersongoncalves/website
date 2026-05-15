@@ -10,6 +10,23 @@ return [
         'sponsors' => 'Patrocina el trabajo — financia nuevos releases, documentación en portugués y soporte para la comunidad Laravel y Filament brasileña.',
     ],
 
+    'errors' => [
+        'label' => 'Error',
+        'home' => 'Volver al inicio',
+        'e404_title' => 'Página no encontrada',
+        'e404_message' => 'La página que buscas no existe o ha sido movida.',
+        'e403_title' => 'Acceso denegado',
+        'e403_message' => 'No tienes permiso para acceder a esta página.',
+        'e419_title' => 'Página expirada',
+        'e419_message' => 'Tu sesión ha expirado. Recarga la página e inténtalo de nuevo.',
+        'e429_title' => 'Demasiadas solicitudes',
+        'e429_message' => 'Estás enviando solicitudes demasiado rápido. Espera un momento e inténtalo de nuevo.',
+        'e500_title' => 'Algo salió mal',
+        'e500_message' => 'Ocurrió un error inesperado de nuestro lado. Inténtalo de nuevo en breve.',
+        'e503_title' => 'Volvemos enseguida',
+        'e503_message' => 'El sitio está en mantenimiento breve. Vuelve pronto.',
+    ],
+
     'nav' => [
         'about' => 'Acerca',
         'projects' => 'Proyectos',

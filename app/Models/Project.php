@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
+use RalphJSmit\Laravel\SEO\Support\HasSEO;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
@@ -92,6 +95,7 @@ use Spatie\Translatable\HasTranslations;
 class Project extends Model
 {
     use HasFactory;
+    use HasSEO;
     use HasSlug;
     use HasTranslations;
 
@@ -185,6 +189,26 @@ class Project extends Model
     public function scopeAuthored(Builder $query): Builder
     {
         return $query->where('is_maintainer', false);
+    }
+
+    public function getDynamicSEOData(): SEOData
+    {
+        $locale = app()->getLocale();
+        $title = $this->getTranslation('title', $locale, false) ?: $this->name;
+        $description = $this->getTranslation('description', $locale, false)
+            ?: $this->getTranslation('description', 'pt', false);
+
+        return new SEOData(
+            title: $title,
+            description: $description,
+            author: 'Jefferson Gonçalves',
+            image: $this->cover_image
+                ? Storage::url($this->cover_image)
+                : null,
+            published_time: $this->published_at,
+            modified_time: $this->updated_at,
+            type: 'article',
+        );
     }
 
     public function getGithubUrlAttribute(?string $value): ?string

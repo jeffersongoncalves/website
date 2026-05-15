@@ -2,16 +2,22 @@
     'title' => null,
     'description' => null,
     'breadcrumbs' => null,
+    'seoData' => null,
 ])
+@php
+    $resolvedSeo = $seoData ?? new \RalphJSmit\Laravel\SEO\Support\SEOData(
+        title: $title,
+        description: $description ?: __('site.seo.default_description'),
+    );
+@endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ ($title ?? '') ? ($title . ' · ') : '' }}{{ config('app.name') }}</title>
     <x-favicon/>
-    <x-site.seo :title="$title" :description="$description" :breadcrumbs="$breadcrumbs"/>
+    {!! seo($resolvedSeo) !!}
     @vite(['resources/css/site.css', 'resources/js/site.js'])
     @stack('head')
 </head>

@@ -10,7 +10,7 @@
     ];
 @endphp
 
-<x-site.layouts.app :title="$project->name" :description="$desc" :breadcrumbs="$breadcrumbs">
+<x-site.layouts.app :title="$project->name" :description="$desc" :breadcrumbs="$breadcrumbs" :seoData="$project">
 
     <article class="section" style="border-top:none;padding-top:var(--s-9);">
         <div class="wrap" style="max-width:880px;">

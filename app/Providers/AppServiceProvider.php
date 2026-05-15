@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Support\LocaleSupport;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Infolists;
@@ -20,6 +21,9 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\ValidationException;
+use RalphJSmit\Laravel\SEO\Facades\SEOManager;
+use RalphJSmit\Laravel\SEO\Support\AlternateTag;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 use function view;
 
@@ -51,12 +55,40 @@ class AppServiceProvider extends ServiceProvider
         Paginator::defaultView('pagination.site');
         Paginator::defaultSimpleView('pagination.site-simple');
 
+        $this->configureSeo();
+
         $this->configureActions();
         $this->configureSchema();
         $this->configureForms();
         $this->configureInfolists();
         $this->configurePages();
         $this->configureTables();
+    }
+
+    private function configureSeo(): void
+    {
+        SEOManager::SEODataTransformer(function (SEOData $data): SEOData {
+            if (empty($data->image)) {
+                $data->image = Vite::asset('resources/images/github-og-'.LocaleSupport::short().'.png');
+            }
+
+            $alternates = $data->alternates ?? [];
+            $current = url()->current();
+
+            foreach (['pt' => 'pt-BR', 'en' => 'en', 'es' => 'es'] as $segment => $hreflang) {
+                $href = preg_replace('#/(pt|en|es)(/|$)#', "/{$segment}$2", $current, 1) ?? $current;
+                $alternates[] = new AlternateTag(hreflang: $hreflang, href: $href);
+            }
+
+            $alternates[] = new AlternateTag(
+                hreflang: 'x-default',
+                href: preg_replace('#/(pt|en|es)(/|$)#', '/en$2', $current, 1) ?? $current,
+            );
+
+            $data->alternates = $alternates;
+
+            return $data;
+        });
     }
 
     private function configureActions(): void

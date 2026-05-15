@@ -24,6 +24,8 @@ use Spatie\Translatable\HasTranslations;
  * @property array<array-key, mixed> $description
  * @property array<array-key, mixed>|null $content
  * @property array<array-key, mixed>|null $versions
+ * @property array<array-key, mixed>|null $version_branches
+ * @property string|null $readme_branch
  * @property array<array-key, mixed>|null $stack
  * @property int $stars
  * @property int $downloads
@@ -99,6 +101,8 @@ class Project extends Model
         'description',
         'content',
         'versions',
+        'version_branches',
+        'readme_branch',
         'stack',
         'stars',
         'downloads',
@@ -126,6 +130,7 @@ class Project extends Model
     {
         return [
             'versions' => 'array',
+            'version_branches' => 'array',
             'stack' => 'array',
             'stars' => 'integer',
             'downloads' => 'integer',

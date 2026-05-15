@@ -7,6 +7,7 @@ use App\Enums\ProjectStatus;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -82,13 +83,26 @@ class ProjectForm
                                 'v5' => 'Filament v5',
                             ])
                             ->columns(3)
-                            ->helperText(__('Branch maps by index: lowest version = 1.x, next = 2.x, etc.'))
+                            ->helperText(__('Default branch maps by index: lowest version = 1.x, next = 2.x, etc. Override per version below.'))
                             ->visible(fn ($get) => $get('category') === ProjectCategory::FilamentPlugin->value),
                         TagsInput::make('versions')
                             ->placeholder(__('Laravel 10/11/12, Filament v5'))
                             ->visible(fn ($get) => $get('category') !== ProjectCategory::FilamentPlugin->value),
                         TagsInput::make('stack')
                             ->placeholder(__('Laravel, Filament, Livewire')),
+                        KeyValue::make('version_branches')
+                            ->keyLabel(__('Version'))
+                            ->valueLabel(__('GitHub branch'))
+                            ->keyPlaceholder('v4')
+                            ->valuePlaceholder('2.x')
+                            ->helperText(__('Override the auto-mapped branch for each version. Leave blank to use default index mapping.'))
+                            ->columnSpanFull()
+                            ->visible(fn ($get) => $get('category') === ProjectCategory::FilamentPlugin->value),
+                        TextInput::make('readme_branch')
+                            ->maxLength(255)
+                            ->placeholder('main')
+                            ->helperText(__('GitHub branch used to fetch the README. Leave blank to use the repository default branch.'))
+                            ->visible(fn ($get) => $get('category') !== ProjectCategory::FilamentPlugin->value),
                     ]),
 
                 Section::make(__('Metrics'))

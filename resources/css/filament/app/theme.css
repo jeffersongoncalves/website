@@ -1,8 +1,19 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import '../../tokens.css';
 
 @source '../../../../app/Filament/App/**/*';
 @source '../../../../resources/views/components/**/*';
 @source '../../../../resources/views/filament/app/**/*';
+
+.site-brand {
+    display: flex; align-items: center; gap: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-100);
+    letter-spacing: -0.01em;
+    text-decoration: none;
+}
 
 ::-webkit-scrollbar {
     width: .56vw !important;

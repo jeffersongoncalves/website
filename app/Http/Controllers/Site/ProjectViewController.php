@@ -27,7 +27,13 @@ class ProjectViewController
         if ($versions !== []) {
             $requested = $request->string('v')->toString();
             $activeVersion = in_array($requested, $versions, true) ? $requested : (string) end($versions);
-            $ref = GithubReadme::branchForFilamentVersion($activeVersion, $versions);
+            $overrides = is_array($project->version_branches) ? $project->version_branches : [];
+            $override = isset($overrides[$activeVersion]) ? trim((string) $overrides[$activeVersion]) : '';
+            $ref = $override !== ''
+                ? $override
+                : GithubReadme::branchForFilamentVersion($activeVersion, $versions);
+        } elseif (! empty($project->readme_branch)) {
+            $ref = $project->readme_branch;
         }
 
         $readmeHtml = GithubReadme::fetchHtml($project->github_url, $ref);

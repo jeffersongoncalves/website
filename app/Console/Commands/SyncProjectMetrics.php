@@ -2,16 +2,16 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\PersistSiteStatsJob;
+use App\Jobs\SyncProjectMetricsJob;
 use App\Models\Project;
-use App\Support\ProjectMetrics;
-use App\Support\SiteStats;
 use Illuminate\Console\Command;
 
 class SyncProjectMetrics extends Command
 {
     protected $signature = 'projects:sync-metrics {--slug= : Sync only a specific project slug}';
 
-    protected $description = 'Sync stars and downloads from GitHub and Packagist';
+    protected $description = 'Dispatch jobs to sync stars and downloads from GitHub and Packagist';
 
     public function handle(): int
     {
@@ -22,31 +22,14 @@ class SyncProjectMetrics extends Command
         }
 
         $projects = $query->get();
-        $bar = $this->output->createProgressBar($projects->count());
-        $bar->start();
-
-        $changed = 0;
 
         foreach ($projects as $project) {
-            try {
-                if (ProjectMetrics::sync($project)) {
-                    $changed++;
-                }
-            } catch (\Throwable $e) {
-                $this->newLine();
-                $this->warn("[{$project->slug}] {$e->getMessage()}");
-            }
-
-            $bar->advance();
-            usleep(150_000); // 150ms throttle to respect rate limits
+            SyncProjectMetricsJob::dispatch($project);
         }
 
-        $bar->finish();
-        $this->newLine();
-        $this->info("Synced {$changed}/{$projects->count()} projects.");
+        PersistSiteStatsJob::dispatch();
 
-        SiteStats::persist();
-        $this->info('Site stats persisted to the database.');
+        $this->info("Dispatched {$projects->count()} project sync jobs + site stats job on the `github` queue.");
 
         return self::SUCCESS;
     }

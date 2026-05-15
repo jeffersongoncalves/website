@@ -59,6 +59,10 @@ class ProjectForm
                             ->required(),
                         Toggle::make('featured')
                             ->helperText(__('Show on home page.')),
+                        Toggle::make('is_maintainer')
+                            ->label(__('Maintainer only'))
+                            ->helperText(__('Plugin I maintain but did not create. Shows a "maintainer" badge on the frontend.'))
+                            ->visible(fn (Get $get) => enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
                         TextInput::make('sort_order')
                             ->integer()
                             ->default(0),

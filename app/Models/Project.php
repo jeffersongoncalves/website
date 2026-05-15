@@ -38,6 +38,7 @@ use Spatie\Translatable\HasTranslations;
  * @property string|null $cover_image
  * @property ProjectStatus $status
  * @property bool $featured
+ * @property bool $is_maintainer
  * @property int $sort_order
  * @property Carbon|null $published_at
  * @property Carbon|null $last_synced_at
@@ -115,6 +116,7 @@ class Project extends Model
         'cover_image',
         'status',
         'featured',
+        'is_maintainer',
         'sort_order',
         'published_at',
         'last_synced_at',
@@ -135,6 +137,7 @@ class Project extends Model
             'stars' => 'integer',
             'downloads' => 'integer',
             'featured' => 'boolean',
+            'is_maintainer' => 'boolean',
             'sort_order' => 'integer',
             'category' => ProjectCategory::class,
             'status' => ProjectStatus::class,

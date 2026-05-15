@@ -13,7 +13,12 @@
     <div class="flex items-start justify-between gap-4 pr-6">
         <a href="{{ route('projects.show', ['locale' => $locale, 'slug' => $project->slug]) }}"
            class="mono text-[0.95rem] font-semibold text-ink-100">{{ $project->name }}</a>
-        <span class="badge">{{ $project->category->getLabel() }}</span>
+        <div class="flex items-center gap-2">
+            @if($project->is_maintainer)
+                <span class="badge" title="{{ __('Maintainer, not original author') }}">{{ __('maintainer') }}</span>
+            @endif
+            <span class="badge">{{ $project->category->getLabel() }}</span>
+        </div>
     </div>
 
     <p class="mt-3 body-sm">{{ $description }}</p>

@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\GenerateSitemapJob;
 use App\Models\Project;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -40,5 +41,7 @@ class ProjectObserver
             Cache::delete('featured_projects');
         } catch (InvalidArgumentException) {
         }
+
+        GenerateSitemapJob::dispatch();
     }
 }

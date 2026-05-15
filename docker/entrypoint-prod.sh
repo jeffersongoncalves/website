@@ -26,5 +26,6 @@ php artisan view:clear || true
 php artisan event:clear || true
 
 php artisan migrate --force || true
+php artisan sitemap:generate || true
 
 exec supervisord -c /etc/supervisor/conf.d/supervisord.conf

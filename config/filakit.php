@@ -13,6 +13,7 @@ return [
     'defaultIsoTimeDisplayFormat' => 'LT',
     'theme_mode' => ThemeMode::Light,
     'admin_panel_enabled' => true,
+    'logo' => 'resources/images/admin-logo.png',
     'favicon' => [
         'enabled' => true,
         'manifest' => [

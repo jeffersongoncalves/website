@@ -4,6 +4,6 @@
         <span class="editorial-pulse"></span>
         <span>{{ config('app.env') === 'production' ? __('admin.status.production') : __('admin.status.local') }}</span>
         <span style="color: var(--color-ink-500);">·</span>
-        <span style="color: var(--color-ink-500);">v{{ config('app.version', '0.1.0') }}</span>
+        <span style="color: var(--color-ink-500);">v{{ \App\Support\AppVersion::current() }}</span>
     </div>
 </div>

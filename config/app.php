@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'Jefferson Gonçalves — Full Stack PHP Developer'),
 
+    'version' => env('APP_VERSION'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

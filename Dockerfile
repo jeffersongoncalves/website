@@ -54,7 +54,10 @@ RUN --mount=type=cache,target=/root/.composer,sharing=locked \
 FROM php-base AS runtime
 
 ARG IMAGE_SOURCE=""
+ARG APP_VERSION=""
 LABEL org.opencontainers.image.source=${IMAGE_SOURCE}
+LABEL org.opencontainers.image.version=${APP_VERSION}
+ENV APP_VERSION=${APP_VERSION}
 
 # Runtime-only: sem build tools, sem PHPIZE_DEPS
 RUN apk add --no-cache \

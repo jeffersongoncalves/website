@@ -46,10 +46,10 @@ class ProjectMetrics
      * repaired — first by trying the auto-branch (1.x, 2.x, ...), then
      * the repo's default branch (typically `main` or `master`).
      *
-     * @return array<string,string>|null  the repaired map, or null when no
-     *                                    change is needed / when verification
-     *                                    cannot be performed (network error,
-     *                                    no GitHub URL, non-Filament project)
+     * @return array<string,string>|null the repaired map, or null when no
+     *                                   change is needed / when verification
+     *                                   cannot be performed (network error,
+     *                                   no GitHub URL, non-Filament project)
      */
     private static function repairBranchOverrides(Project $project): ?array
     {
@@ -96,8 +96,8 @@ class ProjectMetrics
     }
 
     /**
-     * @return list<string>|null  branch names, or null when the GitHub API
-     *                            request cannot be completed.
+     * @return list<string>|null branch names, or null when the GitHub API
+     *                           request cannot be completed.
      */
     private static function fetchBranches(?string $githubUrl): ?array
     {

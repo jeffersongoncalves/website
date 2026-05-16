@@ -75,6 +75,11 @@ class AdminPanelProvider extends PanelProvider
                 fn () => view('filament.partials.fonts'),
             )
             ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn () => view('filament.admin.partials.login-styles'),
+                scopes: [Login::class],
+            )
+            ->renderHook(
                 PanelsRenderHook::BODY_START,
                 fn () => view('filament.admin.partials.login-preview'),
                 scopes: [Login::class],

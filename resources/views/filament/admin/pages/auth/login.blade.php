@@ -14,20 +14,18 @@
             </div>
 
             <div class="login-terminal-body">
-                <div class="login-terminal-line login-terminal-line-1">
+                <div class="login-terminal-line">
                     <span class="login-prompt">$</span>
-                    <span style="color: var(--color-ink-300);">whoami</span>
+                    <span style="color: var(--color-ink-300);" data-typewriter="whoami"></span><span class="login-cursor" data-cursor="1"></span>
                 </div>
-                <div class="login-terminal-line login-terminal-line-2" style="color: var(--color-ink-400); margin-bottom: 14px;">
-                    {{ __('admin.login.whoami_unauth') }}
+                <div class="login-terminal-line" style="color: var(--color-ink-400); margin-bottom: 14px; min-height: 1.7em;" data-typewriter-line="2" data-typewriter="{{ __('admin.login.whoami_unauth') }}"></div>
+
+                <div class="login-terminal-line">
+                    <span class="login-prompt" data-prompt="3" style="opacity: 0;">$</span>
+                    <span style="color: var(--color-ink-300);" data-typewriter-line="3" data-typewriter="login --required"></span><span class="login-cursor" data-cursor="3"></span>
                 </div>
 
-                <div class="login-terminal-line login-terminal-line-3 login-caret">
-                    <span class="login-prompt">$</span>
-                    <span style="color: var(--color-ink-300);">login --required</span>
-                </div>
-
-                <form wire:submit="authenticate" class="login-form login-terminal-line login-terminal-form">
+                <form wire:submit="authenticate" class="login-form login-terminal-form" data-typewriter-form>
                     {{ $this->form }}
 
                     <div style="margin-top: 20px;">
@@ -48,4 +46,88 @@
             <span>{{ config('app.name') }} · Assis/SP</span>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            (function () {
+                const TYPE_SPEED = 55;
+                const PAUSE_AFTER = 320;
+                const START_DELAY = 1500;
+
+                function typeInto(el, text, speed) {
+                    return new Promise((resolve) => {
+                        let i = 0;
+                        const tick = () => {
+                            if (i <= text.length) {
+                                el.textContent = text.slice(0, i);
+                                i++;
+                                setTimeout(tick, speed);
+                            } else {
+                                resolve();
+                            }
+                        };
+                        tick();
+                    });
+                }
+
+                function wait(ms) {
+                    return new Promise((r) => setTimeout(r, ms));
+                }
+
+                async function run() {
+                    const line1 = document.querySelector('[data-typewriter="whoami"]');
+                    const line2 = document.querySelector('[data-typewriter-line="2"]');
+                    const line3 = document.querySelector('[data-typewriter-line="3"]');
+                    const cursor1 = document.querySelector('[data-cursor="1"]');
+                    const cursor3 = document.querySelector('[data-cursor="3"]');
+                    const form = document.querySelector('[data-typewriter-form]');
+
+                    if (!line1 || !line2 || !line3) return;
+
+                    // Reset
+                    line1.textContent = '';
+                    line2.textContent = '';
+                    line3.textContent = '';
+                    if (form) form.style.opacity = '0';
+                    if (cursor3) cursor3.style.display = 'none';
+
+                    await wait(START_DELAY);
+
+                    // line 1: $ whoami
+                    await typeInto(line1, line1.dataset.typewriter, TYPE_SPEED);
+                    if (cursor1) cursor1.style.display = 'none';
+                    await wait(PAUSE_AFTER);
+
+                    // response line
+                    await typeInto(line2, line2.dataset.typewriter, TYPE_SPEED);
+                    await wait(PAUSE_AFTER);
+
+                    // line 3: $ login --required
+                    const prompt3 = document.querySelector('[data-prompt="3"]');
+                    if (prompt3) prompt3.style.opacity = '1';
+                    if (cursor3) cursor3.style.display = 'inline-block';
+                    await typeInto(line3, line3.dataset.typewriter, TYPE_SPEED);
+                    await wait(PAUSE_AFTER);
+
+                    // Fade form in
+                    if (form) {
+                        form.style.transition = 'opacity 400ms cubic-bezier(0.22, 1, 0.36, 1)';
+                        form.style.opacity = '1';
+                    }
+
+                    await wait(450);
+
+                    // Focus email input
+                    const input = document.querySelector('.login-terminal input[type="email"], .login-terminal input[name="email"]');
+                    if (input) input.focus({ preventScroll: true });
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', run);
+                } else {
+                    run();
+                }
+            })();
+        </script>
+    @endpush
 </x-filament-panels::page.simple>

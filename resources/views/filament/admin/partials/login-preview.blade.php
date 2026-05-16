@@ -1,14 +1,27 @@
-<div aria-hidden="true" class="login-preview-bg">
-    <iframe
-        src="{{ env('FILAMENT_LOGIN_PREVIEW_URL', config('app.url')) }}"
-        loading="lazy"
-        tabindex="-1"
-        scrolling="no"
-        sandbox="allow-same-origin"
-        class="login-preview-frame"
-        onload="this.style.opacity='1'"
-    ></iframe>
+@php
+    $featured = \App\Models\Project::query()
+        ->published()
+        ->featured()
+        ->orderByDesc('stars')
+        ->take(6)
+        ->get();
 
-    <div class="login-preview-scrim"></div>
-    <div class="login-preview-grain"></div>
+    $rendered = view('site.home', [
+        'featured' => $featured,
+        'homeStats' => \App\Support\SiteStats::homeCards(),
+        'stack' => config('site.stack'),
+        'contributions' => \App\Support\SiteStats::contributions(),
+    ])->render();
+
+    // Extract just the <body> contents from the rendered home page to avoid
+    // a nested <html>/<head> inside the admin layout.
+    if (preg_match('/<body[^>]*>(.*?)<\/body>/is', $rendered, $m)) {
+        $bodyContent = $m[1];
+    } else {
+        $bodyContent = $rendered;
+    }
+@endphp
+
+<div aria-hidden="true" inert class="login-preview-bg">
+    {!! $bodyContent !!}
 </div>

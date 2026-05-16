@@ -1,6 +1,6 @@
 <footer class="px-6 py-4" style="border-top: 1px solid var(--color-ink-800); font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-500); letter-spacing: 0.04em;">
     <div class="flex items-center justify-between flex-wrap gap-3">
         <span>© {{ date('Y') }} · Jefferson Gonçalves · Assis/SP</span>
-        <span>{{ config('app.name') }} · {{ now()->timezone('America/Sao_Paulo')->format('H:i') }} BRT</span>
+        <span>{{ config('app.name') }}</span>
     </div>
 </footer>

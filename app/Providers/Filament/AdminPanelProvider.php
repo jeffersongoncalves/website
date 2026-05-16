@@ -6,6 +6,7 @@ use AchyutN\FilamentLogViewer\FilamentLogViewer;
 use App\Filament\Admin\Pages\Auth\Login;
 use Filament\Actions\Action;
 use Filament\Enums\ThemeMode;
+use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -21,6 +22,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
@@ -65,15 +67,14 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->brandLogo(fn () => view('filament.admin.logo'))
             ->favicon(asset('favicon.ico'))
+            ->font('DM Sans', url: Vite::asset('resources/css/fonts/dm-sans.css'), provider: LocalFontProvider::class)
+            ->monoFont('JetBrains Mono', url: Vite::asset('resources/css/fonts/jetbrains-mono.css'), provider: LocalFontProvider::class)
+            ->serifFont('Fraunces', url: Vite::asset('resources/css/fonts/fraunces.css'), provider: LocalFontProvider::class)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->defaultThemeMode(ThemeMode::Dark)
             ->darkMode(true, isForced: true)
             ->maxContentWidth(Width::ScreenTwoExtraLarge)
             ->sidebarCollapsibleOnDesktop()
-            ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                fn () => view('filament.partials.fonts'),
-            )
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
                 fn () => view('filament.admin.partials.login-styles'),

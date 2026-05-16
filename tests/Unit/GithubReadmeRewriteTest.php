@@ -4,8 +4,8 @@ use App\Support\GithubReadme;
 
 it('maps a real branch back to its user-facing version via overrides', function () {
     expect(GithubReadme::branchToVersion('main', ['v3', 'v4', 'v5'], ['1.x' => 'main']))->toBe('v3');
-    expect(GithubReadme::branchToVersion('2.x',  ['v3', 'v4', 'v5'], ['1.x' => 'main']))->toBe('v4');
-    expect(GithubReadme::branchToVersion('3.x',  ['v3', 'v4', 'v5'], ['1.x' => 'main']))->toBe('v5');
+    expect(GithubReadme::branchToVersion('2.x', ['v3', 'v4', 'v5'], ['1.x' => 'main']))->toBe('v4');
+    expect(GithubReadme::branchToVersion('3.x', ['v3', 'v4', 'v5'], ['1.x' => 'main']))->toBe('v5');
 });
 
 it('maps the auto-branch name when no override matches', function () {

@@ -450,7 +450,7 @@
   /* Theme toggle (sun/moon single button) */
   .theme-toggle {
     display: inline-flex; align-items: center; justify-content: center;
-    width: 38px; height: 38px;
+    width: 32px; height: 32px;
     background: transparent;
     border: 1px solid var(--border-soft);
     border-radius: var(--r-sm);

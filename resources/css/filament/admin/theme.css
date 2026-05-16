@@ -496,6 +496,13 @@ html:not(.dark) .fi-body {
 
 /* When input is inside .fi-input-wrp (icon/prefix wrapper), the wrapper owns the
    border — strip the inner input border to avoid double-border */
+.fi-input-wrp,
+.fi-select-input-ctn,
+.fi-fo-text-input-wrp,
+.fi-fo-select-input-wrp {
+    border-radius: 4px !important;
+    overflow: hidden;
+}
 .fi-input-wrp .fi-input,
 .fi-input-wrp input,
 .fi-input-wrp textarea,

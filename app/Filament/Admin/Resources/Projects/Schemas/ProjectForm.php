@@ -6,11 +6,9 @@ use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
@@ -42,10 +40,12 @@ class ProjectForm
                             ->label(__('admin.fields.slug'))
                             ->maxLength(255)
                             ->unique('projects', 'slug', ignoreRecord: true)
+                            ->disabledOn('edit')
                             ->helperText(__('admin.helpers.slug')),
                         TextInput::make('repo')
                             ->label(__('admin.fields.repo'))
                             ->maxLength(255)
+                            ->disabledOn('edit')
                             ->helperText(__('admin.helpers.repo')),
                         Select::make('category')
                             ->label(__('admin.fields.category'))
@@ -69,15 +69,11 @@ class ProjectForm
                             ->label(__('admin.fields.is_maintainer'))
                             ->helperText(__('admin.helpers.is_maintainer'))
                             ->visible(fn (Get $get) => enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
-                        TextInput::make('sort_order')
-                            ->label(__('admin.fields.sort_order'))
-                            ->integer()
-                            ->default(0),
                         DateTimePicker::make('published_at')
                             ->label(__('admin.fields.published_at')),
                     ]),
 
-                Section::make(__('admin.sections.content'))
+                Section::make(__('admin.sections.title'))
                     ->columnSpanFull()
                     ->schema([
                         Tabs::make()
@@ -157,19 +153,23 @@ class ProjectForm
                         TextInput::make('stars')
                             ->label(__('admin.fields.stars'))
                             ->integer()
-                            ->default(0),
+                            ->default(0)
+                            ->readOnly(),
                         TextInput::make('downloads')
                             ->label(__('admin.fields.downloads'))
                             ->integer()
-                            ->default(0),
+                            ->default(0)
+                            ->readOnly(),
                         TextInput::make('downloads_label')
                             ->label(__('admin.fields.downloads_label'))
                             ->maxLength(32)
-                            ->helperText(__('admin.helpers.downloads_label')),
+                            ->helperText(__('admin.helpers.downloads_label'))
+                            ->readOnly(),
                         TextInput::make('license')
                             ->label(__('admin.fields.license'))
                             ->default('MIT')
-                            ->maxLength(64),
+                            ->maxLength(64)
+                            ->readOnly(),
                     ]),
 
                 Section::make(__('admin.sections.links'))
@@ -194,15 +194,6 @@ class ProjectForm
                             ->maxLength(500),
                     ]),
 
-                Section::make(__('admin.sections.cover'))
-                    ->columnSpanFull()
-                    ->schema([
-                        FileUpload::make('cover_image')
-                            ->label(__('admin.fields.cover_image'))
-                            ->image()
-                            ->directory('projects/covers')
-                            ->imageEditor(),
-                    ]),
             ]);
     }
 
@@ -212,14 +203,6 @@ class ProjectForm
             TextInput::make("title.$locale")
                 ->label(__('admin.fields.title'))
                 ->maxLength(255),
-            Textarea::make("description.$locale")
-                ->label(__('admin.fields.description'))
-                ->rows(3)
-                ->required($locale === 'pt')
-                ->maxLength(1000),
-            Textarea::make("content.$locale")
-                ->label(__('admin.fields.content_markdown'))
-                ->rows(10),
         ];
     }
 }

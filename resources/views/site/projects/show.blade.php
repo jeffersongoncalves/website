@@ -1,8 +1,6 @@
 @php
     $locale  = \App\Support\LocaleSupport::short();
     $title   = $project->getTranslation('title', $locale, false) ?: $project->name;
-    $desc    = $project->getTranslation('description', $locale, false) ?: $project->getTranslation('description', 'pt', false);
-    $content = $project->getTranslation('content', $locale, false) ?: $project->getTranslation('content', 'pt', false);
 
     $breadcrumbs = [
         ['name' => __('site.nav.projects'), 'url' => route('projects.index')],
@@ -12,7 +10,7 @@
     $initial = strtoupper(mb_substr($project->name, 0, 1));
 @endphp
 
-<x-site.layouts.app :title="$project->name" :description="$desc" :breadcrumbs="$breadcrumbs" :seoData="$project">
+<x-site.layouts.app :title="$project->name" :breadcrumbs="$breadcrumbs" :seoData="$project">
 
     <section class="section project-page-section">
         <div class="wrap">
@@ -29,9 +27,6 @@
                     <h1 class="project-title">{{ $project->name }}</h1>
                     @if($title && $title !== $project->name)
                         <p class="project-subtitle">{{ $title }}</p>
-                    @endif
-                    @if($desc)
-                        <p class="project-lede">{{ $desc }}</p>
                     @endif
                 </div>
             </header>
@@ -90,13 +85,6 @@
                                 <span class="mono-meta">·</span>
                                 <span class="mono-meta">branch: <code class="inline">{{ $ref }}</code></span>
                             @endif
-                        </div>
-                    @endif
-
-                    {{-- Inline content / rendered description --}}
-                    @if($content)
-                        <div class="project-content-block">
-                            {{ $content }}
                         </div>
                     @endif
 

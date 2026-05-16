@@ -143,3 +143,36 @@ it('preserves existing target and rel attributes without duplicating them', func
     expect($out)
         ->toBe($html);
 });
+
+it('rewrites relative anchor hrefs into absolute GitHub blob URLs', function () {
+    $html = '<p><a href="LICENSE">license</a> · <a href="./CONTRIBUTING.md">contrib</a> · '
+        .'<a href="docs/install.md">docs</a></p>';
+
+    $out = GithubReadme::rewriteRelativeLinks($html, 'owner/myrepo', '2.x');
+
+    expect($out)
+        ->toContain('href="https://github.com/owner/myrepo/blob/2.x/LICENSE"')
+        ->toContain('href="https://github.com/owner/myrepo/blob/2.x/CONTRIBUTING.md"')
+        ->toContain('href="https://github.com/owner/myrepo/blob/2.x/docs/install.md"');
+});
+
+it('leaves absolute, mailto, hash, root-relative and tel links alone when rewriting relative links', function () {
+    $html = '<a href="https://example.com">abs</a> '
+        .'<a href="//cdn.example.com/x">proto</a> '
+        .'<a href="mailto:a@b.com">mail</a> '
+        .'<a href="tel:+5511">tel</a> '
+        .'<a href="#anchor">hash</a> '
+        .'<a href="/root">root</a>';
+
+    $out = GithubReadme::rewriteRelativeLinks($html, 'owner/myrepo', 'main');
+
+    expect($out)->toBe($html);
+});
+
+it('falls back to HEAD branch when no ref is supplied for relative link rewriting', function () {
+    $html = '<a href="LICENSE">x</a>';
+
+    $out = GithubReadme::rewriteRelativeLinks($html, 'owner/myrepo');
+
+    expect($out)->toContain('href="https://github.com/owner/myrepo/blob/HEAD/LICENSE"');
+});

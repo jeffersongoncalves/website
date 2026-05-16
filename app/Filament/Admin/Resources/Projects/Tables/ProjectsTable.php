@@ -18,7 +18,7 @@ class ProjectsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->defaultSort('sort_order')
+            ->defaultSort('name')
             ->columns([
                 TextColumn::make('name')
                     ->label(__('admin.fields.name'))
@@ -45,10 +45,6 @@ class ProjectsTable
                 TextColumn::make('downloads_label')
                     ->label(__('admin.fields.downloads'))
                     ->placeholder('—')
-                    ->toggleable(),
-                TextColumn::make('sort_order')
-                    ->label(__('admin.fields.sort_order'))
-                    ->sortable()
                     ->toggleable(),
                 TextColumn::make('published_at')
                     ->label(__('admin.fields.published_at'))

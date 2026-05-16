@@ -2,7 +2,7 @@
 
 @php
     $locale = \App\Support\LocaleSupport::short();
-    $description = $project->getTranslation('description', $locale, false) ?: $project->getTranslation('description', 'pt', false);
+    $title = $project->getTranslation('title', $locale, false) ?: $project->getTranslation('title', 'pt', false);
 @endphp
 
 <article class="card project-card">
@@ -21,7 +21,9 @@
         </div>
     </div>
 
-    <p class="mt-3 body-sm">{{ $description }}</p>
+    @if($title && $title !== $project->name)
+        <p class="mt-3 body-sm">{{ $title }}</p>
+    @endif
 
     @if(!empty($project->versions) || !empty($project->stack))
         <div class="flex flex-wrap gap-2 mt-4">

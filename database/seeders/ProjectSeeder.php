@@ -29,10 +29,8 @@ class ProjectSeeder extends Seeder
             return;
         }
 
-        $order = 0;
-
         foreach ($this->iterateEntries($data) as $entry) {
-            $this->upsert($entry, $order++);
+            $this->upsert($entry);
         }
     }
 
@@ -97,7 +95,7 @@ class ProjectSeeder extends Seeder
         }
     }
 
-    private function upsert(array $entry, int $order): void
+    private function upsert(array $entry): void
     {
         [$vendor, $repoName] = explode('/', $entry['package'], 2);
         $githubUrl = "https://github.com/{$vendor}/{$repoName}";
@@ -122,13 +120,11 @@ class ProjectSeeder extends Seeder
         // Default-only fields (set on insert; never overwrite editor changes)
         if (! $project->exists) {
             $project->title = ['pt' => $entry['title'], 'en' => $entry['title'], 'es' => $entry['title']];
-            $project->description = ['pt' => $entry['title'], 'en' => $entry['title'], 'es' => $entry['title']];
             $project->stars = 0;
             $project->downloads = 0;
             $project->license = 'MIT';
             $project->status = ProjectStatus::Published->value;
             $project->featured = in_array($repoName, self::FEATURED_REPOS, true);
-            $project->sort_order = $order;
             $project->published_at = now();
         }
 

@@ -14,6 +14,7 @@ class HomeController
             ->published()
             ->featured()
             ->orderByDesc('stars')
+            ->orderBy('name')
             ->take(6)
             ->get();
 

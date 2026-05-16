@@ -25,7 +25,6 @@ use Spatie\Translatable\HasTranslations;
  * @property string|null $repo
  * @property ProjectCategory $category
  * @property array<array-key, mixed>|null $title
- * @property array<array-key, mixed> $description
  * @property array<array-key, mixed>|null $content
  * @property array<array-key, mixed>|null $versions
  * @property array<array-key, mixed>|null $branch_overrides
@@ -43,7 +42,6 @@ use Spatie\Translatable\HasTranslations;
  * @property ProjectStatus $status
  * @property bool $featured
  * @property bool $is_maintainer
- * @property int $sort_order
  * @property Carbon|null $published_at
  * @property Carbon|null $last_synced_at
  * @property Carbon|null $created_at
@@ -64,7 +62,6 @@ use Spatie\Translatable\HasTranslations;
  * @method static Builder<static>|Project whereCoverImage($value)
  * @method static Builder<static>|Project whereCreatedAt($value)
  * @method static Builder<static>|Project whereDemoUrl($value)
- * @method static Builder<static>|Project whereDescription($value)
  * @method static Builder<static>|Project whereDocsUrl($value)
  * @method static Builder<static>|Project whereDownloads($value)
  * @method static Builder<static>|Project whereDownloadsLabel($value)
@@ -82,7 +79,6 @@ use Spatie\Translatable\HasTranslations;
  * @method static Builder<static>|Project wherePublishedAt($value)
  * @method static Builder<static>|Project whereRepo($value)
  * @method static Builder<static>|Project whereSlug($value)
- * @method static Builder<static>|Project whereSortOrder($value)
  * @method static Builder<static>|Project whereStack($value)
  * @method static Builder<static>|Project whereStars($value)
  * @method static Builder<static>|Project whereStatus($value)
@@ -106,7 +102,6 @@ class Project extends Model
         'repo',
         'category',
         'title',
-        'description',
         'content',
         'versions',
         'branch_overrides',
@@ -124,14 +119,12 @@ class Project extends Model
         'status',
         'featured',
         'is_maintainer',
-        'sort_order',
         'published_at',
         'last_synced_at',
     ];
 
     public array $translatable = [
         'title',
-        'description',
         'content',
     ];
 
@@ -145,7 +138,6 @@ class Project extends Model
             'downloads' => 'integer',
             'featured' => 'boolean',
             'is_maintainer' => 'boolean',
-            'sort_order' => 'integer',
             'category' => ProjectCategory::class,
             'status' => ProjectStatus::class,
             'published_at' => 'datetime',
@@ -196,12 +188,9 @@ class Project extends Model
     {
         $locale = LocaleSupport::short();
         $title = $this->getTranslation('title', $locale, false) ?: $this->name;
-        $description = $this->getTranslation('description', $locale, false)
-            ?: $this->getTranslation('description', 'pt', false);
 
         return new SEOData(
             title: $title,
-            description: $description,
             author: 'Jefferson Gonçalves',
             image: $this->cover_image
                 ? Storage::url($this->cover_image)

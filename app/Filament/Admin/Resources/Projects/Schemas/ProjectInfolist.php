@@ -3,9 +3,7 @@
 namespace App\Filament\Admin\Resources\Projects\Schemas;
 
 use App\Filament\Schemas\Components\AdditionalInformation;
-use App\Support\LocaleSupport;
 use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -32,17 +30,7 @@ class ProjectInfolist
                     ->schema([
                         TextEntry::make('status')->label(__('admin.fields.status'))->badge(),
                         IconEntry::make('featured')->label(__('admin.fields.featured'))->boolean(),
-                        TextEntry::make('sort_order')->label(__('admin.fields.sort_order')),
                         TextEntry::make('published_at')->label(__('admin.fields.published_at'))->dateTime(),
-                    ]),
-
-                Section::make(__('admin.sections.description'))
-                    ->columnSpanFull()
-                    ->schema([
-                        TextEntry::make('description')
-                            ->label(__('admin.fields.description'))
-                            ->getStateUsing(fn ($record) => $record->getTranslation('description', LocaleSupport::short(), false))
-                            ->html(),
                     ]),
 
                 Section::make(__('admin.sections.stack'))
@@ -54,19 +42,13 @@ class ProjectInfolist
                     ]),
 
                 Section::make(__('admin.sections.metrics'))
-                    ->columnSpan(2)
+                    ->columnSpanFull()
                     ->columns(4)
                     ->schema([
                         TextEntry::make('stars')->label(__('admin.fields.stars'))->numeric(),
                         TextEntry::make('downloads')->label(__('admin.fields.downloads'))->numeric(),
                         TextEntry::make('downloads_label')->label(__('admin.fields.downloads_label'))->placeholder('—'),
                         TextEntry::make('license')->label(__('admin.fields.license')),
-                    ]),
-
-                Section::make(__('admin.sections.cover'))
-                    ->columnSpan(1)
-                    ->schema([
-                        ImageEntry::make('cover_image')->label(__('admin.fields.cover_image'))->placeholder('—'),
                     ]),
 
                 Section::make(__('admin.sections.links'))

@@ -65,6 +65,7 @@ class GithubReadme
             $branch = $ref ?: self::defaultBranch($repo, $cache);
             $markdown = self::rewriteRelativeAssets($result['body'], $repo, $branch);
             $html = self::renderMarkdown($markdown);
+            $html = self::rewriteRelativeLinks($html, $repo, $branch);
 
             $path = 'readme/'.str_replace('/', '__', $repo).'/'.$refKey.'.html';
             $disk->put($path, $html);
@@ -294,6 +295,35 @@ class GithubReadme
         }
 
         return $headers;
+    }
+
+    /**
+     * Rewrite relative `<a href="...">` URLs in rendered README HTML into
+     * absolute GitHub blob URLs. README links like `[License](LICENSE)` come
+     * out as `<a href="LICENSE">` and would otherwise resolve to a 404 under
+     * the local site path. Absolute URLs, mailto/tel/hash links and root-
+     * relative paths are passed through unchanged.
+     */
+    public static function rewriteRelativeLinks(string $html, string $repo, ?string $ref = null): string
+    {
+        $branch = $ref ?: 'HEAD';
+        $base = "https://github.com/{$repo}/blob/{$branch}/";
+
+        return preg_replace_callback(
+            '~<a([^>]*?)\shref="([^"]+)"([^>]*)>~i',
+            function (array $m) use ($base): string {
+                $href = trim($m[2]);
+
+                if ($href === '' || preg_match('~^(https?:|//|mailto:|tel:|javascript:|data:|#|/)~i', $href)) {
+                    return $m[0];
+                }
+
+                $url = $base.ltrim($href, './');
+
+                return '<a'.$m[1].' href="'.$url.'"'.$m[3].'>';
+            },
+            $html
+        ) ?? $html;
     }
 
     private static function rewriteRelativeAssets(string $markdown, string $repo, ?string $ref = null): string

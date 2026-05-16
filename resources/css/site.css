@@ -81,7 +81,11 @@
     padding: 0;
   }
 
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    /* Offset anchor jumps so the 64px sticky site-header doesn't cover them */
+    scroll-padding-top: 80px;
+  }
 
   body {
     font-family: var(--font-body);

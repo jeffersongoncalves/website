@@ -431,22 +431,47 @@ html.dark, html {
     animation: editorial-pulse 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
 
-/* Sidebar: relative positioned, stretches with main height, min full viewport */
-@media (min-width: 64rem) {
-    .fi-body-has-topbar .fi-sidebar {
-        position: relative !important;
-        inset-block: auto !important;
-        top: 0 !important;
-        bottom: auto !important;
-        height: auto !important;
-        min-height: calc(100dvh - 64px) !important;
-        align-self: stretch !important;
-    }
-}
-
-/* Livewire wrapper around the sidebar — make it a flex container */
+/* FIX 1 — Livewire wrapper around the sidebar — fixed positioning
+   min-width prevents collapse during Livewire morphing when :has() loses match */
 div:has(> aside.fi-sidebar) {
     display: flex !important;
+    position: fixed !important;
+    inset-block: 0 !important;
+    inset-inline-start: 0 !important;
+    margin-top: 64px !important;
+    z-index: 30;
+    min-width: 81px;
+}
+
+/* FIX 2 — Override Filament's "transition: all" on .fi-main-ctn.
+   Allow opacity + width animations but NOT margin — kills horizontal slide
+   caused by Livewire morphing re-triggering margin transitions. */
+.fi-main-ctn {
+    transition-property: opacity, width !important;
+    transition-duration: 0.15s !important;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* FIX 3 — Push main content right when sidebar open */
+.fi-main-ctn-sidebar-open {
+    margin-inline-start: 320px !important;
+}
+
+/* FIX 3 — Push main content right when sidebar collapsed */
+.fi-main-ctn-sidebar-collapsible-on-desktop:not(.fi-main-ctn-sidebar-open) {
+    margin-inline-start: 81px !important;
+}
+
+/* FIX 5 — Reserve scrollbar space to eliminate horizontal layout shifts */
+html {
+    scrollbar-gutter: stable;
+    overflow-y: scroll;
+}
+
+/* FIX 6 — Sidebar nav scrolls independently */
+.fi-sidebar-nav {
+    overflow-y: auto !important;
+    overflow-x: hidden;
 }
 
 /* Hide sidebar status block when sidebar is collapsed (no `fi-sidebar-open` class) */

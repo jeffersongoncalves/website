@@ -19,7 +19,7 @@
 
             {{-- Breadcrumb back link --}}
             <a href="{{ route('projects.index') }}" class="project-back" id="top">
-                ← @lang('site.projects.back_to_list')
+                @lang('site.projects.back_to_list')
             </a>
 
             {{-- Compact project header --}}

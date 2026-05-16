@@ -26,7 +26,10 @@
                     x-data="{ isDark: document.documentElement.classList.contains('dark') }"
                     @click="
                         isDark = !isDark;
-                        document.documentElement.classList.toggle('dark', isDark);
+                        const h = document.documentElement;
+                        h.classList.toggle('dark', isDark);
+                        h.style.colorScheme = isDark ? 'dark' : 'light';
+                        h.style.background = isDark ? '#0B0A09' : '#FFFEF9';
                         try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch (e) {}
                     "
                     :aria-label="isDark ? @js(__('site.common.toggle_light')) : @js(__('site.common.toggle_dark'))"

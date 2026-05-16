@@ -51,6 +51,8 @@ return [
         'open_menu' => 'Open menu',
         'close_menu' => 'Close menu',
         'toggle_lang' => 'Toggle language',
+        'toggle_light' => 'Switch to light theme',
+        'toggle_dark' => 'Switch to dark theme',
         'less' => 'Less',
         'more' => 'More',
         'updated_in' => 'updated on',

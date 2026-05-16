@@ -51,6 +51,8 @@ return [
         'open_menu' => 'Abrir menu',
         'close_menu' => 'Fechar menu',
         'toggle_lang' => 'Alternar idioma',
+        'toggle_light' => 'Mudar para tema claro',
+        'toggle_dark' => 'Mudar para tema escuro',
         'less' => 'Menos',
         'more' => 'Mais',
         'updated_in' => 'atualizado em',

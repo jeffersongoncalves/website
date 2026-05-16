@@ -122,10 +122,10 @@
                     <div class="flex items-center gap-2 mono-meta">
                         <span>@lang('site.common.less')</span>
                         <span class="hm-cell"></span>
-                        <span class="hm-cell" style="background:rgba(245,158,11,0.25);"></span>
-                        <span class="hm-cell" style="background:rgba(245,158,11,0.5);"></span>
-                        <span class="hm-cell" style="background:rgba(245,158,11,0.75);"></span>
-                        <span class="hm-cell" style="background:rgba(245,158,11,1);"></span>
+                        <span class="hm-cell" data-level="1"></span>
+                        <span class="hm-cell" data-level="2"></span>
+                        <span class="hm-cell" data-level="3"></span>
+                        <span class="hm-cell" data-level="4"></span>
                         <span>@lang('site.common.more')</span>
                     </div>
                 </div>

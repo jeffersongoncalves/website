@@ -1,6 +1,10 @@
 /* ============================================================================
    Jefferson Gonçalves — Design System Tokens
    Source of truth: jeffersongoncalves.dev.br-assets/jefferson-design-system.html
+
+   Dark + Light schemes via semantic tokens.
+   Tailwind dark-mode convention: html.dark = dark, default = light.
+   Pre-paint script in <head> applies .dark when needed (avoids FOUC).
    ============================================================================ */
 
 /* ============== @font-face (split per family, served via Vite) ============== */
@@ -23,7 +27,20 @@
   --ink-100: #F0EBDF;
   --ink-050: #F8F5EE;
 
-  /* ========== AMBER (signature) ========== */
+  /* ========== PAPER SCALE (warm off-white, paper-light) ========== */
+  --paper-50:  #FFFEF9;
+  --paper-100: #F8F5EE;
+  --paper-150: #F2EEE2;
+  --paper-200: #EDE7D8;
+  --paper-300: #D9D2C5;
+  --paper-400: #B8B0A4;
+  --paper-500: #8B8377;
+  --paper-600: #5C5349;
+  --paper-700: #3D362F;
+  --paper-800: #2A2620;
+  --paper-900: #1F1B17;
+
+  /* ========== AMBER (signature — shared across schemes) ========== */
   --amber-100: #FEF3C7;
   --amber-200: #FDE68A;
   --amber-300: #FCD34D;
@@ -31,13 +48,12 @@
   --amber-500: #F59E0B;
   --amber-600: #D97706;
   --amber-700: #B45309;
-  --amber-glow: rgba(251, 191, 36, 0.18);
 
   /* ========== ACCENT (terminal moss / nature) ========== */
   --moss-400: #A3B86A;
   --moss-500: #84A07C;
 
-  /* ========== SEMANTIC ========== */
+  /* ========== SEMANTIC SIGNAL COLORS ========== */
   --success: #86C682;
   --warning: #FBBF24;
   --danger: #E26B5C;
@@ -69,16 +85,110 @@
   --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
 
-  /* ========== ELEVATION ========== */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 0 1px var(--amber-glow), 0 8px 32px var(--amber-glow);
-
   /* ========== MOTION ========== */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-fast: 120ms;
   --dur-base: 240ms;
   --dur-slow: 480ms;
+
+  /* ========================================================================
+     SEMANTIC TOKENS · default = LIGHT scheme
+     (html.dark below overrides for dark scheme — Tailwind convention)
+     ======================================================================== */
+  --surface-base:           var(--paper-50);
+  --surface-elevated:       var(--paper-100);
+  --surface-elevated-alt:   var(--paper-150);
+  --surface-glass:          rgba(255, 254, 249, 0.9);
+  --surface-terminal:       var(--paper-100);
+  --surface-terminal-bar:   var(--paper-200);
+  --surface-code:           var(--paper-150);
+  --surface-pill:           var(--paper-100);
+
+  --text-strong:            var(--paper-900);
+  --text-regular:           var(--paper-800);
+  --text-muted:             var(--paper-600);
+  --text-dim:               var(--paper-500);
+  --text-faint:             var(--paper-400);
+  --text-on-accent:         var(--ink-950);
+
+  --border-soft:            var(--paper-200);
+  --border-strong:          var(--paper-300);
+  --border-hover:           var(--paper-400);
+  --border-dashed:          var(--paper-300);
+
+  --accent:                 var(--amber-600);
+  --accent-strong:          var(--amber-700);
+  --accent-soft:            var(--amber-500);
+  --accent-glow:            rgba(217, 119, 6, 0.18);
+  --accent-bg-soft:         rgba(217, 119, 6, 0.10);
+  --accent-bg-strong:       rgba(217, 119, 6, 0.22);
+  --accent-text:            var(--amber-700);
+  --accent-underline:       rgba(217, 119, 6, 0.40);
+
+  --shadow-sm:              0 1px 2px rgba(60, 40, 20, 0.06);
+  --shadow-md:              0 4px 12px rgba(60, 40, 20, 0.10);
+  --shadow-lg:              0 12px 32px rgba(60, 40, 20, 0.18);
+  --shadow-glow:            0 0 0 1px var(--accent-glow), 0 8px 32px var(--accent-glow);
+
+  --bg-glow-accent:         rgba(217, 119, 6, 0.05);
+  --bg-glow-moss:           rgba(132, 160, 124, 0.05);
+
+  --paper-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.24 0 0 0 0 0.20 0 0 0 0 0.14 0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  --paper-grain-opacity:    0.04;
+
+  /* Legacy amber-glow alias kept for backwards compat */
+  --amber-glow:             var(--accent-glow);
+
+  color-scheme: light;
+}
+
+/* ========================================================================
+   SEMANTIC TOKENS · DARK scheme override
+   ======================================================================== */
+html.dark {
+  --surface-base:           var(--ink-950);
+  --surface-elevated:       var(--ink-900);
+  --surface-elevated-alt:   var(--ink-850);
+  --surface-glass:          rgba(11, 10, 9, 0.9);
+  --surface-terminal:       var(--ink-900);
+  --surface-terminal-bar:   var(--ink-850);
+  --surface-code:           var(--ink-950);
+  --surface-pill:           var(--ink-900);
+
+  --text-strong:            var(--ink-100);
+  --text-regular:           var(--ink-200);
+  --text-muted:             var(--ink-400);
+  --text-dim:               var(--ink-500);
+  --text-faint:             var(--ink-600);
+  --text-on-accent:         var(--ink-950);
+
+  --border-soft:            var(--ink-800);
+  --border-strong:          var(--ink-700);
+  --border-hover:           var(--ink-600);
+  --border-dashed:          var(--ink-700);
+
+  --accent:                 var(--amber-400);
+  --accent-strong:          var(--amber-300);
+  --accent-soft:            var(--amber-500);
+  --accent-glow:            rgba(251, 191, 36, 0.18);
+  --accent-bg-soft:         rgba(251, 191, 36, 0.10);
+  --accent-bg-strong:       rgba(251, 191, 36, 0.20);
+  --accent-text:            var(--amber-400);
+  --accent-underline:       rgba(251, 191, 36, 0.40);
+
+  --shadow-sm:              0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md:              0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg:              0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow:            0 0 0 1px var(--accent-glow), 0 8px 32px var(--accent-glow);
+
+  --bg-glow-accent:         rgba(251, 191, 36, 0.06);
+  --bg-glow-moss:           rgba(132, 160, 124, 0.05);
+
+  --paper-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.92 0 0 0 0 0.85 0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  --paper-grain-opacity:    0.06;
+
+  --amber-glow:             var(--accent-glow);
+
+  color-scheme: dark;
 }

@@ -85,7 +85,7 @@ class AdminPanelProvider extends PanelProvider
                 scopes: [Login::class],
             )
             ->renderHook(
-                PanelsRenderHook::SIDEBAR_NAV_END,
+                PanelsRenderHook::SIDEBAR_FOOTER,
                 fn () => view('filament.partials.sidebar-status'),
             )
             ->renderHook(

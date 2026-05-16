@@ -83,10 +83,6 @@ html.dark, html {
     mix-blend-mode: overlay;
 }
 
-.fi-main, .fi-sidebar, .fi-topbar {
-    position: relative;
-    z-index: 2;
-}
 
 /* ============================================================
    TYPOGRAPHY

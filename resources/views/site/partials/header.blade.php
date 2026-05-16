@@ -14,10 +14,10 @@
         </a>
 
         <nav class="hidden md:flex items-center gap-8 text-[0.9375rem]" aria-label="@lang('site.nav.about')">
-            <a href="{{ route('about',         ['locale' => $locale]) }}" class="nav-link">@lang('site.nav.about')</a>
-            <a href="{{ route('projects.index',['locale' => $locale]) }}" class="nav-link">@lang('site.nav.projects')</a>
-            <a href="{{ route('open-source',   ['locale' => $locale]) }}" class="nav-link">@lang('site.nav.open_source')</a>
-            <a href="{{ route('sponsors',      ['locale' => $locale]) }}" class="nav-link">@lang('site.nav.sponsors')</a>
+            <a href="{{ route('about') }}" class="nav-link">@lang('site.nav.about')</a>
+            <a href="{{ route('projects.index') }}" class="nav-link">@lang('site.nav.projects')</a>
+            <a href="{{ route('open-source') }}" class="nav-link">@lang('site.nav.open_source')</a>
+            <a href="{{ route('sponsors') }}" class="nav-link">@lang('site.nav.sponsors')</a>
         </nav>
 
         <div class="flex items-center gap-2">

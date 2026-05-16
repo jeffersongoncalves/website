@@ -16,10 +16,10 @@
             <div>
                 <div class="site-footer-title">@lang('site.footer.navigation')</div>
                 <ul class="site-footer-list">
-                    <li><a href="{{ route('about',          ['locale' => $locale]) }}">@lang('site.nav.about')</a></li>
+                    <li><a href="{{ route('about') }}">@lang('site.nav.about')</a></li>
                     <li><a href="{{ route('projects.index') }}">@lang('site.nav.projects')</a></li>
-                    <li><a href="{{ route('open-source',    ['locale' => $locale]) }}">@lang('site.nav.open_source')</a></li>
-                    <li><a href="{{ route('sponsors',       ['locale' => $locale]) }}">@lang('site.nav.sponsors')</a></li>
+                    <li><a href="{{ route('open-source') }}">@lang('site.nav.open_source')</a></li>
+                    <li><a href="{{ route('sponsors') }}">@lang('site.nav.sponsors')</a></li>
                 </ul>
             </div>
 

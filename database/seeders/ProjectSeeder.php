@@ -108,8 +108,6 @@ class ProjectSeeder extends Seeder
         $project->name = $repoName;
         $project->repo = $repoName;
         $project->category = $entry['category']->value;
-        $project->versions = $entry['versions'];
-        $project->stack = $entry['stack'];
         $project->github_url = $githubUrl;
         $project->packagist_url = $packagistUrl;
 
@@ -117,9 +115,13 @@ class ProjectSeeder extends Seeder
             $project->docs_url = "https://plugins.jetbrains.com/plugin/{$entry['extra']['jetbrainsId']}";
         }
 
-        // Default-only fields (set on insert; never overwrite editor changes)
+        // Default-only fields (set on insert; never overwrite editor changes).
+        // versions + stack stay editor-managed after creation so a re-seed can
+        // never wipe manual branch_overrides tied to a specific versions list.
         if (! $project->exists) {
             $project->title = ['pt' => $entry['title'], 'en' => $entry['title'], 'es' => $entry['title']];
+            $project->versions = $entry['versions'];
+            $project->stack = $entry['stack'];
             $project->stars = 0;
             $project->downloads = 0;
             $project->license = 'MIT';

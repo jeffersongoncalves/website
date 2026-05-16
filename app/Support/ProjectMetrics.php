@@ -25,12 +25,149 @@ class ProjectMetrics
             $changed = true;
         }
 
+        $repairedOverrides = self::repairBranchOverrides($project);
+        if ($repairedOverrides !== null) {
+            $project->branch_overrides = $repairedOverrides;
+            $changed = true;
+        }
+
         if ($changed) {
             $project->last_synced_at = now();
             $project->save();
         }
 
         return $changed;
+    }
+
+    /**
+     * Verify each branch_overrides entry against the real branch list on
+     * GitHub. Manual overrides that still point at an existing branch are
+     * preserved verbatim. Only entries pointing at a now-missing branch are
+     * repaired — first by trying the auto-branch (1.x, 2.x, ...), then
+     * the repo's default branch (typically `main` or `master`).
+     *
+     * @return array<string,string>|null  the repaired map, or null when no
+     *                                    change is needed / when verification
+     *                                    cannot be performed (network error,
+     *                                    no GitHub URL, non-Filament project)
+     */
+    private static function repairBranchOverrides(Project $project): ?array
+    {
+        if (! is_array($project->versions) || $project->versions === []) {
+            return null;
+        }
+
+        $branches = self::fetchBranches($project->github_url);
+
+        if ($branches === null) {
+            return null;
+        }
+
+        $current = is_array($project->branch_overrides) ? $project->branch_overrides : [];
+        $defaultBranch = self::fetchDefaultBranch($project->github_url);
+
+        $next = [];
+        foreach (array_values($project->versions) as $i => $_) {
+            $autoBranch = ($i + 1).'.x';
+            $currentValue = isset($current[$autoBranch]) ? trim((string) $current[$autoBranch]) : '';
+
+            if ($currentValue !== '' && in_array($currentValue, $branches, true)) {
+                $next[$autoBranch] = $currentValue;
+
+                continue;
+            }
+
+            if (in_array($autoBranch, $branches, true)) {
+                $next[$autoBranch] = $autoBranch;
+
+                continue;
+            }
+
+            if ($defaultBranch !== null && in_array($defaultBranch, $branches, true)) {
+                $next[$autoBranch] = $defaultBranch;
+
+                continue;
+            }
+
+            $next[$autoBranch] = $currentValue !== '' ? $currentValue : $autoBranch;
+        }
+
+        return $next === $current ? null : $next;
+    }
+
+    /**
+     * @return list<string>|null  branch names, or null when the GitHub API
+     *                            request cannot be completed.
+     */
+    private static function fetchBranches(?string $githubUrl): ?array
+    {
+        $repo = GithubReadme::repoFromUrl($githubUrl);
+
+        if (! $repo) {
+            return null;
+        }
+
+        $headers = ['User-Agent' => 'jeffersongoncalves-site', 'Accept' => 'application/vnd.github+json'];
+
+        if ($token = config('services.github.token')) {
+            $headers['Authorization'] = "Bearer {$token}";
+        }
+
+        $names = [];
+        $page = 1;
+
+        do {
+            $response = Http::timeout(8)
+                ->withHeaders($headers)
+                ->get("https://api.github.com/repos/{$repo}/branches", [
+                    'per_page' => 100,
+                    'page' => $page,
+                ]);
+
+            if (! $response->successful()) {
+                Log::warning('GitHub branches API failed', ['repo' => $repo, 'status' => $response->status()]);
+
+                return null;
+            }
+
+            $batch = (array) $response->json();
+            foreach ($batch as $branch) {
+                if (is_array($branch) && isset($branch['name']) && is_string($branch['name'])) {
+                    $names[] = $branch['name'];
+                }
+            }
+
+            $page++;
+        } while (count($batch) === 100 && $page <= 5);
+
+        return $names;
+    }
+
+    private static function fetchDefaultBranch(?string $githubUrl): ?string
+    {
+        $repo = GithubReadme::repoFromUrl($githubUrl);
+
+        if (! $repo) {
+            return null;
+        }
+
+        $headers = ['User-Agent' => 'jeffersongoncalves-site', 'Accept' => 'application/vnd.github+json'];
+
+        if ($token = config('services.github.token')) {
+            $headers['Authorization'] = "Bearer {$token}";
+        }
+
+        $response = Http::timeout(8)
+            ->withHeaders($headers)
+            ->get("https://api.github.com/repos/{$repo}");
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        $branch = $response->json('default_branch');
+
+        return is_string($branch) && $branch !== '' ? $branch : null;
     }
 
     private static function fetchStars(?string $githubUrl): ?int

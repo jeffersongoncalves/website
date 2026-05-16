@@ -17,27 +17,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="color-scheme" content="light dark">
-    {{-- Pre-paint theme resolver: applies html.dark + inline bg before CSS loads.
-         Inline style on <html> paints immediately so there is no light→dark flash
-         while the external stylesheet is still in-flight. --}}
+    {{-- Pre-paint theme resolver: applies html.dark + inline bg + browser
+         theme-color before CSS loads. Inline style on <html> paints
+         immediately so there is no light→dark flash while the external
+         stylesheet is still in-flight. --}}
+    <x-favicon/>
     <script>
         (function () {
             try {
                 var t = localStorage.getItem('theme');
                 var dark = t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches);
                 var h = document.documentElement;
-                if (dark) {
-                    h.classList.add('dark');
-                    h.style.colorScheme = 'dark';
-                    h.style.background = '#0B0A09';
-                } else {
-                    h.style.colorScheme = 'light';
-                    h.style.background = '#FFFEF9';
-                }
+                var bg = dark ? '#0B0A09' : '#FFFEF9';
+                if (dark) h.classList.add('dark');
+                h.style.colorScheme = dark ? 'dark' : 'light';
+                h.style.background = bg;
+                var tcm = document.getElementById('theme-color-meta');
+                if (tcm) tcm.content = bg;
             } catch (e) {}
         })();
     </script>
-    <x-favicon/>
     {!! seo($resolvedSeo) !!}
     @vite(['resources/css/site.css', 'resources/js/site.js'])
     @stack('head')

@@ -27,9 +27,12 @@
                     @click="
                         isDark = !isDark;
                         const h = document.documentElement;
+                        const bg = isDark ? '#0B0A09' : '#FFFEF9';
                         h.classList.toggle('dark', isDark);
                         h.style.colorScheme = isDark ? 'dark' : 'light';
-                        h.style.background = isDark ? '#0B0A09' : '#FFFEF9';
+                        h.style.background = bg;
+                        const tcm = document.getElementById('theme-color-meta');
+                        if (tcm) tcm.content = bg;
                         try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch (e) {}
                     "
                     :aria-label="isDark ? @js(__('site.common.toggle_light')) : @js(__('site.common.toggle_dark'))"

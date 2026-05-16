@@ -13,7 +13,7 @@
 <link rel="manifest" href="{{ asset('/manifest.json') }}">
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="msapplication-TileImage" content="{{ Vite::asset('resources/favicon/ms-icon-144x144.png') }}">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" id="theme-color-meta" content="#FFFEF9">
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="{{ config('filakit.favicon.manifest.name') }}"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black"/>

@@ -716,6 +716,28 @@
     border-radius: var(--r-xs);
   }
   .markdown-body img { max-width: 100%; height: auto; border-radius: var(--r-sm); margin: var(--s-3) 0; }
+
+  /* Badge row — when a paragraph only holds anchor-wrapped images (shields.io
+     badges, CI status badges, etc) keep them on one inline row instead of
+     letting each badge stack on its own line. */
+  .markdown-body p:has(> a > img) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.4;
+  }
+  .markdown-body p:has(> a > img) > a {
+    display: inline-flex;
+    margin: 0;
+  }
+  .markdown-body p:has(> a > img) > a > img,
+  .markdown-body p > a > img {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    border-radius: 3px;
+  }
   .markdown-body hr { border: 0; border-top: 1px solid var(--border-soft); margin: var(--s-7) 0; }
   .markdown-body table {
     width: 100%;

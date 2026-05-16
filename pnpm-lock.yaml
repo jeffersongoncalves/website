@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      alpinejs:
+        specifier: ^3.15.12
+        version: 3.15.12
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.2.4
@@ -260,6 +264,15 @@ packages:
 
   '@tybys/wasm-util@0.10.2':
     resolution: {integrity: sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==}
+
+  '@vue/reactivity@3.1.5':
+    resolution: {integrity: sha512-1tdfLmNjWG6t/CsPldh+foumYFo3cpyCHgBYQ34ylaMsJ+SNHQ1kApMIa8jN+i593zQuaw3AdWH0nJTARzCFhg==}
+
+  '@vue/shared@3.1.5':
+    resolution: {integrity: sha512-oJ4F3TnvpXaQwZJNF3ZK+kLPHKarDmJjJ6jyzVNDKH9md1dptjC7lWR//jrGuLdek/U6iltWxqAnYOu8gCiOvA==}
+
+  alpinejs@3.15.12:
+    resolution: {integrity: sha512-nJvPAQVNPdZZ0NrExJ/kzQco3ijR8LwvCOadQecllESiqT4NyZ/57sN9V2XyvhlBGAbmlKYgeWZvYdKq99ij/Q==}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -862,6 +875,16 @@ snapshots:
     dependencies:
       tslib: 2.8.1
     optional: true
+
+  '@vue/reactivity@3.1.5':
+    dependencies:
+      '@vue/shared': 3.1.5
+
+  '@vue/shared@3.1.5': {}
+
+  alpinejs@3.15.12:
+    dependencies:
+      '@vue/reactivity': 3.1.5
 
   ansi-regex@5.0.1: {}
 

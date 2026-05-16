@@ -49,6 +49,12 @@ class AppServiceProvider extends ServiceProvider
             Vite::useAggressivePrefetching();
         }
 
+        // Strip Livewire's data-navigate-track="reload" from Vite-injected
+        // assets — no panel uses SPA navigate, and the attribute otherwise
+        // forces a hard CSS/JS reload on every full-page navigation.
+        Vite::useStyleTagAttributes(['data-navigate-track' => false]);
+        Vite::useScriptTagAttributes(['data-navigate-track' => false]);
+
         Model::automaticallyEagerLoadRelationships();
 
         Paginator::defaultView('pagination.site');

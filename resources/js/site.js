@@ -1,4 +1,6 @@
-import { Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm';
+import Alpine from 'alpinejs';
+
+window.Alpine = Alpine;
 Alpine.data('terminalTyping', ({ target = '', delay = 600, speed = 60 } = {}) => ({
     typed: '',
     typingDone: false,

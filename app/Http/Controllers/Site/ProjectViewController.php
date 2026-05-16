@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class ProjectViewController
 {
-    public function __invoke(Request $request, string $locale, string $slug): View
+    public function __invoke(Request $request, string $slug): View
     {
         /** @var Project $project */
         $project = Project::query()

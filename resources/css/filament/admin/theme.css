@@ -452,14 +452,17 @@ div:has(> aside.fi-sidebar) {
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* FIX 3 — Push main content right when sidebar open */
-.fi-main-ctn-sidebar-open {
-    margin-inline-start: 320px !important;
+/* FIX 3 — Push main content right when sidebar open (320px) or collapsed (81px).
+   Scoped via body class so guest/login pages without sidebar are unaffected. */
+.fi-body-has-sidebar-collapsible-on-desktop .fi-main-ctn,
+.fi-body-has-sidebar-fully-collapsible-on-desktop .fi-main-ctn {
+    margin-inline-start: 81px !important;
 }
 
-/* FIX 3 — Push main content right when sidebar collapsed */
-.fi-main-ctn-sidebar-collapsible-on-desktop:not(.fi-main-ctn-sidebar-open) {
-    margin-inline-start: 81px !important;
+.fi-body-has-sidebar-collapsible-on-desktop .fi-main-ctn.fi-main-ctn-sidebar-open,
+.fi-body-has-sidebar-fully-collapsible-on-desktop .fi-main-ctn.fi-main-ctn-sidebar-open,
+.fi-main-ctn-sidebar-open {
+    margin-inline-start: 320px !important;
 }
 
 /* FIX 5 — Reserve scrollbar space to eliminate horizontal layout shifts */
@@ -664,14 +667,20 @@ html {
     background: rgba(24, 22, 18, 0.6) !important;
     border-color: var(--color-ink-700) !important;
 }
-.login-terminal .fi-fo-field-wrp-label {
-    font-family: var(--font-mono);
+.login-terminal .fi-fo-field-wrp-label,
+.login-terminal label,
+.login-terminal .fi-fo-field-wrp label {
+    font-family: var(--font-mono) !important;
     font-size: 10px !important;
     letter-spacing: 0.12em !important;
+    text-transform: uppercase;
+    color: var(--color-ink-400) !important;
 }
-.login-terminal .fi-btn-color-primary {
-    width: 100%;
-    justify-content: center;
+.login-terminal .fi-btn,
+.login-terminal .fi-color-primary,
+.login-terminal button[type="submit"] {
+    width: 100% !important;
+    justify-content: center !important;
     font-family: var(--font-sans);
     font-weight: 500;
 }

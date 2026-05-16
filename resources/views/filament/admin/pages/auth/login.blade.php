@@ -49,10 +49,24 @@
 
     @push('scripts')
         <script>
+            // No-op Alpine stubs for site components inlined into the login preview.
+            // Prevents ReferenceErrors from leaking into the admin console.
+            document.addEventListener('alpine:init', () => {
+                const noop = () => ({ init() {} });
+                window.Alpine.data('stickyHeader',    () => ({ scrolled: false, init() {} }));
+                window.Alpine.data('terminalTyping',  () => ({ typed: '', typingDone: false, init() {} }));
+                window.Alpine.data('countUp',         () => ({ stats: {}, init() {} }));
+                window.Alpine.data('heatmap',         () => ({ cells: [], init() {} }));
+                window.Alpine.data('markdownCopy',    noop);
+            });
+        </script>
+
+        <script>
             (function () {
                 const TYPE_SPEED = 55;
                 const PAUSE_AFTER = 320;
                 const START_DELAY = 1500;
+                const SEEN_KEY = 'admin-login-intro-seen';
 
                 function typeInto(el, text, speed) {
                     return new Promise((resolve) => {
@@ -74,6 +88,24 @@
                     return new Promise((r) => setTimeout(r, ms));
                 }
 
+                function revealForm() {
+                    const line1 = document.querySelector('[data-typewriter="whoami"]');
+                    const line2 = document.querySelector('[data-typewriter-line="2"]');
+                    const line3 = document.querySelector('[data-typewriter-line="3"]');
+                    const cursor1 = document.querySelector('[data-cursor="1"]');
+                    const cursor3 = document.querySelector('[data-cursor="3"]');
+                    const prompt3 = document.querySelector('[data-prompt="3"]');
+                    const form = document.querySelector('[data-typewriter-form]');
+
+                    if (line1) line1.textContent = line1.dataset.typewriter;
+                    if (line2) line2.textContent = line2.dataset.typewriter;
+                    if (line3) line3.textContent = line3.dataset.typewriter;
+                    if (cursor1) cursor1.style.display = 'none';
+                    if (cursor3) cursor3.style.display = 'inline-block';
+                    if (prompt3) prompt3.style.opacity = '1';
+                    if (form) form.style.opacity = '1';
+                }
+
                 async function run() {
                     const line1 = document.querySelector('[data-typewriter="whoami"]');
                     const line2 = document.querySelector('[data-typewriter-line="2"]');
@@ -84,6 +116,14 @@
 
                     if (!line1 || !line2 || !line3) return;
 
+                    // Fast-path: skip intro if user already saw it this session
+                    let seen = false;
+                    try { seen = sessionStorage.getItem(SEEN_KEY) === '1'; } catch (e) {}
+                    if (seen) {
+                        revealForm();
+                        return;
+                    }
+
                     // Reset
                     line1.textContent = '';
                     line2.textContent = '';
@@ -93,31 +133,28 @@
 
                     await wait(START_DELAY);
 
-                    // line 1: $ whoami
                     await typeInto(line1, line1.dataset.typewriter, TYPE_SPEED);
                     if (cursor1) cursor1.style.display = 'none';
                     await wait(PAUSE_AFTER);
 
-                    // response line
                     await typeInto(line2, line2.dataset.typewriter, TYPE_SPEED);
                     await wait(PAUSE_AFTER);
 
-                    // line 3: $ login --required
                     const prompt3 = document.querySelector('[data-prompt="3"]');
                     if (prompt3) prompt3.style.opacity = '1';
                     if (cursor3) cursor3.style.display = 'inline-block';
                     await typeInto(line3, line3.dataset.typewriter, TYPE_SPEED);
                     await wait(PAUSE_AFTER);
 
-                    // Fade form in
                     if (form) {
                         form.style.transition = 'opacity 400ms cubic-bezier(0.22, 1, 0.36, 1)';
                         form.style.opacity = '1';
                     }
 
+                    try { sessionStorage.setItem(SEEN_KEY, '1'); } catch (e) {}
+
                     await wait(450);
 
-                    // Focus email input
                     const input = document.querySelector('.login-terminal input[type="email"], .login-terminal input[name="email"]');
                     if (input) input.focus({ preventScroll: true });
                 }
@@ -127,6 +164,17 @@
                 } else {
                     run();
                 }
+
+                // Re-reveal after Livewire morph (validation failure round-trip)
+                document.addEventListener('livewire:navigated', revealForm);
+                document.addEventListener('livewire:initialized', () => {
+                    if (window.Livewire && window.Livewire.hook) {
+                        window.Livewire.hook('morph.updated', revealForm);
+                        window.Livewire.hook('commit', ({ succeed }) => {
+                            succeed(() => revealForm());
+                        });
+                    }
+                });
             })();
         </script>
     @endpush

@@ -22,6 +22,6 @@
     }
 @endphp
 
-<div aria-hidden="true" inert class="login-preview-bg">
+<div x-ignore aria-hidden="true" inert class="login-preview-bg">
     {!! $bodyContent !!}
 </div>

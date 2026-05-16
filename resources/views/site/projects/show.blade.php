@@ -8,116 +8,190 @@
         ['name' => __('site.nav.projects'), 'url' => route('projects.index')],
         ['name' => $title, 'url' => route('projects.show', ['slug' => $project->slug])],
     ];
+
+    $initial = strtoupper(mb_substr($project->name, 0, 1));
 @endphp
 
 <x-site.layouts.app :title="$project->name" :description="$desc" :breadcrumbs="$breadcrumbs" :seoData="$project">
 
-    <article class="section" style="border-top:none;padding-top:var(--s-9);">
-        <div class="wrap" style="max-width:880px;">
-            <x-site.eyebrow num="01" label="projeto"/>
+    <section class="section project-page-section">
+        <div class="wrap">
 
-            <div class="flex items-center flex-wrap"
-                 style="gap:var(--s-3);font-family:var(--font-mono);font-size:0.8125rem;color:var(--ink-500);">
-                <span class="badge">{{ $project->category->getLabel() }}</span>
-                @if($project->is_maintainer)
-                    <span class="badge badge-success" title="{{ __('Maintainer, not original author') }}">{{ __('maintainer') }}</span>
-                @endif
-                <span>★ {{ $project->stars }}</span>
-                <span>·</span>
-                <span>↓ {{ $project->downloads_label ?: '—' }}</span>
-                <span>·</span>
-                <span>⎘ {{ $project->license }}</span>
-            </div>
+            {{-- Breadcrumb back link --}}
+            <a href="{{ route('projects.index') }}" class="project-back" id="top">
+                ← @lang('site.projects.back_to_list')
+            </a>
 
-            <h1 style="margin-top:var(--s-5);font-size:clamp(36px,6vw,72px);font-weight:400;letter-spacing:-0.025em;line-height:1.05;">
-                {{ $project->name }}
-            </h1>
-
-            <p style="margin-top:var(--s-5);font-size:1.125rem;line-height:1.6;max-width:62ch;color:var(--ink-300);">
-                {{ $desc }}
-            </p>
-
-            @if(!empty($project->versions) || !empty($project->stack))
-                <div class="flex flex-wrap" style="margin-top:var(--s-6);gap:var(--s-2);">
-                    @foreach($project->versions ?? [] as $v)
-                        <span class="badge badge-accent">{{ $v }}</span>
-                    @endforeach
-                    @foreach($project->stack ?? [] as $s)
-                        <span class="badge">{{ $s }}</span>
-                    @endforeach
-                </div>
-            @endif
-
-            <div class="flex flex-wrap" style="margin-top:var(--s-6);gap:var(--s-3);">
-                <a href="{{ $project->github_url }}" rel="noopener" target="_blank" class="btn btn-primary">
-                    GitHub
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-                </a>
-                @if($project->packagist_url)
-                    <a href="{{ $project->packagist_url }}" rel="noopener" target="_blank" class="btn btn-secondary">Packagist</a>
-                @endif
-                @if($project->docs_url)
-                    <a href="{{ $project->docs_url }}" rel="noopener" target="_blank" class="btn btn-secondary">Docs</a>
-                @endif
-                @if($project->demo_url)
-                    <a href="{{ $project->demo_url }}" rel="noopener" target="_blank" class="btn btn-secondary">Demo</a>
-                @endif
-            </div>
-        </div>
-    </article>
-
-    @if($content)
-        <div class="divider"></div>
-        <section class="section">
-            <div class="wrap" style="max-width:760px;">
-                <div style="color:var(--ink-300);font-size:1.0625rem;line-height:1.75;white-space:pre-wrap;">{{ $content }}</div>
-            </div>
-        </section>
-    @endif
-
-    <div class="divider"></div>
-
-    <section class="section">
-        <div class="wrap" style="max-width:880px;">
-            <x-site.eyebrow num="02" label="readme"/>
-
-            @if(!empty($versions))
-                <div class="flex items-center flex-wrap gap-2 mb-6 mono-meta">
-                    <span>@lang('site.projects.version_label')</span>
-                    @foreach($versions as $v)
-                        <a href="{{ route('projects.show', ['slug' => $project->slug, 'v' => $v]) }}#top"
-                           class="chip {{ $activeVersion === $v ? 'chip-active' : '' }}">
-                            {{ $v }}
-                        </a>
-                    @endforeach
-                    @if($ref)
-                        <span class="text-ink-500">·</span>
-                        <span>branch: <code class="inline">{{ $ref }}</code></span>
+            {{-- Compact project header --}}
+            <header class="project-header">
+                <div class="project-header-icon" aria-hidden="true">{{ $initial }}</div>
+                <div class="project-header-text">
+                    <h1 class="project-title">{{ $project->name }}</h1>
+                    @if($title && $title !== $project->name)
+                        <p class="project-subtitle">{{ $title }}</p>
+                    @endif
+                    @if($desc)
+                        <p class="project-lede">{{ $desc }}</p>
                     @endif
                 </div>
-            @endif
+            </header>
 
-            @if($readmeHtml)
-                <div class="markdown-body" x-data="markdownCopy" x-init="enhance()">
-                    {!! $readmeHtml !!}
-                </div>
-            @else
-                <p class="body-text" style="color:var(--ink-400);">
-                    @lang('site.projects.readme_unavailable')
-                    <a href="{{ $project->github_url }}" rel="noopener" target="_blank" class="text-amber">{{ $project->github_url }}</a>
-                </p>
-            @endif
-        </div>
-    </section>
+            {{-- Two-column layout: README main + sticky sidebar --}}
+            <div class="project-layout">
 
-    <div class="divider"></div>
+                <main class="project-main">
 
-    <section class="section">
-        <div class="wrap" style="max-width:760px;">
-            <a href="{{ route('projects.index') }}"
-               class="btn-ghost" style="font-family:var(--font-mono);font-size:0.9375rem;color:var(--ink-200);">
-                @lang('site.projects.back_to_list')
-            </a>
+                    {{-- On this page ToC (dropdown, auto-populated from markdown headings) --}}
+                    @if($readmeHtml)
+                        <div class="on-this-page"
+                             x-data="onThisPage"
+                             x-init="build()"
+                             @click.outside="open = false"
+                             @keydown.escape.window="open = false">
+                            <button type="button"
+                                    class="on-this-page-btn"
+                                    @click="open = !open"
+                                    :aria-expanded="open.toString()">
+                                <span>@lang('site.projects.on_this_page')</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" :class="{'rotate-180': open}" style="transition:transform 200ms var(--ease-out);"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                            <ul class="on-this-page-menu"
+                                x-show="open"
+                                x-transition:enter="transition ease-out duration-150"
+                                x-transition:enter-start="opacity-0 -translate-y-1"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                x-cloak>
+                                <template x-for="h in headings" :key="h.id">
+                                    <li>
+                                        <a :href="'#' + h.id"
+                                           :class="'on-this-page-link otp-level-' + h.level"
+                                           @click="open = false"
+                                           x-text="h.text"></a>
+                                    </li>
+                                </template>
+                                <template x-if="headings.length === 0">
+                                    <li class="on-this-page-empty">@lang('site.projects.no_headings')</li>
+                                </template>
+                            </ul>
+                        </div>
+                    @endif
+
+                    {{-- Version selector --}}
+                    @if(!empty($versions))
+                        <div class="version-selector">
+                            <span class="mono-meta">@lang('site.projects.version_label')</span>
+                            @foreach($versions as $v)
+                                <a href="{{ route('projects.show', ['slug' => $project->slug, 'v' => $v]) }}#top"
+                                   class="chip {{ $activeVersion === $v ? 'chip-active' : '' }}">
+                                    {{ $v }}
+                                </a>
+                            @endforeach
+                            @if($ref)
+                                <span class="mono-meta">·</span>
+                                <span class="mono-meta">branch: <code class="inline">{{ $ref }}</code></span>
+                            @endif
+                        </div>
+                    @endif
+
+                    {{-- Inline content / rendered description --}}
+                    @if($content)
+                        <div class="project-content-block">
+                            {{ $content }}
+                        </div>
+                    @endif
+
+                    {{-- README markdown --}}
+                    @if($readmeHtml)
+                        <div class="markdown-body" x-data="markdownCopy" x-init="enhance()">
+                            {!! $readmeHtml !!}
+                        </div>
+                    @else
+                        <p class="body-text" style="color:var(--text-muted);">
+                            @lang('site.projects.readme_unavailable')
+                            <a href="{{ $project->github_url }}" rel="noopener" target="_blank" class="text-amber">{{ $project->github_url }}</a>
+                        </p>
+                    @endif
+
+                </main>
+
+                <aside class="project-sidebar">
+
+                    {{-- Card 1: primary actions --}}
+                    <div class="card project-actions-card">
+                        <a href="{{ $project->github_url }}" rel="noopener" target="_blank" class="btn btn-primary project-action-btn">
+                            GitHub
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                        </a>
+                        @if($project->packagist_url)
+                            <a href="{{ $project->packagist_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Packagist ↗</a>
+                        @endif
+                        @if($project->docs_url)
+                            <a href="{{ $project->docs_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Docs ↗</a>
+                        @endif
+                        @if($project->demo_url)
+                            <a href="{{ $project->demo_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Demo ↗</a>
+                        @endif
+                    </div>
+
+                    {{-- Card 2: project details --}}
+                    <div class="card project-details-card">
+                        <h3 class="project-details-title">@lang('site.projects.details_title')</h3>
+
+                        <div class="project-detail-row">
+                            <span class="project-detail-label">@lang('site.projects.label_type')</span>
+                            <span class="project-detail-value">{{ $project->category->getLabel() }}</span>
+                        </div>
+
+                        @if($project->is_maintainer)
+                            <div class="project-detail-row">
+                                <span class="project-detail-label">@lang('site.projects.label_role')</span>
+                                <span class="badge badge-success">@lang('maintainer')</span>
+                            </div>
+                        @endif
+
+                        <div class="project-detail-grid">
+                            <div class="project-detail-stat">
+                                <small>@lang('site.projects.label_stars')</small>
+                                <strong>★ {{ $project->stars }}</strong>
+                            </div>
+                            <div class="project-detail-stat">
+                                <small>@lang('site.projects.label_downloads')</small>
+                                <strong>↓ {{ $project->downloads_label ?: '—' }}</strong>
+                            </div>
+                            <div class="project-detail-stat">
+                                <small>@lang('site.projects.label_license')</small>
+                                <strong>{{ $project->license ?: '—' }}</strong>
+                            </div>
+                            @if(!empty($project->versions))
+                                <div class="project-detail-stat">
+                                    <small>@lang('site.projects.label_versions')</small>
+                                    <strong>{{ implode(' · ', $project->versions) }}</strong>
+                                </div>
+                            @endif
+                        </div>
+
+                        @if(!empty($project->stack))
+                            <div class="project-detail-row project-detail-row-stack">
+                                <span class="project-detail-label">@lang('site.projects.label_stack')</span>
+                                <div class="project-detail-stack">
+                                    @foreach($project->stack as $s)
+                                        <span class="badge">{{ $s }}</span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        @if($project->updated_at)
+                            <div class="project-detail-row project-detail-row-footer">
+                                <span class="project-detail-label">@lang('site.projects.label_updated')</span>
+                                <span class="project-detail-value mono-meta-sm">{{ $project->updated_at->diffForHumans() }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                </aside>
+            </div>
+
         </div>
     </section>
 

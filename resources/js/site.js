@@ -124,4 +124,35 @@ Alpine.data('stickyHeader', () => ({
     },
 }));
 
+Alpine.data('onThisPage', () => ({
+    open: false,
+    headings: [],
+    build() {
+        this.$nextTick(() => {
+            const body = document.querySelector('.markdown-body');
+            if (!body) return;
+            const slugify = (s) => s
+                .toLowerCase()
+                .normalize('NFD').replace(/[̀-ͯ]/g, '')
+                .replace(/[^\w\s-]/g, '')
+                .trim().replace(/\s+/g, '-');
+            const used = new Set();
+            const items = [];
+            body.querySelectorAll('h2, h3, h4').forEach((h) => {
+                const text = h.textContent.trim();
+                if (!text) return;
+                let id = h.id || slugify(text);
+                let candidate = id;
+                let i = 1;
+                while (used.has(candidate)) candidate = `${id}-${++i}`;
+                id = candidate;
+                used.add(id);
+                if (!h.id) h.id = id;
+                items.push({ id, text, level: parseInt(h.tagName.slice(1), 10) });
+            });
+            this.headings = items;
+        });
+    },
+}));
+
 Alpine.start();

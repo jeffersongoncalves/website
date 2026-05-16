@@ -118,6 +118,17 @@ return [
         'back_to_list' => '← Voltar para projetos',
         'readme_unavailable' => 'README indisponível no momento. Veja direto no GitHub:',
         'version_label' => 'Versão:',
+        'on_this_page' => 'Nesta página',
+        'no_headings' => 'Sem títulos no README',
+        'details_title' => 'Detalhes do projeto',
+        'label_type' => 'Tipo',
+        'label_role' => 'Papel',
+        'label_stars' => 'Stars',
+        'label_downloads' => 'Downloads',
+        'label_license' => 'Licença',
+        'label_versions' => 'Versões',
+        'label_stack' => 'Stack',
+        'label_updated' => 'Atualizado',
     ],
 
     'about' => [

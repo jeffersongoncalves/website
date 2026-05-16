@@ -118,6 +118,17 @@ return [
         'back_to_list' => '← Back to projects',
         'readme_unavailable' => 'README is currently unavailable. View it directly on GitHub:',
         'version_label' => 'Version:',
+        'on_this_page' => 'On this page',
+        'no_headings' => 'No headings in README',
+        'details_title' => 'Project details',
+        'label_type' => 'Type',
+        'label_role' => 'Role',
+        'label_stars' => 'Stars',
+        'label_downloads' => 'Downloads',
+        'label_license' => 'License',
+        'label_versions' => 'Versions',
+        'label_stack' => 'Stack',
+        'label_updated' => 'Updated',
     ],
 
     'about' => [

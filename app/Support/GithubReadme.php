@@ -111,6 +111,116 @@ class GithubReadme
         return ($idx + 1).'.x';
     }
 
+    /**
+     * Reverse of branchForFilamentVersion: given a branch name (raw or
+     * after applying branch_overrides), return the user-facing version
+     * (e.g. 'v3', 'v4', 'v5') or null when the branch is not tracked.
+     *
+     * @param  list<string>  $supportedVersions  ordered ascending (e.g. ['v3','v4','v5'])
+     * @param  array<string,string>  $branchOverrides  auto-branch → real-branch map
+     */
+    public static function branchToVersion(string $branch, array $supportedVersions, array $branchOverrides = []): ?string
+    {
+        foreach (array_values($supportedVersions) as $i => $version) {
+            $autoBranch = ($i + 1).'.x';
+            $realBranch = isset($branchOverrides[$autoBranch]) && trim((string) $branchOverrides[$autoBranch]) !== ''
+                ? trim((string) $branchOverrides[$autoBranch])
+                : $autoBranch;
+
+            if ($branch === $realBranch || $branch === $autoBranch) {
+                return $version;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Rewrite anchors in rendered README HTML that point to the project's
+     * OWN GitHub repo `/tree/{branch}` URLs so they target the local
+     * `projects.show?v={version}` route instead. Untracked branches and
+     * non-self links are left untouched.
+     *
+     * @param  list<string>  $supportedVersions
+     * @param  array<string,string>  $branchOverrides
+     */
+    public static function rewriteSelfRepoLinks(
+        string $html,
+        ?string $githubUrl,
+        string $projectSlug,
+        array $supportedVersions,
+        array $branchOverrides = []
+    ): string {
+        $repo = self::repoFromUrl($githubUrl);
+
+        if (! $repo || $supportedVersions === []) {
+            return $html;
+        }
+
+        [$owner, $name] = explode('/', $repo, 2);
+        $ownerPattern = preg_quote($owner, '~');
+        $namePattern = preg_quote($name, '~');
+
+        $pattern = "~href=\"https?://github\\.com/{$ownerPattern}/{$namePattern}/tree/([^\"/#?]+)[^\"]*\"~i";
+
+        return preg_replace_callback(
+            $pattern,
+            function (array $m) use ($projectSlug, $supportedVersions, $branchOverrides): string {
+                $branch = $m[1];
+                $version = self::branchToVersion($branch, $supportedVersions, $branchOverrides);
+
+                if ($version === null) {
+                    return $m[0];
+                }
+
+                $url = route('projects.show', ['slug' => $projectSlug, 'v' => $version]);
+
+                return 'href="'.htmlspecialchars($url, ENT_QUOTES | ENT_HTML5).'"';
+            },
+            $html
+        ) ?? $html;
+    }
+
+    /**
+     * Decorate absolute http(s) anchors that point off-site with
+     * target="_blank" + rel="nofollow noopener". Existing target/rel
+     * attributes are preserved (never duplicated, never overwritten).
+     */
+    public static function markExternalLinks(string $html, string $selfHost): string
+    {
+        $selfHost = strtolower(trim($selfHost));
+
+        return preg_replace_callback(
+            '~<a([^>]*?)\shref="(https?://[^"]+)"([^>]*)>~i',
+            function (array $m) use ($selfHost): string {
+                $url = $m[2];
+                $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+
+                if ($host === '' || $host === $selfHost) {
+                    return $m[0];
+                }
+
+                $attrs = $m[1].$m[3];
+                $extras = '';
+
+                if (! preg_match('/\btarget\s*=/i', $attrs)) {
+                    $extras .= ' target="_blank"';
+                }
+
+                if (! preg_match('/\brel\s*=/i', $attrs)) {
+                    $extras .= ' rel="nofollow noopener"';
+                }
+
+                if ($extras === '') {
+                    return $m[0];
+                }
+
+                return '<a'.$m[1].' href="'.$url.'"'.$m[3].$extras.'>';
+            },
+            $html
+        ) ?? $html;
+    }
+
     public static function repoFromUrl(?string $url): ?string
     {
         if (! $url) {

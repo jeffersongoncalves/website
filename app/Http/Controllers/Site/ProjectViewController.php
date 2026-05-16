@@ -39,6 +39,21 @@ class ProjectViewController
 
         $readmeHtml = GithubReadme::fetchHtml($project->github_url, $ref);
 
+        if ($readmeHtml !== null) {
+            if ($versions !== []) {
+                $readmeHtml = GithubReadme::rewriteSelfRepoLinks(
+                    $readmeHtml,
+                    $project->github_url,
+                    $project->slug,
+                    $versions,
+                    is_array($project->branch_overrides) ? $project->branch_overrides : []
+                );
+            }
+
+            $selfHost = (string) parse_url(config('app.url'), PHP_URL_HOST);
+            $readmeHtml = GithubReadme::markExternalLinks($readmeHtml, $selfHost);
+        }
+
         return view('site.projects.show', compact('project', 'readmeHtml', 'versions', 'activeVersion', 'ref'));
     }
 }

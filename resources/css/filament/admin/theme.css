@@ -8,6 +8,7 @@
 
 /* ============================================================
    EDITORIAL TERMINAL · Filament v5 admin theme
+   Dark + Light schemes via semantic tokens
    ============================================================ */
 
 @theme {
@@ -15,6 +16,7 @@
     --font-serif: 'Fraunces', 'Times New Roman', serif;
     --font-mono: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
 
+    /* Palette · Ink (dark scheme) */
     --color-ink-50:  #F8F5EE;
     --color-ink-100: #F0EBDF;
     --color-ink-200: #D9D2C5;
@@ -28,6 +30,20 @@
     --color-ink-900: #13110E;
     --color-ink-950: #0B0A09;
 
+    /* Palette · Paper (light scheme) */
+    --color-paper-50:  #FFFEF9;
+    --color-paper-100: #F8F5EE;
+    --color-paper-150: #F2EEE2;
+    --color-paper-200: #EDE7D8;
+    --color-paper-300: #D9D2C5;
+    --color-paper-400: #B8B0A4;
+    --color-paper-500: #8B8377;
+    --color-paper-600: #5C5349;
+    --color-paper-700: #3D362F;
+    --color-paper-800: #2A2620;
+    --color-paper-900: #1F1B17;
+
+    /* Palette · Primary (amber — shared) */
     --color-primary-50:  #FEF3C7;
     --color-primary-100: #FEF3C7;
     --color-primary-200: #FDE68A;
@@ -40,33 +56,152 @@
     --color-primary-900: #B45309;
     --color-primary-950: #78350F;
 
+    /* Palette · Signal colors */
     --color-moss-400: #A3B86A;
     --color-moss-500: #84A07C;
+    --color-danger-500: #E26B5C;
 }
 
-:root, .fi-body {
-    --amber-glow: rgba(251, 191, 36, 0.18);
+/* ============================================================
+   SEMANTIC TOKENS · Dark scheme (default)
+   ============================================================ */
+:root,
+.fi-body,
+html.dark,
+html.dark .fi-body {
+    --surface-base:            var(--color-ink-950);
+    --surface-elevated:        var(--color-ink-900);
+    --surface-elevated-alt:    var(--color-ink-850);
+    --surface-glass:           rgba(11, 10, 9, 0.85);
+    --surface-scrim:           rgba(11, 10, 9, 0.55);
+    --surface-button-gray:     var(--color-ink-800);
+    --surface-button-gray-h:   var(--color-ink-700);
+    --surface-terminal:        rgba(19, 17, 14, 0.92);
+    --surface-terminal-bar:    rgba(24, 22, 18, 0.6);
+    --surface-terminal-input:  rgba(24, 22, 18, 0.6);
+
+    --text-strong:             var(--color-ink-100);
+    --text-regular:            var(--color-ink-200);
+    --text-muted:              var(--color-ink-400);
+    --text-dim:                var(--color-ink-500);
+    --text-on-accent:          var(--color-ink-950);
+
+    --border-soft:             var(--color-ink-800);
+    --border-strong:           var(--color-ink-700);
+    --border-hover:            var(--color-ink-600);
+    --border-dashed:           var(--color-ink-700);
+    --border-dashed-soft:      var(--color-ink-600);
+
+    --accent:                  var(--color-primary-400);
+    --accent-strong:           var(--color-primary-300);
+    --accent-glow:             rgba(251, 191, 36, 0.18);
+    --accent-bg-soft:          rgba(251, 191, 36, 0.10);
+    --accent-bg-strong:        rgba(251, 191, 36, 0.20);
+    --accent-text:             var(--color-primary-300);
+    --accent-ring-soft:        rgba(251, 191, 36, 0.08);
+    --accent-ring-faint:       rgba(251, 191, 36, 0.04);
+
+    --success:                 var(--color-moss-400);
+    --success-bg-soft:         rgba(134, 198, 130, 0.10);
+    --success-bg-strong:       rgba(134, 198, 130, 0.25);
+    --danger:                  var(--color-danger-500);
+    --danger-bg-soft:          rgba(226, 107, 92, 0.10);
+    --danger-bg-strong:        rgba(226, 107, 92, 0.25);
+
+    --shadow-card:             0 1px 2px rgba(0, 0, 0, 0.35);
+    --shadow-modal:            0 12px 32px rgba(0, 0, 0, 0.5);
+    --shadow-terminal:         0 24px 60px rgba(0, 0, 0, 0.6),
+                               0 0 0 1px rgba(251, 191, 36, 0.08),
+                               0 0 40px rgba(251, 191, 36, 0.04);
+
+    --bg-glow-accent:          rgba(251, 191, 36, 0.06);
+    --bg-glow-moss:            rgba(132, 160, 124, 0.05);
+    --bg-glow-accent-strong:   rgba(251, 191, 36, 0.12);
+    --bg-glow-moss-strong:     rgba(132, 160, 124, 0.08);
+
+    --amber-glow:              var(--accent-glow);
     --paper-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.92 0 0 0 0 0.85 0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    --paper-grain-opacity: 0.06;
+
+    color-scheme: dark;
+}
+
+/* ============================================================
+   SEMANTIC TOKENS · Light scheme
+   ============================================================ */
+html:not(.dark),
+html:not(.dark) .fi-body {
+    --surface-base:            var(--color-paper-50);
+    --surface-elevated:        var(--color-paper-100);
+    --surface-elevated-alt:    var(--color-paper-150);
+    --surface-glass:           rgba(255, 254, 249, 0.85);
+    --surface-scrim:           rgba(255, 254, 249, 0.55);
+    --surface-button-gray:     var(--color-paper-200);
+    --surface-button-gray-h:   var(--color-paper-300);
+    --surface-terminal:        rgba(255, 253, 245, 0.94);
+    --surface-terminal-bar:    rgba(237, 231, 216, 0.7);
+    --surface-terminal-input:  rgba(248, 245, 238, 0.7);
+
+    --text-strong:             var(--color-paper-900);
+    --text-regular:            var(--color-paper-800);
+    --text-muted:              var(--color-paper-600);
+    --text-dim:                var(--color-paper-500);
+    --text-on-accent:          var(--color-ink-950);
+
+    --border-soft:             var(--color-paper-200);
+    --border-strong:           var(--color-paper-300);
+    --border-hover:            var(--color-paper-400);
+    --border-dashed:           var(--color-paper-300);
+    --border-dashed-soft:      var(--color-paper-200);
+
+    --accent:                  var(--color-primary-600);
+    --accent-strong:           var(--color-primary-700);
+    --accent-glow:             rgba(217, 119, 6, 0.18);
+    --accent-bg-soft:          rgba(217, 119, 6, 0.10);
+    --accent-bg-strong:        rgba(217, 119, 6, 0.22);
+    --accent-text:             var(--color-primary-700);
+    --accent-ring-soft:        rgba(217, 119, 6, 0.10);
+    --accent-ring-faint:       rgba(217, 119, 6, 0.05);
+
+    --success:                 var(--color-moss-500);
+    --success-bg-soft:         rgba(132, 160, 124, 0.14);
+    --success-bg-strong:       rgba(132, 160, 124, 0.30);
+    --danger:                  var(--color-danger-500);
+    --danger-bg-soft:          rgba(226, 107, 92, 0.12);
+    --danger-bg-strong:        rgba(226, 107, 92, 0.30);
+
+    --shadow-card:             0 1px 2px rgba(60, 40, 20, 0.06),
+                               0 2px 6px rgba(60, 40, 20, 0.04);
+    --shadow-modal:            0 12px 32px rgba(60, 40, 20, 0.16);
+    --shadow-terminal:         0 24px 60px rgba(60, 40, 20, 0.20),
+                               0 0 0 1px rgba(217, 119, 6, 0.10),
+                               0 0 40px rgba(217, 119, 6, 0.05);
+
+    --bg-glow-accent:          rgba(217, 119, 6, 0.05);
+    --bg-glow-moss:            rgba(132, 160, 124, 0.05);
+    --bg-glow-accent-strong:   rgba(217, 119, 6, 0.10);
+    --bg-glow-moss-strong:     rgba(132, 160, 124, 0.08);
+
+    --paper-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.24 0 0 0 0 0.20 0 0 0 0 0.14 0 0 0 0.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    --paper-grain-opacity: 0.04;
+
+    color-scheme: light;
 }
 
 /* ============================================================
    BASE
    ============================================================ */
-html.dark, html {
-    color-scheme: dark;
-}
-
 .fi-body {
-    background: var(--color-ink-950);
-    color: var(--color-ink-200);
+    background: var(--surface-base);
+    color: var(--text-regular);
     font-family: var(--font-sans);
     font-size: 15px;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     background-image:
-        radial-gradient(at 12% 6%,  rgba(251, 191, 36, 0.06), transparent 45%),
-        radial-gradient(at 92% 100%, rgba(132, 160, 124, 0.05), transparent 50%);
+        radial-gradient(at 12% 6%,  var(--bg-glow-accent), transparent 45%),
+        radial-gradient(at 92% 100%, var(--bg-glow-moss), transparent 50%);
     background-attachment: fixed;
     min-height: 100vh;
     position: relative;
@@ -78,11 +213,10 @@ html.dark, html {
     inset: 0;
     pointer-events: none;
     z-index: 1;
-    opacity: 0.06;
+    opacity: var(--paper-grain-opacity);
     background-image: var(--paper-grain);
     mix-blend-mode: overlay;
 }
-
 
 /* ============================================================
    TYPOGRAPHY
@@ -94,7 +228,7 @@ html.dark, html {
     font-family: var(--font-serif);
     font-weight: 400;
     letter-spacing: -0.025em;
-    color: var(--color-ink-100);
+    color: var(--text-strong);
     line-height: 1.1;
 }
 
@@ -103,7 +237,7 @@ html.dark, html {
 
 .fi-header-subheading,
 .fi-section-header-description {
-    color: var(--color-ink-400);
+    color: var(--text-muted);
     font-family: var(--font-sans);
 }
 
@@ -112,69 +246,69 @@ html.dark, html {
     font-size: 11px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--color-primary-400);
+    color: var(--accent);
     font-weight: 500;
 }
 .editorial-eyebrow::before {
     content: "§ ";
-    color: var(--color-ink-500);
+    color: var(--text-dim);
 }
 
 /* ============================================================
    TOPBAR
    ============================================================ */
 .fi-topbar {
-    background: rgba(11, 10, 9, 0.85) !important;
+    background: var(--surface-glass) !important;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--color-ink-800);
+    border-bottom: 1px solid var(--border-soft);
 }
 .fi-topbar nav { font-family: var(--font-mono); font-size: 12px; }
 .fi-topbar a { transition: color 120ms; }
-.fi-topbar a:hover { color: var(--color-primary-400); }
+.fi-topbar a:hover { color: var(--accent); }
 
 .fi-logo {
     font-family: var(--font-serif);
     font-weight: 300;
     letter-spacing: -0.02em;
     font-size: 18px;
-    color: var(--color-ink-100);
+    color: var(--text-strong);
 }
-.fi-logo em { font-style: italic; color: var(--color-primary-400); }
+.fi-logo em { font-style: italic; color: var(--accent); }
 
 /* ============================================================
    SIDEBAR
    ============================================================ */
 .fi-sidebar {
-    background: var(--color-ink-900) !important;
-    border-right: 1px solid var(--color-ink-800);
+    background: var(--surface-elevated) !important;
+    border-right: 1px solid var(--border-soft);
 }
 .fi-sidebar-nav-groups { gap: 8px; }
-.fi-sidebar-group { border-top: 1px dashed var(--color-ink-700); padding-top: 16px; }
+.fi-sidebar-group { border-top: 1px dashed var(--border-dashed); padding-top: 16px; }
 .fi-sidebar-group:first-child { border-top: none; }
 .fi-sidebar-group-label {
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-ink-500) !important;
+    color: var(--text-dim) !important;
 }
 
 .fi-sidebar-item-button {
     border-radius: 4px !important;
     font-family: var(--font-sans);
     font-size: 14px;
-    color: var(--color-ink-300) !important;
+    color: var(--text-regular) !important;
     transition: all 120ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .fi-sidebar-item-button:hover {
-    background: var(--color-ink-850) !important;
-    color: var(--color-ink-100) !important;
+    background: var(--surface-elevated-alt) !important;
+    color: var(--text-strong) !important;
 }
 .fi-sidebar-item.fi-active .fi-sidebar-item-button {
-    background: var(--color-ink-850) !important;
-    color: var(--color-primary-400) !important;
-    box-shadow: inset 2px 0 0 var(--color-primary-400);
+    background: var(--surface-elevated-alt) !important;
+    color: var(--accent) !important;
+    box-shadow: inset 2px 0 0 var(--accent);
 }
 
 /* ============================================================
@@ -185,10 +319,10 @@ html.dark, html {
 .fi-wi-chart,
 .fi-fo-section,
 .fi-ta-ctn {
-    background: var(--color-ink-900) !important;
-    border: 1px solid var(--color-ink-800) !important;
+    background: var(--surface-elevated) !important;
+    border: 1px solid var(--border-soft) !important;
     border-radius: 8px !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    box-shadow: var(--shadow-card);
     position: relative;
     overflow: hidden;
 }
@@ -208,7 +342,7 @@ html.dark, html {
 }
 .fi-wi-stats-overview-stat:hover {
     transform: translateY(-2px);
-    border-color: var(--color-ink-700) !important;
+    border-color: var(--border-strong) !important;
 }
 
 .fi-section::after {
@@ -216,7 +350,7 @@ html.dark, html {
     position: absolute;
     left: 0; top: 0;
     height: 1px; width: 0;
-    background: var(--color-primary-400);
+    background: var(--accent);
     transition: width 480ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .fi-section:hover::after { width: 100%; }
@@ -226,7 +360,7 @@ html.dark, html {
     font-weight: 300 !important;
     font-size: 48px !important;
     letter-spacing: -0.04em;
-    color: var(--color-ink-100) !important;
+    color: var(--text-strong) !important;
     line-height: 1;
 }
 .fi-wi-stats-overview-stat-label {
@@ -234,37 +368,113 @@ html.dark, html {
     font-size: 11px !important;
     letter-spacing: 0.08em !important;
     text-transform: uppercase;
-    color: var(--color-ink-500) !important;
+    color: var(--text-dim) !important;
 }
 .fi-wi-stats-overview-stat-description {
     font-family: var(--font-mono);
     font-size: 11px;
-    color: var(--color-ink-400);
+    color: var(--text-muted);
 }
 
 /* ============================================================
    BUTTONS
    ============================================================ */
 .fi-btn-color-primary {
-    background: var(--color-primary-400) !important;
-    color: var(--color-ink-950) !important;
-    border: 1px solid var(--color-primary-400) !important;
+    background: var(--accent) !important;
+    color: var(--text-on-accent) !important;
+    border: 1px solid var(--accent) !important;
     font-weight: 500;
     transition: all 120ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .fi-btn-color-primary:hover {
-    background: var(--color-primary-300) !important;
+    background: var(--accent-strong) !important;
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px var(--amber-glow);
+    box-shadow: 0 6px 20px var(--accent-glow);
 }
 .fi-btn-color-gray {
-    background: var(--color-ink-800) !important;
-    color: var(--color-ink-100) !important;
-    border: 1px solid var(--color-ink-700) !important;
+    background: var(--surface-button-gray) !important;
+    color: var(--text-strong) !important;
+    border: 1px solid var(--border-strong) !important;
 }
 .fi-btn-color-gray:hover {
-    background: var(--color-ink-700) !important;
-    border-color: var(--color-ink-600) !important;
+    background: var(--surface-button-gray-h) !important;
+    border-color: var(--border-hover) !important;
+}
+
+/* Danger / Success / Warning buttons — editorial tinted variants
+   Filament default is saturated solid; override to match paper aesthetic */
+.fi-btn-color-danger,
+.fi-icon-btn-color-danger,
+.fi-btn.fi-color-danger,
+.fi-icon-btn.fi-color-danger {
+    background: var(--danger-bg-soft) !important;
+    color: var(--danger) !important;
+    border: 1px solid var(--danger-bg-strong) !important;
+}
+.fi-btn-color-danger:hover,
+.fi-icon-btn-color-danger:hover,
+.fi-btn.fi-color-danger:hover,
+.fi-icon-btn.fi-color-danger:hover {
+    background: var(--danger-bg-strong) !important;
+    border-color: var(--danger) !important;
+}
+
+.fi-btn-color-success,
+.fi-icon-btn-color-success,
+.fi-btn.fi-color-success,
+.fi-icon-btn.fi-color-success {
+    background: var(--success-bg-soft) !important;
+    color: var(--success) !important;
+    border: 1px solid var(--success-bg-strong) !important;
+}
+.fi-btn-color-success:hover,
+.fi-icon-btn-color-success:hover,
+.fi-btn.fi-color-success:hover,
+.fi-icon-btn.fi-color-success:hover {
+    background: var(--success-bg-strong) !important;
+    border-color: var(--success) !important;
+}
+
+.fi-btn-color-warning,
+.fi-icon-btn-color-warning,
+.fi-btn.fi-color-warning,
+.fi-icon-btn.fi-color-warning {
+    background: var(--accent-bg-soft) !important;
+    color: var(--accent-strong) !important;
+    border: 1px solid var(--accent-bg-strong) !important;
+}
+.fi-btn-color-warning:hover,
+.fi-icon-btn-color-warning:hover,
+.fi-btn.fi-color-warning:hover,
+.fi-icon-btn.fi-color-warning:hover {
+    background: var(--accent-bg-strong) !important;
+    border-color: var(--accent) !important;
+}
+
+/* Force SVG icon color to match button — Filament may apply text-white inline */
+.fi-btn-color-danger svg,
+.fi-icon-btn-color-danger svg,
+.fi-btn.fi-color-danger svg,
+.fi-icon-btn.fi-color-danger svg {
+    color: var(--danger) !important;
+}
+.fi-btn-color-success svg,
+.fi-icon-btn-color-success svg,
+.fi-btn.fi-color-success svg,
+.fi-icon-btn.fi-color-success svg {
+    color: var(--success) !important;
+}
+.fi-btn-color-warning svg,
+.fi-icon-btn-color-warning svg,
+.fi-btn.fi-color-warning svg,
+.fi-icon-btn.fi-color-warning svg {
+    color: var(--accent-strong) !important;
+}
+.fi-btn-color-primary svg,
+.fi-icon-btn-color-primary svg,
+.fi-btn.fi-color-primary svg,
+.fi-icon-btn.fi-color-primary svg {
+    color: var(--text-on-accent) !important;
 }
 
 /* ============================================================
@@ -276,9 +486,9 @@ html.dark, html {
 .fi-fo-text-input input,
 .fi-fo-textarea textarea,
 .fi-fo-select select {
-    background: var(--color-ink-850) !important;
-    color: var(--color-ink-100) !important;
-    border: 1px solid var(--color-ink-700) !important;
+    background: var(--surface-elevated-alt) !important;
+    color: var(--text-strong) !important;
+    border: 1px solid var(--border-strong) !important;
     border-radius: 4px !important;
     font-family: var(--font-sans);
     transition: border-color 120ms, box-shadow 120ms;
@@ -307,8 +517,8 @@ html.dark, html {
 .fi-fo-text-input input:focus,
 .fi-fo-textarea textarea:focus {
     outline: none !important;
-    border-color: var(--color-primary-400) !important;
-    box-shadow: 0 0 0 3px var(--amber-glow) !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px var(--accent-glow) !important;
 }
 .fi-fo-field-wrp-label,
 .fi-fo-field-wrp .fi-fo-field-wrp-hint {
@@ -316,7 +526,7 @@ html.dark, html {
     font-size: 11px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--color-ink-400) !important;
+    color: var(--text-muted) !important;
 }
 
 /* ============================================================
@@ -327,18 +537,18 @@ html.dark, html {
     font-size: 11px !important;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-ink-500) !important;
-    background: var(--color-ink-850) !important;
-    border-bottom: 1px solid var(--color-ink-800) !important;
+    color: var(--text-dim) !important;
+    background: var(--surface-elevated-alt) !important;
+    border-bottom: 1px solid var(--border-soft) !important;
 }
 .fi-ta-row {
-    border-bottom: 1px solid var(--color-ink-800);
+    border-bottom: 1px solid var(--border-soft);
     transition: background 120ms;
 }
-.fi-ta-row:hover { background: var(--color-ink-850) !important; }
+.fi-ta-row:hover { background: var(--surface-elevated-alt) !important; }
 .fi-ta-text-item-label,
 .fi-ta-text {
-    color: var(--color-ink-200) !important;
+    color: var(--text-regular) !important;
     font-size: 14px;
 }
 
@@ -355,19 +565,19 @@ html.dark, html {
     padding: 4px 10px !important;
 }
 .fi-badge.fi-color-primary {
-    background: rgba(251, 191, 36, 0.1);
-    color: var(--color-primary-300);
-    border-color: rgba(251, 191, 36, 0.2);
+    background: var(--accent-bg-soft);
+    color: var(--accent-text);
+    border-color: var(--accent-bg-strong);
 }
 .fi-badge.fi-color-success {
-    background: rgba(134, 198, 130, 0.1);
-    color: var(--color-moss-400);
-    border-color: rgba(134, 198, 130, 0.25);
+    background: var(--success-bg-soft);
+    color: var(--success);
+    border-color: var(--success-bg-strong);
 }
 .fi-badge.fi-color-danger {
-    background: rgba(226, 107, 92, 0.1);
-    color: #E26B5C;
-    border-color: rgba(226, 107, 92, 0.25);
+    background: var(--danger-bg-soft);
+    color: var(--danger);
+    border-color: var(--danger-bg-strong);
 }
 
 /* ============================================================
@@ -375,23 +585,23 @@ html.dark, html {
    ============================================================ */
 .fi-modal-window,
 .fi-dropdown-panel {
-    background: var(--color-ink-850) !important;
-    border: 1px solid var(--color-ink-800) !important;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    background: var(--surface-elevated-alt) !important;
+    border: 1px solid var(--border-soft) !important;
+    box-shadow: var(--shadow-modal);
 }
 
 /* ============================================================
    NOTIFICATIONS
    ============================================================ */
 .fi-no-notification {
-    background: var(--color-ink-900) !important;
-    border: 1px solid var(--color-ink-800) !important;
-    border-left: 3px solid var(--color-primary-400) !important;
+    background: var(--surface-elevated) !important;
+    border: 1px solid var(--border-soft) !important;
+    border-left: 3px solid var(--accent) !important;
     border-radius: 6px !important;
     font-family: var(--font-sans);
 }
-.fi-no-notification.fi-color-success { border-left-color: var(--color-moss-400) !important; }
-.fi-no-notification.fi-color-danger  { border-left-color: #E26B5C !important; }
+.fi-no-notification.fi-color-success { border-left-color: var(--success) !important; }
+.fi-no-notification.fi-color-danger  { border-left-color: var(--danger) !important; }
 .fi-no-notification-body { font-family: var(--font-mono); font-size: 12px; }
 
 /* ============================================================
@@ -399,37 +609,41 @@ html.dark, html {
    ============================================================ */
 .fi-pagination-item-button {
     font-family: var(--font-mono);
-    color: var(--color-ink-400);
+    color: var(--text-muted);
 }
 .fi-pagination-item-button.fi-active {
-    background: var(--color-primary-400) !important;
-    color: var(--color-ink-950) !important;
+    background: var(--accent) !important;
+    color: var(--text-on-accent) !important;
 }
 
 /* ============================================================
    SCROLLBAR
    ============================================================ */
 .fi-body ::-webkit-scrollbar { width: 8px; height: 8px; }
-.fi-body ::-webkit-scrollbar-track { background: var(--color-ink-950); }
+.fi-body ::-webkit-scrollbar-track { background: var(--surface-base); }
 .fi-body ::-webkit-scrollbar-thumb {
-    background: var(--color-ink-700);
+    background: var(--border-strong);
     border-radius: 4px;
 }
-.fi-body ::-webkit-scrollbar-thumb:hover { background: var(--color-ink-600); }
+.fi-body ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
 
 /* ============================================================
    PULSE
    ============================================================ */
 @keyframes editorial-pulse {
-    0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 var(--amber-glow); }
+    0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 var(--accent-glow); }
     50%      { opacity: 0.7; box-shadow: 0 0 0 6px transparent; }
 }
 .editorial-pulse {
     display: inline-block;
     width: 6px; height: 6px; border-radius: 50%;
-    background: var(--color-primary-400);
+    background: var(--accent);
     animation: editorial-pulse 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
+
+/* ============================================================
+   LAYOUT FIXES · sidebar morph, scrollbar gutter, main margin
+   ============================================================ */
 
 /* FIX 1 — Livewire wrapper around the sidebar — fixed positioning
    min-width prevents collapse during Livewire morphing when :has() loses match */
@@ -506,6 +720,7 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Always dark scrim — login aesthetic is terminal-dark regardless of admin theme */
     background: rgba(11, 10, 9, 0.55) !important;
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
@@ -530,6 +745,8 @@ html {
     transition: none !important;
 }
 
+/* Login preview · ALWAYS rendered dark (site public has no light variant).
+   Heavy filter darkening + overlay covers light-mode bleed-through. */
 .login-preview-bg {
     position: fixed;
     inset: 0;
@@ -538,10 +755,20 @@ html {
     pointer-events: none;
     user-select: none;
     -webkit-user-select: none;
-    filter: blur(5px) brightness(0.7) saturate(0.9);
+    filter: blur(5px) brightness(0.35) saturate(0.6) contrast(1.1);
     transform: scale(1.03);
     transform-origin: 50%;
     animation: editorial-kenburns 40s ease-in-out infinite;
+    background: #0B0A09;
+    color-scheme: dark;
+}
+
+.login-preview-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(11, 10, 9, 0.45);
+    pointer-events: none;
 }
 
 @keyframes editorial-kenburns {
@@ -559,7 +786,7 @@ html {
     content: "▊";
     display: inline-block;
     margin-left: 2px;
-    color: var(--color-primary-400);
+    color: var(--accent);
     animation: login-caret 900ms steps(1) infinite;
 }
 
@@ -568,7 +795,7 @@ html {
     width: 7px;
     height: 1.1em;
     margin-left: 3px;
-    background: var(--color-primary-400);
+    background: var(--accent);
     vertical-align: text-bottom;
     animation: login-caret 900ms steps(1) infinite;
 }
@@ -609,24 +836,21 @@ html {
 
 .login-terminal {
     font-family: var(--font-mono);
-    background: rgba(19, 17, 14, 0.92);
+    background: var(--surface-terminal);
     backdrop-filter: blur(20px) saturate(1.2);
     -webkit-backdrop-filter: blur(20px) saturate(1.2);
-    border: 1px solid var(--color-ink-800);
+    border: 1px solid var(--border-soft);
     border-radius: 10px;
     overflow: hidden;
-    box-shadow:
-        0 24px 60px rgba(0, 0, 0, 0.6),
-        0 0 0 1px rgba(251, 191, 36, 0.08),
-        0 0 40px rgba(251, 191, 36, 0.04);
+    box-shadow: var(--shadow-terminal);
 }
 
 .login-terminal-bar {
     padding: 10px 14px;
-    background: rgba(24, 22, 18, 0.6);
-    border-bottom: 1px solid var(--color-ink-800);
+    background: var(--surface-terminal-bar);
+    border-bottom: 1px solid var(--border-soft);
     display: flex; align-items: center; gap: 8px;
-    font-size: 11px; color: var(--color-ink-500);
+    font-size: 11px; color: var(--text-dim);
 }
 
 .login-terminal-dot {
@@ -639,10 +863,11 @@ html {
     padding: 24px 28px;
     font-size: 13px;
     line-height: 1.7;
+    color: var(--text-regular);
 }
 
 .login-prompt {
-    color: var(--color-primary-400);
+    color: var(--accent);
     margin-right: 4px;
 }
 
@@ -654,18 +879,19 @@ html {
 .login-terminal-status {
     margin-top: 20px;
     padding-top: 14px;
-    border-top: 1px dashed var(--color-ink-700);
+    border-top: 1px dashed var(--border-dashed);
     display: flex; align-items: center; gap: 8px;
     font-size: 11px;
-    color: var(--color-ink-500);
+    color: var(--text-dim);
 }
 
 .login-terminal .fi-fo-text-input input,
 .login-terminal .fi-fo-text-input-wrp,
 .login-terminal .fi-input,
 .login-terminal .fi-input-wrp {
-    background: rgba(24, 22, 18, 0.6) !important;
-    border-color: var(--color-ink-700) !important;
+    background: var(--surface-terminal-input) !important;
+    border-color: var(--border-strong) !important;
+    color: var(--text-strong) !important;
 }
 .login-terminal .fi-fo-field-wrp-label,
 .login-terminal label,
@@ -674,7 +900,7 @@ html {
     font-size: 10px !important;
     letter-spacing: 0.12em !important;
     text-transform: uppercase;
-    color: var(--color-ink-400) !important;
+    color: var(--text-muted) !important;
 }
 .login-terminal .fi-btn,
 .login-terminal .fi-color-primary,
@@ -690,22 +916,22 @@ html {
     margin-top: 20px;
     font-family: var(--font-mono);
     font-size: 11px;
-    color: var(--color-ink-500);
+    color: var(--text-dim);
     letter-spacing: 0.04em;
 }
 .login-footer a {
-    color: var(--color-ink-400);
+    color: var(--text-muted);
     text-decoration: none;
-    border-bottom: 1px dashed var(--color-ink-600);
+    border-bottom: 1px dashed var(--border-dashed-soft);
     transition: color 120ms, border-color 120ms;
 }
 .login-footer a:hover {
-    color: var(--color-primary-400);
-    border-bottom-color: var(--color-primary-400);
+    color: var(--accent);
+    border-bottom-color: var(--accent);
 }
 .login-footer .sep {
     margin: 0 12px;
-    color: var(--color-ink-700);
+    color: var(--border-dashed);
 }
 
 @media (max-width: 640px) {
@@ -714,8 +940,8 @@ html {
         content: "";
         position: absolute; inset: 0;
         background:
-            radial-gradient(at 30% 20%, rgba(251, 191, 36, 0.12), transparent 50%),
-            radial-gradient(at 70% 80%, rgba(132, 160, 124, 0.08), transparent 50%),
+            radial-gradient(at 30% 20%, var(--bg-glow-accent-strong), transparent 50%),
+            radial-gradient(at 70% 80%, var(--bg-glow-moss-strong), transparent 50%),
             var(--color-ink-950);
     }
     .login-terminal-body { padding: 20px; }

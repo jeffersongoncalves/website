@@ -71,8 +71,8 @@ class AdminPanelProvider extends PanelProvider
             ->monoFont('JetBrains Mono', url: Vite::asset('resources/css/fonts/jetbrains-mono.css'), provider: LocalFontProvider::class)
             ->serifFont('Fraunces', url: Vite::asset('resources/css/fonts/fraunces.css'), provider: LocalFontProvider::class)
             ->viteTheme('resources/css/filament/admin/theme.css')
-            ->defaultThemeMode(ThemeMode::Dark)
-            ->darkMode(true, isForced: true)
+            ->defaultThemeMode(ThemeMode::System)
+            ->darkMode(true)
             ->maxContentWidth(Width::ScreenTwoExtraLarge)
             ->sidebarCollapsibleOnDesktop()
             ->renderHook(

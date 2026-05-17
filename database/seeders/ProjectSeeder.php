@@ -10,12 +10,64 @@ use Illuminate\Database\Seeder;
 class ProjectSeeder extends Seeder
 {
     private const FEATURED_REPOS = [
-        'filakitv5',
-        'filament-help-desk',
-        'filament-cep-field',
-        'filament-documentation',
-        'teamkitv5',
-        'filament-service-desk',
+        'jeffersongoncalves/filakitv5',
+        'jeffersongoncalves/filament-help-desk',
+        'jeffersongoncalves/filament-cep-field',
+        'jeffersongoncalves/filament-documentation',
+        'jeffersongoncalves/teamkitv5',
+        'jeffersongoncalves/filament-service-desk',
+    ];
+
+    /**
+     * Repos where the user is owner/author (no upstream "maintainer" badge).
+     */
+    private const OWNED_EXTRAS = [
+        'filakitphp/installer' => [
+            'title' => 'FilaKit Installer',
+            'category' => ProjectCategory::Tool,
+            'stack' => ['CLI', 'PHP'],
+            'versions' => [],
+            'no_packagist' => true,
+        ],
+    ];
+
+    /**
+     * Upstream repos the user contributes to / maintains alongside the author.
+     * Listed here so the public projects page surfaces them with the
+     * "maintainer" badge.
+     */
+    private const MAINTAINED_EXTRAS = [
+        'filamentphp/filament' => ['title' => 'Filament', 'category' => ProjectCategory::Framework, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'laravel/framework' => ['title' => 'Laravel', 'category' => ProjectCategory::Framework, 'stack' => ['Laravel'], 'versions' => []],
+        'livewire/livewire' => ['title' => 'Livewire', 'category' => ProjectCategory::Framework, 'stack' => ['Livewire'], 'versions' => []],
+        'livewire/flux' => ['title' => 'Flux', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Livewire'], 'versions' => []],
+        'livewire/volt' => ['title' => 'Volt', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Livewire'], 'versions' => []],
+        'livewire/blaze' => ['title' => 'Blaze', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Livewire'], 'versions' => [], 'no_packagist' => true],
+        'secondnetwork/blade-tabler-icons' => ['title' => 'Blade Tabler Icons', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
+        'iurygdeoliveira/labSIS-KIT' => ['title' => 'labSIS Kit', 'category' => ProjectCategory::StarterKit, 'stack' => ['Laravel', 'Filament'], 'versions' => []],
+        'laravel-zero/awesome-laravel-zero' => ['title' => 'Awesome Laravel Zero', 'category' => ProjectCategory::Tool, 'stack' => ['Laravel Zero', 'CLI'], 'versions' => [], 'no_packagist' => true],
+        'wallacemartinss/filament-whatsapp-conector' => ['title' => 'Filament WhatsApp Conector', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'wallacemartinss/filament-icon-picker' => ['title' => 'Filament Icon Picker', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'stechstudio/filament-impersonate' => ['title' => 'Filament Impersonate', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'leandrocfe/filament-ptbr-form-fields' => ['title' => 'Filament PT-BR Form Fields', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/panels' => ['title' => 'Filament Panels', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/forms' => ['title' => 'Filament Forms', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/tables' => ['title' => 'Filament Tables', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/infolists' => ['title' => 'Filament Infolists', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/notifications' => ['title' => 'Filament Notifications', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/widgets' => ['title' => 'Filament Widgets', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/actions' => ['title' => 'Filament Actions', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/support' => ['title' => 'Filament Support', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/schemas' => ['title' => 'Filament Schemas', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/upgrade' => ['title' => 'Filament Upgrade', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/query-builder' => ['title' => 'Filament Query Builder', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/spatie-laravel-tags-plugin' => ['title' => 'Filament Spatie Tags', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/spatie-laravel-media-library-plugin' => ['title' => 'Filament Spatie Media Library', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/spatie-laravel-google-fonts-plugin' => ['title' => 'Filament Spatie Google Fonts', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/spatie-laravel-settings-plugin' => ['title' => 'Filament Spatie Settings', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/spatie-laravel-translatable-plugin' => ['title' => 'Filament Spatie Translatable', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/spark-billing-provider' => ['title' => 'Filament Spark Billing Provider', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/legacy-site' => ['title' => 'Filament Legacy Site', 'category' => ProjectCategory::Tool, 'stack' => ['Filament'], 'versions' => [], 'no_packagist' => true],
     ];
 
     public function run(): void
@@ -93,6 +145,34 @@ class ProjectSeeder extends Seeder
                 'extra' => ['jetbrainsId' => $row['jetbrainsId'] ?? null],
             ];
         }
+
+        foreach (self::OWNED_EXTRAS as $package => $meta) {
+            yield [
+                'package' => $package,
+                'title' => $meta['title'],
+                'category' => $meta['category'],
+                'versions' => $meta['versions'] ?? [],
+                'stack' => $meta['stack'] ?? [],
+                'extra' => [
+                    'is_maintainer' => false,
+                    'no_packagist' => $meta['no_packagist'] ?? false,
+                ],
+            ];
+        }
+
+        foreach (self::MAINTAINED_EXTRAS as $package => $meta) {
+            yield [
+                'package' => $package,
+                'title' => $meta['title'],
+                'category' => $meta['category'],
+                'versions' => $meta['versions'] ?? [],
+                'stack' => $meta['stack'] ?? [],
+                'extra' => [
+                    'is_maintainer' => true,
+                    'no_packagist' => $meta['no_packagist'] ?? false,
+                ],
+            ];
+        }
     }
 
     private function upsert(array $entry): void
@@ -100,7 +180,8 @@ class ProjectSeeder extends Seeder
         [$vendor, $repoName] = explode('/', $entry['package'], 2);
         $githubUrl = "https://github.com/{$vendor}/{$repoName}";
         $isJetBrains = ! empty($entry['extra']['jetbrainsId']);
-        $packagistUrl = $isJetBrains ? null : "https://packagist.org/packages/{$entry['package']}";
+        $noPackagist = ! empty($entry['extra']['no_packagist']);
+        $packagistUrl = ($isJetBrains || $noPackagist) ? null : "https://packagist.org/packages/{$entry['package']}";
 
         // Slug is owner-repo to avoid collisions across vendors that publish a
         // package with the same repo name (e.g. owner-a/foo + owner-b/foo).
@@ -116,7 +197,7 @@ class ProjectSeeder extends Seeder
         $project->slug = $slug;
 
         // Structural fields (always synced from plugins.json — source of truth)
-        $project->name = $repoName;
+        $project->name = self::prettifyName($repoName);
         $project->repo = $repoName;
         $project->category = $entry['category']->value;
         $project->github_url = $githubUrl;
@@ -124,6 +205,12 @@ class ProjectSeeder extends Seeder
 
         if ($isJetBrains) {
             $project->docs_url = "https://plugins.jetbrains.com/plugin/{$entry['extra']['jetbrainsId']}";
+        }
+
+        // is_maintainer is source-of-truth from the seed when explicitly
+        // provided (extras list), otherwise left to the editor.
+        if (array_key_exists('is_maintainer', $entry['extra'] ?? [])) {
+            $project->is_maintainer = (bool) $entry['extra']['is_maintainer'];
         }
 
         // Default-only fields (set on insert; never overwrite editor changes).
@@ -137,11 +224,22 @@ class ProjectSeeder extends Seeder
             $project->downloads = 0;
             $project->license = 'MIT';
             $project->status = ProjectStatus::Published->value;
-            $project->featured = in_array($repoName, self::FEATURED_REPOS, true);
+            $project->featured = in_array($entry['package'], self::FEATURED_REPOS, true);
             $project->published_at = now();
         }
 
         $project->save();
+    }
+
+    /**
+     * Turn a repo name like "filament-cep-field" into "Filament Cep Field"
+     * and normalize "Php" → "PHP" as a whole word.
+     */
+    private static function prettifyName(string $repo): string
+    {
+        $name = ucwords(str_replace(['-', '_'], ' ', $repo));
+
+        return preg_replace('/\bPhp\b/u', 'PHP', $name) ?? $name;
     }
 
     /**

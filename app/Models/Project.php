@@ -148,8 +148,18 @@ class Project extends Model
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug');
+            ->generateSlugsFrom(fn (Project $m): string => $m->buildVendorRepoSlug())
+            ->saveSlugsTo('slug')
+            ->doNotGenerateSlugsOnUpdate();
+    }
+
+    public function buildVendorRepoSlug(): string
+    {
+        if ($this->github_url && preg_match('~github\.com/([^/]+)/([^/?#]+)~i', $this->github_url, $m)) {
+            return $m[1].'-'.rtrim($m[2], '/');
+        }
+
+        return (string) ($this->name ?? '');
     }
 
     public function getRouteKeyName(): string

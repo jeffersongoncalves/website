@@ -24,11 +24,18 @@ class ProjectSeeder extends Seeder
     private const OWNED_EXTRAS = [
         'filakitphp/installer' => [
             'title' => 'FilaKit Installer',
-            'category' => ProjectCategory::Tool,
-            'stack' => ['CLI', 'PHP'],
+            'category' => ProjectCategory::LaravelZeroCli,
+            'stack' => ['Laravel Zero', 'CLI'],
             'versions' => [],
             'no_packagist' => true,
         ],
+        'jeffersongoncalves/cakephp-fractal-transformer-view' => ['title' => 'CakePHP Fractal Transformer View', 'category' => ProjectCategory::CakePhpPackage, 'stack' => ['CakePHP'], 'versions' => []],
+        'jeffersongoncalves/cakephp-datatables' => ['title' => 'CakePHP Datatables', 'category' => ProjectCategory::CakePhpPackage, 'stack' => ['CakePHP'], 'versions' => []],
+        'jeffersongoncalves/cakephp-utils' => ['title' => 'CakePHP Utils', 'category' => ProjectCategory::CakePhpPackage, 'stack' => ['CakePHP'], 'versions' => []],
+        'jeffersongoncalves/cakephp-permission' => ['title' => 'CakePHP Permission', 'category' => ProjectCategory::CakePhpPackage, 'stack' => ['CakePHP'], 'versions' => []],
+        'jeffersongoncalves/cakephp-settings' => ['title' => 'CakePHP Settings', 'category' => ProjectCategory::CakePhpPackage, 'stack' => ['CakePHP'], 'versions' => []],
+        'jeffersongoncalves/cakephp-utility' => ['title' => 'CakePHP Utility', 'category' => ProjectCategory::CakePhpPackage, 'stack' => ['CakePHP'], 'versions' => []],
+        'jeffersongoncalves/cakephp-user-activity' => ['title' => 'CakePHP User Activity', 'category' => ProjectCategory::CakePhpPackage, 'stack' => ['CakePHP'], 'versions' => []],
     ];
 
     /**
@@ -40,12 +47,12 @@ class ProjectSeeder extends Seeder
         'filamentphp/filament' => ['title' => 'Filament', 'category' => ProjectCategory::Framework, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
         'laravel/framework' => ['title' => 'Laravel', 'category' => ProjectCategory::Framework, 'stack' => ['Laravel'], 'versions' => []],
         'livewire/livewire' => ['title' => 'Livewire', 'category' => ProjectCategory::Framework, 'stack' => ['Livewire'], 'versions' => []],
-        'livewire/flux' => ['title' => 'Flux', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Livewire'], 'versions' => []],
-        'livewire/volt' => ['title' => 'Volt', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Livewire'], 'versions' => []],
-        'livewire/blaze' => ['title' => 'Blaze', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Livewire'], 'versions' => [], 'no_packagist' => true],
+        'livewire/flux' => ['title' => 'Flux', 'category' => ProjectCategory::LivewirePackage, 'stack' => ['Livewire'], 'versions' => []],
+        'livewire/volt' => ['title' => 'Volt', 'category' => ProjectCategory::LivewirePackage, 'stack' => ['Livewire'], 'versions' => []],
+        'livewire/blaze' => ['title' => 'Blaze', 'category' => ProjectCategory::LivewirePackage, 'stack' => ['Livewire'], 'versions' => [], 'no_packagist' => true],
         'secondnetwork/blade-tabler-icons' => ['title' => 'Blade Tabler Icons', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
         'iurygdeoliveira/labSIS-KIT' => ['title' => 'labSIS Kit', 'category' => ProjectCategory::StarterKit, 'stack' => ['Laravel', 'Filament'], 'versions' => []],
-        'laravel-zero/awesome-laravel-zero' => ['title' => 'Awesome Laravel Zero', 'category' => ProjectCategory::Tool, 'stack' => ['Laravel Zero', 'CLI'], 'versions' => [], 'no_packagist' => true],
+        'laravel-zero/awesome-laravel-zero' => ['title' => 'Awesome Laravel Zero', 'category' => ProjectCategory::LaravelZeroCli, 'stack' => ['Laravel Zero', 'CLI'], 'versions' => [], 'no_packagist' => true],
         'wallacemartinss/filament-whatsapp-conector' => ['title' => 'Filament WhatsApp Conector', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
         'wallacemartinss/filament-icon-picker' => ['title' => 'Filament Icon Picker', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
         'stechstudio/filament-impersonate' => ['title' => 'Filament Impersonate', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
@@ -68,6 +75,28 @@ class ProjectSeeder extends Seeder
         'filamentphp/spatie-laravel-translatable-plugin' => ['title' => 'Filament Spatie Translatable', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
         'filamentphp/spark-billing-provider' => ['title' => 'Filament Spark Billing Provider', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
         'filamentphp/legacy-site' => ['title' => 'Filament Legacy Site', 'category' => ProjectCategory::Tool, 'stack' => ['Filament'], 'versions' => [], 'no_packagist' => true],
+        'fruitcake/laravel-debugbar' => ['title' => 'Laravel Debugbar', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
+        'php-debugbar/php-debugbar' => ['title' => 'PHP Debugbar', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['PHP'], 'versions' => []],
+        'bezhanSalleh/filament-shield' => ['title' => 'Filament Shield', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'leandrocfe/filament-apex-charts' => ['title' => 'Filament Apex Charts', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'lara-zeus/zeus' => ['title' => 'Lara Zeus', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'CodeWithDennis/filament-simple-map' => ['title' => 'Filament Simple Map', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'lukas-frey/filament-icon-picker' => ['title' => 'Filament Icon Picker (Lukas)', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'TappNetwork/Filament-Help-Article' => ['title' => 'Filament Help Article', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        '4nuunes/filament-communicate' => ['title' => 'Filament Communicate', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'AlizHarb/laravel-modular-themer-tester' => ['title' => 'Laravel Modular Themer Tester', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
+        'wallacemartinss/website_template' => ['title' => 'Website Template', 'category' => ProjectCategory::StarterKit, 'stack' => ['Laravel'], 'versions' => [], 'no_packagist' => true],
+        'andrefelipe18/filament-webpush' => ['title' => 'Filament WebPush', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'TappNetwork/filament-footer-package' => ['title' => 'Filament Footer', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'dietercoopman/laravel-dashboard-laravelnews-tile' => ['title' => 'Laravel Dashboard Laravel News Tile', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
+        'filaship/filaship' => ['title' => 'Filaship', 'category' => ProjectCategory::Framework, 'stack' => ['Filament'], 'versions' => []],
+        'barraroot/filament_material_theme' => ['title' => 'Filament Material Theme', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'andrefelipe18/laradumps-filament' => ['title' => 'LaraDumps Filament', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'andrefelipe18/tallstackui-filament' => ['title' => 'TallStackUI Filament', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'wallacemartinss/Infra-com-Traefik' => ['title' => 'Infra com Traefik', 'category' => ProjectCategory::Tool, 'stack' => ['Docker', 'Traefik'], 'versions' => [], 'no_packagist' => true],
+        'wallacemartinss/core_tenant' => ['title' => 'Core Tenant', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => [], 'no_packagist' => true],
+        'dvarilek/filament-table-select' => ['title' => 'Filament Table Select', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'alessandronuunes/AiHub' => ['title' => 'AiHub', 'category' => ProjectCategory::Tool, 'stack' => ['PHP'], 'versions' => [], 'no_packagist' => true],
     ];
 
     public function run(): void
@@ -128,9 +157,9 @@ class ProjectSeeder extends Seeder
             yield [
                 'package' => $row['package'],
                 'title' => $row['title'],
-                'category' => ProjectCategory::Tool,
+                'category' => ProjectCategory::LaravelZeroCli,
                 'versions' => [],
-                'stack' => ['CLI', 'PHP'],
+                'stack' => ['Laravel Zero', 'CLI'],
                 'extra' => [],
             ];
         }
@@ -139,7 +168,7 @@ class ProjectSeeder extends Seeder
             yield [
                 'package' => $row['package'],
                 'title' => $row['title'],
-                'category' => ProjectCategory::Tool,
+                'category' => ProjectCategory::IdePlugin,
                 'versions' => [],
                 'stack' => ['JetBrains', 'IDE'],
                 'extra' => ['jetbrainsId' => $row['jetbrainsId'] ?? null],

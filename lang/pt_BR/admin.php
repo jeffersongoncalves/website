@@ -117,6 +117,10 @@ return [
         'category' => [
             'filament_plugin' => 'Plugin Filament',
             'laravel_package' => 'Pacote Laravel',
+            'livewire_package' => 'Pacote Livewire',
+            'cakephp_package' => 'Pacote CakePHP',
+            'laravel_zero_cli' => 'CLI Laravel Zero',
+            'ide_plugin' => 'Plugin de IDE',
             'framework' => 'Framework',
             'starter_kit' => 'Starter Kit',
             'saas' => 'SaaS',

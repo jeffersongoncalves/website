@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Models\Project;
 use App\Models\SiteStat;
@@ -20,7 +21,8 @@ class SiteStats
      *
      * @return array{
      *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
-     *   stars:int, downloads:int, followers:int, public_sponsors:int,
+     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
+     *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
      */
@@ -40,7 +42,8 @@ class SiteStats
      *
      * @return array{
      *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
-     *   stars:int, downloads:int, followers:int, public_sponsors:int,
+     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
+     *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
      */
@@ -56,6 +59,9 @@ class SiteStats
             'daily_drivers' => 0,
             'stars' => 0,
             'downloads' => 0,
+            'downloads_packagist' => 0,
+            'downloads_npm' => 0,
+            'downloads_jetbrains' => 0,
             'followers' => 0,
             'public_sponsors' => 0,
             'contributions' => ['cells' => [], 'total' => 0],
@@ -68,7 +74,8 @@ class SiteStats
      *
      * @return array{
      *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
-     *   stars:int, downloads:int, followers:int, public_sponsors:int,
+     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
+     *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
      */
@@ -125,21 +132,24 @@ class SiteStats
         $s = self::all();
 
         return [
-            ['label_key' => 'os.repos',            'target' => $s['repos']],
-            ['label_key' => 'os.followers',        'target' => self::scaleK($s['followers']), 'suffix' => self::suffixK($s['followers']), 'decimals' => 1],
-            ['label_key' => 'os.downloads',        'target' => self::scaleM($s['downloads']), 'suffix' => self::suffixM($s['downloads']), 'decimals' => 1],
-            ['label_key' => 'os.plugins_filament', 'target' => $s['filament']],
-            ['label_key' => 'os.packages_laravel', 'target' => $s['laravel']],
-            ['label_key' => 'os.starter_kits',     'target' => $s['starter']],
-            ['label_key' => 'os.stars',            'target' => self::scaleK($s['stars']), 'suffix' => self::suffixK($s['stars']), 'decimals' => 1],
-            ['label_key' => 'os.public_sponsors',  'target' => $s['public_sponsors']],
+            ['label_key' => 'os.repos',                'target' => $s['repos']],
+            ['label_key' => 'os.followers',            'target' => self::scaleK($s['followers']), 'suffix' => self::suffixK($s['followers']), 'decimals' => 1],
+            ['label_key' => 'os.downloads_packagist',  'target' => self::scaleM($s['downloads_packagist']), 'suffix' => self::suffixM($s['downloads_packagist']), 'decimals' => 1],
+            ['label_key' => 'os.downloads_npm',        'target' => self::scaleM($s['downloads_npm']), 'suffix' => self::suffixM($s['downloads_npm']), 'decimals' => 1],
+            ['label_key' => 'os.downloads_jetbrains',  'target' => self::scaleM($s['downloads_jetbrains']), 'suffix' => self::suffixM($s['downloads_jetbrains']), 'decimals' => 1],
+            ['label_key' => 'os.plugins_filament',     'target' => $s['filament']],
+            ['label_key' => 'os.packages_laravel',     'target' => $s['laravel']],
+            ['label_key' => 'os.starter_kits',         'target' => $s['starter']],
+            ['label_key' => 'os.stars',                'target' => self::scaleK($s['stars']), 'suffix' => self::suffixK($s['stars']), 'decimals' => 1],
+            ['label_key' => 'os.public_sponsors',      'target' => $s['public_sponsors']],
         ];
     }
 
     /**
      * @return array{
      *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
-     *   stars:int, downloads:int, followers:int, public_sponsors:int,
+     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
+     *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
      */
@@ -155,6 +165,9 @@ class SiteStats
             'daily_drivers' => $stat->daily_drivers,
             'stars' => $stat->stars,
             'downloads' => $stat->downloads,
+            'downloads_packagist' => $stat->downloads_packagist,
+            'downloads_npm' => $stat->downloads_npm,
+            'downloads_jetbrains' => $stat->downloads_jetbrains,
             'followers' => $stat->followers,
             'public_sponsors' => $stat->public_sponsors,
             'contributions' => $stat->contributions ?? ['cells' => [], 'total' => 0],
@@ -164,7 +177,8 @@ class SiteStats
     /**
      * @return array{
      *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
-     *   stars:int, downloads:int, followers:int, public_sponsors:int,
+     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
+     *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
      */
@@ -174,6 +188,9 @@ class SiteStats
 
         $stars = (int) (clone $base)->sum('stars');
         $downloads = (int) (clone $base)->sum('downloads');
+        $downloadsPackagist = (int) (clone $base)->where('package_type', PackageType::Composer->value)->sum('downloads');
+        $downloadsNpm = (int) (clone $base)->where('package_type', PackageType::Npm->value)->sum('downloads');
+        $downloadsJetbrains = (int) (clone $base)->where('package_type', PackageType::JetBrains->value)->sum('downloads');
 
         $github = self::fetchGithubUser(self::GITHUB_LOGIN);
 
@@ -187,6 +204,9 @@ class SiteStats
             'daily_drivers' => (int) (clone $base)->where('is_daily_driver', true)->count(),
             'stars' => $stars,
             'downloads' => $downloads,
+            'downloads_packagist' => $downloadsPackagist,
+            'downloads_npm' => $downloadsNpm,
+            'downloads_jetbrains' => $downloadsJetbrains,
             'followers' => $github['followers'] ?? 0,
             'public_sponsors' => self::fetchSponsorCount(self::GITHUB_LOGIN),
             'contributions' => GithubContributions::fetch(self::GITHUB_LOGIN),

@@ -16,6 +16,9 @@ use Illuminate\Support\Carbon;
  * @property int $daily_drivers
  * @property int $stars
  * @property int $downloads
+ * @property int $downloads_packagist
+ * @property int $downloads_npm
+ * @property int $downloads_jetbrains
  * @property int $followers
  * @property int $public_sponsors
  * @property array{cells: list<int>, total: int}|null $contributions
@@ -37,6 +40,9 @@ class SiteStat extends Model
         'daily_drivers',
         'stars',
         'downloads',
+        'downloads_packagist',
+        'downloads_npm',
+        'downloads_jetbrains',
         'followers',
         'public_sponsors',
         'contributions',
@@ -55,6 +61,9 @@ class SiteStat extends Model
             'daily_drivers' => 'integer',
             'stars' => 'integer',
             'downloads' => 'integer',
+            'downloads_packagist' => 'integer',
+            'downloads_npm' => 'integer',
+            'downloads_jetbrains' => 'integer',
             'followers' => 'integer',
             'public_sponsors' => 'integer',
             'contributions' => 'array',

@@ -81,7 +81,10 @@ return [
     'os' => [
         'repos' => 'Repositórios públicos',
         'followers' => 'Seguidores no GitHub',
-        'downloads' => 'Downloads no Packagist',
+        'downloads' => 'Downloads',
+        'downloads_packagist' => 'Downloads no Packagist',
+        'downloads_npm' => 'Downloads no npm',
+        'downloads_jetbrains' => 'Downloads na JetBrains',
         'plugins' => 'Plugins Filament mantidos',
         'plugins_filament' => 'Plugins Filament',
         'packages_laravel' => 'Pacotes Laravel',

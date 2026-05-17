@@ -28,8 +28,16 @@ class SiteMetricsWidget extends StatsOverviewWidget
                 ->description('★ '.__('admin.widgets.site_metrics.stars_desc'))
                 ->color('primary'),
 
-            Stat::make(__('admin.widgets.site_metrics.downloads'), $this->compact($s['downloads']))
-                ->description('↓ '.__('admin.widgets.site_metrics.downloads_desc'))
+            Stat::make(__('admin.widgets.site_metrics.downloads_packagist'), $this->compact($s['downloads_packagist']))
+                ->description('↓ '.__('admin.widgets.site_metrics.downloads_packagist_desc'))
+                ->color('success'),
+
+            Stat::make(__('admin.widgets.site_metrics.downloads_npm'), $this->compact($s['downloads_npm']))
+                ->description('↓ '.__('admin.widgets.site_metrics.downloads_npm_desc'))
+                ->color('success'),
+
+            Stat::make(__('admin.widgets.site_metrics.downloads_jetbrains'), $this->compact($s['downloads_jetbrains']))
+                ->description('↓ '.__('admin.widgets.site_metrics.downloads_jetbrains_desc'))
                 ->color('success'),
 
             Stat::make(__('admin.widgets.site_metrics.filament'), number_format($s['filament'], 0, ',', '.'))

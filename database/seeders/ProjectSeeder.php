@@ -102,7 +102,18 @@ class ProjectSeeder extends Seeder
         $isJetBrains = ! empty($entry['extra']['jetbrainsId']);
         $packagistUrl = $isJetBrains ? null : "https://packagist.org/packages/{$entry['package']}";
 
-        $project = Project::query()->firstOrNew(['slug' => $repoName]);
+        // Slug is owner-repo to avoid collisions across vendors that publish a
+        // package with the same repo name (e.g. owner-a/foo + owner-b/foo).
+        $slug = $vendor.'-'.$repoName;
+
+        // Match by github_url (canonical identifier) so re-seeding always
+        // updates the existing row, even when its slug pre-dates the
+        // owner-repo convention.
+        $project = Project::query()
+            ->where('github_url', $githubUrl)
+            ->first() ?? new Project;
+
+        $project->slug = $slug;
 
         // Structural fields (always synced from plugins.json — source of truth)
         $project->name = $repoName;

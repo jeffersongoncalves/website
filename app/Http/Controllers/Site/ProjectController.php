@@ -24,11 +24,13 @@ class ProjectController
             $query->byCategory($category);
         }
 
-        $activeRole = in_array($role, ['authored', 'maintainer'], true) ? $role : 'all';
+        $activeRole = in_array($role, ['authored', 'maintainer', 'daily_driver'], true) ? $role : 'all';
         if ($activeRole === 'maintainer') {
             $query->maintained();
         } elseif ($activeRole === 'authored') {
             $query->authored();
+        } elseif ($activeRole === 'daily_driver') {
+            $query->where('is_daily_driver', true);
         }
 
         if ($search !== '') {

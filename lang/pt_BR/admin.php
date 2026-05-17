@@ -60,7 +60,6 @@ return [
         'stack_versions' => 'Stack & versões',
         'metrics' => 'Métricas',
         'links' => 'Links',
-        'cover' => 'Capa',
         'description' => 'Descrição',
         'stack' => 'Stack',
     ],
@@ -72,6 +71,7 @@ return [
         'slug' => 'Slug',
         'repo' => 'Repositório',
         'category' => 'Categoria',
+        'package_type' => 'Tipo de pacote',
         'status' => 'Status',
         'featured' => 'Destacado',
         'sort_order' => 'Ordem',
@@ -94,7 +94,6 @@ return [
         'npm_url' => 'URL do npm',
         'docs_url' => 'URL da documentação',
         'demo_url' => 'URL do demo',
-        'cover_image' => 'Imagem de capa',
         'is_maintainer' => 'Apenas mantenedor',
         'is_daily_driver' => 'Uso diário',
         'is_paid' => 'Pacote pago',
@@ -113,6 +112,7 @@ return [
         'branch_overrides' => 'Remapeia branches auto para as reais do repo (ex: `1.x → main`, `2.x → 2.x`). Vazio = usa o branch auto.',
         'readme_branch' => 'Branch do GitHub usada para buscar o README. Vazio = usa a branch padrão do repositório.',
         'downloads_label' => 'Valor exibido: 21k, 1.2M, —',
+        'package_type' => 'Qual manifesto o sync deve ler pra resolver o nome do pacote: composer.json (Packagist), package.json (npm), JetBrains, ou nenhum.',
     ],
 
     'placeholders' => [
@@ -132,12 +132,17 @@ return [
             'starter_kit' => 'Starter Kit',
             'saas' => 'SaaS',
             'tool' => 'Ferramenta',
-            'daily_driver' => 'Uso Diário',
         ],
         'status' => [
             'draft' => 'Rascunho',
             'published' => 'Publicado',
             'archived' => 'Arquivado',
+        ],
+        'package_type' => [
+            'composer' => 'Composer (composer.json)',
+            'npm' => 'npm (package.json)',
+            'jetbrains' => 'JetBrains',
+            'none' => 'Nenhum',
         ],
     ],
 ];

@@ -113,6 +113,7 @@ return [
         'role_all' => 'All roles',
         'role_authored' => 'Authored',
         'role_maintainer' => 'Maintainer',
+        'role_daily_driver' => 'Daily driver',
         'cta_title' => 'Contribute, report issues, open PRs.',
         'cta_body' => 'All packages have CI, Pest tests and open issues tagged :code. Docs are in English, but the maintainer replies in Portuguese.',
         'good_first_issue' => 'good first issue',

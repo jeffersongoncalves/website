@@ -7,18 +7,15 @@ use App\Models\ReadmeCache;
 use App\Models\SiteStat;
 use App\Support\GithubReadme;
 use App\Support\SiteStats;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
-
-uses(RefreshDatabase::class);
 
 function makeProject(int $i, ProjectCategory $category): Project
 {
     return Project::query()->create([
         'name' => "Project {$i}",
+        'slug' => "project-{$i}",
         'category' => $category,
-        'description' => 'A test project.',
         'status' => ProjectStatus::Published,
         'stars' => 10,
         'downloads' => 100,
@@ -26,8 +23,6 @@ function makeProject(int $i, ProjectCategory $category): Project
 }
 
 it('persists site stats to the database and reads them back without recomputing', function () {
-    Http::fake(['api.github.com/*' => Http::response([], 200)]);
-
     makeProject(1, ProjectCategory::FilamentPlugin);
     makeProject(2, ProjectCategory::FilamentPlugin);
     makeProject(3, ProjectCategory::LaravelPackage);
@@ -43,7 +38,6 @@ it('persists site stats to the database and reads them back without recomputing'
     expect($row->stars)->toBe(30);
     expect($row->synced_at)->not->toBeNull();
 
-    // Reading goes straight to the row — no HTTP, no recompute.
     Http::fake(fn () => throw new RuntimeException('site stats read should not hit the network'));
     expect(SiteStats::all()['repos'])->toBe(3);
 });
@@ -53,7 +47,7 @@ it('renders the README and writes it to the github disk', function () {
 
     $html = GithubReadme::fetchHtml('https://github.com/jeffersongoncalves/example');
 
-    expect($html)->toContain('README'); // body from the global HTTP fake in tests/Pest.php
+    expect($html)->toContain('README');
 
     $cache = ReadmeCache::query()->where('repo', 'jeffersongoncalves/example')->first();
     expect($cache)->not->toBeNull();
@@ -78,5 +72,5 @@ it('serves the README from disk within the check window without calling GitHub',
     $html = GithubReadme::fetchHtml('https://github.com/jeffersongoncalves/example');
 
     expect($html)->toBe('<h1>Cached</h1>');
-    Http::assertNothingSent(); // inside the check window — no GitHub request at all
+    Http::assertNothingSent();
 });

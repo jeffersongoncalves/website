@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Enums\PackageType;
 use App\Models\Project;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -11,6 +12,18 @@ class ProjectMetrics
     public static function sync(Project $project): bool
     {
         $changed = false;
+
+        $resolvedPackagistUrl = self::resolvePackagistUrl($project);
+        if ($resolvedPackagistUrl !== null && $resolvedPackagistUrl !== $project->packagist_url) {
+            $project->packagist_url = $resolvedPackagistUrl;
+            $changed = true;
+        }
+
+        $resolvedNpmUrl = self::resolveNpmUrl($project);
+        if ($resolvedNpmUrl !== null && $resolvedNpmUrl !== $project->npm_url) {
+            $project->npm_url = $resolvedNpmUrl;
+            $changed = true;
+        }
 
         $stars = self::fetchStars($project->github_url);
         if ($stars !== null && $stars !== $project->stars) {
@@ -339,6 +352,84 @@ class ProjectMetrics
         }
 
         return rtrim($m[1], '/');
+    }
+
+    /**
+     * Re-derive the Packagist URL from the repo's `composer.json` `name` field.
+     * Owners that publish under a different vendor than the GitHub owner (e.g.
+     * github.com/achyutkneupane/filament-log-viewer publishes as
+     * achyutn/filament-log-viewer on Packagist) would otherwise have a broken
+     * packagist_url. Returns null when verification is skipped (no current
+     * packagist_url, no GitHub URL, no composer.json, fetch error).
+     */
+    private static function resolvePackagistUrl(Project $project): ?string
+    {
+        if ($project->package_type !== PackageType::Composer || ! $project->github_url) {
+            return null;
+        }
+
+        $repo = GithubReadme::repoFromUrl($project->github_url);
+
+        if (! $repo) {
+            return null;
+        }
+
+        $branch = self::fetchDefaultBranch($project->github_url) ?? 'main';
+
+        $headers = ['User-Agent' => 'jeffersongoncalves-site'];
+
+        $response = Http::timeout(8)
+            ->withHeaders($headers)
+            ->get("https://raw.githubusercontent.com/{$repo}/{$branch}/composer.json");
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        $name = $response->json('name');
+
+        if (! is_string($name) || ! preg_match('~^[a-z0-9_.-]+/[a-z0-9_.-]+$~i', $name)) {
+            return null;
+        }
+
+        return 'https://packagist.org/packages/'.strtolower($name);
+    }
+
+    /**
+     * Same idea as resolvePackagistUrl, but reads `name` from `package.json`
+     * to keep the npm URL aligned with the published npm package name (which
+     * can differ from the GitHub repo name, especially for scoped packages
+     * like `@scope/name`).
+     */
+    private static function resolveNpmUrl(Project $project): ?string
+    {
+        if ($project->package_type !== PackageType::Npm || ! $project->github_url) {
+            return null;
+        }
+
+        $repo = GithubReadme::repoFromUrl($project->github_url);
+
+        if (! $repo) {
+            return null;
+        }
+
+        $branch = self::fetchDefaultBranch($project->github_url) ?? 'main';
+
+        $response = Http::timeout(8)
+            ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
+            ->get("https://raw.githubusercontent.com/{$repo}/{$branch}/package.json");
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        $name = $response->json('name');
+
+        if (! is_string($name) || ! preg_match('#^(@[a-z0-9_.~-]+/)?[a-z0-9_.~-]+$#i', $name)) {
+            return null;
+        }
+
+        return 'https://www.npmjs.com/package/'.$name;
     }
 
     private static function fetchPackagistDownloads(?string $packagistUrl): ?int

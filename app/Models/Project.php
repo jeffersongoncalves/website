@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Observers\ProjectObserver;
@@ -11,7 +12,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Storage;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 use Spatie\Sluggable\HasSlug;
@@ -24,6 +24,7 @@ use Spatie\Translatable\HasTranslations;
  * @property string $name
  * @property string|null $repo
  * @property ProjectCategory $category
+ * @property PackageType|null $package_type
  * @property array<array-key, mixed>|null $title
  * @property array<array-key, mixed>|null $content
  * @property array<array-key, mixed>|null $versions
@@ -40,7 +41,6 @@ use Spatie\Translatable\HasTranslations;
  * @property string|null $npm_url
  * @property string|null $docs_url
  * @property string|null $demo_url
- * @property string|null $cover_image
  * @property ProjectStatus $status
  * @property bool $featured
  * @property bool $is_maintainer
@@ -105,6 +105,7 @@ class Project extends Model
         'name',
         'repo',
         'category',
+        'package_type',
         'title',
         'content',
         'versions',
@@ -121,7 +122,6 @@ class Project extends Model
         'npm_url',
         'docs_url',
         'demo_url',
-        'cover_image',
         'status',
         'featured',
         'is_maintainer',
@@ -150,6 +150,7 @@ class Project extends Model
             'is_daily_driver' => 'boolean',
             'is_paid' => 'boolean',
             'category' => ProjectCategory::class,
+            'package_type' => PackageType::class,
             'status' => ProjectStatus::class,
             'published_at' => 'datetime',
             'last_synced_at' => 'datetime',
@@ -213,9 +214,6 @@ class Project extends Model
         return new SEOData(
             title: $title,
             author: 'Jefferson Gonçalves',
-            image: $this->cover_image
-                ? Storage::url($this->cover_image)
-                : null,
             published_time: $this->published_at,
             modified_time: $this->updated_at,
             type: 'article',

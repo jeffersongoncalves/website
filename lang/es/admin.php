@@ -60,7 +60,6 @@ return [
         'stack_versions' => 'Stack y versiones',
         'metrics' => 'Métricas',
         'links' => 'Enlaces',
-        'cover' => 'Portada',
         'description' => 'Descripción',
         'stack' => 'Stack',
     ],
@@ -72,6 +71,7 @@ return [
         'slug' => 'Slug',
         'repo' => 'Repositorio',
         'category' => 'Categoría',
+        'package_type' => 'Tipo de paquete',
         'status' => 'Estado',
         'featured' => 'Destacado',
         'sort_order' => 'Orden',
@@ -94,7 +94,6 @@ return [
         'npm_url' => 'URL de npm',
         'docs_url' => 'URL de la documentación',
         'demo_url' => 'URL del demo',
-        'cover_image' => 'Imagen de portada',
         'is_maintainer' => 'Solo mantenedor',
         'is_daily_driver' => 'Uso diario',
         'is_paid' => 'Paquete de pago',
@@ -113,6 +112,7 @@ return [
         'branch_overrides' => 'Remapea ramas automáticas a las reales del repo, ej: `1.x → main`, `2.x → 2.x`. Deja en blanco para usar la rama automática.',
         'readme_branch' => 'Rama de GitHub usada para obtener el README. Deja en blanco para usar la rama por defecto del repositorio.',
         'downloads_label' => 'Valor mostrado: 21k, 1.2M, —',
+        'package_type' => 'Qué manifiesto debe leer el sync para resolver el nombre del paquete: composer.json (Packagist), package.json (npm), JetBrains, o ninguno.',
     ],
 
     'placeholders' => [
@@ -132,12 +132,17 @@ return [
             'starter_kit' => 'Starter Kit',
             'saas' => 'SaaS',
             'tool' => 'Herramienta',
-            'daily_driver' => 'Uso Diario',
         ],
         'status' => [
             'draft' => 'Borrador',
             'published' => 'Publicado',
             'archived' => 'Archivado',
+        ],
+        'package_type' => [
+            'composer' => 'Composer (composer.json)',
+            'npm' => 'npm (package.json)',
+            'jetbrains' => 'JetBrains',
+            'none' => 'Ninguno',
         ],
     ],
 ];

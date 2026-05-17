@@ -1,11 +1,16 @@
 <?php
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
-pest()->extend(TestCase::class)->in('Feature', 'Unit');
+uses(TestCase::class)->in('Feature', 'Unit');
+uses(RefreshDatabase::class)->in('Feature');
 
 pest()->beforeEach(function () {
+    Queue::fake();
+
     Http::preventStrayRequests();
     Http::fake([
         'api.github.com/users/*' => Http::response(['followers' => 0, 'public_repos' => 0]),

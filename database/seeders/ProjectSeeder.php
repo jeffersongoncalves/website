@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Jobs\SyncProjectMetricsJob;
@@ -46,7 +47,7 @@ class ProjectSeeder extends Seeder
     private const DAILY_DRIVER_EXTRAS = [
         'alpinejs/alpine' => [
             'title' => 'Alpine.js',
-            'category' => ProjectCategory::DailyDriver,
+            'category' => ProjectCategory::Framework,
             'stack' => ['JavaScript'],
             'versions' => [],
             'no_packagist' => true,
@@ -55,7 +56,7 @@ class ProjectSeeder extends Seeder
         ],
         'tailwindlabs/tailwindcss' => [
             'title' => 'Tailwind CSS',
-            'category' => ProjectCategory::DailyDriver,
+            'category' => ProjectCategory::Framework,
             'stack' => ['CSS', 'JavaScript'],
             'versions' => [],
             'no_packagist' => true,
@@ -64,23 +65,23 @@ class ProjectSeeder extends Seeder
         ],
         'wire-elements/modal' => [
             'title' => 'Wire Elements Modal',
-            'category' => ProjectCategory::DailyDriver,
+            'category' => ProjectCategory::LivewirePackage,
             'stack' => ['Livewire'],
             'versions' => [],
         ],
-        'achyutn/filament-log-viewer' => ['title' => 'Filament Log Viewer', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Filament'], 'versions' => []],
-        'dutchcodingcompany/filament-developer-logins' => ['title' => 'Filament Developer Logins', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Filament'], 'versions' => []],
-        'laravel/horizon' => ['title' => 'Laravel Horizon', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
-        'ralphjsmit/laravel-seo' => ['title' => 'Laravel SEO', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
-        'spatie/laravel-sitemap' => ['title' => 'Laravel Sitemap', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
-        'spatie/laravel-sluggable' => ['title' => 'Laravel Sluggable', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
-        'spatie/laravel-translatable' => ['title' => 'Laravel Translatable', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
-        'barryvdh/laravel-debugbar' => ['title' => 'Laravel Debugbar (barryvdh)', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
-        'barryvdh/laravel-ide-helper' => ['title' => 'Laravel IDE Helper', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
-        'fakerphp/faker' => ['title' => 'Faker', 'category' => ProjectCategory::DailyDriver, 'stack' => ['PHP'], 'versions' => []],
-        'larastan/larastan' => ['title' => 'Larastan', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel', 'PHPStan'], 'versions' => []],
-        'pestphp/pest' => ['title' => 'Pest', 'category' => ProjectCategory::DailyDriver, 'stack' => ['PHP', 'Testing'], 'versions' => []],
-        'pestphp/pest-plugin-laravel' => ['title' => 'Pest Plugin Laravel', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel', 'Testing'], 'versions' => []],
+        'achyutkneupane/filament-log-viewer' => ['title' => 'Filament Log Viewer', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => []],
+        'dutchcodingcompany/filament-developer-logins' => ['title' => 'Filament Developer Logins', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => []],
+        'laravel/horizon' => ['title' => 'Laravel Horizon', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
+        'ralphjsmit/laravel-seo' => ['title' => 'Laravel SEO', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
+        'spatie/laravel-sitemap' => ['title' => 'Laravel Sitemap', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
+        'spatie/laravel-sluggable' => ['title' => 'Laravel Sluggable', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
+        'spatie/laravel-translatable' => ['title' => 'Laravel Translatable', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
+        'barryvdh/laravel-debugbar' => ['title' => 'Laravel Debugbar (barryvdh)', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
+        'barryvdh/laravel-ide-helper' => ['title' => 'Laravel IDE Helper', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
+        'fakerphp/faker' => ['title' => 'Faker', 'category' => ProjectCategory::Tool, 'stack' => ['PHP'], 'versions' => []],
+        'larastan/larastan' => ['title' => 'Larastan', 'category' => ProjectCategory::Tool, 'stack' => ['Laravel', 'PHPStan'], 'versions' => []],
+        'pestphp/pest' => ['title' => 'Pest', 'category' => ProjectCategory::Tool, 'stack' => ['PHP', 'Testing'], 'versions' => []],
+        'pestphp/pest-plugin-laravel' => ['title' => 'Pest Plugin Laravel', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel', 'Testing'], 'versions' => []],
     ];
 
     /**
@@ -322,6 +323,7 @@ class ProjectSeeder extends Seeder
         $project->category = $entry['category']->value;
         $project->github_url = $githubUrl;
         $project->packagist_url = $packagistUrl;
+        $project->package_type = self::resolvePackageType($entry, $isJetBrains, $noPackagist)->value;
 
         if ($isJetBrains) {
             $project->docs_url = "https://plugins.jetbrains.com/plugin/{$entry['extra']['jetbrainsId']}";
@@ -378,6 +380,29 @@ class ProjectSeeder extends Seeder
         // up GitHub stars, Packagist downloads and the user's contribution
         // count without waiting for the daily scheduler.
         SyncProjectMetricsJob::dispatch($project);
+    }
+
+    /**
+     * Decide which manifest the metrics sync should read for this project:
+     * `composer.json` for Composer/Packagist packages, `package.json` for npm
+     * packages, or `none` for repos that don't publish either (JetBrains
+     * plugins, infra repos, paid packages without a public source).
+     */
+    private static function resolvePackageType(array $entry, bool $isJetBrains, bool $noPackagist): PackageType
+    {
+        if ($isJetBrains) {
+            return PackageType::JetBrains;
+        }
+
+        if (! empty($entry['extra']['npm']) && $noPackagist) {
+            return PackageType::Npm;
+        }
+
+        if ($noPackagist) {
+            return PackageType::None;
+        }
+
+        return PackageType::Composer;
     }
 
     /**

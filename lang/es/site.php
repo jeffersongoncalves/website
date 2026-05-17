@@ -113,6 +113,7 @@ return [
         'role_all' => 'Todos los roles',
         'role_authored' => 'Autoría',
         'role_maintainer' => 'Mantenimiento',
+        'role_daily_driver' => 'Uso diario',
         'cta_title' => 'Contribuye, reporta issues, abre PRs.',
         'cta_body' => 'Todos los paquetes tienen CI, tests Pest e issues abiertas marcadas con :code. Documentación en inglés, mantenedor responde en español/portugués.',
         'good_first_issue' => 'good first issue',

@@ -60,8 +60,9 @@
                         <span class="projects-filter-label">@lang('site.projects.filter_role')</span>
                         <select name="role" class="projects-filter-select" onchange="this.form.submit()">
                             <option value="">@lang('site.projects.role_all')</option>
-                            <option value="authored"   @selected($activeRole === 'authored')>@lang('site.projects.role_authored')</option>
-                            <option value="maintainer" @selected($activeRole === 'maintainer')>@lang('site.projects.role_maintainer')</option>
+                            <option value="authored"     @selected($activeRole === 'authored')>@lang('site.projects.role_authored')</option>
+                            <option value="maintainer"   @selected($activeRole === 'maintainer')>@lang('site.projects.role_maintainer')</option>
+                            <option value="daily_driver" @selected($activeRole === 'daily_driver')>@lang('site.projects.role_daily_driver')</option>
                         </select>
                     </label>
 

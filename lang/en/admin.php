@@ -60,7 +60,6 @@ return [
         'stack_versions' => 'Stack & versions',
         'metrics' => 'Metrics',
         'links' => 'Links',
-        'cover' => 'Cover',
         'description' => 'Description',
         'stack' => 'Stack',
     ],
@@ -72,6 +71,7 @@ return [
         'slug' => 'Slug',
         'repo' => 'Repository',
         'category' => 'Category',
+        'package_type' => 'Package type',
         'status' => 'Status',
         'featured' => 'Featured',
         'sort_order' => 'Sort order',
@@ -94,7 +94,6 @@ return [
         'npm_url' => 'npm URL',
         'docs_url' => 'Docs URL',
         'demo_url' => 'Demo URL',
-        'cover_image' => 'Cover image',
         'is_maintainer' => 'Maintainer only',
         'is_daily_driver' => 'Daily driver',
         'is_paid' => 'Paid package',
@@ -113,6 +112,7 @@ return [
         'branch_overrides' => 'Remap auto-mapped branches to the real ones in the repo, e.g. `1.x → main`, `2.x → 2.x`. Leave blank to use the auto branch as-is.',
         'readme_branch' => 'GitHub branch used to fetch the README. Leave blank to use the repository default branch.',
         'downloads_label' => 'Display value: 21k, 1.2M, —',
+        'package_type' => 'Which manifest the sync should read to resolve the package name: composer.json (Packagist), package.json (npm), JetBrains, or none.',
     ],
 
     'placeholders' => [
@@ -132,12 +132,17 @@ return [
             'starter_kit' => 'Starter Kit',
             'saas' => 'SaaS',
             'tool' => 'Tool',
-            'daily_driver' => 'Daily Driver',
         ],
         'status' => [
             'draft' => 'Draft',
             'published' => 'Published',
             'archived' => 'Archived',
+        ],
+        'package_type' => [
+            'composer' => 'Composer (composer.json)',
+            'npm' => 'npm (package.json)',
+            'jetbrains' => 'JetBrains',
+            'none' => 'None',
         ],
     ],
 ];

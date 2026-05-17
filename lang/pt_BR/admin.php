@@ -117,6 +117,7 @@ return [
         'category' => [
             'filament_plugin' => 'Plugin Filament',
             'laravel_package' => 'Pacote Laravel',
+            'framework' => 'Framework',
             'starter_kit' => 'Starter Kit',
             'saas' => 'SaaS',
             'tool' => 'Ferramenta',

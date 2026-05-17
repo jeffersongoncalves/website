@@ -66,8 +66,7 @@ class ProjectForm
                             ->helperText(__('admin.helpers.featured')),
                         Toggle::make('is_maintainer')
                             ->label(__('admin.fields.is_maintainer'))
-                            ->helperText(__('admin.helpers.is_maintainer'))
-                            ->visible(fn (Get $get) => enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
+                            ->helperText(__('admin.helpers.is_maintainer')),
                     ]),
 
                 Section::make(__('admin.sections.title'))

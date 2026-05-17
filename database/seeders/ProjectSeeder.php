@@ -177,14 +177,32 @@ class ProjectSeeder extends Seeder
             ];
         }
 
-        foreach (array_merge($data['filament']['plugins'] ?? [], $data['filament']['collaborator'] ?? []) as $row) {
+        foreach ($data['filament']['plugins'] ?? [] as $row) {
             yield [
                 'package' => $row['package'],
                 'title' => $row['title'],
                 'category' => ProjectCategory::FilamentPlugin,
                 'versions' => $this->filamentVersions($row),
                 'stack' => ['Filament'],
-                'extra' => [],
+                'extra' => [
+                    'is_maintainer' => false,
+                ],
+            ];
+        }
+
+        // Collaborator entries are upstream plugins the user maintains alongside
+        // the author — flag them as maintainer so they get the badge + show up
+        // in the maintained count.
+        foreach ($data['filament']['collaborator'] ?? [] as $row) {
+            yield [
+                'package' => $row['package'],
+                'title' => $row['title'],
+                'category' => ProjectCategory::FilamentPlugin,
+                'versions' => $this->filamentVersions($row),
+                'stack' => ['Filament'],
+                'extra' => [
+                    'is_maintainer' => true,
+                ],
             ];
         }
 

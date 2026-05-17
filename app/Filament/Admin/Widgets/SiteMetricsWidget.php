@@ -46,6 +46,10 @@ class SiteMetricsWidget extends StatsOverviewWidget
                 ->description(__('admin.widgets.site_metrics.maintained_desc'))
                 ->color('success'),
 
+            Stat::make(__('admin.widgets.site_metrics.daily_drivers'), number_format($s['daily_drivers'], 0, ',', '.'))
+                ->description(__('admin.widgets.site_metrics.daily_drivers_desc'))
+                ->color('info'),
+
             Stat::make(__('admin.widgets.site_metrics.followers'), $this->compact($s['followers']))
                 ->description(__('admin.widgets.site_metrics.followers_desc')),
 

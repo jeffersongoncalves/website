@@ -238,6 +238,8 @@
     background: var(--surface-elevated-alt);
     color: var(--text-muted);
     line-height: 1;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .badge-accent  { background: var(--accent-bg-soft); color: var(--accent-text); }
   .badge-success { background: var(--surface-elevated-alt); color: var(--success); }

@@ -12,8 +12,8 @@
 
     <div class="flex items-start justify-between gap-4 pr-6">
         <a href="{{ route('projects.show', ['slug' => $project->slug]) }}"
-           class="mono text-[0.95rem] font-semibold text-ink-100">{{ $project->name }}</a>
-        <div class="flex items-center gap-2">
+           class="mono text-[0.95rem] font-semibold text-ink-100 flex-1 min-w-0">{{ $project->name }}</a>
+        <div class="flex items-center gap-2 flex-wrap justify-end">
             @if($project->is_maintainer)
                 <span class="badge badge-success" title="{{ __('Maintainer, not original author') }}">{{ __('maintainer') }}</span>
             @endif

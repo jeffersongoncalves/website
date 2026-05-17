@@ -41,6 +41,8 @@ return [
             'starter_desc' => 'category',
             'maintained' => 'Maintainer',
             'maintained_desc' => 'projects I maintain but did not create',
+            'daily_drivers' => 'Daily Drivers',
+            'daily_drivers_desc' => 'tools I use every day',
             'followers' => 'Followers',
             'followers_desc' => 'on GitHub',
             'sponsors' => 'Sponsors',

@@ -41,6 +41,8 @@ return [
             'starter_desc' => 'categoría',
             'maintained' => 'Mantenedor',
             'maintained_desc' => 'proyectos que mantengo pero no creé',
+            'daily_drivers' => 'Uso Diario',
+            'daily_drivers_desc' => 'herramientas que uso todos los días',
             'followers' => 'Seguidores',
             'followers_desc' => 'en GitHub',
             'sponsors' => 'Sponsors',

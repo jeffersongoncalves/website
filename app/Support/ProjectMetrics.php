@@ -423,6 +423,13 @@ class ProjectMetrics
             return null;
         }
 
+        // Monorepo roots (tailwindcss, livewire, etc) have `private: true` and
+        // a non-publishable name like "@scope/root". Trust the seeded npm_url
+        // in that case rather than overwriting it with the root manifest name.
+        if ($response->json('private') === true) {
+            return null;
+        }
+
         $name = $response->json('name');
 
         if (! is_string($name) || ! preg_match('#^(@[a-z0-9_.~-]+/)?[a-z0-9_.~-]+$#i', $name)) {

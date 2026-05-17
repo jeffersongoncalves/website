@@ -204,23 +204,23 @@ class ProjectMetrics
         }
 
         if ($project->packagist_url) {
-            return self::fetchPackagistDownloads($project->github_url);
+            return self::fetchPackagistDownloads($project->packagist_url);
         }
 
         return null;
     }
 
-    private static function fetchPackagistDownloads(?string $githubUrl): ?int
+    private static function fetchPackagistDownloads(?string $packagistUrl): ?int
     {
-        $repo = GithubReadme::repoFromUrl($githubUrl);
+        $package = self::packageFromPackagistUrl($packagistUrl);
 
-        if (! $repo) {
+        if (! $package) {
             return null;
         }
 
         $response = Http::timeout(8)
             ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
-            ->get("https://packagist.org/packages/{$repo}.json");
+            ->get("https://packagist.org/packages/{$package}.json");
 
         if (! $response->successful()) {
             return null;
@@ -229,6 +229,19 @@ class ProjectMetrics
         $total = $response->json('package.downloads.total');
 
         return is_numeric($total) ? (int) $total : null;
+    }
+
+    private static function packageFromPackagistUrl(?string $url): ?string
+    {
+        if (! $url) {
+            return null;
+        }
+
+        if (! preg_match('~packagist\.org/packages/([^/]+/[^/?#]+)~i', $url, $m)) {
+            return null;
+        }
+
+        return rtrim($m[1], '/');
     }
 
     private static function fetchJetBrainsDownloads(string $idWithSlug): ?int

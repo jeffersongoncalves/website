@@ -135,7 +135,7 @@ class GithubReadme
      */
     public static function branchToVersion(string $branch, array $supportedVersions, array $branchOverrides = []): ?string
     {
-        foreach (array_values($supportedVersions) as $i => $version) {
+        foreach ($supportedVersions as $i => $version) {
             $autoBranch = ($i + 1).'.x';
             $realBranch = isset($branchOverrides[$autoBranch]) && trim((string) $branchOverrides[$autoBranch]) !== ''
                 ? trim((string) $branchOverrides[$autoBranch])

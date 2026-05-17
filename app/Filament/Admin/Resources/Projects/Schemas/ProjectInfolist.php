@@ -74,10 +74,11 @@ class ProjectInfolist
                         Section::make(__('admin.sections.links'))
                             ->columnSpanFull()
                             ->schema([
-                                TextEntry::make('github_url')->label(__('admin.fields.github_url'))->url(fn ($state) => $state)->placeholder('—'),
-                                TextEntry::make('packagist_url')->label(__('admin.fields.packagist_url'))->url(fn ($state) => $state)->placeholder('—'),
-                                TextEntry::make('docs_url')->label(__('admin.fields.docs_url'))->url(fn ($state) => $state)->placeholder('—'),
-                                TextEntry::make('demo_url')->label(__('admin.fields.demo_url'))->url(fn ($state) => $state)->placeholder('—'),
+                                TextEntry::make('github_url')->label(__('admin.fields.github_url'))->url(fn ($state) => $state)->visible(fn ($record) => filled($record->github_url)),
+                                TextEntry::make('packagist_url')->label(__('admin.fields.packagist_url'))->url(fn ($state) => $state)->visible(fn ($record) => filled($record->packagist_url)),
+                                TextEntry::make('npm_url')->label(__('admin.fields.npm_url'))->url(fn ($state) => $state)->visible(fn ($record) => filled($record->npm_url)),
+                                TextEntry::make('docs_url')->label(__('admin.fields.docs_url'))->url(fn ($state) => $state)->visible(fn ($record) => filled($record->docs_url)),
+                                TextEntry::make('demo_url')->label(__('admin.fields.demo_url'))->url(fn ($state) => $state)->visible(fn ($record) => filled($record->demo_url)),
                             ]),
                     ]),
             ]);

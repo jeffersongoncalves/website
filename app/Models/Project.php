@@ -37,12 +37,14 @@ use Spatie\Translatable\HasTranslations;
  * @property string $license
  * @property string|null $github_url
  * @property string|null $packagist_url
+ * @property string|null $npm_url
  * @property string|null $docs_url
  * @property string|null $demo_url
  * @property string|null $cover_image
  * @property ProjectStatus $status
  * @property bool $featured
  * @property bool $is_maintainer
+ * @property bool $is_daily_driver
  * @property Carbon|null $published_at
  * @property Carbon|null $last_synced_at
  * @property Carbon|null $created_at
@@ -115,12 +117,14 @@ class Project extends Model
         'license',
         'github_url',
         'packagist_url',
+        'npm_url',
         'docs_url',
         'demo_url',
         'cover_image',
         'status',
         'featured',
         'is_maintainer',
+        'is_daily_driver',
         'published_at',
         'last_synced_at',
     ];
@@ -141,6 +145,7 @@ class Project extends Model
             'user_contributions' => 'integer',
             'featured' => 'boolean',
             'is_maintainer' => 'boolean',
+            'is_daily_driver' => 'boolean',
             'category' => ProjectCategory::class,
             'status' => ProjectStatus::class,
             'published_at' => 'datetime',

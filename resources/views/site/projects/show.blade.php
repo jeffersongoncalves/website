@@ -137,6 +137,13 @@
                             </div>
                         @endif
 
+                        @if($project->is_daily_driver)
+                            <div class="project-detail-row">
+                                <span class="project-detail-label">@lang('site.projects.label_role')</span>
+                                <span class="badge badge-accent">@lang('site.projects.badge_daily_driver')</span>
+                            </div>
+                        @endif
+
                         <div class="project-detail-grid">
                             <div class="project-detail-stat">
                                 <small>@lang('site.projects.label_stars')</small>

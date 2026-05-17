@@ -31,7 +31,7 @@ class ProjectObserver
         // editor touches a field that changes WHAT we should fetch. Metric-only
         // updates (stars, downloads, branch_overrides, last_synced_at) coming
         // from the job itself are excluded so we don't bounce-loop.
-        if ($project->wasChanged(['repo', 'github_url', 'packagist_url', 'docs_url', 'versions'])) {
+        if ($project->wasChanged(['repo', 'github_url', 'packagist_url', 'npm_url', 'docs_url', 'versions'])) {
             SyncProjectMetricsJob::dispatch($project);
         }
 

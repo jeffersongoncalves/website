@@ -268,7 +268,46 @@ class ProjectMetrics
             return self::fetchPackagistDownloads($project->packagist_url);
         }
 
+        if ($project->npm_url) {
+            return self::fetchNpmDownloads($project->npm_url);
+        }
+
         return null;
+    }
+
+    private static function fetchNpmDownloads(?string $npmUrl): ?int
+    {
+        $package = self::packageFromNpmUrl($npmUrl);
+
+        if (! $package) {
+            return null;
+        }
+
+        $response = Http::timeout(8)
+            ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
+            ->get("https://api.npmjs.org/downloads/point/last-month/{$package}");
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        $downloads = $response->json('downloads');
+
+        return is_numeric($downloads) ? (int) $downloads : null;
+    }
+
+    private static function packageFromNpmUrl(?string $url): ?string
+    {
+        if (! $url) {
+            return null;
+        }
+
+        // Matches npmjs.com/package/{name} or npmjs.com/package/@scope/name
+        if (! preg_match('~npmjs\.com/package/(@[^/?#]+/[^/?#]+|[^/?#]+)~i', $url, $m)) {
+            return null;
+        }
+
+        return rtrim($m[1], '/');
     }
 
     private static function fetchPackagistDownloads(?string $packagistUrl): ?int

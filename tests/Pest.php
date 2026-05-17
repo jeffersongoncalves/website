@@ -21,6 +21,7 @@ pest()->beforeEach(function () {
         ]]),
         'raw.githubusercontent.com/*' => Http::response('# README', 200),
         'packagist.org/*' => Http::response(['package' => ['downloads' => ['total' => 0]]]),
+        'api.npmjs.org/*' => Http::response(['downloads' => 0]),
         'plugins.jetbrains.com/*' => Http::response(['downloads' => 0]),
     ]);
 })->in('Feature', 'Unit');

@@ -135,6 +135,7 @@ return [
         'label_stack' => 'Stack',
         'label_updated' => 'Atualizado',
         'label_contributions' => 'Contribuições',
+        'badge_daily_driver' => 'uso diário',
     ],
 
     'about' => [

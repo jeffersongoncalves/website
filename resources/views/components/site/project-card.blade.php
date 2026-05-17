@@ -17,6 +17,9 @@
             @if($project->is_maintainer)
                 <span class="badge badge-success" title="{{ __('Maintainer, not original author') }}">{{ __('maintainer') }}</span>
             @endif
+            @if($project->is_daily_driver)
+                <span class="badge badge-accent" title="{{ __('site.projects.badge_daily_driver') }}">@lang('site.projects.badge_daily_driver')</span>
+            @endif
             <span class="badge">{{ $project->category->getLabel() }}</span>
         </div>
     </div>

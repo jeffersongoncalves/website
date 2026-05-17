@@ -67,6 +67,9 @@ class ProjectForm
                         Toggle::make('is_maintainer')
                             ->label(__('admin.fields.is_maintainer'))
                             ->helperText(__('admin.helpers.is_maintainer')),
+                        Toggle::make('is_daily_driver')
+                            ->label(__('admin.fields.is_daily_driver'))
+                            ->helperText(__('admin.helpers.is_daily_driver')),
                     ]),
 
                 Section::make(__('admin.sections.title'))
@@ -153,6 +156,10 @@ class ProjectForm
                             ->maxLength(500),
                         TextInput::make('packagist_url')
                             ->label(__('admin.fields.packagist_url'))
+                            ->url()
+                            ->maxLength(500),
+                        TextInput::make('npm_url')
+                            ->label(__('admin.fields.npm_url'))
                             ->url()
                             ->maxLength(500),
                         TextInput::make('docs_url')

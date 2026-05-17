@@ -40,6 +40,50 @@ class ProjectSeeder extends Seeder
     ];
 
     /**
+     * Projects the user relies on daily without authoring or maintaining.
+     * Surfaced with the "daily driver" badge on the public projects page.
+     */
+    private const DAILY_DRIVER_EXTRAS = [
+        'alpinejs/alpine' => [
+            'title' => 'Alpine.js',
+            'category' => ProjectCategory::DailyDriver,
+            'stack' => ['JavaScript'],
+            'versions' => [],
+            'no_packagist' => true,
+            'npm' => 'alpinejs',
+            'docs' => 'https://alpinejs.dev/docs',
+        ],
+        'tailwindlabs/tailwindcss' => [
+            'title' => 'Tailwind CSS',
+            'category' => ProjectCategory::DailyDriver,
+            'stack' => ['CSS', 'JavaScript'],
+            'versions' => [],
+            'no_packagist' => true,
+            'npm' => 'tailwindcss',
+            'docs' => 'https://tailwindcss.com/docs',
+        ],
+        'wire-elements/modal' => [
+            'title' => 'Wire Elements Modal',
+            'category' => ProjectCategory::DailyDriver,
+            'stack' => ['Livewire'],
+            'versions' => [],
+        ],
+        'achyutn/filament-log-viewer' => ['title' => 'Filament Log Viewer', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Filament'], 'versions' => []],
+        'dutchcodingcompany/filament-developer-logins' => ['title' => 'Filament Developer Logins', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Filament'], 'versions' => []],
+        'laravel/horizon' => ['title' => 'Laravel Horizon', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
+        'ralphjsmit/laravel-seo' => ['title' => 'Laravel SEO', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
+        'spatie/laravel-sitemap' => ['title' => 'Laravel Sitemap', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
+        'spatie/laravel-sluggable' => ['title' => 'Laravel Sluggable', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
+        'spatie/laravel-translatable' => ['title' => 'Laravel Translatable', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
+        'barryvdh/laravel-debugbar' => ['title' => 'Laravel Debugbar (barryvdh)', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
+        'barryvdh/laravel-ide-helper' => ['title' => 'Laravel IDE Helper', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel'], 'versions' => []],
+        'fakerphp/faker' => ['title' => 'Faker', 'category' => ProjectCategory::DailyDriver, 'stack' => ['PHP'], 'versions' => []],
+        'larastan/larastan' => ['title' => 'Larastan', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel', 'PHPStan'], 'versions' => []],
+        'pestphp/pest' => ['title' => 'Pest', 'category' => ProjectCategory::DailyDriver, 'stack' => ['PHP', 'Testing'], 'versions' => []],
+        'pestphp/pest-plugin-laravel' => ['title' => 'Pest Plugin Laravel', 'category' => ProjectCategory::DailyDriver, 'stack' => ['Laravel', 'Testing'], 'versions' => []],
+    ];
+
+    /**
      * Upstream repos the user contributes to / maintains alongside the author.
      * Listed here so the public projects page surfaces them with the
      * "maintainer" badge.
@@ -205,6 +249,24 @@ class ProjectSeeder extends Seeder
                 ],
             ];
         }
+
+        foreach (self::DAILY_DRIVER_EXTRAS as $package => $meta) {
+            yield [
+                'package' => $package,
+                'title' => $meta['title'],
+                'category' => $meta['category'],
+                'versions' => $meta['versions'] ?? [],
+                'stack' => $meta['stack'] ?? [],
+                'extra' => [
+                    'is_maintainer' => false,
+                    'is_daily_driver' => true,
+                    'no_packagist' => $meta['no_packagist'] ?? false,
+                    'packagist' => $meta['packagist'] ?? null,
+                    'npm' => $meta['npm'] ?? null,
+                    'docs' => $meta['docs'] ?? null,
+                ],
+            ];
+        }
     }
 
     private function upsert(array $entry): void
@@ -240,10 +302,23 @@ class ProjectSeeder extends Seeder
             $project->docs_url = "https://plugins.jetbrains.com/plugin/{$entry['extra']['jetbrainsId']}";
         }
 
-        // is_maintainer is source-of-truth from the seed when explicitly
-        // provided (extras list), otherwise left to the editor.
+        // is_maintainer + is_daily_driver are source-of-truth from the seed
+        // when explicitly provided (extras list), otherwise left to the editor.
         if (array_key_exists('is_maintainer', $entry['extra'] ?? [])) {
             $project->is_maintainer = (bool) $entry['extra']['is_maintainer'];
+        }
+
+        if (array_key_exists('is_daily_driver', $entry['extra'] ?? [])) {
+            $project->is_daily_driver = (bool) $entry['extra']['is_daily_driver'];
+        }
+
+        // Optional npm + extra docs URL overrides for extras (e.g. JS packages
+        // that publish only on npm, or projects whose docs live off-repo).
+        if (! empty($entry['extra']['npm'])) {
+            $project->npm_url = 'https://www.npmjs.com/package/'.$entry['extra']['npm'];
+        }
+        if (! empty($entry['extra']['docs'])) {
+            $project->docs_url = $entry['extra']['docs'];
         }
 
         // Default-only fields (set on insert; never overwrite editor changes).

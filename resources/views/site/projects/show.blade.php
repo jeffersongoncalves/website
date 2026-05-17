@@ -156,6 +156,12 @@
                                     <strong>{{ implode(' · ', $project->versions) }}</strong>
                                 </div>
                             @endif
+                            @if($project->is_maintainer && $project->user_contributions > 0)
+                                <div class="project-detail-stat">
+                                    <small>@lang('site.projects.label_contributions')</small>
+                                    <strong>⎘ {{ number_format($project->user_contributions, 0, ',', '.') }}</strong>
+                                </div>
+                            @endif
                         </div>
 
                         @if(!empty($project->stack))

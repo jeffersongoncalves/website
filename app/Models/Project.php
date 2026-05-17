@@ -33,6 +33,7 @@ use Spatie\Translatable\HasTranslations;
  * @property int $stars
  * @property int $downloads
  * @property string|null $downloads_label
+ * @property int $user_contributions
  * @property string $license
  * @property string|null $github_url
  * @property string|null $packagist_url
@@ -110,6 +111,7 @@ class Project extends Model
         'stars',
         'downloads',
         'downloads_label',
+        'user_contributions',
         'license',
         'github_url',
         'packagist_url',
@@ -136,6 +138,7 @@ class Project extends Model
             'stack' => 'array',
             'stars' => 'integer',
             'downloads' => 'integer',
+            'user_contributions' => 'integer',
             'featured' => 'boolean',
             'is_maintainer' => 'boolean',
             'category' => ProjectCategory::class,

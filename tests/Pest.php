@@ -11,6 +11,7 @@ pest()->beforeEach(function () {
         'api.github.com/users/*' => Http::response(['followers' => 0, 'public_repos' => 0]),
         'api.github.com/repos/*/readme' => Http::response('# README', 200, ['Content-Type' => 'text/plain']),
         'api.github.com/repos/*/branches*' => Http::response([['name' => 'main'], ['name' => '1.x']]),
+        'api.github.com/repos/*/contributors*' => Http::response([['login' => 'jeffersongoncalves', 'contributions' => 0]]),
         'api.github.com/repos/*' => Http::response(['default_branch' => 'main', 'stargazers_count' => 0]),
         'api.github.com/graphql' => Http::response(['data' => [
             'user' => [

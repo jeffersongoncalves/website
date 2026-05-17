@@ -31,6 +31,12 @@ class ProjectMetrics
             $changed = true;
         }
 
+        $contributions = self::fetchUserContributions($project->github_url);
+        if ($contributions !== null && $contributions !== $project->user_contributions) {
+            $project->user_contributions = $contributions;
+            $changed = true;
+        }
+
         if ($changed) {
             $project->last_synced_at = now();
             $project->save();
@@ -168,6 +174,61 @@ class ProjectMetrics
         $branch = $response->json('default_branch');
 
         return is_string($branch) && $branch !== '' ? $branch : null;
+    }
+
+    /**
+     * Count the configured GitHub user's commits to a repo via the
+     * /repos/{repo}/contributors endpoint. Returns null when verification
+     * cannot be performed (no URL, no username, network error).
+     */
+    private static function fetchUserContributions(?string $githubUrl): ?int
+    {
+        $repo = GithubReadme::repoFromUrl($githubUrl);
+        $username = strtolower((string) config('services.github.username'));
+
+        if (! $repo || $username === '') {
+            return null;
+        }
+
+        $headers = ['User-Agent' => 'jeffersongoncalves-site', 'Accept' => 'application/vnd.github+json'];
+
+        if ($token = config('services.github.token')) {
+            $headers['Authorization'] = "Bearer {$token}";
+        }
+
+        $page = 1;
+
+        do {
+            $response = Http::timeout(8)
+                ->withHeaders($headers)
+                ->get("https://api.github.com/repos/{$repo}/contributors", [
+                    'per_page' => 100,
+                    'page' => $page,
+                    'anon' => 'false',
+                ]);
+
+            if (! $response->successful()) {
+                Log::warning('GitHub contributors API failed', ['repo' => $repo, 'status' => $response->status()]);
+
+                return null;
+            }
+
+            $batch = (array) $response->json();
+
+            foreach ($batch as $contributor) {
+                if (! is_array($contributor) || ! isset($contributor['login'])) {
+                    continue;
+                }
+
+                if (strtolower((string) $contributor['login']) === $username) {
+                    return (int) ($contributor['contributions'] ?? 0);
+                }
+            }
+
+            $page++;
+        } while (count($batch) === 100 && $page <= 5);
+
+        return 0;
     }
 
     private static function fetchStars(?string $githubUrl): ?int

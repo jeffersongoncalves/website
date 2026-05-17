@@ -129,6 +129,7 @@ return [
         'label_versions' => 'Versiones',
         'label_stack' => 'Stack',
         'label_updated' => 'Actualizado',
+        'label_contributions' => 'Contribuciones',
     ],
 
     'about' => [

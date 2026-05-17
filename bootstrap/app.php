@@ -19,6 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'set.locale' => SetLocale::class,
         ]);
+
+        // The theme cookie is written by JS on the client (no PHP touchpoint),
+        // so EncryptCookies must skip it — otherwise the decrypt step strips
+        // the plain "dark"/"light" value before Blade can read it back.
+        $middleware->encryptCookies(except: ['theme']);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

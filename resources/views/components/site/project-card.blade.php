@@ -41,6 +41,9 @@
             <span>★ {{ $project->stars }}</span>
             <span>↓ {{ $project->downloads_label ?: '—' }}</span>
             <span>⎘ {{ $project->license }}</span>
+            @if($project->is_maintainer && $project->user_contributions > 0)
+                <span title="@lang('site.projects.label_contributions')">⎇ {{ number_format($project->user_contributions, 0, ',', '.') }}</span>
+            @endif
         </div>
         <div class="flex items-center gap-3 text-ink-400">
             <a href="{{ $project->github_url }}" aria-label="GitHub" rel="noopener" target="_blank">

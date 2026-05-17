@@ -261,6 +261,12 @@ class ProjectSeeder extends Seeder
         }
 
         $project->save();
+
+        // Force a metrics sync for every seeded project so freshly added rows
+        // and pre-existing rows whose synced fields didn't change still pick
+        // up GitHub stars, Packagist downloads and the user's contribution
+        // count without waiting for the daily scheduler.
+        \App\Jobs\SyncProjectMetricsJob::dispatch($project);
     }
 
     /**

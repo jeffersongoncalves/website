@@ -15,6 +15,7 @@ class ProjectController
         $cat = $request->string('cat')->toString();
         $sort = $request->string('sort', 'stars')->toString();
         $role = $request->string('role')->toString();
+        $search = trim($request->string('search')->toString());
 
         $query = Project::query()->published();
 
@@ -28,6 +29,14 @@ class ProjectController
             $query->maintained();
         } elseif ($activeRole === 'authored') {
             $query->authored();
+        }
+
+        if ($search !== '') {
+            $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $search).'%';
+            $query->where(function ($q) use ($like) {
+                $q->where('name', 'like', $like)
+                  ->orWhere('repo', 'like', $like);
+            });
         }
 
         match ($sort) {
@@ -53,6 +62,7 @@ class ProjectController
             'activeCat' => $category ? $category->value : 'all',
             'activeSort' => $sort,
             'activeRole' => $activeRole,
+            'activeSearch' => $search,
             'categories' => ProjectCategory::cases(),
             'counts' => $counts,
         ]);

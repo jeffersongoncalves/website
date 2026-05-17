@@ -790,6 +790,70 @@
   .markdown-body h4:hover .md-anchor { opacity: 1; }
 
   /* ==========================================================================
+     Projects index · dropdown-based filters + search input
+     ========================================================================== */
+  .projects-filters {
+    margin-bottom: var(--s-7);
+  }
+  .projects-filters-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    gap: var(--s-3);
+    align-items: end;
+  }
+  .projects-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .projects-filter-label {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--text-dim);
+  }
+  .projects-filter-input,
+  .projects-filter-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--surface-elevated);
+    color: var(--text-strong);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    padding: 8px 12px;
+    width: 100%;
+    transition: border-color 120ms var(--ease-out);
+  }
+  .projects-filter-input:focus,
+  .projects-filter-select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .projects-filter-select {
+    padding-right: 28px;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238B8377' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+  .projects-filter-submit {
+    height: 36px;
+    align-self: end;
+  }
+  @media (max-width: 900px) {
+    .projects-filters-row {
+      grid-template-columns: 1fr 1fr;
+    }
+    .projects-filter:first-child,
+    .projects-filter-submit {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* ==========================================================================
      Project show page · two-column layout with sticky sidebar
      ========================================================================== */
   .project-page-section { padding-top: var(--s-7); }

@@ -31,54 +31,53 @@
         <div class="wrap">
             <x-site.eyebrow num="02" label="catálogo"/>
 
-            @php
-                $catParam = $activeCat === 'all' ? null : $activeCat;
-                $roleParam = $activeRole === 'all' ? null : $activeRole;
-                $catLink = fn ($c) => route('projects.index', array_filter(['cat' => $c, 'role' => $roleParam, 'sort' => $activeSort === 'stars' ? null : $activeSort]));
-                $roleLink = fn ($r) => route('projects.index', array_filter(['cat' => $catParam, 'role' => $r, 'sort' => $activeSort === 'stars' ? null : $activeSort]));
-                $sortLink = fn ($s) => route('projects.index', array_filter(['cat' => $catParam, 'role' => $roleParam, 'sort' => $s]));
-            @endphp
+            <form method="GET" action="{{ route('projects.index') }}" class="projects-filters">
+                <div class="projects-filters-row">
+                    <label class="projects-filter">
+                        <span class="projects-filter-label">@lang('site.projects.filter_search')</span>
+                        <input type="text"
+                               name="search"
+                               value="{{ $activeSearch }}"
+                               placeholder="{{ __('site.projects.filter_search_placeholder') }}"
+                               class="projects-filter-input"
+                               autocomplete="off">
+                    </label>
 
-            <div class="flex flex-wrap items-center gap-3 mb-8">
-                <div class="overflow-x-auto no-scrollbar flex-1">
-                    <div class="flex gap-2 min-w-max">
-                        <a href="{{ $catLink(null) }}"
-                           class="chip {{ $activeCat === 'all' ? 'chip-active' : '' }}">
-                            @lang('site.projects.category_all')
-                        </a>
-                        @foreach($categories as $cat)
-                            <a href="{{ $catLink($cat->value) }}"
-                               class="chip {{ $activeCat === $cat->value ? 'chip-active' : '' }}">
-                                {{ $cat->getLabel() }}
-                            </a>
-                        @endforeach
-                    </div>
+                    <label class="projects-filter">
+                        <span class="projects-filter-label">@lang('site.projects.filter_category')</span>
+                        <select name="cat" class="projects-filter-select" onchange="this.form.submit()">
+                            <option value="">@lang('site.projects.category_all')</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->value }}" @selected($activeCat === $cat->value)>
+                                    {{ $cat->getLabel() }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </label>
+
+                    <label class="projects-filter">
+                        <span class="projects-filter-label">@lang('site.projects.filter_role')</span>
+                        <select name="role" class="projects-filter-select" onchange="this.form.submit()">
+                            <option value="">@lang('site.projects.role_all')</option>
+                            <option value="authored"   @selected($activeRole === 'authored')>@lang('site.projects.role_authored')</option>
+                            <option value="maintainer" @selected($activeRole === 'maintainer')>@lang('site.projects.role_maintainer')</option>
+                        </select>
+                    </label>
+
+                    <label class="projects-filter">
+                        <span class="projects-filter-label">@lang('site.common.sort_by')</span>
+                        <select name="sort" class="projects-filter-select" onchange="this.form.submit()">
+                            <option value="stars"     @selected($activeSort === 'stars')>@lang('site.common.sort_stars')</option>
+                            <option value="downloads" @selected($activeSort === 'downloads')>@lang('site.common.sort_downloads')</option>
+                            <option value="name"      @selected($activeSort === 'name')>@lang('site.common.sort_az')</option>
+                        </select>
+                    </label>
+
+                    <button type="submit" class="btn btn-primary projects-filter-submit">
+                        @lang('site.projects.filter_apply')
+                    </button>
                 </div>
-
-                <div class="flex items-center gap-2 mono-meta">
-                    <span>@lang('site.common.sort_by')</span>
-                    <a href="{{ $sortLink('stars') }}"     class="{{ $activeSort === 'stars' ? 'text-ink-100' : 'text-ink-500' }}">@lang('site.common.sort_stars')</a>
-                    <span>·</span>
-                    <a href="{{ $sortLink('downloads') }}" class="{{ $activeSort === 'downloads' ? 'text-ink-100' : 'text-ink-500' }}">@lang('site.common.sort_downloads')</a>
-                    <span>·</span>
-                    <a href="{{ $sortLink('name') }}"      class="{{ $activeSort === 'name' ? 'text-ink-100' : 'text-ink-500' }}">@lang('site.common.sort_az')</a>
-                </div>
-            </div>
-
-            <div class="flex flex-wrap gap-2 mb-8">
-                <a href="{{ $roleLink(null) }}"
-                   class="chip {{ $activeRole === 'all' ? 'chip-active' : '' }}">
-                    @lang('site.projects.role_all')
-                </a>
-                <a href="{{ $roleLink('authored') }}"
-                   class="chip {{ $activeRole === 'authored' ? 'chip-active' : '' }}">
-                    @lang('site.projects.role_authored')
-                </a>
-                <a href="{{ $roleLink('maintainer') }}"
-                   class="chip {{ $activeRole === 'maintainer' ? 'chip-active' : '' }}">
-                    @lang('site.projects.role_maintainer')
-                </a>
-            </div>
+            </form>
 
             @if($projects->isEmpty())
                 <div class="text-center py-16 mono text-sm text-ink-500">@lang('site.common.no_results')</div>

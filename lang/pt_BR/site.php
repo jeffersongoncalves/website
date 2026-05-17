@@ -124,6 +124,8 @@ return [
         'filter_role' => 'Papel',
         'filter_apply' => 'Filtrar',
         'readme_unavailable' => 'README indisponível no momento. Veja direto no GitHub:',
+        'readme_unavailable_no_source' => 'README indisponível — projeto sem código-fonte público.',
+        'readme_paid' => 'Pacote comercial sem repositório público. Consulte a documentação oficial:',
         'version_label' => 'Versão:',
         'on_this_page' => 'Nesta página',
         'no_headings' => 'Sem títulos no README',

@@ -219,15 +219,4 @@ class Project extends Model
             type: 'article',
         );
     }
-
-    public function getGithubUrlAttribute(?string $value): ?string
-    {
-        if ($value) {
-            return $value;
-        }
-
-        $repo = $this->repo ?: $this->slug;
-
-        return $repo ? "https://github.com/jeffersongoncalves/{$repo}" : null;
-    }
 }

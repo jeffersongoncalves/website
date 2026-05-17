@@ -124,6 +124,8 @@ return [
         'filter_role' => 'Role',
         'filter_apply' => 'Filter',
         'readme_unavailable' => 'README is currently unavailable. View it directly on GitHub:',
+        'readme_unavailable_no_source' => 'README unavailable — project has no public source code.',
+        'readme_paid' => 'Commercial package without a public repository. See the official docs:',
         'version_label' => 'Version:',
         'on_this_page' => 'On this page',
         'no_headings' => 'No headings in README',

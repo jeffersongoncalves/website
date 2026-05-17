@@ -37,7 +37,9 @@ class ProjectViewController
             $ref = $project->readme_branch;
         }
 
-        $readmeHtml = GithubReadme::fetchHtml($project->github_url, $ref);
+        $readmeHtml = $project->github_url
+            ? GithubReadme::fetchHtml($project->github_url, $ref)
+            : null;
 
         if ($readmeHtml !== null) {
             if ($versions !== []) {

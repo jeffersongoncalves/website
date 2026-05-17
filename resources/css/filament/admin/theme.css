@@ -640,20 +640,36 @@ html:not(.dark) .fi-body {
 /* ============================================================
    SCROLLBAR
    ============================================================ */
-.fi-body { --sb-size: 6px; }
-.fi-body ::-webkit-scrollbar { width: var(--sb-size); height: var(--sb-size); }
-.fi-body ::-webkit-scrollbar-track {
+html { --sb-size: 6px; }
+
+html::-webkit-scrollbar,
+.fi-body::-webkit-scrollbar,
+.fi-body *::-webkit-scrollbar {
+    width: var(--sb-size);
+    height: var(--sb-size);
+}
+html::-webkit-scrollbar-track,
+.fi-body::-webkit-scrollbar-track,
+.fi-body *::-webkit-scrollbar-track {
     background: var(--surface-base);
     border-radius: 2px;
 }
-.fi-body ::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb,
+.fi-body::-webkit-scrollbar-thumb,
+.fi-body *::-webkit-scrollbar-thumb {
     background: var(--accent);
     border-radius: 2px;
 }
-.fi-body ::-webkit-scrollbar-thumb:hover { background: var(--accent-strong); }
+html::-webkit-scrollbar-thumb:hover,
+.fi-body::-webkit-scrollbar-thumb:hover,
+.fi-body *::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-strong);
+}
 
 @supports not selector(::-webkit-scrollbar) {
-    .fi-body {
+    html,
+    .fi-body,
+    .fi-body * {
         scrollbar-color: var(--accent) var(--surface-base);
         scrollbar-width: thin;
     }

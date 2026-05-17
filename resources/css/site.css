@@ -131,6 +131,17 @@
 
   ::selection { background: var(--accent); color: var(--text-on-accent); }
 
+  /* Scrollbar — theme-adaptive (track = surface-base, thumb = accent) */
+  html { --sb-size: 6px; }
+  ::-webkit-scrollbar { width: var(--sb-size); height: var(--sb-size); }
+  ::-webkit-scrollbar-track { background: var(--surface-base); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent-strong); }
+
+  @supports not selector(::-webkit-scrollbar) {
+    html { scrollbar-color: var(--accent) var(--surface-base); scrollbar-width: thin; }
+  }
+
   a:focus-visible,
   button:focus-visible,
   input:focus-visible,

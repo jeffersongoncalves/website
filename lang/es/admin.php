@@ -24,6 +24,21 @@ return [
         'local' => 'local',
     ],
 
+    'actions' => [
+        'import_from_github' => 'Importar desde GitHub',
+        'import_from_github_help' => 'Pega la URL del repositorio. Solo rellena los campos vacíos.',
+        'import' => 'Importar',
+    ],
+
+    'import' => [
+        'success' => ':count campos rellenados',
+        'skipped' => ':count campos preservados (ya tenían valor)',
+        'error' => [
+            'invalid_url' => 'URL de GitHub inválida.',
+            'repo_not_found' => 'Repositorio no encontrado o inaccesible.',
+        ],
+    ],
+
     'widgets' => [
         'site_metrics' => [
             'heading' => 'Métricas del sitio',

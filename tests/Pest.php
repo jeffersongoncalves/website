@@ -29,4 +29,4 @@ pest()->beforeEach(function () {
         'api.npmjs.org/*' => Http::response(['downloads' => 0]),
         'plugins.jetbrains.com/*' => Http::response(['downloads' => 0]),
     ]);
-})->in('Feature', 'Unit');
+})->in('Feature');

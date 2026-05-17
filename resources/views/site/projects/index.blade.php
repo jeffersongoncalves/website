@@ -10,11 +10,12 @@
 
             @php
                 $countItems = [
-                    ['v' => $counts['total'],      'label' => __('site.os.repos')],
-                    ['v' => $counts['filament'],   'label' => __('site.os.plugins_filament')],
-                    ['v' => $counts['laravel'],    'label' => __('site.os.packages_laravel')],
-                    ['v' => $counts['starter'],    'label' => __('site.os.starter_kits')],
-                    ['v' => $counts['maintained'], 'label' => __('site.os.maintained')],
+                    ['v' => $counts['total'],         'label' => __('site.os.repos')],
+                    ['v' => $counts['filament'],      'label' => __('site.os.plugins_filament')],
+                    ['v' => $counts['laravel'],       'label' => __('site.os.packages_laravel')],
+                    ['v' => $counts['starter'],       'label' => __('site.os.starter_kits')],
+                    ['v' => $counts['maintained'],    'label' => __('site.os.maintained')],
+                    ['v' => $counts['daily_drivers'], 'label' => __('site.os.daily_drivers')],
                 ];
             @endphp
             <div class="flex flex-wrap gap-8 mt-8 mono-meta-sm">

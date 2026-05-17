@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
  * @property int $starter
  * @property int $tool
  * @property int $maintained
+ * @property int $daily_drivers
  * @property int $stars
  * @property int $downloads
  * @property int $followers
@@ -33,6 +34,7 @@ class SiteStat extends Model
         'starter',
         'tool',
         'maintained',
+        'daily_drivers',
         'stars',
         'downloads',
         'followers',
@@ -50,6 +52,7 @@ class SiteStat extends Model
             'starter' => 'integer',
             'tool' => 'integer',
             'maintained' => 'integer',
+            'daily_drivers' => 'integer',
             'stars' => 'integer',
             'downloads' => 'integer',
             'followers' => 'integer',

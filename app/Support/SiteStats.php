@@ -19,7 +19,7 @@ class SiteStats
      * still renders; views hide GitHub-dependent pieces when the data is empty.
      *
      * @return array{
-     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int,
+     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
@@ -39,7 +39,7 @@ class SiteStats
      * Zeroed stats — the safe fallback when nothing has been synced yet.
      *
      * @return array{
-     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int,
+     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
@@ -53,6 +53,7 @@ class SiteStats
             'starter' => 0,
             'tool' => 0,
             'maintained' => 0,
+            'daily_drivers' => 0,
             'stars' => 0,
             'downloads' => 0,
             'followers' => 0,
@@ -66,7 +67,7 @@ class SiteStats
      * scheduled sync command, not by the request path.
      *
      * @return array{
-     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int,
+     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
@@ -137,7 +138,7 @@ class SiteStats
 
     /**
      * @return array{
-     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int,
+     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
@@ -151,6 +152,7 @@ class SiteStats
             'starter' => $stat->starter,
             'tool' => $stat->tool,
             'maintained' => $stat->maintained,
+            'daily_drivers' => $stat->daily_drivers,
             'stars' => $stat->stars,
             'downloads' => $stat->downloads,
             'followers' => $stat->followers,
@@ -161,7 +163,7 @@ class SiteStats
 
     /**
      * @return array{
-     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int,
+     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
@@ -182,6 +184,7 @@ class SiteStats
             'starter' => (int) (clone $base)->byCategory(ProjectCategory::StarterKit)->count(),
             'tool' => (int) (clone $base)->byCategory(ProjectCategory::Tool)->count(),
             'maintained' => (int) (clone $base)->maintained()->count(),
+            'daily_drivers' => (int) (clone $base)->where('is_daily_driver', true)->count(),
             'stars' => $stars,
             'downloads' => $downloads,
             'followers' => $github['followers'] ?? 0,

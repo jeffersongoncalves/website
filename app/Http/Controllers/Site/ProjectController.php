@@ -55,6 +55,7 @@ class ProjectController
             'starter' => $stats['starter'],
             'tool' => $stats['tool'],
             'maintained' => $stats['maintained'],
+            'daily_drivers' => $stats['daily_drivers'],
         ];
 
         return view('site.projects.index', [

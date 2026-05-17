@@ -87,6 +87,7 @@ return [
         'packages_laravel' => 'Laravel packages',
         'starter_kits' => 'Starter Kits',
         'maintained' => 'Maintained',
+        'daily_drivers' => 'Daily drivers',
         'stars' => 'Total stars',
         'public_sponsors' => 'Public sponsors',
         'page_title' => 'Open Source',

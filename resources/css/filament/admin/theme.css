@@ -324,7 +324,6 @@ html:not(.dark) .fi-body {
     border-radius: 8px !important;
     box-shadow: var(--shadow-card);
     position: relative;
-    overflow: hidden;
 }
 
 .fi-section,
@@ -401,8 +400,20 @@ html:not(.dark) .fi-body {
     border-color: var(--border-hover) !important;
 }
 
+/* KeyValue table action column — give the trash button breathing room
+   so it doesn't bleed into the table's right border */
+.fi-fo-key-value-table th.fi-has-action,
+.fi-fo-key-value-table td.fi-has-action {
+    width: 1%;
+    white-space: nowrap;
+    padding: 6px 10px !important;
+    text-align: center;
+}
+
 /* Danger / Success / Warning buttons — editorial tinted variants
-   Filament default is saturated solid; override to match paper aesthetic */
+   Filament default is saturated solid; override to match paper aesthetic.
+   Padding + radius scoped to tinted icon-btns so plain icon-btns elsewhere
+   keep their default sizing untouched. */
 .fi-btn-color-danger,
 .fi-icon-btn-color-danger,
 .fi-btn.fi-color-danger,
@@ -410,6 +421,17 @@ html:not(.dark) .fi-body {
     background: var(--danger-bg-soft) !important;
     color: var(--danger) !important;
     border: 1px solid var(--danger-bg-strong) !important;
+    border-radius: 6px !important;
+}
+.fi-icon-btn.fi-color-danger,
+.fi-icon-btn.fi-color-success,
+.fi-icon-btn.fi-color-warning {
+    padding: 6px !important;
+}
+.fi-icon-btn.fi-color-danger.fi-size-sm,
+.fi-icon-btn.fi-color-success.fi-size-sm,
+.fi-icon-btn.fi-color-warning.fi-size-sm {
+    padding: 4px !important;
 }
 .fi-btn-color-danger:hover,
 .fi-icon-btn-color-danger:hover,
@@ -481,7 +503,6 @@ html:not(.dark) .fi-body {
    INPUTS
    ============================================================ */
 .fi-input,
-.fi-select-input,
 .fi-textarea,
 .fi-fo-text-input input,
 .fi-fo-textarea textarea,
@@ -494,15 +515,9 @@ html:not(.dark) .fi-body {
     transition: border-color 120ms, box-shadow 120ms;
 }
 
+
 /* When input is inside .fi-input-wrp (icon/prefix wrapper), the wrapper owns the
    border — strip the inner input border to avoid double-border */
-.fi-input-wrp,
-.fi-select-input-ctn,
-.fi-fo-text-input-wrp,
-.fi-fo-select-input-wrp {
-    border-radius: 4px !important;
-    overflow: hidden;
-}
 .fi-input-wrp .fi-input,
 .fi-input-wrp input,
 .fi-input-wrp textarea,
@@ -519,7 +534,6 @@ html:not(.dark) .fi-body {
     outline: none !important;
 }
 .fi-input:focus,
-.fi-select-input:focus,
 .fi-textarea:focus,
 .fi-fo-text-input input:focus,
 .fi-fo-textarea textarea:focus {

@@ -53,6 +53,7 @@ return [
     'sections' => [
         'identity' => 'Identity',
         'publication' => 'Publication',
+        'title' => 'Title',
         'content' => 'Content',
         'stack_versions' => 'Stack & versions',
         'metrics' => 'Metrics',

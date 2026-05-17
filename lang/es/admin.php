@@ -53,6 +53,7 @@ return [
     'sections' => [
         'identity' => 'Identidad',
         'publication' => 'Publicación',
+        'title' => 'Título',
         'content' => 'Contenido',
         'stack_versions' => 'Stack y versiones',
         'metrics' => 'Métricas',

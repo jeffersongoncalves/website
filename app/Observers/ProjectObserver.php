@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\ProjectStatus;
 use App\Jobs\GenerateSitemapJob;
 use App\Models\Project;
 use Illuminate\Support\Facades\Cache;
@@ -9,6 +10,14 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 class ProjectObserver
 {
+    public function saving(Project $project): void
+    {
+        // Stamp published_at the first time a project flips to Published.
+        if ($project->status === ProjectStatus::Published && empty($project->published_at)) {
+            $project->published_at = now();
+        }
+    }
+
     public function created(Project $project): void
     {
         $this->flush();

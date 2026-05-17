@@ -5,7 +5,6 @@ namespace App\Filament\Admin\Resources\Projects\Schemas;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
@@ -69,8 +68,6 @@ class ProjectForm
                             ->label(__('admin.fields.is_maintainer'))
                             ->helperText(__('admin.helpers.is_maintainer'))
                             ->visible(fn (Get $get) => enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
-                        DateTimePicker::make('published_at')
-                            ->label(__('admin.fields.published_at')),
                     ]),
 
                 Section::make(__('admin.sections.title'))
@@ -85,7 +82,7 @@ class ProjectForm
                     ]),
 
                 Section::make(__('admin.sections.stack_versions'))
-                    ->columnSpan(2)
+                    ->columnSpanFull()
                     ->columns(2)
                     ->schema([
                         CheckboxList::make('versions')
@@ -145,31 +142,6 @@ class ProjectForm
                             ->placeholder('main')
                             ->helperText(__('admin.helpers.readme_branch'))
                             ->visible(fn (Get $get) => ! enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
-                    ]),
-
-                Section::make(__('admin.sections.metrics'))
-                    ->columnSpan(1)
-                    ->schema([
-                        TextInput::make('stars')
-                            ->label(__('admin.fields.stars'))
-                            ->integer()
-                            ->default(0)
-                            ->readOnly(),
-                        TextInput::make('downloads')
-                            ->label(__('admin.fields.downloads'))
-                            ->integer()
-                            ->default(0)
-                            ->readOnly(),
-                        TextInput::make('downloads_label')
-                            ->label(__('admin.fields.downloads_label'))
-                            ->maxLength(32)
-                            ->helperText(__('admin.helpers.downloads_label'))
-                            ->readOnly(),
-                        TextInput::make('license')
-                            ->label(__('admin.fields.license'))
-                            ->default('MIT')
-                            ->maxLength(64)
-                            ->readOnly(),
                     ]),
 
                 Section::make(__('admin.sections.links'))

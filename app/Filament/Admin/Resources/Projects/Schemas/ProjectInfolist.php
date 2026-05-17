@@ -27,6 +27,7 @@ class ProjectInfolist
                                 TextEntry::make('slug')->label(__('admin.fields.slug'))->copyable(),
                                 TextEntry::make('repo')->label(__('admin.fields.repo'))->placeholder('—'),
                                 TextEntry::make('category')->label(__('admin.fields.category'))->badge(),
+                                TextEntry::make('package_type')->label(__('admin.fields.package_type'))->badge()->placeholder('—'),
                             ]),
                         Grid::make()
                             ->columnSpan(1)

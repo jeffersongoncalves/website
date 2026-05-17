@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
+use App\Jobs\SyncProjectMetricsJob;
 use App\Models\Project;
 use Illuminate\Database\Seeder;
 
@@ -266,7 +267,7 @@ class ProjectSeeder extends Seeder
         // and pre-existing rows whose synced fields didn't change still pick
         // up GitHub stars, Packagist downloads and the user's contribution
         // count without waiting for the daily scheduler.
-        \App\Jobs\SyncProjectMetricsJob::dispatch($project);
+        SyncProjectMetricsJob::dispatch($project);
     }
 
     /**

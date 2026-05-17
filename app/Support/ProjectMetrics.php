@@ -81,31 +81,52 @@ class ProjectMetrics
 
         $current = is_array($project->branch_overrides) ? $project->branch_overrides : [];
         $defaultBranch = self::fetchDefaultBranch($project->github_url);
+        $versions = array_values($project->versions);
+        $lastIndex = count($versions) - 1;
 
         $next = [];
-        foreach (array_values($project->versions) as $i => $_) {
+        foreach ($versions as $i => $version) {
             $autoBranch = ($i + 1).'.x';
             $currentValue = isset($current[$autoBranch]) ? trim((string) $current[$autoBranch]) : '';
 
+            // Manual override still pointing at a real branch — keep verbatim.
             if ($currentValue !== '' && in_array($currentValue, $branches, true)) {
                 $next[$autoBranch] = $currentValue;
 
                 continue;
             }
 
-            if (in_array($autoBranch, $branches, true)) {
-                $next[$autoBranch] = $autoBranch;
+            // Build a prioritized candidate list per version.
+            $candidates = [];
 
-                continue;
+            // 1. Literal Filament major number ("v3" → "3.x"). Filament core
+            //    repos + many plugins follow this convention.
+            if (preg_match('/^v(\d+)$/', $version, $m)) {
+                $candidates[] = $m[1].'.x';
             }
 
-            if ($defaultBranch !== null && in_array($defaultBranch, $branches, true)) {
-                $next[$autoBranch] = $defaultBranch;
+            // 2. Auto-branch ("1.x", "2.x", "3.x") — older plugins started here.
+            $candidates[] = $autoBranch;
 
-                continue;
+            // 3. Default branch (main/master) as last resort — covers plugins
+            //    whose oldest tracked version was developed directly on the
+            //    default branch (e.g. v3 on main for many community plugins).
+            //    Filament core repos hit their {major}.x first so this never
+            //    accidentally pulls v5 content for an earlier version.
+            if ($defaultBranch !== null) {
+                $candidates[] = $defaultBranch;
             }
 
-            $next[$autoBranch] = $currentValue !== '' ? $currentValue : $autoBranch;
+            $resolved = null;
+            foreach ($candidates as $candidate) {
+                if (in_array($candidate, $branches, true)) {
+                    $resolved = $candidate;
+
+                    break;
+                }
+            }
+
+            $next[$autoBranch] = $resolved ?? ($currentValue !== '' ? $currentValue : $autoBranch);
         }
 
         return $next === $current ? null : $next;

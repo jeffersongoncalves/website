@@ -33,7 +33,7 @@
                         h.style.background = bg;
                         const tcm = document.getElementById('theme-color-meta');
                         if (tcm) tcm.content = bg;
-                        try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch (e) {}
+                        document.cookie = 'theme=' + (isDark ? 'dark' : 'light') + '; max-age=31536000; path=/; SameSite=Lax';
                     "
                     :aria-label="isDark ? @js(__('site.common.toggle_light')) : @js(__('site.common.toggle_dark'))"
                     :title="isDark ? @js(__('site.common.toggle_light')) : @js(__('site.common.toggle_dark'))">

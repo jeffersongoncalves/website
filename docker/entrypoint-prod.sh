@@ -16,6 +16,12 @@ mkdir -p \
 chown -R www-data:www-data storage bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 
+# Ensure sitemap files exist and are writable by www-data so the scheduler
+# and the boot-time sitemap:generate can rewrite them without 403/permission errors.
+touch public/sitemap.xml public/sitemap-pages.xml public/sitemap-projects.xml
+chown www-data:www-data public/sitemap.xml public/sitemap-pages.xml public/sitemap-projects.xml
+chmod 664 public/sitemap.xml public/sitemap-pages.xml public/sitemap-projects.xml
+
 mkdir -p /var/log/supervisor
 
 # Limpa caches antigos do build para evitar Horizon/worker herdar APP_ENV congelado.

@@ -44,12 +44,14 @@
 
     <div class="card-foot">
         <div class="card-meta-row">
-            <span>★ {{ $project->stars }}</span>
-            <span>↓ {{ $project->downloads_label ?: '—' }}</span>
-            <span>⎘ {{ $project->license }}</span>
-            @if($project->is_maintainer && $project->user_contributions > 0)
-                <span title="@lang('site.projects.label_contributions')">⎇ {{ number_format($project->user_contributions, 0, ',', '.') }}</span>
-            @endif
+            @unless($project->is_paid)
+                <span>★ {{ $project->stars }}</span>
+                <span>↓ {{ $project->downloads_label ?: '—' }}</span>
+                <span>⎘ {{ $project->license }}</span>
+                @if($project->is_maintainer && $project->user_contributions > 0)
+                    <span title="@lang('site.projects.label_contributions')">⎇ {{ number_format($project->user_contributions, 0, ',', '.') }}</span>
+                @endif
+            @endunless
         </div>
         <div class="flex items-center gap-3 text-ink-400">
             @if($project->github_url)

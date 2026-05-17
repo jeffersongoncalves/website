@@ -167,18 +167,20 @@
                         @endif
 
                         <div class="project-detail-grid">
-                            <div class="project-detail-stat">
-                                <small>@lang('site.projects.label_stars')</small>
-                                <strong>★ {{ $project->stars }}</strong>
-                            </div>
-                            <div class="project-detail-stat">
-                                <small>@lang('site.projects.label_downloads')</small>
-                                <strong>↓ {{ $project->downloads_label ?: '—' }}</strong>
-                            </div>
-                            <div class="project-detail-stat">
-                                <small>@lang('site.projects.label_license')</small>
-                                <strong>{{ $project->license ?: '—' }}</strong>
-                            </div>
+                            @unless($project->is_paid)
+                                <div class="project-detail-stat">
+                                    <small>@lang('site.projects.label_stars')</small>
+                                    <strong>★ {{ $project->stars }}</strong>
+                                </div>
+                                <div class="project-detail-stat">
+                                    <small>@lang('site.projects.label_downloads')</small>
+                                    <strong>↓ {{ $project->downloads_label ?: '—' }}</strong>
+                                </div>
+                                <div class="project-detail-stat">
+                                    <small>@lang('site.projects.label_license')</small>
+                                    <strong>{{ $project->license ?: '—' }}</strong>
+                                </div>
+                            @endunless
                             @if(!empty($project->versions))
                                 <div class="project-detail-stat">
                                     <small>@lang('site.projects.label_versions')</small>

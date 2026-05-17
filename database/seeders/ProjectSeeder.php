@@ -49,7 +49,7 @@ class ProjectSeeder extends Seeder
         'livewire/livewire' => ['title' => 'Livewire', 'category' => ProjectCategory::Framework, 'stack' => ['Livewire'], 'versions' => []],
         'livewire/flux' => ['title' => 'Flux', 'category' => ProjectCategory::LivewirePackage, 'stack' => ['Livewire'], 'versions' => []],
         'livewire/volt' => ['title' => 'Volt', 'category' => ProjectCategory::LivewirePackage, 'stack' => ['Livewire'], 'versions' => []],
-        'livewire/blaze' => ['title' => 'Blaze', 'category' => ProjectCategory::LivewirePackage, 'stack' => ['Livewire'], 'versions' => [], 'no_packagist' => true],
+        'livewire/blaze' => ['title' => 'Blaze', 'category' => ProjectCategory::LivewirePackage, 'stack' => ['Livewire'], 'versions' => []],
         'secondnetwork/blade-tabler-icons' => ['title' => 'Blade Tabler Icons', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
         'iurygdeoliveira/labSIS-KIT' => ['title' => 'labSIS Kit', 'category' => ProjectCategory::StarterKit, 'stack' => ['Laravel', 'Filament'], 'versions' => []],
         'laravel-zero/awesome-laravel-zero' => ['title' => 'Awesome Laravel Zero', 'category' => ProjectCategory::LaravelZeroCli, 'stack' => ['Laravel Zero', 'CLI'], 'versions' => [], 'no_packagist' => true],

@@ -5,7 +5,7 @@ cd /var/www/html
 
 mkdir -p \
     storage/app/public \
-    storage/app/github \
+    storage/app/github/readme \
     storage/framework/cache/data \
     storage/framework/sessions \
     storage/framework/testing \
@@ -13,8 +13,14 @@ mkdir -p \
     storage/logs \
     bootstrap/cache
 
+# Two-pass ownership reset: the outer chown handles the freshly
+# mkdir'd parents; the inner chown drills into the github cache root
+# specifically because production runs on a volume that sometimes
+# preserves root-owned subdirs across container restarts.
 chown -R www-data:www-data storage bootstrap/cache
+chown -R www-data:www-data storage/app/github
 chmod -R 775 storage bootstrap/cache
+chmod -R 775 storage/app/github
 
 # Ensure sitemap files exist and are writable by www-data so the scheduler
 # and the boot-time sitemap:generate can rewrite them without 403/permission errors.

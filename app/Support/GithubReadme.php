@@ -68,15 +68,27 @@ class GithubReadme
             $html = self::rewriteRelativeLinks($html, $repo, $branch);
 
             $path = 'readme/'.str_replace('/', '__', $repo).'/'.$refKey.'.html';
-            $disk->put($path, $html);
 
-            $cache->fill([
-                'etag' => $result['etag'],
-                'default_branch' => $branch,
-                'html_path' => $path,
-                'fetched_at' => now(),
-                'checked_at' => now(),
-            ])->save();
+            // Cache write is best-effort — a permission-denied volume must
+            // not break the page render. Serve the freshly rendered HTML
+            // even when persistence fails.
+            try {
+                $disk->put($path, $html);
+
+                $cache->fill([
+                    'etag' => $result['etag'],
+                    'default_branch' => $branch,
+                    'html_path' => $path,
+                    'fetched_at' => now(),
+                    'checked_at' => now(),
+                ])->save();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('GithubReadme cache write failed', [
+                    'repo' => $repo,
+                    'path' => $path,
+                    'error' => $e->getMessage(),
+                ]);
+            }
 
             return $html;
         }

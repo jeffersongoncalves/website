@@ -37,6 +37,16 @@ class ProjectMetrics
             $changed = true;
         }
 
+        // Auto-demote a maintainer flag to daily-driver when the user has
+        // zero verified commits on the repo's default branch. Avoids leaving
+        // stale "maintainer" badges on projects the user does not actually
+        // contribute to.
+        if ($project->is_maintainer && (int) $project->user_contributions === 0 && $contributions !== null) {
+            $project->is_maintainer = false;
+            $project->is_daily_driver = true;
+            $changed = true;
+        }
+
         if ($changed) {
             $project->last_synced_at = now();
             $project->save();

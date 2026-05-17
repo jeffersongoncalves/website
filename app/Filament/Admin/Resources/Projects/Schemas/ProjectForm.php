@@ -70,6 +70,9 @@ class ProjectForm
                         Toggle::make('is_daily_driver')
                             ->label(__('admin.fields.is_daily_driver'))
                             ->helperText(__('admin.helpers.is_daily_driver')),
+                        Toggle::make('is_paid')
+                            ->label(__('admin.fields.is_paid'))
+                            ->helperText(__('admin.helpers.is_paid')),
                     ]),
 
                 Section::make(__('admin.sections.title'))

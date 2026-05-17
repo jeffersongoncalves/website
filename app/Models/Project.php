@@ -45,6 +45,7 @@ use Spatie\Translatable\HasTranslations;
  * @property bool $featured
  * @property bool $is_maintainer
  * @property bool $is_daily_driver
+ * @property bool $is_paid
  * @property Carbon|null $published_at
  * @property Carbon|null $last_synced_at
  * @property Carbon|null $created_at
@@ -125,6 +126,7 @@ class Project extends Model
         'featured',
         'is_maintainer',
         'is_daily_driver',
+        'is_paid',
         'published_at',
         'last_synced_at',
     ];
@@ -146,6 +148,7 @@ class Project extends Model
             'featured' => 'boolean',
             'is_maintainer' => 'boolean',
             'is_daily_driver' => 'boolean',
+            'is_paid' => 'boolean',
             'category' => ProjectCategory::class,
             'status' => ProjectStatus::class,
             'published_at' => 'datetime',

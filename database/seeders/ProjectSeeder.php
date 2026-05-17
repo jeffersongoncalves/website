@@ -93,6 +93,7 @@ class ProjectSeeder extends Seeder
         'laravel/framework' => ['title' => 'Laravel', 'category' => ProjectCategory::Framework, 'stack' => ['Laravel'], 'versions' => []],
         'livewire/livewire' => ['title' => 'Livewire', 'category' => ProjectCategory::Framework, 'stack' => ['Livewire'], 'versions' => []],
         'livewire/flux' => ['title' => 'Flux', 'category' => ProjectCategory::LivewirePackage, 'stack' => ['Livewire'], 'versions' => []],
+        'livewire/flux-pro' => ['title' => 'Flux Pro', 'category' => ProjectCategory::LivewirePackage, 'stack' => ['Livewire'], 'versions' => [], 'is_paid' => true, 'no_github' => true, 'docs' => 'https://fluxui.dev/docs'],
         'livewire/volt' => ['title' => 'Volt', 'category' => ProjectCategory::LivewirePackage, 'stack' => ['Livewire'], 'versions' => []],
         'livewire/blaze' => ['title' => 'Blaze', 'category' => ProjectCategory::LivewirePackage, 'stack' => ['Livewire'], 'versions' => []],
         'secondnetwork/blade-tabler-icons' => ['title' => 'Blade Tabler Icons', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
@@ -243,9 +244,12 @@ class ProjectSeeder extends Seeder
                 'versions' => $meta['versions'] ?? [],
                 'stack' => $meta['stack'] ?? [],
                 'extra' => [
-                    'is_maintainer' => true,
+                    'is_maintainer' => empty($meta['is_paid']),
+                    'is_paid' => $meta['is_paid'] ?? false,
                     'no_packagist' => $meta['no_packagist'] ?? false,
+                    'no_github' => $meta['no_github'] ?? false,
                     'packagist' => $meta['packagist'] ?? null,
+                    'docs' => $meta['docs'] ?? null,
                 ],
             ];
         }
@@ -272,7 +276,8 @@ class ProjectSeeder extends Seeder
     private function upsert(array $entry): void
     {
         [$vendor, $repoName] = explode('/', $entry['package'], 2);
-        $githubUrl = "https://github.com/{$vendor}/{$repoName}";
+        $noGithub = ! empty($entry['extra']['no_github']);
+        $githubUrl = $noGithub ? null : "https://github.com/{$vendor}/{$repoName}";
         $isJetBrains = ! empty($entry['extra']['jetbrainsId']);
         $noPackagist = ! empty($entry['extra']['no_packagist']);
         $packagistPackage = ! empty($entry['extra']['packagist']) ? $entry['extra']['packagist'] : $entry['package'];
@@ -284,10 +289,11 @@ class ProjectSeeder extends Seeder
 
         // Match by github_url (canonical identifier) so re-seeding always
         // updates the existing row, even when its slug pre-dates the
-        // owner-repo convention.
-        $project = Project::query()
-            ->where('github_url', $githubUrl)
-            ->first() ?? new Project;
+        // owner-repo convention. For repos without a public github
+        // (paid packages) fall back to matching by the slug we computed.
+        $project = $githubUrl
+            ? (Project::query()->where('github_url', $githubUrl)->first() ?? new Project)
+            : (Project::query()->where('slug', $slug)->first() ?? new Project);
 
         $project->slug = $slug;
 
@@ -310,6 +316,10 @@ class ProjectSeeder extends Seeder
 
         if (array_key_exists('is_daily_driver', $entry['extra'] ?? [])) {
             $project->is_daily_driver = (bool) $entry['extra']['is_daily_driver'];
+        }
+
+        if (array_key_exists('is_paid', $entry['extra'] ?? [])) {
+            $project->is_paid = (bool) $entry['extra']['is_paid'];
         }
 
         // Optional npm + extra docs URL overrides for extras (e.g. JS packages

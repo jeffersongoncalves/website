@@ -137,6 +137,7 @@ return [
         'label_updated' => 'Updated',
         'label_contributions' => 'Contributions',
         'badge_daily_driver' => 'daily driver',
+        'badge_paid' => 'paid',
     ],
 
     'about' => [

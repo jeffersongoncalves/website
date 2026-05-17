@@ -35,7 +35,7 @@ class ProjectController
             $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $search).'%';
             $query->where(function ($q) use ($like) {
                 $q->where('name', 'like', $like)
-                  ->orWhere('repo', 'like', $like);
+                    ->orWhere('repo', 'like', $like);
             });
         }
 

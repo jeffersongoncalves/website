@@ -159,6 +159,13 @@
                             </div>
                         @endif
 
+                        @if($project->is_paid)
+                            <div class="project-detail-row">
+                                <span class="project-detail-label">@lang('site.projects.label_role')</span>
+                                <span class="badge badge-warning">@lang('site.projects.badge_paid')</span>
+                            </div>
+                        @endif
+
                         <div class="project-detail-grid">
                             <div class="project-detail-stat">
                                 <small>@lang('site.projects.label_stars')</small>

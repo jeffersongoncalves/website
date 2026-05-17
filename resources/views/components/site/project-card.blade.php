@@ -10,10 +10,10 @@
         <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
     </svg>
 
-    <div class="flex items-start justify-between gap-4 pr-6">
+    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 pr-6">
         <a href="{{ route('projects.show', ['slug' => $project->slug]) }}"
-           class="mono text-[0.95rem] font-semibold text-ink-100 flex-1 min-w-0">{{ $project->name }}</a>
-        <div class="flex items-center gap-2 flex-wrap justify-end">
+           class="mono text-[0.95rem] font-semibold text-ink-100 flex-1 min-w-0 break-words">{{ $project->name }}</a>
+        <div class="flex items-center gap-2 flex-wrap sm:justify-end">
             @if($project->is_maintainer)
                 <span class="badge badge-success" title="{{ __('Maintainer, not original author') }}">{{ __('maintainer') }}</span>
             @endif

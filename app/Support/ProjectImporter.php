@@ -34,6 +34,146 @@ class ProjectImporter
     }
 
     /**
+     * Fetch a generic website and extract metadata from its <head> tags.
+     * Use for projects with no public GitHub repo (SaaS tools, hosted
+     * services, etc). Only fills name/title/docs_url + sane defaults
+     * for the form's required selects.
+     *
+     * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
+     */
+    public static function fromUrl(string $url): array
+    {
+        $url = trim($url);
+
+        if (! filter_var($url, FILTER_VALIDATE_URL) || ! preg_match('#^https?://#i', $url)) {
+            return ['error' => 'invalid_url'];
+        }
+
+        $host = parse_url($url, PHP_URL_HOST);
+
+        if (! is_string($host) || $host === '') {
+            return ['error' => 'invalid_url'];
+        }
+
+        return Cache::remember(
+            'project_importer:url:'.sha1($url),
+            now()->addHour(),
+            fn () => self::buildUrlResult($url, $host)
+        );
+    }
+
+    /**
+     * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
+     */
+    private static function buildUrlResult(string $url, string $host): array
+    {
+        try {
+            $response = Http::timeout(8)
+                ->withHeaders([
+                    'User-Agent' => 'jeffersongoncalves-site',
+                    'Accept' => 'text/html,application/xhtml+xml',
+                ])
+                ->get($url);
+        } catch (Throwable) {
+            return ['error' => 'fetch_failed'];
+        }
+
+        if (! $response->successful()) {
+            return ['error' => 'fetch_failed'];
+        }
+
+        $meta = self::parseMeta($response->body());
+
+        $name = self::nameFromHost($host);
+        $description = $meta['og:description'] ?? $meta['description'] ?? null;
+        $title = $meta['og:title'] ?? $meta['title'] ?? $name;
+
+        $fields = [
+            'github_url' => null,
+            'slug' => self::slugFromHost($host),
+            'name' => $name,
+            'repo' => null,
+            'license' => null,
+            'readme_branch' => null,
+            'docs_url' => $url,
+            'title.en' => $description ?? $title,
+            'title.pt' => $description ?? $title,
+            'title.es' => $description ?? $title,
+            'category' => 'tool',
+            'package_type' => 'none',
+            'packagist_url' => null,
+            'npm_url' => null,
+            'stack' => [],
+            'versions' => [],
+        ];
+
+        $warnings = [];
+
+        if ($description === null) {
+            $warnings[] = 'no_description';
+        }
+
+        return ['fields' => $fields, 'warnings' => $warnings];
+    }
+
+    /**
+     * Best-effort meta extraction from an HTML <head>. Reads <title>, the
+     * standard <meta name="description">, and the Open Graph counterparts.
+     * Silently ignores libxml warnings on malformed markup.
+     *
+     * @return array<string, string>
+     */
+    private static function parseMeta(string $html): array
+    {
+        $meta = [];
+
+        $previous = libxml_use_internal_errors(true);
+
+        $doc = new \DOMDocument;
+        $doc->loadHTML('<?xml encoding="UTF-8">'.$html);
+
+        $titleNodes = $doc->getElementsByTagName('title');
+        if ($titleNodes->length > 0) {
+            $value = trim((string) $titleNodes->item(0)?->textContent);
+            if ($value !== '') {
+                $meta['title'] = $value;
+            }
+        }
+
+        foreach ($doc->getElementsByTagName('meta') as $node) {
+            $property = $node->getAttribute('property') ?: $node->getAttribute('name');
+            $content = trim($node->getAttribute('content'));
+            if ($property === '' || $content === '') {
+                continue;
+            }
+            $key = strtolower($property);
+            if (in_array($key, ['title', 'description', 'og:title', 'og:description'], true)) {
+                $meta[$key] = $content;
+            }
+        }
+
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        return $meta;
+    }
+
+    private static function nameFromHost(string $host): string
+    {
+        $host = preg_replace('/^www\./i', '', $host) ?? $host;
+        $first = explode('.', $host)[0];
+
+        return ucfirst($first);
+    }
+
+    private static function slugFromHost(string $host): string
+    {
+        $host = preg_replace('/^www\./i', '', $host) ?? $host;
+
+        return strtolower(str_replace('.', '-', $host));
+    }
+
+    /**
      * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
      */
     private static function buildResult(string $repoSlug, string $url): array

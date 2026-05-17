@@ -18,6 +18,7 @@ class EditProject extends EditRecord
     {
         return [
             $this->importFromGithubAction(),
+            $this->importFromUrlAction(),
             ViewAction::make(),
             DeleteAction::make(),
         ];

@@ -27,6 +27,8 @@ return [
     'actions' => [
         'import_from_github' => 'Import from GitHub',
         'import_from_github_help' => 'Paste the repository URL. Only fills empty fields.',
+        'import_from_url' => 'Import from a URL',
+        'import_from_url_help' => 'For projects without a public repo. Reads the page <title> and meta tags.',
         'import' => 'Import',
     ],
 
@@ -34,8 +36,9 @@ return [
         'success' => ':count fields populated',
         'skipped' => ':count fields preserved (already set)',
         'error' => [
-            'invalid_url' => 'Invalid GitHub URL.',
+            'invalid_url' => 'Invalid URL.',
             'repo_not_found' => 'Repository not found or inaccessible.',
+            'fetch_failed' => 'Could not fetch the given page.',
         ],
     ],
 

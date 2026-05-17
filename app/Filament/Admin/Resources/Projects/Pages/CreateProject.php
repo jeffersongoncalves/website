@@ -16,6 +16,7 @@ class CreateProject extends CreateRecord
     {
         return [
             $this->importFromGithubAction(),
+            $this->importFromUrlAction(),
         ];
     }
 }

@@ -27,44 +27,73 @@ trait HasImportFromGithubAction
             ])
             ->action(function (array $data): void {
                 $result = ProjectImporter::fromGithub($data['github_url']);
-
-                if (isset($result['error'])) {
-                    Notification::make()
-                        ->title(__('admin.import.error.'.$result['error']))
-                        ->danger()
-                        ->send();
-
-                    return;
-                }
-
-                $state = $this->data;
-                $applied = [];
-                $skipped = [];
-
-                foreach ($result['fields'] ?? [] as $key => $value) {
-                    if (self::isImportValueEmpty($value)) {
-                        continue;
-                    }
-
-                    if (self::isImportValueEmpty(data_get($state, $key))) {
-                        data_set($state, $key, $value);
-                        $applied[] = $key;
-                    } else {
-                        $skipped[] = $key;
-                    }
-                }
-
-                $this->data = $state;
-                $this->form->fill($this->data);
-
-                Notification::make()
-                    ->title(__('admin.import.success', ['count' => count($applied)]))
-                    ->body(count($skipped) > 0
-                        ? __('admin.import.skipped', ['count' => count($skipped)])
-                        : null)
-                    ->success()
-                    ->send();
+                $this->applyImporterResult($result);
             });
+    }
+
+    protected function importFromUrlAction(): Action
+    {
+        return Action::make('importFromUrl')
+            ->label(__('admin.actions.import_from_url'))
+            ->icon('heroicon-o-globe-alt')
+            ->color('info')
+            ->modalHeading(__('admin.actions.import_from_url'))
+            ->modalDescription(__('admin.actions.import_from_url_help'))
+            ->modalSubmitActionLabel(__('admin.actions.import'))
+            ->schema([
+                TextInput::make('docs_url')
+                    ->label(__('admin.fields.docs_url'))
+                    ->placeholder('https://example.com')
+                    ->url()
+                    ->required(),
+            ])
+            ->action(function (array $data): void {
+                $result = ProjectImporter::fromUrl($data['docs_url']);
+                $this->applyImporterResult($result);
+            });
+    }
+
+    /**
+     * @param  array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}  $result
+     */
+    private function applyImporterResult(array $result): void
+    {
+        if (isset($result['error'])) {
+            Notification::make()
+                ->title(__('admin.import.error.'.$result['error']))
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        $state = $this->data;
+        $applied = [];
+        $skipped = [];
+
+        foreach ($result['fields'] ?? [] as $key => $value) {
+            if (self::isImportValueEmpty($value)) {
+                continue;
+            }
+
+            if (self::isImportValueEmpty(data_get($state, $key))) {
+                data_set($state, $key, $value);
+                $applied[] = $key;
+            } else {
+                $skipped[] = $key;
+            }
+        }
+
+        $this->data = $state;
+        $this->form->fill($this->data);
+
+        Notification::make()
+            ->title(__('admin.import.success', ['count' => count($applied)]))
+            ->body(count($skipped) > 0
+                ? __('admin.import.skipped', ['count' => count($skipped)])
+                : null)
+            ->success()
+            ->send();
     }
 
     private static function isImportValueEmpty(mixed $value): bool

@@ -117,6 +117,53 @@ it('falls back to tool category and emits a warning when nothing matches', funct
     expect($result['warnings'])->toContain('category_fallback');
 });
 
+it('imports from a generic URL using <head> meta tags', function (): void {
+    $html = <<<'HTML'
+    <!doctype html>
+    <html>
+      <head>
+        <title>Linear — The new standard for software teams</title>
+        <meta name="description" content="Linear streamlines issues, projects, and product roadmaps.">
+        <meta property="og:title" content="Linear">
+        <meta property="og:description" content="The issue tracker built for high-performance teams.">
+      </head>
+    </html>
+    HTML;
+
+    Http::fake([
+        'linear.app' => Http::response($html, 200, ['Content-Type' => 'text/html']),
+    ]);
+
+    $result = ProjectImporter::fromUrl('https://linear.app');
+
+    expect($result['error'] ?? null)->toBeNull();
+    $fields = $result['fields'];
+    expect($fields['name'])->toBe('Linear');
+    expect($fields['slug'])->toBe('linear-app');
+    expect($fields['docs_url'])->toBe('https://linear.app');
+    expect($fields['github_url'])->toBeNull();
+    expect($fields['category'])->toBe('tool');
+    expect($fields['package_type'])->toBe('none');
+    expect($fields['title.en'])->toBe('The issue tracker built for high-performance teams.');
+    expect($fields['title.pt'])->toBe('The issue tracker built for high-performance teams.');
+});
+
+it('returns invalid_url for non-http schemes', function (): void {
+    $result = ProjectImporter::fromUrl('ftp://example.com');
+
+    expect($result)->toBe(['error' => 'invalid_url']);
+});
+
+it('returns fetch_failed when the URL responds with non-2xx', function (): void {
+    Http::fake([
+        '*' => Http::response('', 500),
+    ]);
+
+    $result = ProjectImporter::fromUrl('https://example.com');
+
+    expect($result)->toBe(['error' => 'fetch_failed']);
+});
+
 it('caches results so the second call does not hit the network', function (): void {
     importerFakes(fakeGithubRepo(), fakeComposer(), null, ['main', '3.x', '4.x', '5.x']);
 

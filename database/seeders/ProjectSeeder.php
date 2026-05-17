@@ -44,7 +44,7 @@ class ProjectSeeder extends Seeder
      * "maintainer" badge.
      */
     private const MAINTAINED_EXTRAS = [
-        'filamentphp/filament' => ['title' => 'Filament', 'category' => ProjectCategory::Framework, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/filament' => ['title' => 'Filament', 'category' => ProjectCategory::Framework, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/filament'],
         'laravel/framework' => ['title' => 'Laravel', 'category' => ProjectCategory::Framework, 'stack' => ['Laravel'], 'versions' => []],
         'livewire/livewire' => ['title' => 'Livewire', 'category' => ProjectCategory::Framework, 'stack' => ['Livewire'], 'versions' => []],
         'livewire/flux' => ['title' => 'Flux', 'category' => ProjectCategory::LivewirePackage, 'stack' => ['Livewire'], 'versions' => []],
@@ -57,23 +57,23 @@ class ProjectSeeder extends Seeder
         'wallacemartinss/filament-icon-picker' => ['title' => 'Filament Icon Picker', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
         'stechstudio/filament-impersonate' => ['title' => 'Filament Impersonate', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
         'leandrocfe/filament-ptbr-form-fields' => ['title' => 'Filament PT-BR Form Fields', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/panels' => ['title' => 'Filament Panels', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/forms' => ['title' => 'Filament Forms', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/tables' => ['title' => 'Filament Tables', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/infolists' => ['title' => 'Filament Infolists', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/notifications' => ['title' => 'Filament Notifications', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/widgets' => ['title' => 'Filament Widgets', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/actions' => ['title' => 'Filament Actions', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/support' => ['title' => 'Filament Support', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/schemas' => ['title' => 'Filament Schemas', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/upgrade' => ['title' => 'Filament Upgrade', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/query-builder' => ['title' => 'Filament Query Builder', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/spatie-laravel-tags-plugin' => ['title' => 'Filament Spatie Tags', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/spatie-laravel-media-library-plugin' => ['title' => 'Filament Spatie Media Library', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/spatie-laravel-google-fonts-plugin' => ['title' => 'Filament Spatie Google Fonts', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/spatie-laravel-settings-plugin' => ['title' => 'Filament Spatie Settings', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/spatie-laravel-translatable-plugin' => ['title' => 'Filament Spatie Translatable', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
-        'filamentphp/spark-billing-provider' => ['title' => 'Filament Spark Billing Provider', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5']],
+        'filamentphp/panels' => ['title' => 'Filament Panels', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/panels'],
+        'filamentphp/forms' => ['title' => 'Filament Forms', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/forms'],
+        'filamentphp/tables' => ['title' => 'Filament Tables', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/tables'],
+        'filamentphp/infolists' => ['title' => 'Filament Infolists', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/infolists'],
+        'filamentphp/notifications' => ['title' => 'Filament Notifications', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/notifications'],
+        'filamentphp/widgets' => ['title' => 'Filament Widgets', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/widgets'],
+        'filamentphp/actions' => ['title' => 'Filament Actions', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/actions'],
+        'filamentphp/support' => ['title' => 'Filament Support', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/support'],
+        'filamentphp/schemas' => ['title' => 'Filament Schemas', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/schemas'],
+        'filamentphp/upgrade' => ['title' => 'Filament Upgrade', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/upgrade'],
+        'filamentphp/query-builder' => ['title' => 'Filament Query Builder', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/query-builder'],
+        'filamentphp/spatie-laravel-tags-plugin' => ['title' => 'Filament Spatie Tags', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/spatie-laravel-tags-plugin'],
+        'filamentphp/spatie-laravel-media-library-plugin' => ['title' => 'Filament Spatie Media Library', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/spatie-laravel-media-library-plugin'],
+        'filamentphp/spatie-laravel-google-fonts-plugin' => ['title' => 'Filament Spatie Google Fonts', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/spatie-laravel-google-fonts-plugin'],
+        'filamentphp/spatie-laravel-settings-plugin' => ['title' => 'Filament Spatie Settings', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/spatie-laravel-settings-plugin'],
+        'filamentphp/spatie-laravel-translatable-plugin' => ['title' => 'Filament Spatie Translatable', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/spatie-laravel-translatable-plugin'],
+        'filamentphp/spark-billing-provider' => ['title' => 'Filament Spark Billing Provider', 'category' => ProjectCategory::FilamentPlugin, 'stack' => ['Filament'], 'versions' => ['v3', 'v4', 'v5'], 'packagist' => 'filament/spark-billing-provider'],
         'filamentphp/legacy-site' => ['title' => 'Filament Legacy Site', 'category' => ProjectCategory::Tool, 'stack' => ['Filament'], 'versions' => [], 'no_packagist' => true],
         'fruitcake/laravel-debugbar' => ['title' => 'Laravel Debugbar', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['Laravel'], 'versions' => []],
         'php-debugbar/php-debugbar' => ['title' => 'PHP Debugbar', 'category' => ProjectCategory::LaravelPackage, 'stack' => ['PHP'], 'versions' => []],
@@ -185,6 +185,7 @@ class ProjectSeeder extends Seeder
                 'extra' => [
                     'is_maintainer' => false,
                     'no_packagist' => $meta['no_packagist'] ?? false,
+                    'packagist' => $meta['packagist'] ?? null,
                 ],
             ];
         }
@@ -199,6 +200,7 @@ class ProjectSeeder extends Seeder
                 'extra' => [
                     'is_maintainer' => true,
                     'no_packagist' => $meta['no_packagist'] ?? false,
+                    'packagist' => $meta['packagist'] ?? null,
                 ],
             ];
         }
@@ -210,7 +212,8 @@ class ProjectSeeder extends Seeder
         $githubUrl = "https://github.com/{$vendor}/{$repoName}";
         $isJetBrains = ! empty($entry['extra']['jetbrainsId']);
         $noPackagist = ! empty($entry['extra']['no_packagist']);
-        $packagistUrl = ($isJetBrains || $noPackagist) ? null : "https://packagist.org/packages/{$entry['package']}";
+        $packagistPackage = ! empty($entry['extra']['packagist']) ? $entry['extra']['packagist'] : $entry['package'];
+        $packagistUrl = ($isJetBrains || $noPackagist) ? null : "https://packagist.org/packages/{$packagistPackage}";
 
         // Slug is owner-repo to avoid collisions across vendors that publish a
         // package with the same repo name (e.g. owner-a/foo + owner-b/foo).

@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\ReadmeCache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
@@ -83,7 +84,7 @@ class GithubReadme
                     'checked_at' => now(),
                 ])->save();
             } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning('GithubReadme cache write failed', [
+                Log::warning('GithubReadme cache write failed', [
                     'repo' => $repo,
                     'path' => $path,
                     'error' => $e->getMessage(),

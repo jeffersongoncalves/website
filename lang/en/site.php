@@ -118,7 +118,7 @@ return [
         'role_maintainer' => 'Maintainer',
         'role_daily_driver' => 'Daily driver',
         'cta_title' => 'Contribute, report issues, open PRs.',
-        'cta_body' => 'All packages have CI, Pest tests and open issues tagged :code. Docs are in English, but the maintainer replies in Portuguese.',
+        'cta_body' => 'All packages have CI, Pest tests and open issues tagged :code.',
         'good_first_issue' => 'good first issue',
         'back_to_list' => '← Back to projects',
         'filter_search' => 'Search',

@@ -118,7 +118,7 @@ return [
         'role_maintainer' => 'Manutenção',
         'role_daily_driver' => 'Uso diário',
         'cta_title' => 'Contribua, reporte issues, abra PRs.',
-        'cta_body' => 'Todos os pacotes têm CI, testes Pest e issues abertas marcadas com :code. Documentação em inglês, mas mantenedor responde em português.',
+        'cta_body' => 'Todos os pacotes têm CI, testes Pest e issues abertas marcadas com :code.',
         'good_first_issue' => 'good first issue',
         'back_to_list' => '← Voltar para projetos',
         'filter_search' => 'Buscar',

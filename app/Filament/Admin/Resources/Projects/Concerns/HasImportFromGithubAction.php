@@ -54,6 +54,14 @@ trait HasImportFromGithubAction
     }
 
     /**
+     * Fields derived from the repo metadata itself — always overwrite, even
+     * if the form already has a value. Otherwise the form's create-time
+     * defaults (e.g. package_type = Composer) hide whatever the importer
+     * detected.
+     */
+    private const OVERWRITE_KEYS = ['category', 'package_type'];
+
+    /**
      * @param  array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}  $result
      */
     private function applyImporterResult(array $result): void
@@ -76,7 +84,7 @@ trait HasImportFromGithubAction
                 continue;
             }
 
-            if (self::isImportValueEmpty(data_get($state, $key))) {
+            if (in_array($key, self::OVERWRITE_KEYS, true) || self::isImportValueEmpty(data_get($state, $key))) {
                 data_set($state, $key, $value);
                 $applied[] = $key;
             } else {

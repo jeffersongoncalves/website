@@ -20,7 +20,9 @@ class SiteStats
      * still renders; views hide GitHub-dependent pieces when the data is empty.
      *
      * @return array{
-     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
+     *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
+     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int,
+     *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
@@ -41,7 +43,9 @@ class SiteStats
      * Zeroed stats — the safe fallback when nothing has been synced yet.
      *
      * @return array{
-     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
+     *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
+     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int,
+     *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
@@ -53,7 +57,13 @@ class SiteStats
             'repos' => 0,
             'filament' => 0,
             'laravel' => 0,
+            'livewire' => 0,
+            'cakephp' => 0,
+            'laravel_zero' => 0,
+            'ide_plugin' => 0,
+            'framework' => 0,
             'starter' => 0,
+            'saas' => 0,
             'tool' => 0,
             'maintained' => 0,
             'daily_drivers' => 0,
@@ -73,7 +83,9 @@ class SiteStats
      * scheduled sync command, not by the request path.
      *
      * @return array{
-     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
+     *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
+     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int,
+     *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
@@ -147,7 +159,9 @@ class SiteStats
 
     /**
      * @return array{
-     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
+     *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
+     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int,
+     *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
@@ -159,7 +173,13 @@ class SiteStats
             'repos' => $stat->repos,
             'filament' => $stat->filament,
             'laravel' => $stat->laravel,
+            'livewire' => $stat->livewire,
+            'cakephp' => $stat->cakephp,
+            'laravel_zero' => $stat->laravel_zero,
+            'ide_plugin' => $stat->ide_plugin,
+            'framework' => $stat->framework,
             'starter' => $stat->starter,
+            'saas' => $stat->saas,
             'tool' => $stat->tool,
             'maintained' => $stat->maintained,
             'daily_drivers' => $stat->daily_drivers,
@@ -176,7 +196,9 @@ class SiteStats
 
     /**
      * @return array{
-     *   repos:int, filament:int, laravel:int, starter:int, tool:int, maintained:int, daily_drivers:int,
+     *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
+     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int,
+     *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
@@ -198,7 +220,13 @@ class SiteStats
             'repos' => (int) (clone $base)->count(),
             'filament' => (int) (clone $base)->byCategory(ProjectCategory::FilamentPlugin)->count(),
             'laravel' => (int) (clone $base)->byCategory(ProjectCategory::LaravelPackage)->count(),
+            'livewire' => (int) (clone $base)->byCategory(ProjectCategory::LivewirePackage)->count(),
+            'cakephp' => (int) (clone $base)->byCategory(ProjectCategory::CakePhpPackage)->count(),
+            'laravel_zero' => (int) (clone $base)->byCategory(ProjectCategory::LaravelZeroCli)->count(),
+            'ide_plugin' => (int) (clone $base)->byCategory(ProjectCategory::IdePlugin)->count(),
+            'framework' => (int) (clone $base)->byCategory(ProjectCategory::Framework)->count(),
             'starter' => (int) (clone $base)->byCategory(ProjectCategory::StarterKit)->count(),
+            'saas' => (int) (clone $base)->byCategory(ProjectCategory::Saas)->count(),
             'tool' => (int) (clone $base)->byCategory(ProjectCategory::Tool)->count(),
             'maintained' => (int) (clone $base)->maintained()->count(),
             'daily_drivers' => (int) (clone $base)->where('is_daily_driver', true)->count(),

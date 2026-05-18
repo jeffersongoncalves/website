@@ -10,7 +10,13 @@ use Illuminate\Support\Carbon;
  * @property int $repos
  * @property int $filament
  * @property int $laravel
+ * @property int $livewire
+ * @property int $cakephp
+ * @property int $laravel_zero
+ * @property int $ide_plugin
+ * @property int $framework
  * @property int $starter
+ * @property int $saas
  * @property int $tool
  * @property int $maintained
  * @property int $daily_drivers
@@ -34,7 +40,13 @@ class SiteStat extends Model
         'repos',
         'filament',
         'laravel',
+        'livewire',
+        'cakephp',
+        'laravel_zero',
+        'ide_plugin',
+        'framework',
         'starter',
+        'saas',
         'tool',
         'maintained',
         'daily_drivers',
@@ -55,7 +67,13 @@ class SiteStat extends Model
             'repos' => 'integer',
             'filament' => 'integer',
             'laravel' => 'integer',
+            'livewire' => 'integer',
+            'cakephp' => 'integer',
+            'laravel_zero' => 'integer',
+            'ide_plugin' => 'integer',
+            'framework' => 'integer',
             'starter' => 'integer',
+            'saas' => 'integer',
             'tool' => 'integer',
             'maintained' => 'integer',
             'daily_drivers' => 'integer',

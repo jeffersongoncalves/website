@@ -693,18 +693,6 @@ html::-webkit-scrollbar-thumb:hover,
    LAYOUT FIXES · sidebar morph, scrollbar gutter, main margin
    ============================================================ */
 
-/* FIX 1 — Livewire wrapper around the sidebar — fixed positioning
-   min-width prevents collapse during Livewire morphing when :has() loses match */
-div:has(> aside.fi-sidebar) {
-    display: flex !important;
-    position: fixed !important;
-    inset-block: 0 !important;
-    inset-inline-start: 0 !important;
-    margin-top: 64px !important;
-    z-index: 30;
-    min-width: 81px;
-}
-
 /* FIX 2 — Override Filament's "transition: all" on .fi-main-ctn.
    Allow opacity + width animations but NOT margin — kills horizontal slide
    caused by Livewire morphing re-triggering margin transitions. */
@@ -714,17 +702,35 @@ div:has(> aside.fi-sidebar) {
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* FIX 3 — Push main content right when sidebar open (320px) or collapsed (81px).
-   Scoped via body class so guest/login pages without sidebar are unaffected. */
-.fi-body-has-sidebar-collapsible-on-desktop .fi-main-ctn,
-.fi-body-has-sidebar-fully-collapsible-on-desktop .fi-main-ctn {
-    margin-inline-start: 81px !important;
-}
+/* FIX 1 + FIX 3 — desktop-only (>= lg breakpoint, 1024px).
+   On mobile Filament renders the sidebar as a slide-in drawer; pinning the
+   wrapper to 81px on small screens would steal layout space without showing
+   the icons and shove the topbar hamburger off-screen. */
+@media (min-width: 1024px) {
+    /* FIX 1 — Livewire wrapper around the sidebar — fixed positioning
+       min-width prevents collapse during Livewire morphing when :has() loses match */
+    div:has(> aside.fi-sidebar) {
+        display: flex !important;
+        position: fixed !important;
+        inset-block: 0 !important;
+        inset-inline-start: 0 !important;
+        margin-top: 64px !important;
+        z-index: 30;
+        min-width: 81px;
+    }
 
-.fi-body-has-sidebar-collapsible-on-desktop .fi-main-ctn.fi-main-ctn-sidebar-open,
-.fi-body-has-sidebar-fully-collapsible-on-desktop .fi-main-ctn.fi-main-ctn-sidebar-open,
-.fi-main-ctn-sidebar-open {
-    margin-inline-start: 320px !important;
+    /* FIX 3 — Push main content right when sidebar open (320px) or collapsed (81px).
+       Scoped via body class so guest/login pages without sidebar are unaffected. */
+    .fi-body-has-sidebar-collapsible-on-desktop .fi-main-ctn,
+    .fi-body-has-sidebar-fully-collapsible-on-desktop .fi-main-ctn {
+        margin-inline-start: 81px !important;
+    }
+
+    .fi-body-has-sidebar-collapsible-on-desktop .fi-main-ctn.fi-main-ctn-sidebar-open,
+    .fi-body-has-sidebar-fully-collapsible-on-desktop .fi-main-ctn.fi-main-ctn-sidebar-open,
+    .fi-main-ctn-sidebar-open {
+        margin-inline-start: 320px !important;
+    }
 }
 
 /* FIX 5 — Reserve scrollbar space to eliminate horizontal layout shifts */

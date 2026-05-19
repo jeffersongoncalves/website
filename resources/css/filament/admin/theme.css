@@ -739,10 +739,23 @@ html {
     overflow-y: scroll;
 }
 
-/* FIX 6 — Sidebar nav scrolls independently */
+/* FIX 6 — Sidebar nav scrolls independently.
+   min-height:0 on flex child lets it shrink past intrinsic content height so
+   overflow:auto actually clips. Without it, nav expands and shoves
+   editorial-sidebar-status below viewport — footer appears to scroll. */
 .fi-sidebar-nav {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden;
+}
+
+/* FIX 7 — Pin sidebar footer to bottom regardless of nav content height.
+   Sidebar is flex-column; mt-auto + flex-shrink:0 keeps the status block
+   anchored to the bottom edge while nav scrolls above it. */
+.fi-sidebar .editorial-sidebar-status {
+    flex-shrink: 0;
+    margin-top: auto;
 }
 
 /* Hide sidebar status block when sidebar is collapsed (no `fi-sidebar-open` class) */

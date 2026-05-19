@@ -316,6 +316,62 @@ class ProjectMetrics
             return self::fetchNpmDownloads($project->npm_url);
         }
 
+        if ($project->docker_url) {
+            return self::fetchDockerHubPulls($project->docker_url);
+        }
+
+        return null;
+    }
+
+    /**
+     * Docker Hub exposes a cumulative `pull_count` on the public repository
+     * endpoint — no auth required. GHCR (ghcr.io) has no equivalent public
+     * counter, so only Docker Hub URLs resolve here; a ghcr.io docker_url
+     * yields null and the project keeps its previous download value.
+     */
+    private static function fetchDockerHubPulls(?string $dockerUrl): ?int
+    {
+        $repo = self::repoFromDockerHubUrl($dockerUrl);
+
+        if (! $repo) {
+            return null;
+        }
+
+        $response = Http::timeout(8)
+            ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
+            ->get("https://hub.docker.com/v2/repositories/{$repo}/");
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        $pulls = $response->json('pull_count');
+
+        return is_numeric($pulls) ? (int) $pulls : null;
+    }
+
+    /**
+     * Normalise a Docker Hub URL to the `{namespace}/{repo}` form the v2
+     * API expects. Handles namespaced repos (`/r/owner/repo`) and official
+     * images (`/_/repo` → `library/repo`). Returns null for anything that
+     * isn't a hub.docker.com URL (e.g. a ghcr.io link).
+     */
+    private static function repoFromDockerHubUrl(?string $url): ?string
+    {
+        if (! $url) {
+            return null;
+        }
+
+        // Official image: hub.docker.com/_/nginx → library/nginx
+        if (preg_match('~hub\.docker\.com/_/([^/?#]+)~i', $url, $m)) {
+            return 'library/'.rtrim($m[1], '/');
+        }
+
+        // Namespaced: hub.docker.com/r/plausible/analytics → plausible/analytics
+        if (preg_match('~hub\.docker\.com/r/([^/?#]+/[^/?#]+)~i', $url, $m)) {
+            return rtrim($m[1], '/');
+        }
+
         return null;
     }
 

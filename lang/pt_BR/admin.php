@@ -128,6 +128,8 @@ return [
         'github_url' => 'URL do GitHub',
         'packagist_url' => 'URL do Packagist',
         'npm_url' => 'URL do npm',
+        'docker_url' => 'URL do Docker Hub',
+        'docker_url_hint' => 'Ex: https://hub.docker.com/r/owner/repo — usado para contar pulls. GHCR não tem contador público.',
         'docs_url' => 'URL da documentação',
         'demo_url' => 'URL do demo',
         'is_maintainer' => 'Apenas mantenedor',

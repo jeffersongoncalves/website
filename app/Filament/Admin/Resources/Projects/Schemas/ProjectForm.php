@@ -174,6 +174,11 @@ class ProjectForm
                                     ->label(__('admin.fields.npm_url'))
                                     ->url()
                                     ->maxLength(500),
+                                TextInput::make('docker_url')
+                                    ->label(__('admin.fields.docker_url'))
+                                    ->helperText(__('admin.fields.docker_url_hint'))
+                                    ->url()
+                                    ->maxLength(500),
                                 TextInput::make('docs_url')
                                     ->label(__('admin.fields.docs_url'))
                                     ->url()

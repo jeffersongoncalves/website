@@ -39,6 +39,7 @@ use Spatie\Translatable\HasTranslations;
  * @property string|null $github_url
  * @property string|null $packagist_url
  * @property string|null $npm_url
+ * @property string|null $docker_url
  * @property string|null $docs_url
  * @property string|null $demo_url
  * @property ProjectStatus $status
@@ -120,6 +121,7 @@ class Project extends Model
         'github_url',
         'packagist_url',
         'npm_url',
+        'docker_url',
         'docs_url',
         'demo_url',
         'status',

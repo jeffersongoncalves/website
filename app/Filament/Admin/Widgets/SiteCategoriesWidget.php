@@ -62,6 +62,10 @@ class SiteCategoriesWidget extends StatsOverviewWidget
             Stat::make(__('admin.widgets.site_categories.tool'), number_format($s['tool'], 0, ',', '.'))
                 ->description($desc)
                 ->color('gray'),
+
+            Stat::make(__('admin.widgets.site_categories.docker'), number_format($s['docker'], 0, ',', '.'))
+                ->description($desc)
+                ->color('info'),
         ];
     }
 

@@ -188,11 +188,18 @@ class ProjectImporter
         $branch = is_string($repo['default_branch'] ?? null) ? $repo['default_branch'] : 'main';
         $composer = self::fetchManifest($repoSlug, $branch, 'composer.json');
         $package = self::fetchManifest($repoSlug, $branch, 'package.json');
+        // Docker classification signal — try the canonical `.yml` first,
+        // fall back to the `.yaml` variant. Either presence flips the
+        // detection along with the `docker` topic.
+        $hasDockerCompose = self::fileExists($repoSlug, $branch, 'docker-compose.yml')
+            || self::fileExists($repoSlug, $branch, 'docker-compose.yaml')
+            || self::fileExists($repoSlug, $branch, 'compose.yml')
+            || self::fileExists($repoSlug, $branch, 'compose.yaml');
         $branches = self::fetchBranches($repoSlug);
 
         [$owner, $repoName] = explode('/', $repoSlug, 2);
 
-        $category = self::resolveCategory($composer, $repo);
+        $category = self::resolveCategory($composer, $repo, $hasDockerCompose);
 
         // Only treat the project as an npm package if it's actually published.
         // A `package.json` checked into the repo is not enough — many repos
@@ -390,12 +397,16 @@ class ProjectImporter
 
     /**
      * Priority order matters — a Filament plugin that also requires Laravel
-     * should still resolve as a filament_plugin, not laravel_package.
+     * should still resolve as a filament_plugin, not laravel_package. Docker
+     * sits below all PHP-stack classifications because a repo with both a
+     * composer.json AND a docker-compose.yml is still primarily the PHP
+     * package; the Docker fallback is for self-hosted apps that ship as
+     * compose stacks (e.g. plausible/analytics).
      *
      * @param  array<string, mixed>|null  $composer
      * @param  array<string, mixed>  $repo
      */
-    private static function resolveCategory(?array $composer, array $repo): string
+    private static function resolveCategory(?array $composer, array $repo, bool $hasDockerCompose = false): string
     {
         $topics = is_array($repo['topics'] ?? null) ? $repo['topics'] : [];
         $require = is_array($composer['require'] ?? null) ? $composer['require'] : [];
@@ -438,7 +449,29 @@ class ProjectImporter
             return 'framework';
         }
 
+        if ($hasDockerCompose || in_array('docker', $topics, true)) {
+            return 'docker';
+        }
+
         return 'tool';
+    }
+
+    /**
+     * HEAD a raw.githubusercontent.com path to verify a file exists on a
+     * given branch without downloading it. Used by the Docker detector
+     * to check for docker-compose / compose files without parsing JSON.
+     */
+    private static function fileExists(string $repoSlug, string $branch, string $file): bool
+    {
+        try {
+            $response = Http::timeout(6)
+                ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
+                ->head("https://raw.githubusercontent.com/{$repoSlug}/{$branch}/{$file}");
+        } catch (Throwable) {
+            return false;
+        }
+
+        return $response->successful();
     }
 
     /**

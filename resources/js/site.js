@@ -204,13 +204,18 @@ Alpine.data('pushPermission', () => ({
     permission: 'default',
     subscribed: false,
     busy: false,
+    lastError: '',
 
     async init() {
         if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+            console.info('[push] Browser missing Push API support');
             return;
         }
         const vapid = document.querySelector('meta[name="vapid-public-key"]');
-        if (!vapid || !vapid.content) return;
+        if (!vapid || !vapid.content) {
+            console.warn('[push] meta[name="vapid-public-key"] missing — set VAPID_PUBLIC_KEY in env');
+            return;
+        }
 
         this.supported = true;
         this.permission = Notification.permission;
@@ -220,19 +225,26 @@ Alpine.data('pushPermission', () => ({
             const existing = await registration.pushManager.getSubscription();
             this.subscribed = existing !== null;
         } catch (e) {
-            // Older browsers / private mode — keep subscribed=false silently.
+            console.warn('[push] getSubscription failed', e);
         }
     },
 
     async toggle() {
         if (!this.supported || this.busy) return;
         this.busy = true;
+        this.lastError = '';
         try {
             if (this.subscribed) {
                 await this._unsubscribe();
             } else {
                 await this._subscribe();
             }
+        } catch (e) {
+            this.lastError = e && e.message ? e.message : String(e);
+            console.error('[push] toggle failed', e);
+            // Visible feedback — the bell button is small, surface the
+            // failure in an alert so the visitor knows it didn't work.
+            window.alert('Push: ' + this.lastError);
         } finally {
             this.busy = false;
         }
@@ -241,7 +253,10 @@ Alpine.data('pushPermission', () => ({
     async _subscribe() {
         const permission = await Notification.requestPermission();
         this.permission = permission;
-        if (permission !== 'granted') return;
+        if (permission !== 'granted') {
+            console.info('[push] permission not granted:', permission);
+            return;
+        }
 
         const registration = await navigator.serviceWorker.ready;
         const vapid = document.querySelector('meta[name="vapid-public-key"]').content;
@@ -252,7 +267,7 @@ Alpine.data('pushPermission', () => ({
         });
 
         const csrf = document.querySelector('meta[name="csrf-token"]').content;
-        await fetch('/push/subscribe', {
+        const response = await fetch('/push/subscribe', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -269,7 +284,15 @@ Alpine.data('pushPermission', () => ({
             }),
         });
 
+        if (!response.ok) {
+            // Try to surface the validation message from Laravel so the
+            // server-side cause is visible without DevTools.
+            const text = await response.text();
+            throw new Error(`HTTP ${response.status} — ${text.slice(0, 200)}`);
+        }
+
         this.subscribed = true;
+        console.info('[push] subscribed', subscription.endpoint);
     },
 
     async _unsubscribe() {

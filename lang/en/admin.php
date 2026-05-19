@@ -84,6 +84,7 @@ return [
             'starter' => 'Starter Kits',
             'saas' => 'SaaS',
             'tool' => 'Tools',
+            'docker' => 'Docker',
         ],
     ],
 
@@ -167,6 +168,7 @@ return [
             'starter_kit' => 'Starter Kit',
             'saas' => 'SaaS',
             'tool' => 'Tool',
+            'docker' => 'Docker',
         ],
         'status' => [
             'draft' => 'Draft',

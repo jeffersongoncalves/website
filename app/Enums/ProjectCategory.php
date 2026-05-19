@@ -17,6 +17,7 @@ enum ProjectCategory: string implements HasColor, HasLabel
     case StarterKit = 'starter_kit';
     case Saas = 'saas';
     case Tool = 'tool';
+    case Docker = 'docker';
 
     public function getLabel(): string
     {
@@ -31,6 +32,7 @@ enum ProjectCategory: string implements HasColor, HasLabel
             self::StarterKit => __('admin.enums.category.starter_kit'),
             self::Saas => __('admin.enums.category.saas'),
             self::Tool => __('admin.enums.category.tool'),
+            self::Docker => __('admin.enums.category.docker'),
         };
     }
 
@@ -47,6 +49,7 @@ enum ProjectCategory: string implements HasColor, HasLabel
             self::StarterKit => 'success',
             self::Saas => 'info',
             self::Tool => 'gray',
+            self::Docker => 'info',
         };
     }
 }

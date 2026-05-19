@@ -5,6 +5,7 @@ namespace App\Support;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Throwable;
 
 class ProjectImporter
@@ -196,7 +197,7 @@ class ProjectImporter
 
         $fields = [
             'github_url' => $url,
-            'slug' => $owner.'-'.$repoName,
+            'slug' => Str::slug($owner.'-'.$repoName),
             'name' => self::prettifyName($repoName),
             'repo' => $repoName,
             'license' => is_string($repo['license']['spdx_id'] ?? null) ? $repo['license']['spdx_id'] : 'MIT',

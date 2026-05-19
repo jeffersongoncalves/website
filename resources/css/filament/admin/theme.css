@@ -492,11 +492,22 @@ html:not(.dark) .fi-body {
 .fi-icon-btn.fi-color-warning svg {
     color: var(--accent-strong) !important;
 }
-.fi-btn-color-primary svg,
-.fi-icon-btn-color-primary svg,
-.fi-btn.fi-color-primary svg,
-.fi-icon-btn.fi-color-primary svg {
+/* Solid primary buttons (no .fi-outlined) get the dark on-accent text/icon
+   color because their bg is the amber accent. Outlined-primary keeps text
+   color (handled below) so the icon doesn't go ink-950 on a transparent bg. */
+.fi-btn-color-primary:not(.fi-outlined) svg,
+.fi-icon-btn-color-primary:not(.fi-outlined) svg,
+.fi-btn.fi-color-primary:not(.fi-outlined) svg,
+.fi-icon-btn.fi-color-primary:not(.fi-outlined) svg {
     color: var(--text-on-accent) !important;
+}
+
+/* Outlined buttons: icon inherits text color (currentColor) instead of
+   Filament default `var(--color-600)` so amber-outlined icon matches the
+   text-700/300 used by the button label. */
+.fi-btn.fi-outlined.fi-color svg,
+.fi-icon-btn.fi-outlined.fi-color svg {
+    color: currentColor !important;
 }
 
 /* ============================================================

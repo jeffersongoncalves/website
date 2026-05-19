@@ -6,10 +6,12 @@ on:
   workflow_dispatch:
 
 concurrency:
-  # Por-ref: builds de tags/branches diferentes rodam em paralelo sem conflitar;
-  # pushes sucessivos na mesma ref serializam. cancel-in-progress=false garante
-  # que nenhuma publicação seja perdida.
-  group: docker-build-${{ github.ref }}
+  # Global lock — qualquer release-*.*.* enfileira atras do anterior. Garante
+  # que GHCR :latest, GitHub Release e o cache do BuildKit nao sejam mexidos
+  # por dois runs simultaneos (cenario que rolava quando duas tags eram
+  # pushadas no mesmo minuto). cancel-in-progress=false preserva todo
+  # release na fila — perder uma publicacao nunca eh aceitavel.
+  group: docker-build
   cancel-in-progress: false
 
 env:

@@ -183,4 +183,10 @@ return [
             'none' => 'Ninguno',
         ],
     ],
+
+    'push' => [
+        'project_published' => [
+            'title' => 'Nuevo proyecto publicado',
+        ],
+    ],
 ];

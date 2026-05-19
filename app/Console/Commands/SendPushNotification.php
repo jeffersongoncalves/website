@@ -2,10 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\PushSubscription;
+use App\Support\PushBroadcaster;
 use Illuminate\Console\Command;
-use Minishlink\WebPush\Subscription;
-use Minishlink\WebPush\WebPush;
 
 class SendPushNotification extends Command
 {
@@ -26,99 +24,34 @@ class SendPushNotification extends Command
             return self::FAILURE;
         }
 
-        $publicKey = config('services.webpush.public_key');
-        $privateKey = config('services.webpush.private_key');
-        $subject = config('services.webpush.subject');
+        $result = PushBroadcaster::send(
+            $title,
+            (string) $this->option('body'),
+            (string) $this->option('url'),
+            (string) $this->option('tag'),
+        );
 
-        if (! is_string($publicKey) || ! is_string($privateKey)) {
+        if (! $result['configured']) {
             $this->error('VAPID keys are missing. Run `php artisan webpush:vapid` and set both VAPID_* env vars.');
 
             return self::FAILURE;
         }
 
-        $payload = json_encode([
-            'title' => $title,
-            'body' => (string) $this->option('body'),
-            'url' => (string) $this->option('url'),
-            'tag' => (string) $this->option('tag'),
-        ]);
-
-        if ($payload === false) {
-            $this->error('Failed to encode push payload as JSON.');
-
-            return self::FAILURE;
-        }
-
-        $webPush = new WebPush([
-            'VAPID' => [
-                'subject' => is_string($subject) ? $subject : 'mailto:noreply@example.com',
-                'publicKey' => $publicKey,
-                'privateKey' => $privateKey,
-            ],
-        ]);
-
-        $total = PushSubscription::query()->count();
-
-        if ($total === 0) {
+        if ($result['queued'] === 0) {
             $this->warn('No push subscriptions in the database — nothing to send.');
             $this->line('Make sure a visitor clicked the bell button + granted permission first.');
 
             return self::SUCCESS;
         }
 
-        $this->info("Queueing push to {$total} subscription(s)...");
+        $this->info(sprintf(
+            'Delivered: %d · Expired (pruned): %d · Failed: %d · Queued: %d',
+            $result['delivered'],
+            $result['expired'],
+            $result['failed'],
+            $result['queued'],
+        ));
 
-        $queued = 0;
-        PushSubscription::query()->chunkById(200, function ($subs) use ($webPush, $payload, &$queued) {
-            foreach ($subs as $row) {
-                $webPush->queueNotification(
-                    Subscription::create([
-                        'endpoint' => $row->endpoint,
-                        'publicKey' => $row->p256dh,
-                        'authToken' => $row->auth,
-                    ]),
-                    $payload,
-                );
-                $queued++;
-            }
-        });
-
-        $delivered = 0;
-        $expired = 0;
-        $failed = 0;
-
-        foreach ($webPush->flush() as $report) {
-            $endpointHost = parse_url($report->getEndpoint(), PHP_URL_HOST) ?: 'unknown';
-
-            if ($report->isSuccess()) {
-                $delivered++;
-                $this->line("  <fg=green>ok</> {$endpointHost}");
-
-                continue;
-            }
-
-            // The Push Service tells us a subscription is permanently gone
-            // (404 / 410). Drop those rows so we stop wasting bytes on them.
-            if ($report->isSubscriptionExpired()) {
-                PushSubscription::query()
-                    ->where('endpoint_hash', PushSubscription::hashEndpoint($report->getEndpoint()))
-                    ->delete();
-                $expired++;
-                $this->line("  <fg=yellow>expired</> {$endpointHost} — subscription pruned");
-
-                continue;
-            }
-
-            $failed++;
-            $response = $report->getResponse();
-            $status = $response !== null ? $response->getStatusCode() : 'n/a';
-            $reason = $report->getReason();
-            $this->line("  <fg=red>fail</> {$endpointHost} — HTTP {$status} · {$reason}");
-        }
-
-        $this->newLine();
-        $this->info("Delivered: {$delivered} · Expired (pruned): {$expired} · Failed: {$failed} · Queued: {$queued}");
-
-        return $failed > 0 ? self::FAILURE : self::SUCCESS;
+        return $result['failed'] > 0 ? self::FAILURE : self::SUCCESS;
     }
 }

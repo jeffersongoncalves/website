@@ -529,4 +529,33 @@ Alpine.data('installPrompt', () => ({
     },
 }));
 
+// External links → new tab. Any <a> pointing at a different hostname over
+// http(s) gets target=_blank + rel="noopener noreferrer" (noopener closes
+// the reverse-tabnabbing hole, noreferrer drops the Referer). Internal nav,
+// mailto:, tel: and in-page anchors are left untouched so the site keeps
+// behaving like a normal multi-page app.
+function markExternalLinks(root) {
+    const host = window.location.hostname;
+    (root || document).querySelectorAll('a[href]').forEach((a) => {
+        if (a.dataset.extProcessed) return;
+        let url;
+        try {
+            url = new URL(a.href, window.location.href);
+        } catch (e) {
+            return;
+        }
+        if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
+        if (url.hostname === host) return;
+
+        a.target = '_blank';
+        const rel = new Set((a.rel || '').split(/\s+/).filter(Boolean));
+        rel.add('noopener');
+        rel.add('noreferrer');
+        a.rel = [...rel].join(' ');
+        a.dataset.extProcessed = '1';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => markExternalLinks());
+
 Alpine.start();

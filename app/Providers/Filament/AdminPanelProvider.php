@@ -90,6 +90,10 @@ class AdminPanelProvider extends PanelProvider
                 fn () => view('filament.partials.sidebar-status'),
             )
             ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn () => view('filament.partials.external-links'),
+            )
+            ->renderHook(
                 PanelsRenderHook::FOOTER,
                 fn () => view('filament.partials.footer'),
             )

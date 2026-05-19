@@ -3,6 +3,7 @@
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Models\Project;
+use App\Models\PushSubscription;
 
 it('renders home', function () {
     Project::query()->create([
@@ -130,6 +131,37 @@ it('renders the offline fallback page', function () {
     $this->get('/offline')
         ->assertOk()
         ->assertSeeText(__('site.offline.retry'));
+});
+
+it('stores a push subscription and dedupes on the endpoint hash', function () {
+    $endpoint = 'https://fcm.googleapis.com/wp/abc123';
+    $payload = [
+        'endpoint' => $endpoint,
+        'keys' => ['p256dh' => 'pubkey_b64', 'auth' => 'auth_b64'],
+        'locale' => 'pt-BR',
+    ];
+
+    $this->postJson('/push/subscribe', $payload)->assertOk();
+    $this->postJson('/push/subscribe', $payload)->assertOk();
+
+    $rows = PushSubscription::query()->get();
+    expect($rows)->toHaveCount(1);
+    expect($rows->first()->endpoint)->toBe($endpoint);
+    expect($rows->first()->locale)->toBe('pt-BR');
+});
+
+it('deletes a push subscription by endpoint', function () {
+    PushSubscription::query()->create([
+        'endpoint' => 'https://fcm.googleapis.com/wp/zzz',
+        'endpoint_hash' => PushSubscription::hashEndpoint('https://fcm.googleapis.com/wp/zzz'),
+        'p256dh' => 'pubkey',
+        'auth' => 'auth',
+    ]);
+
+    $this->postJson('/push/unsubscribe', ['endpoint' => 'https://fcm.googleapis.com/wp/zzz'])
+        ->assertOk();
+
+    expect(PushSubscription::query()->count())->toBe(0);
 });
 
 it('serves the PWA manifest with the spec content-type, an id, and a 512 icon', function () {

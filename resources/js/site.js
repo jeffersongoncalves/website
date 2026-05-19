@@ -194,6 +194,131 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// Web Push subscribe / unsubscribe. The component only surfaces a button
+// when the browser supports both Notification + PushManager, the VAPID
+// public key meta is present, and the user hasn't blocked notifications
+// at the OS level. Subscription handshake speaks JSON to our Laravel
+// endpoints and uses the CSRF token from the layout's meta.
+Alpine.data('pushPermission', () => ({
+    supported: false,
+    permission: 'default',
+    subscribed: false,
+    busy: false,
+
+    async init() {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+            return;
+        }
+        const vapid = document.querySelector('meta[name="vapid-public-key"]');
+        if (!vapid || !vapid.content) return;
+
+        this.supported = true;
+        this.permission = Notification.permission;
+
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            const existing = await registration.pushManager.getSubscription();
+            this.subscribed = existing !== null;
+        } catch (e) {
+            // Older browsers / private mode — keep subscribed=false silently.
+        }
+    },
+
+    async toggle() {
+        if (!this.supported || this.busy) return;
+        this.busy = true;
+        try {
+            if (this.subscribed) {
+                await this._unsubscribe();
+            } else {
+                await this._subscribe();
+            }
+        } finally {
+            this.busy = false;
+        }
+    },
+
+    async _subscribe() {
+        const permission = await Notification.requestPermission();
+        this.permission = permission;
+        if (permission !== 'granted') return;
+
+        const registration = await navigator.serviceWorker.ready;
+        const vapid = document.querySelector('meta[name="vapid-public-key"]').content;
+
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(vapid),
+        });
+
+        const csrf = document.querySelector('meta[name="csrf-token"]').content;
+        await fetch('/push/subscribe', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrf,
+            },
+            body: JSON.stringify({
+                endpoint: subscription.endpoint,
+                keys: {
+                    p256dh: arrayBufferToBase64(subscription.getKey('p256dh')),
+                    auth: arrayBufferToBase64(subscription.getKey('auth')),
+                },
+                locale: document.documentElement.lang || null,
+            }),
+        });
+
+        this.subscribed = true;
+    },
+
+    async _unsubscribe() {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        if (!subscription) {
+            this.subscribed = false;
+            return;
+        }
+
+        const endpoint = subscription.endpoint;
+        await subscription.unsubscribe();
+
+        const csrf = document.querySelector('meta[name="csrf-token"]').content;
+        await fetch('/push/unsubscribe', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrf,
+            },
+            body: JSON.stringify({ endpoint }),
+        });
+
+        this.subscribed = false;
+    },
+}));
+
+// VAPID `applicationServerKey` must be a Uint8Array. The Push API spec
+// hands the key in URL-safe base64 — decode it into raw bytes here.
+function urlBase64ToUint8Array(base64) {
+    const padding = '='.repeat((4 - (base64.length % 4)) % 4);
+    const normal = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const raw = window.atob(normal);
+    const out = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+    return out;
+}
+
+// `subscription.getKey()` returns an ArrayBuffer; we POST it as base64
+// so PHP can verify+forward it without a binary content-type.
+function arrayBufferToBase64(buffer) {
+    if (!buffer) return '';
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    return window.btoa(binary);
+}
+
 Alpine.data('pwaUpdateToast', () => ({
     open: false,
     nextVersion: '',

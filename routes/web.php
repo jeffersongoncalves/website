@@ -6,6 +6,7 @@ use App\Http\Controllers\Site\OfflineController;
 use App\Http\Controllers\Site\OpenSourceController;
 use App\Http\Controllers\Site\ProjectController;
 use App\Http\Controllers\Site\ProjectViewController;
+use App\Http\Controllers\Site\PushSubscriptionController;
 use App\Http\Controllers\Site\ServiceWorkerController;
 use App\Http\Controllers\Site\SponsorsController;
 use App\Http\Controllers\Site\SwitchLocaleController;
@@ -18,6 +19,13 @@ use Illuminate\Support\Facades\Route;
 // pre-cached by the SW and served as the fallback for navigation failures.
 Route::get('/sw.js', ServiceWorkerController::class)->name('pwa.sw');
 Route::get('/offline', OfflineController::class)->name('pwa.offline');
+
+// Push subscription endpoints. POST-only, CSRF token comes from the
+// `<meta name="csrf-token">` already in the layout. Kept outside the
+// locale middleware so the browser doesn't get bounced to a localised URL
+// when posting from the service worker context.
+Route::post('/push/subscribe', [PushSubscriptionController::class, 'store'])->name('pwa.push.subscribe');
+Route::post('/push/unsubscribe', [PushSubscriptionController::class, 'destroy'])->name('pwa.push.unsubscribe');
 
 Route::middleware('set.locale')->group(function () {
     Route::get('/', HomeController::class)->name('home');

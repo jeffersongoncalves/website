@@ -274,12 +274,27 @@ Alpine.data('pushPermission', () => ({
             return;
         }
 
-        const registration = await navigator.serviceWorker.ready;
-        const vapid = document.querySelector('meta[name="vapid-public-key"]').content;
+        // Force the SW to update before subscribing so we never hand
+        // pushManager.subscribe() a stale registration from a previous
+        // deploy that lacked the `push` handler — Chrome sometimes
+        // throws AbortError when the registration is in the middle of
+        // a soft update.
+        let registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+            try { await registration.update(); } catch (_) { /* non-fatal */ }
+        }
+        registration = await navigator.serviceWorker.ready;
+
+        const vapid = document.querySelector('meta[name="vapid-public-key"]').content.trim();
+
+        // Pass the raw ArrayBuffer (not the Uint8Array view) — older
+        // Chrome builds accept either, but stricter ones throw on the
+        // typed-array form.
+        const applicationServerKey = urlBase64ToUint8Array(vapid).buffer;
 
         const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(vapid),
+            applicationServerKey,
         });
 
         const csrf = document.querySelector('meta[name="csrf-token"]').content;

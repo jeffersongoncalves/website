@@ -21,5 +21,9 @@
 @endphp
 <meta name="theme-color" id="theme-color-meta" content="{{ $themeColorMetaInitial }}">
 <meta name="mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-title" content="{{ config('filakit.favicon.manifest.name') }}"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="{{ config('filakit.favicon.manifest.short_name', config('filakit.favicon.manifest.name')) }}"/>
+{{-- `black-translucent` lets the page paint behind the iOS status bar so the
+     dark theme bg covers the area — `black` would otherwise leave a flat
+     black strip even in light mode. --}}
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>

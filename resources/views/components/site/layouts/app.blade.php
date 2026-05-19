@@ -23,7 +23,10 @@
       style="background: {{ $isDarkInitial ? '#0B0A09' : '#FFFEF9' }}; color-scheme: {{ $isDarkInitial ? 'dark' : 'light' }};">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{-- viewport-fit=cover lets the page paint into the iOS safe-area
+         (notch/dynamic island) when running as a standalone PWA with
+         status-bar-style=black-translucent. --}}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="color-scheme" content="{{ $isDarkInitial ? 'dark' : 'light' }}">
     <x-favicon/>

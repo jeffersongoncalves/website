@@ -157,4 +157,17 @@ Alpine.data('onThisPage', () => ({
     },
 }));
 
+// Service Worker registration. Scoped at `/` so it controls the public site
+// (admin/livewire/api are skipped inside sw.js itself). Registered after
+// `load` so the first paint isn't competing with the SW install for the
+// network — improves perceived performance on the very first visit.
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {
+            // Registration can fail in private mode / older browsers — drop
+            // silently, the site stays fully functional without offline.
+        });
+    });
+}
+
 Alpine.start();

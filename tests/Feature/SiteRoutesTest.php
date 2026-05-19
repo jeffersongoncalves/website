@@ -110,3 +110,21 @@ it('renders open-source page', function () {
 it('renders sponsors page', function () {
     $this->get('/sponsors')->assertOk();
 });
+
+it('serves the service worker as javascript with no-cache headers', function () {
+    $response = $this->get('/sw.js');
+
+    $response->assertOk()
+        ->assertHeader('Content-Type', 'application/javascript; charset=utf-8')
+        ->assertHeader('Service-Worker-Allowed', '/');
+
+    expect($response->headers->get('Cache-Control'))->toContain('no-cache');
+    expect($response->getContent())->toContain('const VERSION = ');
+    expect($response->getContent())->toContain('OFFLINE_URL');
+});
+
+it('renders the offline fallback page', function () {
+    $this->get('/offline')
+        ->assertOk()
+        ->assertSeeText(__('site.offline.retry'));
+});

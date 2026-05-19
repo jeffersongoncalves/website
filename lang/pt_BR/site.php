@@ -184,4 +184,14 @@ return [
         'copyright' => 'Construído com Laravel + Filament',
         'location' => 'Assis, SP',
     ],
+
+    'offline' => [
+        'title' => 'Sem conexão',
+        'eyebrow' => 'offline',
+        'heading_1' => 'Conexão perdida.',
+        'heading_2' => 'Aguardando rede.',
+        'message' => 'Não conseguimos chegar ao servidor. Verifique sua conexão e tente novamente — o site fica disponível assim que a rede voltar.',
+        'retry' => 'Tentar novamente',
+        'home' => 'Voltar para a home',
+    ],
 ];

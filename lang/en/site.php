@@ -184,4 +184,14 @@ return [
         'copyright' => 'Built with Laravel + Filament',
         'location' => 'Assis, SP',
     ],
+
+    'offline' => [
+        'title' => 'Offline',
+        'eyebrow' => 'offline',
+        'heading_1' => 'Connection lost.',
+        'heading_2' => 'Waiting for network.',
+        'message' => 'We couldn\'t reach the server. Check your connection and try again — the site comes back online as soon as the network does.',
+        'retry' => 'Try again',
+        'home' => 'Back to home',
+    ],
 ];

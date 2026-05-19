@@ -21,6 +21,66 @@
         </nav>
 
         <div class="flex items-center gap-2">
+            {{-- PWA install entry point. Renders a tight icon-only button when
+                 Chrome/Edge fires `beforeinstallprompt` OR when the visitor
+                 is on iOS Safari (no event, but eligible for manual install
+                 via Share → Add to Home Screen). Both paths are gated by the
+                 `installPrompt()` Alpine component. --}}
+            <div x-data="installPrompt()" x-cloak class="flex items-center">
+                <button type="button"
+                        x-show="available"
+                        x-on:click="install()"
+                        class="pwa-install-btn"
+                        :aria-label="@js(__('site.pwa.install'))"
+                        :title="@js(__('site.pwa.install'))">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </button>
+
+                <button type="button"
+                        x-show="iosEligible && !available"
+                        x-on:click="showIosHint()"
+                        class="pwa-install-btn"
+                        :aria-label="@js(__('site.pwa.install'))"
+                        :title="@js(__('site.pwa.install'))">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                        <polyline points="16 6 12 2 8 6"/>
+                        <line x1="12" y1="2" x2="12" y2="15"/>
+                    </svg>
+                </button>
+
+                {{-- iOS Add to Home Screen tutorial. Standard Safari modal
+                     pattern: backdrop scrim, centred card, dismiss on
+                     overlay click or Escape. --}}
+                <template x-teleport="body">
+                    <div x-show="iosHintOpen"
+                         x-cloak
+                         x-on:keydown.escape.window="closeIosHint()"
+                         class="pwa-ios-hint-overlay"
+                         x-transition.opacity>
+                        <div class="pwa-ios-hint-card"
+                             x-on:click.outside="closeIosHint()"
+                             x-transition>
+                            <h2 class="pwa-ios-hint-title">@lang('site.pwa.ios.title')</h2>
+                            <ol class="pwa-ios-hint-steps">
+                                <li>@lang('site.pwa.ios.step_1')</li>
+                                <li>@lang('site.pwa.ios.step_2')</li>
+                                <li>@lang('site.pwa.ios.step_3')</li>
+                            </ol>
+                            <button type="button"
+                                    x-on:click="closeIosHint()"
+                                    class="pwa-ios-hint-close">
+                                @lang('site.pwa.ios.close')
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
             <button type="button"
                     class="theme-toggle"
                     x-data="{ isDark: document.documentElement.classList.contains('dark') }"

@@ -194,4 +194,15 @@ return [
         'retry' => 'Reintentar',
         'home' => 'Volver al inicio',
     ],
+
+    'pwa' => [
+        'install' => 'Instalar aplicación',
+        'ios' => [
+            'title' => 'Instalar en iPhone/iPad',
+            'step_1' => 'Toca el botón Compartir en la barra de Safari.',
+            'step_2' => 'Desplázate y elige "Añadir a pantalla de inicio".',
+            'step_3' => 'Confirma con "Añadir". El icono aparece en tu pantalla de inicio.',
+            'close' => 'Entendido',
+        ],
+    ],
 ];

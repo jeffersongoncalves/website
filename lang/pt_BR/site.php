@@ -194,4 +194,15 @@ return [
         'retry' => 'Tentar novamente',
         'home' => 'Voltar para a home',
     ],
+
+    'pwa' => [
+        'install' => 'Instalar aplicativo',
+        'ios' => [
+            'title' => 'Instalar no iPhone/iPad',
+            'step_1' => 'Toque no botão Compartilhar na barra do Safari.',
+            'step_2' => 'Role e escolha "Adicionar à Tela de Início".',
+            'step_3' => 'Confirme em "Adicionar". O ícone aparece na sua tela inicial.',
+            'close' => 'Entendi',
+        ],
+    ],
 ];

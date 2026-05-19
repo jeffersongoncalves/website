@@ -477,6 +477,78 @@
   }
   .theme-toggle:hover { border-color: var(--border-strong); color: var(--accent); }
 
+  /* PWA install entry point — same shape as theme-toggle but tinted with
+     the accent border so it reads as a primary call to action without
+     hijacking the whole header. */
+  .pwa-install-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    background: var(--accent-bg-soft);
+    border: 1px solid var(--accent-bg-strong);
+    border-radius: var(--r-sm);
+    color: var(--accent-text);
+    cursor: pointer;
+    transition: border-color 150ms var(--ease-out), color 150ms var(--ease-out), background 150ms var(--ease-out);
+  }
+  .pwa-install-btn:hover {
+    border-color: var(--accent);
+    background: var(--accent-bg-strong);
+    color: var(--accent-strong);
+  }
+
+  /* iOS "Add to Home Screen" hint modal. Standalone Safari has no
+     beforeinstallprompt event, so we fall back to a tutorial sheet
+     pointing at the Share menu. */
+  .pwa-ios-hint-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+    background: var(--surface-scrim);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .pwa-ios-hint-card {
+    max-width: 360px; width: 100%;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-lg);
+  }
+  .pwa-ios-hint-title {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-strong);
+    margin: 0 0 16px;
+  }
+  .pwa-ios-hint-steps {
+    list-style: decimal;
+    padding-inline-start: 20px;
+    margin: 0 0 20px;
+    font-size: 14px;
+    color: var(--text-regular);
+  }
+  .pwa-ios-hint-steps li { margin-bottom: 8px; }
+  .pwa-ios-hint-close {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 100%;
+    padding: 10px 16px;
+    background: var(--accent);
+    color: var(--text-on-accent);
+    border: 0;
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 150ms var(--ease-out);
+  }
+  .pwa-ios-hint-close:hover { background: var(--accent-strong); }
+
   /* Mobile navigation */
   .mobile-nav { position: relative; }
   .mobile-nav-toggle {

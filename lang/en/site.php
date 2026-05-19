@@ -194,4 +194,15 @@ return [
         'retry' => 'Try again',
         'home' => 'Back to home',
     ],
+
+    'pwa' => [
+        'install' => 'Install app',
+        'ios' => [
+            'title' => 'Install on iPhone/iPad',
+            'step_1' => 'Tap the Share button in the Safari toolbar.',
+            'step_2' => 'Scroll and pick "Add to Home Screen".',
+            'step_3' => 'Confirm with "Add". The icon shows up on your home screen.',
+            'close' => 'Got it',
+        ],
+    ],
 ];

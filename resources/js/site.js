@@ -170,4 +170,96 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// PWA install prompt — the deferred event (`beforeinstallprompt`) is the
+// only way Chrome / Edge / Android lets us trigger the native install UI
+// on demand, so we stash it for the Alpine component to call later from
+// a user gesture. The event won't fire at all if the site is already
+// installed, on iOS Safari, or below Chrome's heuristic threshold.
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    window.dispatchEvent(new CustomEvent('pwa-install-available'));
+});
+
+window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    document.cookie = 'pwa_installed=true; max-age=31536000; path=/; SameSite=Lax';
+    window.dispatchEvent(new CustomEvent('pwa-installed'));
+});
+
+Alpine.data('installPrompt', () => ({
+    available: false,
+    iosHintOpen: false,
+    iosEligible: false,
+
+    init() {
+        // Don't surface the button in already-installed standalone runs —
+        // the OS launcher icon is doing the job; another button is noise.
+        const isStandalone =
+            window.matchMedia('(display-mode: standalone)').matches ||
+            window.navigator.standalone === true ||
+            document.cookie.split('; ').some((c) => c.startsWith('pwa_installed=true'));
+
+        if (isStandalone) return;
+
+        // The user explicitly dismissed before — respect that for the
+        // session. Cookie expires in 7 days so the prompt eventually
+        // gets a second chance.
+        const dismissed = document.cookie
+            .split('; ')
+            .some((c) => c.startsWith('pwa_dismissed=true'));
+
+        if (dismissed) return;
+
+        // Chrome / Edge / Android path: we already cached the event if
+        // it fired before Alpine booted, so check + listen for late ones.
+        if (deferredInstallPrompt) {
+            this.available = true;
+        }
+        window.addEventListener('pwa-install-available', () => {
+            this.available = true;
+        });
+        window.addEventListener('pwa-installed', () => {
+            this.available = false;
+        });
+
+        // iOS Safari path: there is no install event — detect iOS by
+        // user-agent + lack of standalone, then surface a "how to" hint
+        // pointing the user at Share → Add to Home Screen.
+        const ua = window.navigator.userAgent || '';
+        const isIos = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+        if (isIos && !window.navigator.standalone) {
+            this.iosEligible = true;
+        }
+    },
+
+    async install() {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        this.available = false;
+        if (choice && choice.outcome === 'dismissed') {
+            // 7 days — long enough that the user isn't pestered, short
+            // enough that someone who later wants the app can find it again.
+            document.cookie = 'pwa_dismissed=true; max-age=604800; path=/; SameSite=Lax';
+        }
+    },
+
+    dismiss() {
+        this.available = false;
+        this.iosEligible = false;
+        document.cookie = 'pwa_dismissed=true; max-age=604800; path=/; SameSite=Lax';
+    },
+
+    showIosHint() {
+        this.iosHintOpen = true;
+    },
+
+    closeIosHint() {
+        this.iosHintOpen = false;
+    },
+}));
+
 Alpine.start();

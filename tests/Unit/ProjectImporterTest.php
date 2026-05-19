@@ -35,7 +35,7 @@ function fakeComposer(array $overrides = []): array
     ], $overrides);
 }
 
-function importerFakes(array $repo, ?array $composer, ?array $package, array $branches = [], bool $npmPublished = true): void
+function importerFakes(array $repo, ?array $composer, ?array $package, array $branches = [], bool $npmPublished = true, bool $hasDockerCompose = false): void
 {
     Http::fake([
         'api.github.com/repos/*/branches*' => Http::response(array_map(fn ($b) => ['name' => $b], $branches)),
@@ -46,6 +46,17 @@ function importerFakes(array $repo, ?array $composer, ?array $package, array $br
         'raw.githubusercontent.com/*/package.json' => $package !== null
             ? Http::response($package)
             : Http::response('', 404),
+        // Docker detector checks ten candidate paths via HEAD — stub a 200
+        // for the canonical `docker-compose.yml` when the flag is on, and
+        // a 404 for every other docker-* / Dockerfile path so tests don't
+        // hit real network through the wildcard fall-through.
+        'raw.githubusercontent.com/*/docker-compose.yml' => $hasDockerCompose
+            ? Http::response('', 200)
+            : Http::response('', 404),
+        'raw.githubusercontent.com/*docker-compose.yaml' => Http::response('', 404),
+        'raw.githubusercontent.com/*compose.yml' => Http::response('', 404),
+        'raw.githubusercontent.com/*compose.yaml' => Http::response('', 404),
+        'raw.githubusercontent.com/*/Dockerfile' => Http::response('', 404),
         // Stub the npm registry HEAD lookup so tests don't hit real network.
         // Default OK = pretend the package is published; toggle with the flag
         // to simulate `package.json` present but no published package.

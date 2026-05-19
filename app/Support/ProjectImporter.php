@@ -188,18 +188,40 @@ class ProjectImporter
         $branch = is_string($repo['default_branch'] ?? null) ? $repo['default_branch'] : 'main';
         $composer = self::fetchManifest($repoSlug, $branch, 'composer.json');
         $package = self::fetchManifest($repoSlug, $branch, 'package.json');
-        // Docker classification signal — try the canonical `.yml` first,
-        // fall back to the `.yaml` variant. Either presence flips the
-        // detection along with the `docker` topic.
-        $hasDockerCompose = self::fileExists($repoSlug, $branch, 'docker-compose.yml')
-            || self::fileExists($repoSlug, $branch, 'docker-compose.yaml')
-            || self::fileExists($repoSlug, $branch, 'compose.yml')
-            || self::fileExists($repoSlug, $branch, 'compose.yaml');
+        // Docker classification signals — checked on root + the two common
+        // self-hosted layouts (plausible/analytics ships `hosting/`, several
+        // others ship `installer/`). HEAD against raw.githubusercontent.com
+        // so we don't pull the file contents.
+        $composePaths = [
+            'docker-compose.yml',
+            'docker-compose.yaml',
+            'compose.yml',
+            'compose.yaml',
+            'hosting/docker-compose.yml',
+            'hosting/docker-compose.yaml',
+            'installer/docker-compose.yml',
+            'installer/docker-compose.yaml',
+            'docker/docker-compose.yml',
+            'docker/docker-compose.yaml',
+        ];
+        $hasDockerCompose = false;
+        foreach ($composePaths as $path) {
+            if (self::fileExists($repoSlug, $branch, $path)) {
+                $hasDockerCompose = true;
+                break;
+            }
+        }
+        // Standalone Dockerfile counts as a Docker signal only when the
+        // repo doesn't ship composer.json / package.json — otherwise a
+        // Laravel app with a dev Dockerfile would be misclassified.
+        $hasStandaloneDockerfile = $composer === null
+            && $package === null
+            && self::fileExists($repoSlug, $branch, 'Dockerfile');
         $branches = self::fetchBranches($repoSlug);
 
         [$owner, $repoName] = explode('/', $repoSlug, 2);
 
-        $category = self::resolveCategory($composer, $repo, $hasDockerCompose);
+        $category = self::resolveCategory($composer, $repo, $hasDockerCompose || $hasStandaloneDockerfile);
 
         // Only treat the project as an npm package if it's actually published.
         // A `package.json` checked into the repo is not enough — many repos
@@ -209,6 +231,13 @@ class ProjectImporter
         $npmPublished = $npmName !== null && self::npmPackageExists($npmName);
 
         $packageType = self::resolvePackageType($composer, $package, $repo, $npmPublished);
+        // Docker-distributed projects don't fit any of the package-manager
+        // types resolvePackageType knows about, but they still ship as an
+        // image — flip the type so the badge + downloads tracker uses the
+        // Docker rail instead of falling back to `none`.
+        if ($category === 'docker' && $packageType === 'none') {
+            $packageType = 'docker';
+        }
         $description = self::pickDescription($composer, $package, $repo);
 
         $fields = [
@@ -449,7 +478,14 @@ class ProjectImporter
             return 'framework';
         }
 
-        if ($hasDockerCompose || in_array('docker', $topics, true)) {
+        // Broader docker-topic match — self-hosted projects often tag
+        // themselves with `selfhosted` / `self-hosted` / `containers`
+        // rather than the bare `docker` topic.
+        $dockerTopics = array_intersect(
+            ['docker', 'dockerfile', 'docker-image', 'containers', 'selfhosted', 'self-hosted', 'self-hosting'],
+            $topics,
+        );
+        if ($hasDockerCompose || $dockerTopics !== []) {
             return 'docker';
         }
 

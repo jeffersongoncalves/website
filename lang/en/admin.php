@@ -179,6 +179,7 @@ return [
             'composer' => 'Composer (composer.json)',
             'npm' => 'npm (package.json)',
             'jetbrains' => 'JetBrains',
+            'docker' => 'Docker',
             'none' => 'None',
         ],
     ],

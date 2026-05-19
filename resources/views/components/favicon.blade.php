@@ -13,7 +13,13 @@
 <link rel="manifest" href="{{ asset('/manifest.json') }}">
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="msapplication-TileImage" content="{{ Vite::asset('resources/favicon/ms-icon-144x144.png') }}">
-<meta name="theme-color" id="theme-color-meta" content="#FFFEF9">
+@php
+    // Match the site's default-dark theme: dark unless an explicit `light`
+    // cookie is set. Keeps browser chrome (mobile address bar) in sync with
+    // the pre-paint bg stamped in components.site.layouts.app.
+    $themeColorMetaInitial = request()->cookie('theme') === 'light' ? '#FFFEF9' : '#0B0A09';
+@endphp
+<meta name="theme-color" id="theme-color-meta" content="{{ $themeColorMetaInitial }}">
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="{{ config('filakit.favicon.manifest.name') }}"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black"/>

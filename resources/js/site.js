@@ -217,6 +217,22 @@ Alpine.data('pushPermission', () => ({
             return;
         }
 
+        // VAPID public key must decode to exactly 65 bytes — a P-256
+        // uncompressed point (0x04 prefix + 32-byte X + 32-byte Y). If
+        // the env value is malformed (truncated paste, swapped with
+        // private key, trailing newline that wasn't trimmed) the
+        // browser rejects subscribe() with a generic "push service
+        // error". Log the actual length so the failure is obvious.
+        try {
+            const bytes = urlBase64ToUint8Array(vapid.content.trim());
+            console.info(`[push] VAPID key length: ${bytes.length} bytes (expected 65)`);
+            if (bytes.length !== 65) {
+                console.error('[push] VAPID public key is malformed. Regenerate with `php artisan webpush:vapid` and paste the full PUBLIC half into VAPID_PUBLIC_KEY env.');
+            }
+        } catch (e) {
+            console.error('[push] VAPID key failed to decode as base64url', e);
+        }
+
         this.supported = true;
         this.permission = Notification.permission;
 

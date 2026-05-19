@@ -52,8 +52,17 @@ class AppServiceProvider extends ServiceProvider
         // Strip Livewire's data-navigate-track="reload" from Vite-injected
         // assets — no panel uses SPA navigate, and the attribute otherwise
         // forces a hard CSS/JS reload on every full-page navigation.
+        //
+        // `data-cfasync="false"` opts the bundle out of Cloudflare's
+        // Rocket Loader. Rocket Loader defers + reorders script execution,
+        // which breaks `navigator.serviceWorker.register()` timing and
+        // makes `pushManager.subscribe()` fail with the generic
+        // "AbortError: Registration failed — push service error".
         Vite::useStyleTagAttributes(['data-navigate-track' => false]);
-        Vite::useScriptTagAttributes(['data-navigate-track' => false]);
+        Vite::useScriptTagAttributes([
+            'data-navigate-track' => false,
+            'data-cfasync' => 'false',
+        ]);
 
         Model::automaticallyEagerLoadRelationships();
 

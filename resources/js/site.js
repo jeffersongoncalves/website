@@ -205,6 +205,7 @@ Alpine.data('pushPermission', () => ({
     subscribed: false,
     busy: false,
     lastError: '',
+    isBrave: false,
 
     async init() {
         if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
@@ -215,6 +216,23 @@ Alpine.data('pushPermission', () => ({
         if (!vapid || !vapid.content) {
             console.warn('[push] meta[name="vapid-public-key"] missing — set VAPID_PUBLIC_KEY in env');
             return;
+        }
+
+        // Brave fingerprints itself with `navigator.brave.isBrave()`. The
+        // shim returns a Promise that resolves true on Brave and is
+        // missing entirely on Chrome/Edge/Firefox. Brave gates Web Push
+        // behind a per-profile flag at `brave://settings/privacy` →
+        // "Use Google services for push messaging" — when the flag is
+        // off (default), `pushManager.subscribe()` throws the same
+        // generic "AbortError: Registration failed - push service
+        // error" we see on a broken Chrome install. We use this flag to
+        // replace the generic alert with Brave-specific instructions.
+        try {
+            if (navigator.brave && typeof navigator.brave.isBrave === 'function') {
+                this.isBrave = await navigator.brave.isBrave();
+            }
+        } catch (e) {
+            // shim throwing is fine — treat as non-Brave.
         }
 
         // VAPID public key must decode to exactly 65 bytes — a P-256
@@ -258,9 +276,19 @@ Alpine.data('pushPermission', () => ({
         } catch (e) {
             this.lastError = e && e.message ? e.message : String(e);
             console.error('[push] toggle failed', e);
-            // Visible feedback — the bell button is small, surface the
-            // failure in an alert so the visitor knows it didn't work.
-            window.alert('Push: ' + this.lastError);
+
+            // Brave-specific: this exact error is what `pushManager
+            // .subscribe()` throws when "Use Google services for push
+            // messaging" is OFF in `brave://settings/privacy`. Replace
+            // the generic alert with the actual fix instead of the
+            // FCM-side error message that doesn't help the visitor.
+            const looksLikeBraveGcmBlock = this.isBrave
+                && this.lastError.toLowerCase().includes('push service error');
+            if (looksLikeBraveGcmBlock) {
+                window.alert(this._braveHint());
+            } else {
+                window.alert('Push: ' + this.lastError);
+            }
         } finally {
             this.busy = false;
         }
@@ -324,6 +352,20 @@ Alpine.data('pushPermission', () => ({
 
         this.subscribed = true;
         console.info('[push] subscribed', subscription.endpoint);
+    },
+
+    // Build the Brave instructions in the page's current locale by
+    // reading from `<html lang>`. Kept here as plain strings instead of
+    // round-tripping through a server JSON endpoint — these only render
+    // for Brave users on a subscribe failure, the carrying cost is tiny.
+    _braveHint() {
+        const lang = (document.documentElement.lang || 'pt').slice(0, 2);
+        const messages = {
+            pt: 'Brave bloqueia notificações push por padrão.\n\nPara ativar:\n1. Cole brave://settings/privacy na barra de endereço\n2. Ligue "Use Google services for push messaging"\n3. Reinicie o Brave\n4. Volte aqui e clique no sino de novo.',
+            en: 'Brave blocks Web Push by default.\n\nTo enable it:\n1. Paste brave://settings/privacy into the address bar\n2. Turn on "Use Google services for push messaging"\n3. Restart Brave\n4. Come back here and click the bell again.',
+            es: 'Brave bloquea las notificaciones push por defecto.\n\nPara activarlas:\n1. Pega brave://settings/privacy en la barra de direcciones\n2. Activa "Use Google services for push messaging"\n3. Reinicia Brave\n4. Vuelve aquí y haz clic en la campana de nuevo.',
+        };
+        return messages[lang] || messages.en;
     },
 
     async _unsubscribe() {

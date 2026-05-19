@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Observers\PushSubscriptionObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
+#[ObservedBy(PushSubscriptionObserver::class)]
 class PushSubscription extends Model
 {
     use HasFactory;

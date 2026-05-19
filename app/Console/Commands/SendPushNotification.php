@@ -57,10 +57,19 @@ class SendPushNotification extends Command
             ],
         ]);
 
-        $sent = 0;
-        $expired = 0;
+        $total = PushSubscription::query()->count();
 
-        PushSubscription::query()->chunkById(200, function ($subs) use ($webPush, $payload, &$sent) {
+        if ($total === 0) {
+            $this->warn('No push subscriptions in the database — nothing to send.');
+            $this->line('Make sure a visitor clicked the bell button + granted permission first.');
+
+            return self::SUCCESS;
+        }
+
+        $this->info("Queueing push to {$total} subscription(s)...");
+
+        $queued = 0;
+        PushSubscription::query()->chunkById(200, function ($subs) use ($webPush, $payload, &$queued) {
             foreach ($subs as $row) {
                 $webPush->queueNotification(
                     Subscription::create([
@@ -70,11 +79,24 @@ class SendPushNotification extends Command
                     ]),
                     $payload,
                 );
-                $sent++;
+                $queued++;
             }
         });
 
+        $delivered = 0;
+        $expired = 0;
+        $failed = 0;
+
         foreach ($webPush->flush() as $report) {
+            $endpointHost = parse_url($report->getEndpoint(), PHP_URL_HOST) ?: 'unknown';
+
+            if ($report->isSuccess()) {
+                $delivered++;
+                $this->line("  <fg=green>ok</> {$endpointHost}");
+
+                continue;
+            }
+
             // The Push Service tells us a subscription is permanently gone
             // (404 / 410). Drop those rows so we stop wasting bytes on them.
             if ($report->isSubscriptionExpired()) {
@@ -82,11 +104,21 @@ class SendPushNotification extends Command
                     ->where('endpoint_hash', PushSubscription::hashEndpoint($report->getEndpoint()))
                     ->delete();
                 $expired++;
+                $this->line("  <fg=yellow>expired</> {$endpointHost} — subscription pruned");
+
+                continue;
             }
+
+            $failed++;
+            $response = $report->getResponse();
+            $status = $response !== null ? $response->getStatusCode() : 'n/a';
+            $reason = $report->getReason();
+            $this->line("  <fg=red>fail</> {$endpointHost} — HTTP {$status} · {$reason}");
         }
 
-        $this->info("Queued {$sent} push(es). Pruned {$expired} expired subscription(s).");
+        $this->newLine();
+        $this->info("Delivered: {$delivered} · Expired (pruned): {$expired} · Failed: {$failed} · Queued: {$queued}");
 
-        return self::SUCCESS;
+        return $failed > 0 ? self::FAILURE : self::SUCCESS;
     }
 }

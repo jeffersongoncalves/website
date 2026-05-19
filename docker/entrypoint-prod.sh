@@ -37,6 +37,12 @@ php artisan route:clear || true
 php artisan view:clear || true
 php artisan event:clear || true
 
+# Bota fora a chave `app.version` que versoes antigas mantinham por 1h em Redis.
+# Sem isso, deploy novo entra mas a sidebar continua mostrando a versao anterior
+# ate o TTL expirar. AppVersion::current() ja pula o cache quando APP_VERSION
+# vem do env, mas esse forget cobre o periodo de transicao apos rollout.
+php artisan cache:forget app.version || true
+
 php artisan migrate --force || true
 php artisan sitemap:generate || true
 

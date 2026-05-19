@@ -55,7 +55,17 @@ abstract class FaviconSupport
         // the legacy config key.
         $manifest['icons'] = self::pwaIcons();
 
-        return response()->json($manifest);
+        // `id` locks the manifest identity so the browser doesn't treat a
+        // future `start_url` tweak as a brand new installable app. Falls
+        // back to `/` which is stable across releases.
+        $manifest['id'] = $manifest['id'] ?? '/';
+
+        // The W3C-blessed media type is `application/manifest+json`, not
+        // the generic `application/json` that `response()->json()` ships
+        // by default. Lighthouse and Chrome both accept either, but the
+        // strict type makes the audit clean and lines up with the spec.
+        return response()->json($manifest)
+            ->header('Content-Type', 'application/manifest+json');
     }
 
     /**

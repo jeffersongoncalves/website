@@ -131,3 +131,27 @@ it('renders the offline fallback page', function () {
         ->assertOk()
         ->assertSeeText(__('site.offline.retry'));
 });
+
+it('serves the PWA manifest with the spec content-type, an id, and a 512 icon', function () {
+    $response = $this->get('/manifest.json');
+
+    $response->assertOk()
+        ->assertHeader('Content-Type', 'application/manifest+json');
+
+    $manifest = $response->json();
+
+    expect($manifest['id'])->toBe('/');
+    expect($manifest['start_url'])->toBe('/?source=pwa');
+    expect($manifest['display'])->toBe('standalone');
+    expect($manifest['theme_color'])->toBe('#0B0A09');
+
+    $sizes = array_column($manifest['icons'], 'sizes');
+    expect($sizes)->toContain('192x192');
+    expect($sizes)->toContain('512x512');
+
+    $maskable = array_filter(
+        $manifest['icons'],
+        fn ($icon) => ($icon['purpose'] ?? null) === 'maskable',
+    );
+    expect($maskable)->not->toBeEmpty();
+});

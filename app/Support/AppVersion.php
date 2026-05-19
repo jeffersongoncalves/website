@@ -12,17 +12,23 @@ abstract class AppVersion
      *   2. public/VERSION file written at deploy time
      *   3. `git describe --tags --abbrev=0` (dev only, .git available)
      *   4. fallback `0.0.0`
-     * The result is cached for an hour.
+     *
+     * When the env path resolves (production Docker injects APP_VERSION via
+     * build-arg → Dockerfile ENV) the lookup is O(1) and we deliberately
+     * skip the cache. Earlier versions cached the value indefinitely in
+     * Redis, which meant a fresh deploy still served the previous version
+     * for up to an hour after rollout. Only the slow paths (VERSION file
+     * I/O + `git describe` shell-out) are still cached.
      */
     public static function current(): string
     {
+        $configured = config('app.version');
+
+        if (is_string($configured) && $configured !== '') {
+            return self::normalize($configured);
+        }
+
         return Cache::remember('app.version', 3600, function (): string {
-            $configured = config('app.version');
-
-            if (is_string($configured) && $configured !== '') {
-                return self::normalize($configured);
-            }
-
             $file = base_path('VERSION');
             if (is_file($file)) {
                 $raw = trim((string) file_get_contents($file));

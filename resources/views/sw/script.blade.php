@@ -7,9 +7,10 @@ const CACHE_NAME = `jg-pwa-v${VERSION}`;
 const OFFLINE_URL = '/offline';
 
 // Pre-cache the bare minimum needed to answer a navigation request while
-// offline. The home route is included so the standalone PWA opens to a
-// working page even on cold cache + no network.
-const PRECACHE_URLS = [OFFLINE_URL, '/'];
+// offline. Both `/` and `/?source=pwa` (the manifest's `start_url`) are
+// seeded so the standalone PWA launches into a working page even on a
+// cold cache + no network.
+const PRECACHE_URLS = [OFFLINE_URL, '/', '/?source=pwa'];
 
 self.addEventListener('install', (event) => {
     // skipWaiting lets the newly installed SW take over without forcing

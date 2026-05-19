@@ -79,6 +79,49 @@ class SiteStats
     }
 
     /**
+     * Recompute only the columns derived from the local Project table
+     * (counts, category breakdowns, stars/downloads sums). GitHub-sourced
+     * fields (followers, public_sponsors, contributions) are left intact
+     * so admin edits don't trigger external API calls. Called from the
+     * Project observer so the SiteMetricsWidget reflects new projects on
+     * the next page load instead of waiting for the scheduled sync.
+     */
+    public static function refreshProjectDerived(): void
+    {
+        $base = Project::query()->published();
+
+        $data = [
+            'repos' => (int) (clone $base)->count(),
+            'filament' => (int) (clone $base)->byCategory(ProjectCategory::FilamentPlugin)->count(),
+            'laravel' => (int) (clone $base)->byCategory(ProjectCategory::LaravelPackage)->count(),
+            'livewire' => (int) (clone $base)->byCategory(ProjectCategory::LivewirePackage)->count(),
+            'cakephp' => (int) (clone $base)->byCategory(ProjectCategory::CakePhpPackage)->count(),
+            'laravel_zero' => (int) (clone $base)->byCategory(ProjectCategory::LaravelZeroCli)->count(),
+            'ide_plugin' => (int) (clone $base)->byCategory(ProjectCategory::IdePlugin)->count(),
+            'framework' => (int) (clone $base)->byCategory(ProjectCategory::Framework)->count(),
+            'starter' => (int) (clone $base)->byCategory(ProjectCategory::StarterKit)->count(),
+            'saas' => (int) (clone $base)->byCategory(ProjectCategory::Saas)->count(),
+            'tool' => (int) (clone $base)->byCategory(ProjectCategory::Tool)->count(),
+            'maintained' => (int) (clone $base)->maintained()->count(),
+            'daily_drivers' => (int) (clone $base)->where('is_daily_driver', true)->count(),
+            'stars' => (int) (clone $base)->sum('stars'),
+            'downloads' => (int) (clone $base)->sum('downloads'),
+            'downloads_packagist' => (int) (clone $base)->where('package_type', PackageType::Composer->value)->sum('downloads'),
+            'downloads_npm' => (int) (clone $base)->where('package_type', PackageType::Npm->value)->sum('downloads'),
+            'downloads_jetbrains' => (int) (clone $base)->where('package_type', PackageType::JetBrains->value)->sum('downloads'),
+        ];
+
+        $stat = SiteStat::query()->firstOrNew([]);
+        $stat->fill($data);
+
+        if (! $stat->exists) {
+            $stat->synced_at = now();
+        }
+
+        $stat->save();
+    }
+
+    /**
      * Recompute every stat and upsert the singleton row. Called by the
      * scheduled sync command, not by the request path.
      *

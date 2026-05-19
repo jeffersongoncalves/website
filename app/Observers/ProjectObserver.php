@@ -6,6 +6,7 @@ use App\Enums\ProjectStatus;
 use App\Jobs\GenerateSitemapJob;
 use App\Jobs\SyncProjectMetricsJob;
 use App\Models\Project;
+use App\Support\SiteStats;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;
 
@@ -60,6 +61,12 @@ class ProjectObserver
             Cache::delete('featured_projects');
         } catch (InvalidArgumentException) {
         }
+
+        // Recompute the local-only columns of the SiteStat singleton so the
+        // admin metrics widget + public landing cards reflect the change
+        // immediately. GitHub-sourced fields stay untouched — those refresh
+        // on the scheduled sync.
+        SiteStats::refreshProjectDerived();
 
         GenerateSitemapJob::dispatch();
     }

@@ -193,7 +193,16 @@ class ProjectImporter
         [$owner, $repoName] = explode('/', $repoSlug, 2);
 
         $category = self::resolveCategory($composer, $repo);
-        $packageType = self::resolvePackageType($composer, $package, $repo);
+
+        // Only treat the project as an npm package if it's actually published.
+        // A `package.json` checked into the repo is not enough — many repos
+        // ship one for tooling (eslint, vite, prettier) without ever pushing
+        // to the registry. Hit `registry.npmjs.org` HEAD before claiming npm.
+        $npmName = self::extractNpmName($package);
+        $npmPublished = $npmName !== null && self::npmPackageExists($npmName);
+
+        $packageType = self::resolvePackageType($composer, $package, $repo, $npmPublished);
+        $description = self::pickDescription($composer, $package, $repo);
 
         $fields = [
             'github_url' => $url,
@@ -203,11 +212,16 @@ class ProjectImporter
             'license' => is_string($repo['license']['spdx_id'] ?? null) ? $repo['license']['spdx_id'] : 'MIT',
             'readme_branch' => $branch,
             'docs_url' => self::nullableString($repo['homepage'] ?? null),
-            'title.en' => self::pickDescription($composer, $package, $repo),
+            // Mirror the same description across all locales — the importer can't
+            // translate, the editor manually edits per-locale later. Same value
+            // beats null fields the editor has to clear.
+            'title.en' => $description,
+            'title.pt' => $description,
+            'title.es' => $description,
             'category' => $category,
             'package_type' => $packageType,
             'packagist_url' => self::buildPackagistUrl($composer),
-            'npm_url' => self::buildNpmUrl($package),
+            'npm_url' => $npmPublished ? 'https://www.npmjs.com/package/'.$npmName : null,
             'stack' => self::resolveStack($composer, $package),
             'versions' => self::resolveVersions($composer, $branches, $category),
         ];
@@ -218,8 +232,12 @@ class ProjectImporter
             $warnings[] = 'category_fallback';
         }
 
-        if ($fields['title.en'] === null) {
+        if ($description === null) {
             $warnings[] = 'no_description';
+        }
+
+        if ($npmName !== null && ! $npmPublished) {
+            $warnings[] = 'npm_not_published';
         }
 
         return ['fields' => $fields, 'warnings' => $warnings];
@@ -308,13 +326,13 @@ class ProjectImporter
      * @param  array<string, mixed>|null  $package
      * @param  array<string, mixed>  $repo
      */
-    private static function resolvePackageType(?array $composer, ?array $package, array $repo): string
+    private static function resolvePackageType(?array $composer, ?array $package, array $repo, bool $npmPublished): string
     {
         if ($composer !== null) {
             return 'composer';
         }
 
-        if ($package !== null) {
+        if ($package !== null && $npmPublished) {
             return 'npm';
         }
 
@@ -324,6 +342,50 @@ class ProjectImporter
         }
 
         return 'none';
+    }
+
+    /**
+     * Pull the package name out of a parsed `package.json`, if it's a valid
+     * npm identifier. Used to gate the registry lookup so we don't ping
+     * npmjs.org for repos that don't ship a package.json at all.
+     *
+     * @param  array<string, mixed>|null  $package
+     */
+    private static function extractNpmName(?array $package): ?string
+    {
+        $name = $package['name'] ?? null;
+
+        if (! is_string($name) || ! preg_match('#^(@[a-z0-9_.~-]+/)?[a-z0-9_.~-]+$#i', $name)) {
+            return null;
+        }
+
+        return $name;
+    }
+
+    /**
+     * HEAD the public npm registry to verify a package was actually
+     * published under this name. Hitting the JSON GET would also work but
+     * HEAD is cheaper and the body isn't needed — we only care about the
+     * 200 vs 404 distinction. Network failures degrade to "not published"
+     * so a flaky registry doesn't fake a package_type=npm.
+     */
+    private static function npmPackageExists(string $name): bool
+    {
+        // Scoped packages keep the slash unencoded in the registry URL.
+        $url = 'https://registry.npmjs.org/'.$name;
+
+        try {
+            $response = Http::timeout(6)
+                ->withHeaders([
+                    'User-Agent' => 'jeffersongoncalves-site',
+                    'Accept' => 'application/json',
+                ])
+                ->head($url);
+        } catch (Throwable) {
+            return false;
+        }
+
+        return $response->successful();
     }
 
     /**
@@ -485,23 +547,6 @@ class ProjectImporter
         return 'https://packagist.org/packages/'.strtolower($name);
     }
 
-    /**
-     * @param  array<string, mixed>|null  $package
-     */
-    private static function buildNpmUrl(?array $package): ?string
-    {
-        $name = $package['name'] ?? null;
-
-        if (! is_string($name) || ! preg_match('#^(@[a-z0-9_.~-]+/)?[a-z0-9_.~-]+$#i', $name)) {
-            return null;
-        }
-
-        return 'https://www.npmjs.com/package/'.$name;
-    }
-
-    /**
-     * @param  array<string, mixed>  $arr
-     */
     /**
      * @param  array<string, mixed>  $arr
      */

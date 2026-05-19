@@ -35,7 +35,7 @@ function fakeComposer(array $overrides = []): array
     ], $overrides);
 }
 
-function importerFakes(array $repo, ?array $composer, ?array $package, array $branches = []): void
+function importerFakes(array $repo, ?array $composer, ?array $package, array $branches = [], bool $npmPublished = true): void
 {
     Http::fake([
         'api.github.com/repos/*/branches*' => Http::response(array_map(fn ($b) => ['name' => $b], $branches)),
@@ -45,6 +45,12 @@ function importerFakes(array $repo, ?array $composer, ?array $package, array $br
             : Http::response('', 404),
         'raw.githubusercontent.com/*/package.json' => $package !== null
             ? Http::response($package)
+            : Http::response('', 404),
+        // Stub the npm registry HEAD lookup so tests don't hit real network.
+        // Default OK = pretend the package is published; toggle with the flag
+        // to simulate `package.json` present but no published package.
+        'registry.npmjs.org/*' => $npmPublished
+            ? Http::response('', 200)
             : Http::response('', 404),
     ]);
 }
@@ -92,6 +98,32 @@ it('resolves npm package_type when composer.json is missing but package.json exi
     expect($fields['packagist_url'])->toBeNull();
     expect($fields['stack'])->toBe(['Tailwind', 'Alpine.js']);
     expect($fields['category'])->toBe('tool');
+});
+
+it('drops npm_url and downgrades package_type when package.json exists but the registry has no published package', function (): void {
+    importerFakes(
+        fakeGithubRepo(['topics' => ['javascript']]),
+        null,
+        ['name' => 'caveman-installer', 'description' => 'A CLI installer'],
+        npmPublished: false,
+    );
+
+    $result = ProjectImporter::fromGithub('https://github.com/foo/caveman');
+
+    $fields = $result['fields'];
+    expect($fields['npm_url'])->toBeNull();
+    expect($fields['package_type'])->toBe('none');
+    expect($result['warnings'] ?? [])->toContain('npm_not_published');
+});
+
+it('mirrors the same description across every translatable locale on a github import', function (): void {
+    importerFakes(fakeGithubRepo(), fakeComposer(), null, ['main', '3.x', '4.x', '5.x']);
+
+    $fields = ProjectImporter::fromGithub('https://github.com/foo/bar')['fields'];
+
+    expect($fields['title.en'])->toBe('Filament field for Brazilian CEP lookups.');
+    expect($fields['title.pt'])->toBe('Filament field for Brazilian CEP lookups.');
+    expect($fields['title.es'])->toBe('Filament field for Brazilian CEP lookups.');
 });
 
 it('returns repo_not_found when GitHub API 404s', function (): void {

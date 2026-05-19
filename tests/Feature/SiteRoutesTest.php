@@ -121,6 +121,9 @@ it('serves the service worker as javascript with no-cache headers', function () 
     expect($response->headers->get('Cache-Control'))->toContain('no-cache');
     expect($response->getContent())->toContain('const VERSION = ');
     expect($response->getContent())->toContain('OFFLINE_URL');
+    // Update flow — must postMessage clients after activate so the page
+    // can decide whether to surface the update toast.
+    expect($response->getContent())->toContain("type: 'pwa-updated'");
 });
 
 it('renders the offline fallback page', function () {

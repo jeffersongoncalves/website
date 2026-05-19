@@ -168,7 +168,53 @@ if ('serviceWorker' in navigator) {
             // silently, the site stays fully functional without offline.
         });
     });
+
+    // Update flow — the SW posts `{type:'pwa-updated', version}` from its
+    // `activate` handler after `clients.claim()`. We surface a toast only
+    // when the version actually differs from the one the user has been
+    // running, so the very first install (no `pwa.version` in storage)
+    // stays silent. The toast hand-off uses a CustomEvent so the Alpine
+    // component below can react without holding a reference to the SW.
+    navigator.serviceWorker.addEventListener('message', (event) => {
+        const data = event.data;
+        if (!data || data.type !== 'pwa-updated') return;
+
+        const incoming = String(data.version || '');
+        const seen = window.localStorage.getItem('pwa.version');
+
+        if (seen && seen !== incoming) {
+            window.dispatchEvent(
+                new CustomEvent('pwa-update-available', { detail: { version: incoming } }),
+            );
+        }
+
+        if (incoming) {
+            window.localStorage.setItem('pwa.version', incoming);
+        }
+    });
 }
+
+Alpine.data('pwaUpdateToast', () => ({
+    open: false,
+    nextVersion: '',
+
+    init() {
+        window.addEventListener('pwa-update-available', (event) => {
+            this.nextVersion = (event && event.detail && event.detail.version) || '';
+            this.open = true;
+        });
+    },
+
+    reload() {
+        // Hard reload bypasses the SW cache for this single request so the
+        // user lands on the fresh HTML that pulls the new bundle hashes.
+        window.location.reload();
+    },
+
+    dismiss() {
+        this.open = false;
+    },
+}));
 
 // PWA install prompt — the deferred event (`beforeinstallprompt`) is the
 // only way Chrome / Edge / Android lets us trigger the native install UI

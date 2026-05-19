@@ -549,6 +549,85 @@
   }
   .pwa-ios-hint-close:hover { background: var(--accent-strong); }
 
+  /* PWA update toast — bottom-right floating card that appears only when
+     the service worker activates a new VERSION different from the one
+     the visitor has been on. Conservative pattern: no auto-reload, the
+     visitor clicks the reload button when they're ready. */
+  .pwa-update-toast {
+    position: fixed;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    right: max(16px, env(safe-area-inset-right));
+    z-index: 998;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: 420px;
+    padding: 12px 14px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--accent);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-lg);
+  }
+  .pwa-update-toast-body {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+  .pwa-update-toast-pulse {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 var(--accent-glow);
+    animation: pwa-update-pulse 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+    flex-shrink: 0;
+  }
+  .pwa-update-toast-text {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--text-regular);
+  }
+  .pwa-update-toast-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .pwa-update-toast-btn {
+    padding: 6px 12px;
+    background: var(--accent);
+    color: var(--text-on-accent);
+    border: 0;
+    border-radius: var(--r-xs);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 150ms var(--ease-out);
+  }
+  .pwa-update-toast-btn:hover { background: var(--accent-strong); }
+  .pwa-update-toast-dismiss {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px;
+    background: transparent;
+    border: 0;
+    border-radius: var(--r-xs);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: color 150ms var(--ease-out);
+  }
+  .pwa-update-toast-dismiss:hover { color: var(--text-regular); }
+
+  @keyframes pwa-update-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+    50%      { box-shadow: 0 0 0 6px transparent; }
+  }
+
   /* Mobile navigation */
   .mobile-nav { position: relative; }
   .mobile-nav-toggle {

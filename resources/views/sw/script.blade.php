@@ -24,16 +24,24 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches
-            .keys()
-            .then((names) =>
-                Promise.all(
-                    names
-                        .filter((name) => name.startsWith('jg-pwa-') && name !== CACHE_NAME)
-                        .map((name) => caches.delete(name)),
-                ),
-            )
-            .then(() => self.clients.claim()),
+        (async () => {
+            const names = await caches.keys();
+            await Promise.all(
+                names
+                    .filter((name) => name.startsWith('jg-pwa-') && name !== CACHE_NAME)
+                    .map((name) => caches.delete(name)),
+            );
+            await self.clients.claim();
+
+            // Tell every controlled page which version just activated. The
+            // client decides whether to surface an update toast — it can't
+            // be decided here because the SW doesn't know if this is the
+            // first install (no old version) or a real upgrade.
+            const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+            for (const client of clients) {
+                client.postMessage({ type: 'pwa-updated', version: VERSION });
+            }
+        })(),
     );
 });
 

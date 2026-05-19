@@ -204,5 +204,10 @@ return [
             'step_3' => 'Confirma con "Añadir". El icono aparece en tu pantalla de inicio.',
             'close' => 'Entendido',
         ],
+        'update' => [
+            'message' => 'Nueva versión disponible.',
+            'reload' => 'Recargar',
+            'dismiss' => 'Descartar',
+        ],
     ],
 ];

@@ -204,5 +204,10 @@ return [
             'step_3' => 'Confirme em "Adicionar". O ícone aparece na sua tela inicial.',
             'close' => 'Entendi',
         ],
+        'update' => [
+            'message' => 'Nova versão disponível.',
+            'reload' => 'Recarregar',
+            'dismiss' => 'Dispensar',
+        ],
     ],
 ];

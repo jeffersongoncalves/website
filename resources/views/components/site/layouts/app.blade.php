@@ -43,6 +43,36 @@
 
     @include('site.partials.footer')
 
+    {{-- PWA update toast — appears only when the service worker activates
+         a new version different from the one the visitor has been running.
+         Hidden on first install since the localStorage seed is empty then. --}}
+    <div x-data="pwaUpdateToast()"
+         x-show="open"
+         x-cloak
+         x-transition.opacity
+         class="pwa-update-toast"
+         role="status"
+         aria-live="polite">
+        <div class="pwa-update-toast-body">
+            <span class="pwa-update-toast-pulse" aria-hidden="true"></span>
+            <p class="pwa-update-toast-text">@lang('site.pwa.update.message')</p>
+        </div>
+        <div class="pwa-update-toast-actions">
+            <button type="button" x-on:click="reload()" class="pwa-update-toast-btn">
+                @lang('site.pwa.update.reload')
+            </button>
+            <button type="button"
+                    x-on:click="dismiss()"
+                    class="pwa-update-toast-dismiss"
+                    :aria-label="@js(__('site.pwa.update.dismiss'))">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
     @stack('scripts')
 </body>
 </html>

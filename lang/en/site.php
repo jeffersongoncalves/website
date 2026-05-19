@@ -204,5 +204,10 @@ return [
             'step_3' => 'Confirm with "Add". The icon shows up on your home screen.',
             'close' => 'Got it',
         ],
+        'update' => [
+            'message' => 'New version available.',
+            'reload' => 'Reload',
+            'dismiss' => 'Dismiss',
+        ],
     ],
 ];

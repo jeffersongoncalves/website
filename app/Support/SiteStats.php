@@ -21,7 +21,7 @@ class SiteStats
      *
      * @return array{
      *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
-     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int,
+     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int,
      *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
      *   followers:int, public_sponsors:int,
@@ -44,7 +44,7 @@ class SiteStats
      *
      * @return array{
      *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
-     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int,
+     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int,
      *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
      *   followers:int, public_sponsors:int,
@@ -66,6 +66,7 @@ class SiteStats
             'saas' => 0,
             'tool' => 0,
             'docker' => 0,
+            'database' => 0,
             'maintained' => 0,
             'daily_drivers' => 0,
             'stars' => 0,
@@ -104,6 +105,7 @@ class SiteStats
             'saas' => (int) (clone $base)->byCategory(ProjectCategory::Saas)->count(),
             'tool' => (int) (clone $base)->byCategory(ProjectCategory::Tool)->count(),
             'docker' => (int) (clone $base)->byCategory(ProjectCategory::Docker)->count(),
+            'database' => (int) (clone $base)->byCategory(ProjectCategory::Database)->count(),
             'maintained' => (int) (clone $base)->maintained()->count(),
             'daily_drivers' => (int) (clone $base)->where('is_daily_driver', true)->count(),
             'stars' => (int) (clone $base)->sum('stars'),
@@ -129,7 +131,7 @@ class SiteStats
      *
      * @return array{
      *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
-     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int,
+     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int,
      *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
      *   followers:int, public_sponsors:int,
@@ -205,7 +207,7 @@ class SiteStats
     /**
      * @return array{
      *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
-     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int,
+     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int,
      *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
      *   followers:int, public_sponsors:int,
@@ -227,6 +229,7 @@ class SiteStats
             'saas' => $stat->saas,
             'tool' => $stat->tool,
             'docker' => $stat->docker,
+            'database' => $stat->database,
             'maintained' => $stat->maintained,
             'daily_drivers' => $stat->daily_drivers,
             'stars' => $stat->stars,
@@ -243,7 +246,7 @@ class SiteStats
     /**
      * @return array{
      *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
-     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int,
+     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int,
      *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
      *   followers:int, public_sponsors:int,
@@ -275,6 +278,7 @@ class SiteStats
             'saas' => (int) (clone $base)->byCategory(ProjectCategory::Saas)->count(),
             'tool' => (int) (clone $base)->byCategory(ProjectCategory::Tool)->count(),
             'docker' => (int) (clone $base)->byCategory(ProjectCategory::Docker)->count(),
+            'database' => (int) (clone $base)->byCategory(ProjectCategory::Database)->count(),
             'maintained' => (int) (clone $base)->maintained()->count(),
             'daily_drivers' => (int) (clone $base)->where('is_daily_driver', true)->count(),
             'stars' => $stars,

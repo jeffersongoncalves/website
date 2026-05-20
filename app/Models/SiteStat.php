@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property int $saas
  * @property int $tool
  * @property int $docker
+ * @property int $database
  * @property int $maintained
  * @property int $daily_drivers
  * @property int $stars
@@ -50,6 +51,7 @@ class SiteStat extends Model
         'saas',
         'tool',
         'docker',
+        'database',
         'maintained',
         'daily_drivers',
         'stars',
@@ -78,6 +80,7 @@ class SiteStat extends Model
             'saas' => 'integer',
             'tool' => 'integer',
             'docker' => 'integer',
+            'database' => 'integer',
             'maintained' => 'integer',
             'daily_drivers' => 'integer',
             'stars' => 'integer',

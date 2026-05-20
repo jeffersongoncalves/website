@@ -478,6 +478,20 @@ class ProjectImporter
             return 'framework';
         }
 
+        // Database engines win over Docker even when they ship a compose
+        // file — a DB tagged `postgresql` + `docker` is primarily a
+        // database. Checked before the docker branch for that reason.
+        $databaseTopics = array_intersect(
+            ['database', 'databases', 'dbms', 'rdbms', 'sql', 'nosql', 'newsql',
+                'postgres', 'postgresql', 'mysql', 'mariadb', 'sqlite', 'redis',
+                'mongodb', 'cassandra', 'clickhouse', 'cockroachdb', 'duckdb',
+                'timescaledb', 'elasticsearch', 'opensearch', 'key-value-store'],
+            $topics,
+        );
+        if ($databaseTopics !== []) {
+            return 'database';
+        }
+
         // Broader docker-topic match — self-hosted projects often tag
         // themselves with `selfhosted` / `self-hosted` / `containers`
         // rather than the bare `docker` topic.

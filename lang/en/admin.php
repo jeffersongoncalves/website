@@ -85,6 +85,7 @@ return [
             'saas' => 'SaaS',
             'tool' => 'Tools',
             'docker' => 'Docker',
+            'database' => 'Databases',
         ],
     ],
 
@@ -171,6 +172,7 @@ return [
             'saas' => 'SaaS',
             'tool' => 'Tool',
             'docker' => 'Docker',
+            'database' => 'Database',
         ],
         'status' => [
             'draft' => 'Draft',

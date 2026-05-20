@@ -128,6 +128,9 @@
                         @if($project->packagist_url)
                             <a href="{{ $project->packagist_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Packagist ↗</a>
                         @endif
+                        @if($project->docker_url)
+                            <a href="{{ $project->docker_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Docker ↗</a>
+                        @endif
                         @if($project->docs_url)
                             <a href="{{ $project->docs_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Docs ↗</a>
                         @endif

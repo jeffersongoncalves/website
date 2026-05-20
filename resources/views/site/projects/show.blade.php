@@ -172,10 +172,12 @@
                                     <small>@lang('site.projects.label_stars')</small>
                                     <strong>★ {{ $project->stars }}</strong>
                                 </div>
-                                <div class="project-detail-stat">
-                                    <small>@lang('site.projects.label_downloads')</small>
-                                    <strong>↓ {{ $project->downloads_label ?: '—' }}</strong>
-                                </div>
+                                @if($project->downloads_label)
+                                    <div class="project-detail-stat">
+                                        <small>@lang('site.projects.label_downloads')</small>
+                                        <strong>↓ {{ $project->downloads_label }}</strong>
+                                    </div>
+                                @endif
                                 <div class="project-detail-stat">
                                     <small>@lang('site.projects.label_license')</small>
                                     <strong>{{ $project->license ?: '—' }}</strong>

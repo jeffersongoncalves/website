@@ -46,7 +46,9 @@
         <div class="card-meta-row">
             @unless($project->is_paid)
                 <span>★ {{ $project->stars }}</span>
-                <span>↓ {{ $project->downloads_label ?: '—' }}</span>
+                @if($project->downloads_label)
+                    <span>↓ {{ $project->downloads_label }}</span>
+                @endif
                 <span>⎘ {{ $project->license }}</span>
                 @if($project->is_maintainer && $project->user_contributions > 0)
                     <span title="@lang('site.projects.label_contributions')">⎇ {{ number_format($project->user_contributions, 0, ',', '.') }}</span>

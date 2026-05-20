@@ -23,7 +23,7 @@ class SiteStats
      *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
      *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int,
      *   maintained:int, daily_drivers:int,
-     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
+     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
@@ -46,7 +46,7 @@ class SiteStats
      *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
      *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int,
      *   maintained:int, daily_drivers:int,
-     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
+     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
@@ -74,6 +74,7 @@ class SiteStats
             'downloads_packagist' => 0,
             'downloads_npm' => 0,
             'downloads_jetbrains' => 0,
+            'downloads_docker' => 0,
             'followers' => 0,
             'public_sponsors' => 0,
             'contributions' => ['cells' => [], 'total' => 0],
@@ -113,6 +114,7 @@ class SiteStats
             'downloads_packagist' => (int) (clone $base)->where('package_type', PackageType::Composer->value)->sum('downloads'),
             'downloads_npm' => (int) (clone $base)->where('package_type', PackageType::Npm->value)->sum('downloads'),
             'downloads_jetbrains' => (int) (clone $base)->where('package_type', PackageType::JetBrains->value)->sum('downloads'),
+            'downloads_docker' => (int) (clone $base)->where('package_type', PackageType::Docker->value)->sum('downloads'),
         ];
 
         $stat = SiteStat::query()->firstOrNew([]);
@@ -133,7 +135,7 @@ class SiteStats
      *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
      *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int,
      *   maintained:int, daily_drivers:int,
-     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
+     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
@@ -209,7 +211,7 @@ class SiteStats
      *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
      *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int,
      *   maintained:int, daily_drivers:int,
-     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
+     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
@@ -237,6 +239,7 @@ class SiteStats
             'downloads_packagist' => $stat->downloads_packagist,
             'downloads_npm' => $stat->downloads_npm,
             'downloads_jetbrains' => $stat->downloads_jetbrains,
+            'downloads_docker' => $stat->downloads_docker,
             'followers' => $stat->followers,
             'public_sponsors' => $stat->public_sponsors,
             'contributions' => $stat->contributions ?? ['cells' => [], 'total' => 0],
@@ -248,7 +251,7 @@ class SiteStats
      *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
      *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int,
      *   maintained:int, daily_drivers:int,
-     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int,
+     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int}
      * }
@@ -262,6 +265,7 @@ class SiteStats
         $downloadsPackagist = (int) (clone $base)->where('package_type', PackageType::Composer->value)->sum('downloads');
         $downloadsNpm = (int) (clone $base)->where('package_type', PackageType::Npm->value)->sum('downloads');
         $downloadsJetbrains = (int) (clone $base)->where('package_type', PackageType::JetBrains->value)->sum('downloads');
+        $downloadsDocker = (int) (clone $base)->where('package_type', PackageType::Docker->value)->sum('downloads');
 
         $github = self::fetchGithubUser(self::GITHUB_LOGIN);
 
@@ -286,6 +290,7 @@ class SiteStats
             'downloads_packagist' => $downloadsPackagist,
             'downloads_npm' => $downloadsNpm,
             'downloads_jetbrains' => $downloadsJetbrains,
+            'downloads_docker' => $downloadsDocker,
             'followers' => $github['followers'] ?? 0,
             'public_sponsors' => self::fetchSponsorCount(self::GITHUB_LOGIN),
             'contributions' => GithubContributions::fetch(self::GITHUB_LOGIN),

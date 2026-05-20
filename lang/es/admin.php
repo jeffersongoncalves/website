@@ -73,6 +73,8 @@ return [
             'npm_desc' => 'paquetes JS',
             'jetbrains' => 'JetBrains',
             'jetbrains_desc' => 'plugins de IDE',
+            'docker' => 'Docker',
+            'docker_desc' => 'pulls de imágenes',
         ],
         'site_categories' => [
             'heading' => 'Por categoría',

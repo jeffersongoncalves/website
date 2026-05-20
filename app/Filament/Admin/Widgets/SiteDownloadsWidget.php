@@ -37,12 +37,16 @@ class SiteDownloadsWidget extends StatsOverviewWidget
             Stat::make(__('admin.widgets.site_downloads.jetbrains'), $this->compact($s['downloads_jetbrains']))
                 ->description('↓ '.__('admin.widgets.site_downloads.jetbrains_desc'))
                 ->color('success'),
+
+            Stat::make(__('admin.widgets.site_downloads.docker'), $this->compact($s['downloads_docker']))
+                ->description('↓ '.__('admin.widgets.site_downloads.docker_desc'))
+                ->color('success'),
         ];
     }
 
     protected function getColumns(): int
     {
-        return 4;
+        return 5;
     }
 
     private function compact(int $n): string

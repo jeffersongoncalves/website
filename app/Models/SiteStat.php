@@ -27,6 +27,7 @@ use Illuminate\Support\Carbon;
  * @property int $downloads_packagist
  * @property int $downloads_npm
  * @property int $downloads_jetbrains
+ * @property int $downloads_docker
  * @property int $followers
  * @property int $public_sponsors
  * @property array{cells: list<int>, total: int}|null $contributions
@@ -59,6 +60,7 @@ class SiteStat extends Model
         'downloads_packagist',
         'downloads_npm',
         'downloads_jetbrains',
+        'downloads_docker',
         'followers',
         'public_sponsors',
         'contributions',
@@ -88,6 +90,7 @@ class SiteStat extends Model
             'downloads_packagist' => 'integer',
             'downloads_npm' => 'integer',
             'downloads_jetbrains' => 'integer',
+            'downloads_docker' => 'integer',
             'followers' => 'integer',
             'public_sponsors' => 'integer',
             'contributions' => 'array',

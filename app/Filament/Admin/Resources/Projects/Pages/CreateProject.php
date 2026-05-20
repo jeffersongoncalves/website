@@ -15,8 +15,7 @@ class CreateProject extends CreateRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->importFromGithubAction(),
-            $this->importFromUrlAction(),
+            $this->importActionGroup(),
         ];
     }
 }

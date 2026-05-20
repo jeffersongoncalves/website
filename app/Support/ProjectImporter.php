@@ -64,6 +64,169 @@ class ProjectImporter
     }
 
     /**
+     * Fetch an npm package from the public registry and map its manifest to
+     * form fields. Mirrors fromGithub's shape: name/description/license come
+     * from the registry document, github_url is recovered from the
+     * `repository` field and docs_url from `homepage`. Cached for an hour per
+     * package. Returns `['error' => '<key>']` on failure.
+     *
+     * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
+     */
+    public static function fromNpm(string $url): array
+    {
+        $package = self::npmNameFromUrl($url);
+
+        if ($package === null) {
+            return ['error' => 'invalid_url'];
+        }
+
+        return Cache::remember(
+            "project_importer:npm:{$package}",
+            now()->addHour(),
+            fn () => self::buildNpmResult($package)
+        );
+    }
+
+    /**
+     * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
+     */
+    private static function buildNpmResult(string $package): array
+    {
+        $data = self::fetchNpmRegistry($package);
+
+        if ($data === null) {
+            return ['error' => 'repo_not_found'];
+        }
+
+        $name = is_string($data['name'] ?? null) ? $data['name'] : $package;
+        $description = self::nullableString($data['description'] ?? null);
+        $homepage = self::nullableString($data['homepage'] ?? null);
+        $githubUrl = self::githubUrlFromRepository($data['repository'] ?? null);
+        $license = self::npmLicense($data['license'] ?? null);
+
+        // Drop docs_url when homepage just points back at the GitHub repo —
+        // github_url already covers that, no need to duplicate the link.
+        $docsUrl = $homepage;
+        if ($docsUrl !== null && $githubUrl !== null && rtrim($docsUrl, '/') === rtrim($githubUrl, '/')) {
+            $docsUrl = null;
+        }
+
+        $fields = [
+            'github_url' => $githubUrl,
+            // Strip the `@scope/` punctuation before slugging — Str::slug would
+            // otherwise transliterate `@` to "at" (@scope/name → at-scopename).
+            'slug' => Str::slug(str_replace(['@', '/'], ['', '-'], $name)),
+            'name' => self::prettifyName(self::unscopedNpmName($name)),
+            'repo' => null,
+            'license' => $license,
+            'readme_branch' => null,
+            'docs_url' => $docsUrl,
+            'title.en' => $description,
+            'title.pt' => $description,
+            'title.es' => $description,
+            'category' => 'tool',
+            'package_type' => 'npm',
+            'packagist_url' => null,
+            'npm_url' => 'https://www.npmjs.com/package/'.$name,
+            'stack' => [],
+            'versions' => [],
+        ];
+
+        $warnings = [];
+
+        if ($description === null) {
+            $warnings[] = 'no_description';
+        }
+
+        return ['fields' => $fields, 'warnings' => $warnings];
+    }
+
+    /**
+     * Extract the package identifier (`name` or `@scope/name`) from an
+     * npmjs.com/package URL. Returns null for anything else.
+     */
+    private static function npmNameFromUrl(string $url): ?string
+    {
+        if (! preg_match('~npmjs\.com/package/(@[^/?#]+/[^/?#]+|[^/?#]+)~i', trim($url), $m)) {
+            return null;
+        }
+
+        return rtrim($m[1], '/');
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private static function fetchNpmRegistry(string $package): ?array
+    {
+        try {
+            $response = Http::timeout(8)
+                ->withHeaders([
+                    'User-Agent' => 'jeffersongoncalves-site',
+                    'Accept' => 'application/json',
+                ])
+                ->get('https://registry.npmjs.org/'.$package);
+        } catch (Throwable) {
+            return null;
+        }
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        $data = $response->json();
+
+        return is_array($data) ? $data : null;
+    }
+
+    /**
+     * Recover a clean https GitHub URL from an npm `repository` field, which
+     * can be a string or `{type, url}` and is usually a git remote like
+     * `git+https://github.com/owner/repo.git`. Returns null when the remote
+     * isn't a GitHub one.
+     */
+    private static function githubUrlFromRepository(mixed $repository): ?string
+    {
+        if (is_string($repository)) {
+            $raw = $repository;
+        } elseif (is_array($repository) && is_string($repository['url'] ?? null)) {
+            $raw = $repository['url'];
+        } else {
+            return null;
+        }
+
+        if (! preg_match('~github\.com[/:]([^/]+/[^/?#]+?)(?:\.git)?(?:[/?#]|$)~i', $raw, $m)) {
+            return null;
+        }
+
+        return 'https://github.com/'.$m[1];
+    }
+
+    /**
+     * Normalise the npm `license` field, which is a SPDX string on modern
+     * packages but a legacy `{type, url}` object on older ones.
+     */
+    private static function npmLicense(mixed $license): ?string
+    {
+        if (is_string($license)) {
+            return self::nullableString($license);
+        }
+
+        if (is_array($license) && is_string($license['type'] ?? null)) {
+            return self::nullableString($license['type']);
+        }
+
+        return null;
+    }
+
+    private static function unscopedNpmName(string $name): string
+    {
+        $parts = explode('/', $name);
+
+        return end($parts) ?: $name;
+    }
+
+    /**
      * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
      */
     private static function buildUrlResult(string $url, string $host): array

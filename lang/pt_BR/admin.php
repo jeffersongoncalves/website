@@ -29,6 +29,9 @@ return [
         'import_from_github_help' => 'Cola a URL do repositório. Só preenche os campos que ainda estão vazios.',
         'import_from_url' => 'Importar de uma URL',
         'import_from_url_help' => 'Para projetos sem repo público. Lê <title> e meta tags da página.',
+        'import_from_npm' => 'Importar do npm',
+        'import_from_npm_help' => 'Cola a URL do pacote npm. Só preenche os campos que ainda estão vazios.',
+        'import_group' => 'Importação',
         'import' => 'Importar',
     ],
 

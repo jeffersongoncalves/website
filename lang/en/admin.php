@@ -29,6 +29,9 @@ return [
         'import_from_github_help' => 'Paste the repository URL. Only fills empty fields.',
         'import_from_url' => 'Import from a URL',
         'import_from_url_help' => 'For projects without a public repo. Reads the page <title> and meta tags.',
+        'import_from_npm' => 'Import from npm',
+        'import_from_npm_help' => 'Paste the npm package URL. Only fills empty fields.',
+        'import_group' => 'Import',
         'import' => 'Import',
     ],
 

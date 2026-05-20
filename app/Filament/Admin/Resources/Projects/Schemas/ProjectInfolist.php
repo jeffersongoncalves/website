@@ -77,6 +77,7 @@ class ProjectInfolist
                                 TextEntry::make('github_url')->label(__('admin.fields.github_url'))->url(fn ($state) => $state)->hidden(fn ($state) => blank($state)),
                                 TextEntry::make('packagist_url')->label(__('admin.fields.packagist_url'))->url(fn ($state) => $state)->hidden(fn ($state) => blank($state)),
                                 TextEntry::make('npm_url')->label(__('admin.fields.npm_url'))->url(fn ($state) => $state)->hidden(fn ($state) => blank($state)),
+                                TextEntry::make('docker_url')->label(__('admin.fields.docker_url'))->url(fn ($state) => $state)->hidden(fn ($state) => blank($state)),
                                 TextEntry::make('docs_url')->label(__('admin.fields.docs_url'))->url(fn ($state) => $state)->hidden(fn ($state) => blank($state)),
                                 TextEntry::make('demo_url')->label(__('admin.fields.demo_url'))->url(fn ($state) => $state)->hidden(fn ($state) => blank($state)),
                             ]),

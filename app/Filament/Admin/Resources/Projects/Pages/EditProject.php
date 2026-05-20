@@ -17,8 +17,7 @@ class EditProject extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->importFromGithubAction(),
-            $this->importFromUrlAction(),
+            $this->importActionGroup(),
             ViewAction::make(),
             DeleteAction::make(),
         ];

@@ -4,11 +4,29 @@ namespace App\Filament\Admin\Resources\Projects\Concerns;
 
 use App\Support\ProjectImporter;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 
 trait HasImportFromGithubAction
 {
+    /**
+     * All import flows grouped under a single "Importação" dropdown — one
+     * entry per source type (GitHub, npm, generic URL).
+     */
+    protected function importActionGroup(): ActionGroup
+    {
+        return ActionGroup::make([
+            $this->importFromGithubAction(),
+            $this->importFromNpmAction(),
+            $this->importFromUrlAction(),
+        ])
+            ->label(__('admin.actions.import_group'))
+            ->icon('heroicon-o-arrow-down-tray')
+            ->color('warning')
+            ->button();
+    }
+
     protected function importFromGithubAction(): Action
     {
         return Action::make('importFromGithub')
@@ -27,6 +45,28 @@ trait HasImportFromGithubAction
             ])
             ->action(function (array $data): void {
                 $result = ProjectImporter::fromGithub($data['github_url']);
+                $this->applyImporterResult($result);
+            });
+    }
+
+    protected function importFromNpmAction(): Action
+    {
+        return Action::make('importFromNpm')
+            ->label(__('admin.actions.import_from_npm'))
+            ->icon('heroicon-o-cube')
+            ->color('danger')
+            ->modalHeading(__('admin.actions.import_from_npm'))
+            ->modalDescription(__('admin.actions.import_from_npm_help'))
+            ->modalSubmitActionLabel(__('admin.actions.import'))
+            ->schema([
+                TextInput::make('npm_url')
+                    ->label(__('admin.fields.npm_url'))
+                    ->placeholder('https://www.npmjs.com/package/@scope/name')
+                    ->url()
+                    ->required(),
+            ])
+            ->action(function (array $data): void {
+                $result = ProjectImporter::fromNpm($data['npm_url']);
                 $this->applyImporterResult($result);
             });
     }

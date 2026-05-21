@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "22b32f35fcf3c37759c00044641f091d",
+    "content-hash": "49587b8b9a8588ec69e793a1736d5c41",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2448,6 +2448,84 @@
                 "source": "https://github.com/kirschbaum-development/eloquent-power-joins/tree/4.3.1"
             },
             "time": "2026-03-29T12:05:03+00:00"
+        },
+        {
+            "name": "kronn/observability",
+            "version": "v0.6.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wallacemartinss/observability.git",
+                "reference": "3103a2805a08c6d8a1f19fdd2dbad52214ee5ec7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wallacemartinss/observability/zipball/3103a2805a08c6d8a1f19fdd2dbad52214ee5ec7",
+                "reference": "3103a2805a08c6d8a1f19fdd2dbad52214ee5ec7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-zlib": "*",
+                "laravel/framework": "^10.0|^11.0|^12.0|^13.0",
+                "monolog/monolog": "^3.0",
+                "php": "^8.2",
+                "psr/log": "^1.0|^2.0|^3.0",
+                "ramsey/uuid": "^4.0"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^7.0",
+                "guzzlehttp/promises": "^2.0",
+                "mockery/mockery": "^1.6",
+                "orchestra/testbench": "^8.0|^9.0|^10.0",
+                "phpunit/phpunit": "^10.0|^11.0|^12.0"
+            },
+            "suggest": {
+                "ext-curl": "Enables the cURL-based HTTP transport. Without it the SDK falls back to the PHP HTTP stream wrapper, which requires allow_url_fopen."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Telemetry": "Kronn\\Observability\\Facades\\Telemetry"
+                    },
+                    "providers": [
+                        "Kronn\\Observability\\ObservabilityServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Support/helpers.php"
+                ],
+                "psr-4": {
+                    "Kronn\\Observability\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kronn",
+                    "homepage": "https://kronn.io"
+                }
+            ],
+            "description": "Telemetria e APM da plataforma Kronn para aplicações Laravel.",
+            "homepage": "https://kronn.io",
+            "keywords": [
+                "apm",
+                "kronn",
+                "laravel",
+                "monitoring",
+                "observability",
+                "telemetry"
+            ],
+            "support": {
+                "issues": "https://github.com/kronn-io/observability/issues",
+                "source": "https://github.com/kronn-io/observability"
+            },
+            "time": "2026-05-21T15:24:50+00:00"
         },
         {
             "name": "laravel/framework",

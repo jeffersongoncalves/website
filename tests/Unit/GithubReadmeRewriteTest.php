@@ -176,3 +176,34 @@ it('falls back to HEAD branch when no ref is supplied for relative link rewritin
 
     expect($out)->toContain('href="https://github.com/owner/myrepo/blob/HEAD/LICENSE"');
 });
+
+it('rewrites relative markdown image sources into absolute raw URLs', function () {
+    $md = '![logo](./asset/logo.png) and ![banner](images/banner.svg)';
+
+    $out = GithubReadme::rewriteRelativeAssets($md, 'owner/myrepo', '2.x');
+
+    expect($out)
+        ->toContain('![logo](https://raw.githubusercontent.com/owner/myrepo/2.x/asset/logo.png)')
+        ->toContain('![banner](https://raw.githubusercontent.com/owner/myrepo/2.x/images/banner.svg)');
+});
+
+it('rewrites relative <img src> in raw HTML and strips ?raw=true', function () {
+    $md = '<a href="https://echarts.apache.org/"><img style="vertical-align: top;" '
+        .'src="./asset/logo.png?raw=true" alt="logo" height="50px"></a>';
+
+    $out = GithubReadme::rewriteRelativeAssets($md, 'owner/myrepo', 'main');
+
+    expect($out)
+        ->toContain('src="https://raw.githubusercontent.com/owner/myrepo/main/asset/logo.png"')
+        ->not->toContain('raw=true');
+});
+
+it('leaves absolute, data and root-relative asset sources alone', function () {
+    $md = '![a](https://cdn.example.com/x.png) '
+        .'<img src="/abs/logo.png"> '
+        .'<img src="data:image/png;base64,AAAA">';
+
+    $out = GithubReadme::rewriteRelativeAssets($md, 'owner/myrepo', 'main');
+
+    expect($out)->toBe($md);
+});

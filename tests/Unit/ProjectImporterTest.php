@@ -191,6 +191,22 @@ it('imports from a generic URL using <head> meta tags', function (): void {
     expect($fields['title.pt'])->toBe('The issue tracker built for high-performance teams.');
 });
 
+it('keeps the scope in the display name for a scoped npm package', function (): void {
+    Http::fake([
+        'registry.npmjs.org/@tailwindcss/vite' => Http::response([
+            'name' => '@tailwindcss/vite',
+            'description' => 'A Vite plugin for Tailwind CSS.',
+        ], 200),
+    ]);
+
+    $result = ProjectImporter::fromNpm('https://www.npmjs.com/package/@tailwindcss/vite');
+
+    $fields = $result['fields'];
+    expect($fields['name'])->toBe('Tailwindcss Vite');
+    expect($fields['slug'])->toBe('tailwindcss-vite');
+    expect($fields['npm_url'])->toBe('https://www.npmjs.com/package/@tailwindcss/vite');
+});
+
 it('returns invalid_url for non-http schemes', function (): void {
     $result = ProjectImporter::fromUrl('ftp://example.com');
 

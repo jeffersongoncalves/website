@@ -116,7 +116,7 @@ class ProjectImporter
             // Strip the `@scope/` punctuation before slugging — Str::slug would
             // otherwise transliterate `@` to "at" (@scope/name → at-scopename).
             'slug' => Str::slug(str_replace(['@', '/'], ['', '-'], $name)),
-            'name' => self::prettifyName(self::unscopedNpmName($name)),
+            'name' => self::prettifyNpmName($name),
             'repo' => null,
             'license' => $license,
             'readme_branch' => null,
@@ -219,11 +219,18 @@ class ProjectImporter
         return null;
     }
 
-    private static function unscopedNpmName(string $name): string
+    /**
+     * Prettify an npm package name for display. Scoped packages keep their
+     * scope so a generic unscoped name stays meaningful: `@tailwindcss/vite`
+     * → "Tailwindcss Vite" rather than a bare "Vite".
+     */
+    private static function prettifyNpmName(string $name): string
     {
-        $parts = explode('/', $name);
+        if (str_starts_with($name, '@') && str_contains($name, '/')) {
+            return self::prettifyName(str_replace('/', '-', ltrim($name, '@')));
+        }
 
-        return end($parts) ?: $name;
+        return self::prettifyName($name);
     }
 
     /**

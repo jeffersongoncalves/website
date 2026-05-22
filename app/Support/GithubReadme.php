@@ -339,24 +339,37 @@ class GithubReadme
         ) ?? $html;
     }
 
-    private static function rewriteRelativeAssets(string $markdown, string $repo, ?string $ref = null): string
+    public static function rewriteRelativeAssets(string $markdown, string $repo, ?string $ref = null): string
     {
         $branch = $ref ?: 'HEAD';
         $base = "https://raw.githubusercontent.com/{$repo}/{$branch}/";
 
-        return preg_replace_callback(
+        $rewrite = static function (string $src) use ($base): string {
+            $src = trim($src);
+
+            if (preg_match('#^(https?://|data:|/)#i', $src)) {
+                return $src;
+            }
+
+            // Drop the GitHub `?raw=true` hint — raw.githubusercontent serves raw bytes already.
+            $clean = preg_replace('/[?&]raw=true\b/i', '', $src) ?? $src;
+
+            return $base.ltrim($clean, './');
+        };
+
+        // Markdown image syntax: ![alt](src)
+        $markdown = preg_replace_callback(
             '~(!\[[^\]]*\]\()([^)]+)(\))~',
-            function ($m) use ($base) {
-                $src = trim($m[2]);
-
-                if (preg_match('#^(https?://|data:|/)#i', $src)) {
-                    return $m[0];
-                }
-
-                return $m[1].$base.ltrim($src, './').$m[3];
-            },
+            fn ($m) => $m[1].$rewrite($m[2]).$m[3],
             $markdown
-        );
+        ) ?? $markdown;
+
+        // Raw HTML images: <img ... src="src" ...> — common in README logo/banner blocks.
+        return preg_replace_callback(
+            '~(<img\b[^>]*?\ssrc=")([^"]+)(")~i',
+            fn ($m) => $m[1].$rewrite($m[2]).$m[3],
+            $markdown
+        ) ?? $markdown;
     }
 
     private static function renderMarkdown(string $markdown): string

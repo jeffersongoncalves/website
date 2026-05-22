@@ -4,11 +4,26 @@ namespace App\Support;
 
 use App\Enums\PackageType;
 use App\Models\Project;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class ProjectMetrics
 {
+    /**
+     * Shared HTTP client for outbound metrics calls: 3 attempts with a 200ms
+     * backoff, retrying only on connection-level failures (timeouts/DNS),
+     * plus an explicit connect-vs-total timeout split. 4xx/5xx responses are
+     * not retried — callers never call ->throw(), so no RequestException is
+     * raised and each caller inspects $response->successful() itself. A final
+     * exhausted connection failure throws ConnectionException, which the
+     * dispatching job already catches.
+     */
+    private static function http(): PendingRequest
+    {
+        return Http::retry(3, 200)->connectTimeout(4)->timeout(8);
+    }
+
     public static function sync(Project $project): bool
     {
         $changed = false;
@@ -167,7 +182,7 @@ class ProjectMetrics
         $page = 1;
 
         do {
-            $response = Http::timeout(8)
+            $response = self::http()
                 ->withHeaders($headers)
                 ->get("https://api.github.com/repos/{$repo}/branches", [
                     'per_page' => 100,
@@ -207,7 +222,7 @@ class ProjectMetrics
             $headers['Authorization'] = "Bearer {$token}";
         }
 
-        $response = Http::timeout(8)
+        $response = self::http()
             ->withHeaders($headers)
             ->get("https://api.github.com/repos/{$repo}");
 
@@ -243,7 +258,7 @@ class ProjectMetrics
         $page = 1;
 
         do {
-            $response = Http::timeout(8)
+            $response = self::http()
                 ->withHeaders($headers)
                 ->get("https://api.github.com/repos/{$repo}/contributors", [
                     'per_page' => 100,
@@ -289,7 +304,7 @@ class ProjectMetrics
             $headers['Authorization'] = "Bearer {$token}";
         }
 
-        $response = Http::timeout(8)
+        $response = self::http()
             ->withHeaders($headers)
             ->get("https://api.github.com/repos/{$repo}");
 
@@ -337,7 +352,7 @@ class ProjectMetrics
             return null;
         }
 
-        $response = Http::timeout(8)
+        $response = self::http()
             ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
             ->get("https://hub.docker.com/v2/repositories/{$repo}/");
 
@@ -383,7 +398,7 @@ class ProjectMetrics
             return null;
         }
 
-        $response = Http::timeout(8)
+        $response = self::http()
             ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
             ->get("https://api.npmjs.org/downloads/point/last-month/{$package}");
 
@@ -434,7 +449,7 @@ class ProjectMetrics
 
         $headers = ['User-Agent' => 'jeffersongoncalves-site'];
 
-        $response = Http::timeout(8)
+        $response = self::http()
             ->withHeaders($headers)
             ->get("https://raw.githubusercontent.com/{$repo}/{$branch}/composer.json");
 
@@ -471,7 +486,7 @@ class ProjectMetrics
 
         $branch = self::fetchDefaultBranch($project->github_url) ?? 'main';
 
-        $response = Http::timeout(8)
+        $response = self::http()
             ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
             ->get("https://raw.githubusercontent.com/{$repo}/{$branch}/package.json");
 
@@ -503,7 +518,7 @@ class ProjectMetrics
             return null;
         }
 
-        $response = Http::timeout(8)
+        $response = self::http()
             ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
             ->get("https://packagist.org/packages/{$package}.json");
 
@@ -538,7 +553,7 @@ class ProjectMetrics
             return null;
         }
 
-        $response = Http::timeout(8)
+        $response = self::http()
             ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
             ->get("https://plugins.jetbrains.com/api/plugins/{$id}");
 

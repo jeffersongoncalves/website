@@ -18,6 +18,40 @@
             <a href="{{ route('projects.index') }}" class="nav-link">@lang('site.nav.projects')</a>
             <a href="{{ route('open-source') }}" class="nav-link">@lang('site.nav.open_source')</a>
             <a href="{{ route('sponsors') }}" class="nav-link">@lang('site.nav.sponsors')</a>
+            {{-- Demos: live demo subdomains, one per starter kit. Dropdown
+                 reuses `lang-dropdown-menu` styling (same anchored panel
+                 pattern as the locale switcher) so no new CSS is required. --}}
+            <div class="lang-dropdown" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
+                <button type="button"
+                        class="nav-link inline-flex items-center gap-1"
+                        @click="open = !open"
+                        :aria-expanded="open.toString()"
+                        aria-haspopup="true">
+                    <span>@lang('site.nav.demos')</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" :class="{ 'rotate-180': open }" style="transition:transform 200ms var(--ease-out);"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <ul class="lang-dropdown-menu"
+                    role="menu"
+                    x-show="open"
+                    x-transition:enter="transition ease-out duration-150"
+                    x-transition:enter-start="opacity-0 -translate-y-1"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-100"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    x-cloak>
+                    @foreach(config('site.demos', []) as $demo)
+                        <li role="none">
+                            <a href="{{ $demo['url'] }}"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="lang-dropdown-item">
+                                <span>{{ $demo['label'] }}</span>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
         </nav>
 
         <div class="flex items-center gap-2">
@@ -181,6 +215,16 @@
                     <a href="{{ route('projects.index') }}" class="mobile-nav-link">@lang('site.nav.projects')</a>
                     <a href="{{ route('open-source') }}" class="mobile-nav-link">@lang('site.nav.open_source')</a>
                     <a href="{{ route('sponsors') }}" class="mobile-nav-link">@lang('site.nav.sponsors')</a>
+                    {{-- Demos rendered inline (not a nested disclosure) — mobile
+                         already collapses the nav, so a second level of
+                         expand/collapse adds taps for no real gain. --}}
+                    <div class="mobile-nav-link" aria-hidden="true">@lang('site.nav.demos')</div>
+                    @foreach(config('site.demos', []) as $demo)
+                        <a href="{{ $demo['url'] }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="mobile-nav-link pl-6">{{ $demo['label'] }}</a>
+                    @endforeach
                 </nav>
             </div>
         </div>

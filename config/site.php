@@ -12,6 +12,20 @@ return [
 
     // home_stats and os_stats are now computed dynamically by App\Support\SiteStats.
 
+    // Live demo subdomains of the main site. Each entry is a Laravel/Filament
+    // starter kit running its own instance at <slug>.jeffersongoncalves.dev.br
+    // so visitors can poke a real install before adopting the kit. Rendered
+    // by site header's Demos dropdown.
+    'demos' => [
+        ['label' => 'TeamKit', 'url' => 'https://teamkit.jeffersongoncalves.dev.br'],
+        ['label' => 'ServiceDeskKit', 'url' => 'https://servicedeskkit.jeffersongoncalves.dev.br'],
+        ['label' => 'HelpDeskKit', 'url' => 'https://helpdeskkit.jeffersongoncalves.dev.br'],
+        ['label' => 'FilaKit', 'url' => 'https://filakit.jeffersongoncalves.dev.br'],
+        ['label' => 'EvolutionKit', 'url' => 'https://evolutionkit.jeffersongoncalves.dev.br'],
+        ['label' => 'FilaFluxKit', 'url' => 'https://filafluxkit.jeffersongoncalves.dev.br'],
+        ['label' => 'MfaKit', 'url' => 'https://mfakit.jeffersongoncalves.dev.br'],
+    ],
+
     'stack' => [
         ['label' => 'Laravel'],
         ['label' => 'Filament'],

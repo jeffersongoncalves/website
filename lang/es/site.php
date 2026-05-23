@@ -32,6 +32,7 @@ return [
         'projects' => 'Proyectos',
         'open_source' => 'Open Source',
         'sponsors' => 'Sponsors',
+        'demos' => 'Demos',
     ],
 
     'common' => [

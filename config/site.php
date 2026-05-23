@@ -17,6 +17,7 @@ return [
     // so visitors can poke a real install before adopting the kit. Rendered
     // by site header's Demos dropdown.
     'demos' => [
+        ['label' => 'Plugins Showcase', 'url' => 'https://demo.jeffersongoncalves.dev.br'],
         ['label' => 'TeamKit', 'url' => 'https://teamkit.jeffersongoncalves.dev.br'],
         ['label' => 'ServiceDeskKit', 'url' => 'https://servicedeskkit.jeffersongoncalves.dev.br'],
         ['label' => 'HelpDeskKit', 'url' => 'https://helpdeskkit.jeffersongoncalves.dev.br'],

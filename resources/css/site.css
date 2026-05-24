@@ -717,7 +717,12 @@
      grid regardless of description length, badge count, or stack tags. The
      `mt: auto` overrides the static spacer above; the padding-top keeps a
      consistent gap from the last content row to the border. */
-  .project-card .card-foot { margin-top: auto; padding-top: var(--s-5); }
+  .project-card .card-foot { margin-top: auto; padding-top: var(--s-6); }
+  /* When the card already fills the row, `mt: auto` collapses to 0 and the
+     content above sits flush against the separator. Give whichever element
+     immediately precedes the foot (description or stack tags) a minimum
+     bottom margin so the text never touches the border-top. */
+  .project-card > :nth-last-child(2) { margin-bottom: var(--s-5); }
 
   /* Stat card */
   .stat-card { position: relative; }

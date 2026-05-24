@@ -13,7 +13,16 @@
         \App\Enums\ProjectCategory::YoutubeChannel,
     ], true);
     $externalUrl = $isExternalSite ? ($project->docs_url ?: $project->demo_url ?: $project->github_url) : null;
-    $externalHost = $externalUrl ? (parse_url($externalUrl, PHP_URL_HOST) ?: $externalUrl) : null;
+    // YouTube channels label with the handle (`@channel`) — the host is
+    // identical across every channel and adds zero signal. Other external
+    // sites show the hostname.
+    if ($externalUrl
+        && $project->category === \App\Enums\ProjectCategory::YoutubeChannel
+        && preg_match('~youtube\.com/(@?[^/?#]+)~i', $externalUrl, $extMatch)) {
+        $externalHost = $extMatch[1];
+    } else {
+        $externalHost = $externalUrl ? (parse_url($externalUrl, PHP_URL_HOST) ?: $externalUrl) : null;
+    }
 @endphp
 
 <x-site.layouts.app :title="$project->name" :breadcrumbs="$breadcrumbs" :seoData="$project">

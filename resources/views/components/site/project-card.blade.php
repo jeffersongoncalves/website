@@ -50,8 +50,18 @@
         <div class="card-meta-row">
             @if($isExternalSite)
                 @if($project->docs_url)
-                    @php($extHost = parse_url($project->docs_url, PHP_URL_HOST))
-                    <span class="mono-meta-sm">↗ {{ $extHost ?: $project->docs_url }}</span>
+                    @php
+                        // YouTube channels read better with the handle (the
+                        // distinguishing tail) than the shared youtube.com
+                        // host; other external sites use the hostname.
+                        if ($project->category === \App\Enums\ProjectCategory::YoutubeChannel
+                            && preg_match('~youtube\.com/(@?[^/?#]+)~i', (string) $project->docs_url, $m)) {
+                            $extLabel = $m[1];
+                        } else {
+                            $extLabel = parse_url($project->docs_url, PHP_URL_HOST) ?: $project->docs_url;
+                        }
+                    @endphp
+                    <span class="mono-meta-sm">↗ {{ $extLabel }}</span>
                 @endif
             @elseif(! $project->is_paid)
                 <span>★ {{ $project->stars }}</span>

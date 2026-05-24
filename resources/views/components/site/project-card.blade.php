@@ -3,6 +3,7 @@
 @php
     $locale = \App\Support\LocaleSupport::short();
     $title = $project->getTranslation('title', $locale, false) ?: $project->getTranslation('title', 'pt', false);
+    $isExternalSite = $project->category === \App\Enums\ProjectCategory::Website;
 @endphp
 
 <article class="card project-card">
@@ -44,7 +45,12 @@
 
     <div class="card-foot">
         <div class="card-meta-row">
-            @unless($project->is_paid)
+            @if($isExternalSite)
+                @if($project->docs_url)
+                    @php($extHost = parse_url($project->docs_url, PHP_URL_HOST))
+                    <span class="mono-meta-sm">↗ {{ $extHost ?: $project->docs_url }}</span>
+                @endif
+            @elseif(! $project->is_paid)
                 <span>★ {{ $project->stars }}</span>
                 @if($project->downloads_label)
                     <span>↓ {{ $project->downloads_label }}</span>
@@ -53,7 +59,7 @@
                 @if($project->is_maintainer && $project->user_contributions > 0)
                     <span title="@lang('site.projects.label_contributions')">⎇ {{ number_format($project->user_contributions, 0, ',', '.') }}</span>
                 @endif
-            @endunless
+            @endif
         </div>
         <div class="flex items-center gap-3 text-ink-400">
             @if($project->github_url)

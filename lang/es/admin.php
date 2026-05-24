@@ -100,6 +100,7 @@ return [
             'tool' => 'Herramientas',
             'docker' => 'Docker',
             'database' => 'Bases de datos',
+            'website' => 'Sitios externos',
         ],
     ],
 
@@ -189,6 +190,7 @@ return [
             'tool' => 'Herramienta',
             'docker' => 'Docker',
             'database' => 'Base de datos',
+            'website' => 'Sitio externo',
         ],
         'status' => [
             'draft' => 'Borrador',

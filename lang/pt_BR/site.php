@@ -130,6 +130,8 @@ return [
         'readme_unavailable' => 'README indisponível no momento. Veja direto no GitHub:',
         'readme_unavailable_no_source' => 'README indisponível — projeto sem código-fonte público.',
         'readme_paid' => 'Pacote comercial sem repositório público. Consulte a documentação oficial:',
+        'external_site_blurb' => 'Este projeto é um site externo. Conteúdo, manutenção e atualizações ficam no domínio de origem.',
+        'external_site_visit' => 'Abrir site',
         'version_label' => 'Versão:',
         'on_this_page' => 'Nesta página',
         'no_headings' => 'Sem títulos no README',

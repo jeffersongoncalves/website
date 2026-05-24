@@ -100,6 +100,7 @@ return [
             'tool' => 'Tools',
             'docker' => 'Docker',
             'database' => 'Databases',
+            'website' => 'External sites',
         ],
     ],
 
@@ -189,6 +190,7 @@ return [
             'tool' => 'Tool',
             'docker' => 'Docker',
             'database' => 'Database',
+            'website' => 'External site',
         ],
         'status' => [
             'draft' => 'Draft',

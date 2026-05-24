@@ -129,6 +129,8 @@ return [
         'filter_apply' => 'Filtrar',
         'readme_unavailable' => 'README no disponible por el momento. Vea directamente en GitHub:',
         'readme_unavailable_no_source' => 'README no disponible — proyecto sin código fuente público.',
+        'external_site_blurb' => 'Este proyecto es un sitio externo. Contenido, mantenimiento y actualizaciones quedan en el dominio de origen.',
+        'external_site_visit' => 'Abrir sitio',
         'readme_paid' => 'Paquete comercial sin repositorio público. Consulta la documentación oficial:',
         'version_label' => 'Versión:',
         'on_this_page' => 'En esta página',

@@ -129,6 +129,8 @@ return [
         'filter_apply' => 'Filter',
         'readme_unavailable' => 'README is currently unavailable. View it directly on GitHub:',
         'readme_unavailable_no_source' => 'README unavailable — project has no public source code.',
+        'external_site_blurb' => 'This project is an external website. Content, maintenance and updates live on the source domain.',
+        'external_site_visit' => 'Open site',
         'readme_paid' => 'Commercial package without a public repository. See the official docs:',
         'version_label' => 'Version:',
         'on_this_page' => 'On this page',

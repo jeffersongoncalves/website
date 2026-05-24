@@ -181,16 +181,23 @@ class ProjectImporter
 
     /**
      * Recover a clean https GitHub URL from an npm `repository` field, which
-     * can be a string or `{type, url}` and is usually a git remote like
-     * `git+https://github.com/owner/repo.git`. Returns null when the remote
-     * isn't a GitHub one.
+     * can be a string or `{type, url, directory}` and is usually a git remote
+     * like `git+https://github.com/owner/repo.git`. When the manifest declares
+     * a monorepo `directory` (e.g. `packages/@tailwindcss-vite` for
+     * `tailwindlabs/tailwindcss`), append `/tree/{default_branch}/{directory}`
+     * so the link points at the package folder, not the monorepo root.
+     * Returns null when the remote isn't a GitHub one.
      */
     private static function githubUrlFromRepository(mixed $repository): ?string
     {
         if (is_string($repository)) {
             $raw = $repository;
+            $directory = null;
         } elseif (is_array($repository) && is_string($repository['url'] ?? null)) {
             $raw = $repository['url'];
+            $directory = is_string($repository['directory'] ?? null)
+                ? trim($repository['directory'], '/')
+                : null;
         } else {
             return null;
         }
@@ -199,7 +206,18 @@ class ProjectImporter
             return null;
         }
 
-        return 'https://github.com/'.$m[1];
+        $base = 'https://github.com/'.$m[1];
+
+        if ($directory === null || $directory === '') {
+            return $base;
+        }
+
+        $repoData = self::fetchRepo($m[1]);
+        $branch = is_string($repoData['default_branch'] ?? null) && $repoData['default_branch'] !== ''
+            ? $repoData['default_branch']
+            : 'main';
+
+        return $base.'/tree/'.$branch.'/'.$directory;
     }
 
     /**

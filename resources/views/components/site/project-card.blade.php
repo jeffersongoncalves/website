@@ -3,7 +3,10 @@
 @php
     $locale = \App\Support\LocaleSupport::short();
     $title = $project->getTranslation('title', $locale, false) ?: $project->getTranslation('title', 'pt', false);
-    $isExternalSite = $project->category === \App\Enums\ProjectCategory::Website;
+    $isExternalSite = in_array($project->category, [
+        \App\Enums\ProjectCategory::Website,
+        \App\Enums\ProjectCategory::YoutubeChannel,
+    ], true);
 @endphp
 
 <article class="card project-card">

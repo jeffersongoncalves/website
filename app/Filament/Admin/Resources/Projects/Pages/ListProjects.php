@@ -46,6 +46,7 @@ class ListProjects extends ListRecords
                     ->options([
                         'github' => 'GitHub',
                         'npm' => 'npm',
+                        'youtube' => 'YouTube',
                         'url' => 'URL',
                     ])
                     ->default('github')
@@ -68,6 +69,7 @@ class ListProjects extends ListRecords
                 $result = match ($data['source']) {
                     'github' => ProjectImporter::fromGithub($data['url']),
                     'npm' => ProjectImporter::fromNpm($data['url']),
+                    'youtube' => ProjectImporter::fromYoutube($data['url']),
                     default => ProjectImporter::fromUrl($data['url']),
                 };
 

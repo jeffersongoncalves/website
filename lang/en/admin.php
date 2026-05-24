@@ -31,6 +31,8 @@ return [
         'import_from_url_help' => 'For projects without a public repo. Reads the page <title> and meta tags.',
         'import_from_npm' => 'Import from npm',
         'import_from_npm_help' => 'Paste the npm package URL. Only fills empty fields.',
+        'import_from_youtube' => 'Import from YouTube',
+        'import_from_youtube_help' => 'Paste the channel URL (handle, /channel/, /c/ or /user/). Reads title and description from Open Graph tags.',
         'import_group' => 'Import',
         'import' => 'Import',
         'quick_create' => 'Quick create',
@@ -101,6 +103,7 @@ return [
             'docker' => 'Docker',
             'database' => 'Databases',
             'website' => 'External sites',
+            'youtube_channel' => 'YouTube channels',
         ],
     ],
 
@@ -142,6 +145,7 @@ return [
         'downloads_label' => 'Downloads label',
         'license' => 'License',
         'github_url' => 'GitHub URL',
+        'youtube_url' => 'Channel URL',
         'import_source' => 'Source',
         'import_url' => 'URL',
         'packagist_url' => 'Packagist URL',
@@ -191,6 +195,7 @@ return [
             'docker' => 'Docker',
             'database' => 'Database',
             'website' => 'External site',
+            'youtube_channel' => 'YouTube channel',
         ],
         'status' => [
             'draft' => 'Draft',

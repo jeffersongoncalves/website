@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "49587b8b9a8588ec69e793a1736d5c41",
+    "content-hash": "3639fcaa17ce65e882c043a54646e477",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2228,6 +2228,75 @@
                 }
             ],
             "time": "2026-03-04T03:15:23+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/filament-one-time-operations",
+            "version": "3.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/filament-one-time-operations.git",
+                "reference": "8614f04c47de3d6cc676f1326c26e2453413a498"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-one-time-operations/zipball/8614f04c47de3d6cc676f1326c26e2453413a498",
+                "reference": "8614f04c47de3d6cc676f1326c26e2453413a498",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.3",
+                "php": "^8.2|^8.3",
+                "spatie/laravel-package-tools": "^1.14.0",
+                "timokoerber/laravel-one-time-operations": "^1.4"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.21",
+                "orchestra/testbench": "^9.0|^10.0|^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\Filament\\OneTimeOperations\\OneTimeOperationsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\Filament\\OneTimeOperations\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This is a Laravel Filament package that provides a One Time Operations functionality for web applications.",
+            "homepage": "https://github.com/jeffersongoncalves/filament-one-time-operations",
+            "keywords": [
+                "filament",
+                "filament-one-time-operations",
+                "jeffersongoncalves",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/filament-one-time-operations/issues",
+                "source": "https://github.com/jeffersongoncalves/filament-one-time-operations/tree/3.0.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-03-04T03:17:04+00:00"
         },
         {
             "name": "jenssegers/agent",
@@ -9742,6 +9811,70 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/v2.4.0"
             },
             "time": "2025-12-02T11:56:42+00:00"
+        },
+        {
+            "name": "timokoerber/laravel-one-time-operations",
+            "version": "1.4.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TimoKoerber/laravel-one-time-operations.git",
+                "reference": "6fc5e125f98c22587dd1435e723270e191fb62eb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/TimoKoerber/laravel-one-time-operations/zipball/6fc5e125f98c22587dd1435e723270e191fb62eb",
+                "reference": "6fc5e125f98c22587dd1435e723270e191fb62eb",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/support": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "7|^9.0|^10.0|^11.0",
+                "phpunit/phpunit": "^9.4|^10.5|^11.5.3|^12.5.12"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "TimoKoerber\\LaravelOneTimeOperations\\Providers\\OneTimeOperationsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "TimoKoerber\\LaravelOneTimeOperations\\": "src/",
+                    "TimoKoerber\\LaravelOneTimeOperations\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "timo.koerber",
+                    "email": "koerber.timo@gmail.com",
+                    "homepage": "https://www.timokoerber.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Run operations once after deployment - just like you do it with migrations!",
+            "homepage": "https://github.com/timokoerber/laravel-one-time-operations",
+            "keywords": [
+                "deployment",
+                "jobs",
+                "laravel",
+                "migrations",
+                "operations"
+            ],
+            "support": {
+                "issues": "https://github.com/TimoKoerber/laravel-one-time-operations/issues",
+                "source": "https://github.com/TimoKoerber/laravel-one-time-operations/tree/1.4.6"
+            },
+            "time": "2026-03-16T09:46:50+00:00"
         },
         {
             "name": "ueberdosis/tiptap-php",

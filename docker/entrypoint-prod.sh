@@ -44,6 +44,10 @@ php artisan event:clear || true
 php artisan cache:forget app.version || true
 
 php artisan migrate --force || true
+# One-time data operations (e.g. seeding new lookup rows) run after the schema
+# is migrated. `--no-interaction` skips prompts so the entrypoint stays
+# non-blocking; failures are tolerated so the container still boots.
+php artisan operations:process --no-interaction || true
 php artisan sitemap:generate || true
 
 exec supervisord -c /etc/supervisor/conf.d/supervisord.conf

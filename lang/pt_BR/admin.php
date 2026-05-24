@@ -31,6 +31,8 @@ return [
         'import_from_url_help' => 'Para projetos sem repo público. Lê <title> e meta tags da página.',
         'import_from_npm' => 'Importar do npm',
         'import_from_npm_help' => 'Cola a URL do pacote npm. Só preenche os campos que ainda estão vazios.',
+        'import_from_youtube' => 'Importar do YouTube',
+        'import_from_youtube_help' => 'Cola a URL do canal (handle, /channel/, /c/ ou /user/). Lê título e descrição via Open Graph.',
         'import_group' => 'Importação',
         'import' => 'Importar',
         'quick_create' => 'Cadastro rápido',
@@ -101,6 +103,7 @@ return [
             'docker' => 'Docker',
             'database' => 'Bancos de dados',
             'website' => 'Sites externos',
+            'youtube_channel' => 'Canais do YouTube',
         ],
     ],
 
@@ -142,6 +145,7 @@ return [
         'downloads_label' => 'Rótulo de downloads',
         'license' => 'Licença',
         'github_url' => 'URL do GitHub',
+        'youtube_url' => 'URL do canal',
         'import_source' => 'Tipo de importação',
         'import_url' => 'URL',
         'packagist_url' => 'URL do Packagist',
@@ -191,6 +195,7 @@ return [
             'docker' => 'Docker',
             'database' => 'Banco de dados',
             'website' => 'Site externo',
+            'youtube_channel' => 'Canal do YouTube',
         ],
         'status' => [
             'draft' => 'Rascunho',

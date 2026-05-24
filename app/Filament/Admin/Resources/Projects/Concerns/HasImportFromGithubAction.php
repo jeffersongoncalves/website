@@ -19,6 +19,7 @@ trait HasImportFromGithubAction
         return ActionGroup::make([
             $this->importFromGithubAction(),
             $this->importFromNpmAction(),
+            $this->importFromYoutubeAction(),
             $this->importFromUrlAction(),
         ])
             ->label(__('admin.actions.import_group'))
@@ -67,6 +68,28 @@ trait HasImportFromGithubAction
             ])
             ->action(function (array $data): void {
                 $result = ProjectImporter::fromNpm($data['npm_url']);
+                $this->applyImporterResult($result);
+            });
+    }
+
+    protected function importFromYoutubeAction(): Action
+    {
+        return Action::make('importFromYoutube')
+            ->label(__('admin.actions.import_from_youtube'))
+            ->icon('heroicon-o-play-circle')
+            ->color('danger')
+            ->modalHeading(__('admin.actions.import_from_youtube'))
+            ->modalDescription(__('admin.actions.import_from_youtube_help'))
+            ->modalSubmitActionLabel(__('admin.actions.import'))
+            ->schema([
+                TextInput::make('youtube_url')
+                    ->label(__('admin.fields.youtube_url'))
+                    ->placeholder('https://www.youtube.com/@handle')
+                    ->url()
+                    ->required(),
+            ])
+            ->action(function (array $data): void {
+                $result = ProjectImporter::fromYoutube($data['youtube_url']);
                 $this->applyImporterResult($result);
             });
     }

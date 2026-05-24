@@ -74,6 +74,10 @@ class SiteCategoriesWidget extends StatsOverviewWidget
             Stat::make(__('admin.widgets.site_categories.website'), number_format($s['website'], 0, ',', '.'))
                 ->description($desc)
                 ->color('primary'),
+
+            Stat::make(__('admin.widgets.site_categories.youtube_channel'), number_format($s['youtube_channel'], 0, ',', '.'))
+                ->description($desc)
+                ->color('danger'),
         ];
     }
 

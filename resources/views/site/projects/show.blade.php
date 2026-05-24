@@ -8,7 +8,10 @@
     ];
 
     $initial = strtoupper(mb_substr($project->name, 0, 1));
-    $isExternalSite = $project->category === \App\Enums\ProjectCategory::Website;
+    $isExternalSite = in_array($project->category, [
+        \App\Enums\ProjectCategory::Website,
+        \App\Enums\ProjectCategory::YoutubeChannel,
+    ], true);
     $externalUrl = $isExternalSite ? ($project->docs_url ?: $project->demo_url ?: $project->github_url) : null;
     $externalHost = $externalUrl ? (parse_url($externalUrl, PHP_URL_HOST) ?: $externalUrl) : null;
 @endphp

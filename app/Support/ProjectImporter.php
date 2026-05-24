@@ -64,6 +64,32 @@ class ProjectImporter
     }
 
     /**
+     * Fetch a YouTube channel page and pull its display title + description
+     * from the page's Open Graph tags. Forces the Website-style flow with
+     * category set to `youtube_channel`. Accepts handle URLs (`/@name`),
+     * channel-id URLs (`/channel/UC...`), legacy `/c/name` and `/user/name`.
+     * Cached for an hour per URL. Returns `['error' => '<key>']` on failure.
+     *
+     * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
+     */
+    public static function fromYoutube(string $url): array
+    {
+        $url = trim($url);
+
+        if (! preg_match('~^https?://(?:www\.)?youtube\.com/(@[^/?#]+|channel/[^/?#]+|c/[^/?#]+|user/[^/?#]+)~i', $url, $m)) {
+            return ['error' => 'invalid_url'];
+        }
+
+        $pathSegment = $m[1];
+
+        return Cache::remember(
+            'project_importer:youtube:'.sha1($url),
+            now()->addHour(),
+            fn () => self::buildYoutubeResult($url, $pathSegment)
+        );
+    }
+
+    /**
      * Fetch an npm package from the public registry and map its manifest to
      * form fields. Mirrors fromGithub's shape: name/description/license come
      * from the registry document, github_url is recovered from the
@@ -159,6 +185,88 @@ class ProjectImporter
         }
 
         return ['fields' => $fields, 'warnings' => $warnings];
+    }
+
+    /**
+     * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
+     */
+    private static function buildYoutubeResult(string $url, string $pathSegment): array
+    {
+        try {
+            $response = Http::timeout(8)
+                ->withHeaders([
+                    // YouTube replies with a placeholder shell to bare bots —
+                    // a real browser UA gets the og: tag-rich HTML we need.
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+                    'Accept' => 'text/html,application/xhtml+xml',
+                    'Accept-Language' => 'en-US,en;q=0.9',
+                ])
+                ->get($url);
+        } catch (Throwable) {
+            return ['error' => 'fetch_failed'];
+        }
+
+        if (! $response->successful()) {
+            return ['error' => 'fetch_failed'];
+        }
+
+        $meta = self::parseMeta($response->body());
+
+        $rawTitle = $meta['og:title'] ?? $meta['title'] ?? null;
+        $name = self::cleanYoutubeTitle(is_string($rawTitle) ? $rawTitle : null, $pathSegment);
+        $description = self::nullableString($meta['og:description'] ?? $meta['description'] ?? null);
+
+        // Use the channel handle / id for the slug — gives stable URLs that
+        // don't shift when the user renames the channel.
+        $handle = str_starts_with($pathSegment, '@')
+            ? substr($pathSegment, 1)
+            : (str_contains($pathSegment, '/') ? explode('/', $pathSegment, 2)[1] : $pathSegment);
+        $slug = 'youtube-'.Str::slug($handle);
+
+        $fields = [
+            'github_url' => null,
+            'slug' => $slug,
+            'name' => $name,
+            'repo' => null,
+            'license' => null,
+            'readme_branch' => null,
+            'docs_url' => $url,
+            'title.en' => $description ?? $name,
+            'title.pt' => $description ?? $name,
+            'title.es' => $description ?? $name,
+            'category' => 'youtube_channel',
+            'package_type' => 'none',
+            'packagist_url' => null,
+            'npm_url' => null,
+            'stack' => [],
+            'versions' => [],
+        ];
+
+        $warnings = [];
+
+        if ($description === null) {
+            $warnings[] = 'no_description';
+        }
+
+        return ['fields' => $fields, 'warnings' => $warnings];
+    }
+
+    /**
+     * Trim YouTube's "- YouTube" suffix from a fetched <title> / og:title and
+     * fall back to a prettified handle when the page returns no title at all.
+     */
+    private static function cleanYoutubeTitle(?string $raw, string $pathSegment): string
+    {
+        $fallback = self::prettifyName(str_replace(['@', '/', '_'], ['', '-', '-'], $pathSegment));
+
+        if (! is_string($raw) || trim($raw) === '') {
+            return $fallback;
+        }
+
+        $cleaned = (string) preg_replace('~\s*[-–|]\s*YouTube\s*$~iu', '', $raw);
+        $cleaned = trim($cleaned);
+
+        return $cleaned !== '' ? $cleaned : $fallback;
     }
 
     /**

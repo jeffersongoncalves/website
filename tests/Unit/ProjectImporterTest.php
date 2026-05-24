@@ -260,6 +260,39 @@ it('returns invalid_url for non-http schemes', function (): void {
     expect($result)->toBe(['error' => 'invalid_url']);
 });
 
+it('imports a YouTube channel via Open Graph and forces the youtube_channel category', function (): void {
+    $html = <<<'HTML'
+    <!doctype html>
+    <html>
+      <head>
+        <meta property="og:title" content="Akitando - YouTube">
+        <meta property="og:description" content="Blog do Fabio Akita falando sobre tecnologia.">
+      </head>
+    </html>
+    HTML;
+
+    Http::fake([
+        'www.youtube.com/@Akitando' => Http::response($html, 200, ['Content-Type' => 'text/html']),
+    ]);
+
+    $result = ProjectImporter::fromYoutube('https://www.youtube.com/@Akitando');
+
+    expect($result['error'] ?? null)->toBeNull();
+    $fields = $result['fields'];
+    expect($fields['name'])->toBe('Akitando');
+    expect($fields['slug'])->toBe('youtube-akitando');
+    expect($fields['category'])->toBe('youtube_channel');
+    expect($fields['package_type'])->toBe('none');
+    expect($fields['docs_url'])->toBe('https://www.youtube.com/@Akitando');
+    expect($fields['title.pt'])->toBe('Blog do Fabio Akita falando sobre tecnologia.');
+});
+
+it('rejects URLs that do not look like a YouTube channel', function (): void {
+    $result = ProjectImporter::fromYoutube('https://www.youtube.com/watch?v=abc');
+
+    expect($result)->toBe(['error' => 'invalid_url']);
+});
+
 it('returns fetch_failed when the URL responds with non-2xx', function (): void {
     Http::fake([
         '*' => Http::response('', 500),

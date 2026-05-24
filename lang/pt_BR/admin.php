@@ -46,6 +46,12 @@ return [
             'repo_not_found' => 'Repositório não encontrado ou inacessível.',
             'fetch_failed' => 'Não foi possível buscar a página informada.',
         ],
+        'warning' => [
+            'category_fallback' => 'Categoria caiu para "ferramenta" — sem sinais para classificar.',
+            'no_description' => 'Sem descrição no manifesto — preencha manualmente.',
+            'npm_not_published' => 'package.json existe mas o pacote não foi publicado no npm.',
+            'no_directory_readme' => 'O subdiretório informado não tem README — a renderização vai usar o README do repositório raiz.',
+        ],
     ],
 
     'widgets' => [

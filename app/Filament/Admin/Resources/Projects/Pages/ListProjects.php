@@ -87,8 +87,14 @@ class ListProjects extends ListRecords
 
                 $project = Project::create($attributes);
 
+                $lines = [];
+                foreach ($result['warnings'] ?? [] as $warning) {
+                    $lines[] = __('admin.import.warning.'.$warning);
+                }
+
                 Notification::make()
                     ->title(__('admin.import.created', ['name' => $project->name]))
+                    ->body($lines === [] ? null : implode("\n", $lines))
                     ->success()
                     ->send();
             });

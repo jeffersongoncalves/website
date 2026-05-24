@@ -46,6 +46,12 @@ return [
             'repo_not_found' => 'Repository not found or inaccessible.',
             'fetch_failed' => 'Could not fetch the given page.',
         ],
+        'warning' => [
+            'category_fallback' => 'Category fell back to "tool" — no signals to classify by.',
+            'no_description' => 'No description in the manifest — fill it in manually.',
+            'npm_not_published' => 'package.json present but the package is not published on npm.',
+            'no_directory_readme' => 'The declared subdirectory has no README — readme rendering will fall back to the repo root.',
+        ],
     ],
 
     'widgets' => [

@@ -46,6 +46,12 @@ return [
             'repo_not_found' => 'Repositorio no encontrado o inaccesible.',
             'fetch_failed' => 'No se pudo obtener la página indicada.',
         ],
+        'warning' => [
+            'category_fallback' => 'La categoría cayó a "herramienta" — sin señales para clasificar.',
+            'no_description' => 'Sin descripción en el manifiesto — rellénala manualmente.',
+            'npm_not_published' => 'package.json existe pero el paquete no está publicado en npm.',
+            'no_directory_readme' => 'El subdirectorio indicado no tiene README — la renderización usará el README raíz.',
+        ],
     ],
 
     'widgets' => [

@@ -101,8 +101,24 @@ class ProjectImporter
         $name = is_string($data['name'] ?? null) ? $data['name'] : $package;
         $description = self::nullableString($data['description'] ?? null);
         $homepage = self::nullableString($data['homepage'] ?? null);
-        $githubUrl = self::githubUrlFromRepository($data['repository'] ?? null);
         $license = self::npmLicense($data['license'] ?? null);
+
+        $repoInfo = self::parseGithubRepository($data['repository'] ?? null);
+        $githubUrl = null;
+        $missingDirectoryReadme = false;
+
+        if ($repoInfo !== null) {
+            $githubUrl = 'https://github.com/'.$repoInfo['slug'];
+
+            if ($repoInfo['directory'] !== null) {
+                $branch = self::fetchDefaultBranchForSlug($repoInfo['slug']) ?? 'main';
+                $githubUrl .= '/tree/'.$branch.'/'.$repoInfo['directory'];
+                $missingDirectoryReadme = ! self::subdirectoryHasReadme(
+                    $repoInfo['slug'],
+                    $repoInfo['directory'],
+                );
+            }
+        }
 
         // Drop docs_url when homepage just points back at the GitHub repo —
         // github_url already covers that, no need to duplicate the link.
@@ -136,6 +152,10 @@ class ProjectImporter
 
         if ($description === null) {
             $warnings[] = 'no_description';
+        }
+
+        if ($missingDirectoryReadme) {
+            $warnings[] = 'no_directory_readme';
         }
 
         return ['fields' => $fields, 'warnings' => $warnings];
@@ -180,15 +200,15 @@ class ProjectImporter
     }
 
     /**
-     * Recover a clean https GitHub URL from an npm `repository` field, which
-     * can be a string or `{type, url, directory}` and is usually a git remote
-     * like `git+https://github.com/owner/repo.git`. When the manifest declares
-     * a monorepo `directory` (e.g. `packages/@tailwindcss-vite` for
-     * `tailwindlabs/tailwindcss`), append `/tree/{default_branch}/{directory}`
-     * so the link points at the package folder, not the monorepo root.
-     * Returns null when the remote isn't a GitHub one.
+     * Pull the owner/repo slug and optional monorepo subdirectory out of an
+     * npm `repository` field, which can be a string remote or
+     * `{type, url, directory}`. Returns null when the remote isn't a GitHub
+     * one. Lets the caller compose the URL (root vs. /tree/branch/dir) and
+     * branch off into extra validation when a subdirectory is declared.
+     *
+     * @return array{slug:string, directory:?string}|null
      */
-    private static function githubUrlFromRepository(mixed $repository): ?string
+    private static function parseGithubRepository(mixed $repository): ?array
     {
         if (is_string($repository)) {
             $raw = $repository;
@@ -198,6 +218,9 @@ class ProjectImporter
             $directory = is_string($repository['directory'] ?? null)
                 ? trim($repository['directory'], '/')
                 : null;
+            if ($directory === '') {
+                $directory = null;
+            }
         } else {
             return null;
         }
@@ -206,18 +229,35 @@ class ProjectImporter
             return null;
         }
 
-        $base = 'https://github.com/'.$m[1];
+        return ['slug' => $m[1], 'directory' => $directory];
+    }
 
-        if ($directory === null || $directory === '') {
-            return $base;
+    private static function fetchDefaultBranchForSlug(string $repoSlug): ?string
+    {
+        $data = self::fetchRepo($repoSlug);
+
+        if ($data === null) {
+            return null;
         }
 
-        $repoData = self::fetchRepo($m[1]);
-        $branch = is_string($repoData['default_branch'] ?? null) && $repoData['default_branch'] !== ''
-            ? $repoData['default_branch']
-            : 'main';
+        $branch = $data['default_branch'] ?? null;
 
-        return $base.'/tree/'.$branch.'/'.$directory;
+        return is_string($branch) && $branch !== '' ? $branch : null;
+    }
+
+    /**
+     * Probe GitHub's per-directory README endpoint to verify a monorepo
+     * subfolder actually ships a README. Some monorepo packages (e.g.
+     * `alpinejs/alpine/packages/anchor`) declare a `directory` in their
+     * package.json without putting a README alongside the source — the
+     * importer flags the import so the editor knows the readme rendering
+     * will fall back to the repo root.
+     */
+    private static function subdirectoryHasReadme(string $repoSlug, string $directory): bool
+    {
+        $response = self::githubGet("https://api.github.com/repos/{$repoSlug}/readme/{$directory}");
+
+        return $response !== null && $response->successful();
     }
 
     /**

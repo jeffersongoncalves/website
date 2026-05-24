@@ -207,6 +207,53 @@ it('keeps the scope in the display name for a scoped npm package', function (): 
     expect($fields['npm_url'])->toBe('https://www.npmjs.com/package/@tailwindcss/vite');
 });
 
+it('points github_url at the monorepo subdirectory and warns when the subdirectory has no README', function (): void {
+    Http::fake([
+        'registry.npmjs.org/@alpinejs/anchor' => Http::response([
+            'name' => '@alpinejs/anchor',
+            'description' => 'Alpine anchor plugin.',
+            'repository' => [
+                'type' => 'git',
+                'url' => 'git+https://github.com/alpinejs/alpine.git',
+                'directory' => 'packages/anchor',
+            ],
+        ], 200),
+        'api.github.com/repos/alpinejs/alpine/readme/packages/anchor' => Http::response('', 404),
+        'api.github.com/repos/alpinejs/alpine' => Http::response(['default_branch' => 'main'], 200),
+    ]);
+
+    $result = ProjectImporter::fromNpm('https://www.npmjs.com/package/@alpinejs/anchor');
+
+    expect($result['fields']['github_url'])
+        ->toBe('https://github.com/alpinejs/alpine/tree/main/packages/anchor');
+    expect($result['warnings'])->toContain('no_directory_readme');
+});
+
+it('omits the directory-readme warning when the subdirectory ships a README', function (): void {
+    Http::fake([
+        'registry.npmjs.org/@tailwindcss/vite' => Http::response([
+            'name' => '@tailwindcss/vite',
+            'description' => 'Vite plugin for Tailwind.',
+            'repository' => [
+                'type' => 'git',
+                'url' => 'https://github.com/tailwindlabs/tailwindcss.git',
+                'directory' => 'packages/@tailwindcss-vite',
+            ],
+        ], 200),
+        'api.github.com/repos/tailwindlabs/tailwindcss/readme/packages/@tailwindcss-vite' => Http::response([
+            'name' => 'README.md',
+            'path' => 'packages/@tailwindcss-vite/README.md',
+        ], 200),
+        'api.github.com/repos/tailwindlabs/tailwindcss' => Http::response(['default_branch' => 'main'], 200),
+    ]);
+
+    $result = ProjectImporter::fromNpm('https://www.npmjs.com/package/@tailwindcss/vite');
+
+    expect($result['fields']['github_url'])
+        ->toBe('https://github.com/tailwindlabs/tailwindcss/tree/main/packages/@tailwindcss-vite');
+    expect($result['warnings'] ?? [])->not->toContain('no_directory_readme');
+});
+
 it('returns invalid_url for non-http schemes', function (): void {
     $result = ProjectImporter::fromUrl('ftp://example.com');
 

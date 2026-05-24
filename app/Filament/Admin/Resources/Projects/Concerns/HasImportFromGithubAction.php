@@ -135,11 +135,17 @@ trait HasImportFromGithubAction
         $this->data = $state;
         $this->form->fill($this->data);
 
+        $lines = [];
+        if (count($skipped) > 0) {
+            $lines[] = __('admin.import.skipped', ['count' => count($skipped)]);
+        }
+        foreach ($result['warnings'] ?? [] as $warning) {
+            $lines[] = __('admin.import.warning.'.$warning);
+        }
+
         Notification::make()
             ->title(__('admin.import.success', ['count' => count($applied)]))
-            ->body(count($skipped) > 0
-                ? __('admin.import.skipped', ['count' => count($skipped)])
-                : null)
+            ->body($lines === [] ? null : implode("\n", $lines))
             ->success()
             ->send();
     }

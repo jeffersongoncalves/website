@@ -1202,10 +1202,10 @@
   }
   .project-detail-row:last-child { border-bottom: 0; }
   .project-detail-row-stack { align-items: flex-start; flex-direction: column; gap: var(--s-2); }
-  .project-detail-row-footer { margin-top: var(--s-3); padding-top: var(--s-3); border-top: 1px dashed var(--border-dashed); border-bottom: 0; }
-  /* Drop the duplicated divider when the "updated" footer sits directly
-     under another detail row (sparse cards with no stats grid/stack). */
-  .project-detail-row + .project-detail-row-footer { margin-top: 0; padding-top: var(--s-2); border-top: 0; }
+  /* No top border on the "updated" footer — whichever row sits above
+     already supplies a divider via its own border-bottom, so adding a
+     border-top here would draw a duplicated dashed line. */
+  .project-detail-row-footer { margin-top: var(--s-3); padding-top: var(--s-3); border-top: 0; border-bottom: 0; }
   .project-detail-label {
     font-family: var(--font-mono);
     font-size: 0.6875rem;

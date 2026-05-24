@@ -1222,7 +1222,9 @@
     gap: var(--s-3);
     margin: var(--s-4) 0;
     padding: var(--s-3) 0;
-    border-top: 1px dashed var(--border-dashed);
+    /* No top border — the row above already draws its border-bottom, so a
+       border-top here would render two dashed lines stacked on top of each
+       other. */
     border-bottom: 1px dashed var(--border-dashed);
   }
   .project-detail-stat { display: flex; flex-direction: column; gap: 4px; }

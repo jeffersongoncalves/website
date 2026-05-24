@@ -214,7 +214,9 @@ return [
         // Dedicated supervisor for jobs that hit the GitHub API. Kept on a
         // separate `github` queue with few processes so GitHub's rate limit
         // is respected — jobs here should still use the `RateLimited`
-        // middleware / Redis::throttle for hard guarantees.
+        // middleware / Redis::throttle for hard guarantees. Timeout is
+        // generous so bulk-import one-time operations (which can make
+        // dozens of sequential API calls) don't get killed mid-flight.
         'supervisor-github' => [
             'connection' => 'redis',
             'queue' => ['github'],
@@ -223,9 +225,9 @@ return [
             'maxProcesses' => 1,
             'maxTime' => 0,
             'maxJobs' => 0,
-            'memory' => 128,
+            'memory' => 256,
             'tries' => 3,
-            'timeout' => 120,
+            'timeout' => 1800,
             'nice' => 0,
         ],
     ],

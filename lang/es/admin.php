@@ -33,11 +33,14 @@ return [
         'import_from_npm_help' => 'Pega la URL del paquete npm. Solo rellena los campos vacíos.',
         'import_group' => 'Importación',
         'import' => 'Importar',
+        'quick_create' => 'Alta rápida',
+        'quick_create_help' => 'Elige el origen, pega la URL y define estado + uso diario. Persiste en un solo paso.',
     ],
 
     'import' => [
         'success' => ':count campos rellenados',
         'skipped' => ':count campos preservados (ya tenían valor)',
+        'created' => 'Proyecto ":name" creado.',
         'error' => [
             'invalid_url' => 'URL inválida.',
             'repo_not_found' => 'Repositorio no encontrado o inaccesible.',
@@ -132,6 +135,8 @@ return [
         'downloads_label' => 'Etiqueta de descargas',
         'license' => 'Licencia',
         'github_url' => 'URL de GitHub',
+        'import_source' => 'Origen',
+        'import_url' => 'URL',
         'packagist_url' => 'URL de Packagist',
         'npm_url' => 'URL de npm',
         'docker_url' => 'URL de Docker Hub',

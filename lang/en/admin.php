@@ -33,11 +33,14 @@ return [
         'import_from_npm_help' => 'Paste the npm package URL. Only fills empty fields.',
         'import_group' => 'Import',
         'import' => 'Import',
+        'quick_create' => 'Quick create',
+        'quick_create_help' => 'Pick a source, paste the URL, set status + daily-driver. Persists in a single step.',
     ],
 
     'import' => [
         'success' => ':count fields populated',
         'skipped' => ':count fields preserved (already set)',
+        'created' => 'Project ":name" created.',
         'error' => [
             'invalid_url' => 'Invalid URL.',
             'repo_not_found' => 'Repository not found or inaccessible.',
@@ -132,6 +135,8 @@ return [
         'downloads_label' => 'Downloads label',
         'license' => 'License',
         'github_url' => 'GitHub URL',
+        'import_source' => 'Source',
+        'import_url' => 'URL',
         'packagist_url' => 'Packagist URL',
         'npm_url' => 'npm URL',
         'docker_url' => 'Docker Hub URL',

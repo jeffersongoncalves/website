@@ -328,7 +328,11 @@ class ProjectImporter
             'title.en' => $description ?? $title,
             'title.pt' => $description ?? $title,
             'title.es' => $description ?? $title,
-            'category' => 'tool',
+            // URL imports always represent external sites (blogs, hosted
+            // services, personal pages) — there's no manifest to classify
+            // against, so default to the Website category instead of the
+            // generic "tool" fallback used for GitHub imports.
+            'category' => 'website',
             'package_type' => 'none',
             'packagist_url' => null,
             'npm_url' => null,

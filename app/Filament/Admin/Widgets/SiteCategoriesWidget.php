@@ -70,6 +70,10 @@ class SiteCategoriesWidget extends StatsOverviewWidget
             Stat::make(__('admin.widgets.site_categories.database'), number_format($s['database'], 0, ',', '.'))
                 ->description($desc)
                 ->color('success'),
+
+            Stat::make(__('admin.widgets.site_categories.website'), number_format($s['website'], 0, ',', '.'))
+                ->description($desc)
+                ->color('primary'),
         ];
     }
 

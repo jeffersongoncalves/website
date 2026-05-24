@@ -185,7 +185,7 @@ it('imports from a generic URL using <head> meta tags', function (): void {
     expect($fields['slug'])->toBe('linear-app');
     expect($fields['docs_url'])->toBe('https://linear.app');
     expect($fields['github_url'])->toBeNull();
-    expect($fields['category'])->toBe('tool');
+    expect($fields['category'])->toBe('website');
     expect($fields['package_type'])->toBe('none');
     expect($fields['title.en'])->toBe('The issue tracker built for high-performance teams.');
     expect($fields['title.pt'])->toBe('The issue tracker built for high-performance teams.');

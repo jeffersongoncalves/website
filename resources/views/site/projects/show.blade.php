@@ -188,36 +188,43 @@
                             </div>
                         @endif
 
-                        <div class="project-detail-grid">
-                            @unless($project->is_paid || $isExternalSite)
-                                <div class="project-detail-stat">
-                                    <small>@lang('site.projects.label_stars')</small>
-                                    <strong>★ {{ $project->stars }}</strong>
-                                </div>
-                                @if($project->downloads_label)
+                        @php
+                            $showStatsGrid = ! $project->is_paid && ! $isExternalSite;
+                            $showVersionsStat = ! empty($project->versions);
+                            $showContribStat = $project->is_maintainer && $project->user_contributions > 0;
+                        @endphp
+                        @if($showStatsGrid || $showVersionsStat || $showContribStat)
+                            <div class="project-detail-grid">
+                                @if($showStatsGrid)
                                     <div class="project-detail-stat">
-                                        <small>@lang('site.projects.label_downloads')</small>
-                                        <strong>↓ {{ $project->downloads_label }}</strong>
+                                        <small>@lang('site.projects.label_stars')</small>
+                                        <strong>★ {{ $project->stars }}</strong>
+                                    </div>
+                                    @if($project->downloads_label)
+                                        <div class="project-detail-stat">
+                                            <small>@lang('site.projects.label_downloads')</small>
+                                            <strong>↓ {{ $project->downloads_label }}</strong>
+                                        </div>
+                                    @endif
+                                    <div class="project-detail-stat">
+                                        <small>@lang('site.projects.label_license')</small>
+                                        <strong>{{ $project->license ?: '—' }}</strong>
                                     </div>
                                 @endif
-                                <div class="project-detail-stat">
-                                    <small>@lang('site.projects.label_license')</small>
-                                    <strong>{{ $project->license ?: '—' }}</strong>
-                                </div>
-                            @endunless
-                            @if(!empty($project->versions))
-                                <div class="project-detail-stat">
-                                    <small>@lang('site.projects.label_versions')</small>
-                                    <strong>{{ implode(' · ', $project->versions) }}</strong>
-                                </div>
-                            @endif
-                            @if($project->is_maintainer && $project->user_contributions > 0)
-                                <div class="project-detail-stat">
-                                    <small>@lang('site.projects.label_contributions')</small>
-                                    <strong>⎘ {{ number_format($project->user_contributions, 0, ',', '.') }}</strong>
-                                </div>
-                            @endif
-                        </div>
+                                @if($showVersionsStat)
+                                    <div class="project-detail-stat">
+                                        <small>@lang('site.projects.label_versions')</small>
+                                        <strong>{{ implode(' · ', $project->versions) }}</strong>
+                                    </div>
+                                @endif
+                                @if($showContribStat)
+                                    <div class="project-detail-stat">
+                                        <small>@lang('site.projects.label_contributions')</small>
+                                        <strong>⎘ {{ number_format($project->user_contributions, 0, ',', '.') }}</strong>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
 
                         @if(!empty($project->stack))
                             <div class="project-detail-row project-detail-row-stack">

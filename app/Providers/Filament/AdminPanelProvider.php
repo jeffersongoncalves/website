@@ -24,6 +24,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use JeffersonGoncalves\Filament\OneTimeOperations\OneTimeOperationsPlugin;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 
@@ -126,6 +127,7 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 FilamentLogViewer::make()
                     ->navigationGroup(__('admin.navigation.settings')),
+                OneTimeOperationsPlugin::make(),
                 FilamentEditProfilePlugin::make()
                     ->slug('my-profile')
                     ->setTitle(__('admin.profile.title'))

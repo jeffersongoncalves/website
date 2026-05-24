@@ -95,8 +95,16 @@ class SiteStats
     {
         $base = Project::query()->published();
 
+        // "Repos" counts code projects only — external sites and YouTube
+        // channels live in the catalogue but are not repositories, so they
+        // never roll into the headline counter.
+        $codeOnly = (clone $base)->whereNotIn('category', [
+            ProjectCategory::Website->value,
+            ProjectCategory::YoutubeChannel->value,
+        ]);
+
         $data = [
-            'repos' => (int) (clone $base)->count(),
+            'repos' => (int) (clone $codeOnly)->count(),
             'filament' => (int) (clone $base)->byCategory(ProjectCategory::FilamentPlugin)->count(),
             'laravel' => (int) (clone $base)->byCategory(ProjectCategory::LaravelPackage)->count(),
             'livewire' => (int) (clone $base)->byCategory(ProjectCategory::LivewirePackage)->count(),
@@ -265,6 +273,13 @@ class SiteStats
     private static function compute(): array
     {
         $base = Project::query()->published();
+        // Catalogue rows that aren't actually code repositories (external
+        // sites + YouTube channels) get pulled out of the headline `repos`
+        // total so the count matches the user's mental model.
+        $codeOnly = (clone $base)->whereNotIn('category', [
+            ProjectCategory::Website->value,
+            ProjectCategory::YoutubeChannel->value,
+        ]);
 
         $stars = (int) (clone $base)->sum('stars');
         $downloads = (int) (clone $base)->sum('downloads');
@@ -276,7 +291,7 @@ class SiteStats
         $github = self::fetchGithubUser(self::GITHUB_LOGIN);
 
         return [
-            'repos' => (int) (clone $base)->count(),
+            'repos' => (int) (clone $codeOnly)->count(),
             'filament' => (int) (clone $base)->byCategory(ProjectCategory::FilamentPlugin)->count(),
             'laravel' => (int) (clone $base)->byCategory(ProjectCategory::LaravelPackage)->count(),
             'livewire' => (int) (clone $base)->byCategory(ProjectCategory::LivewirePackage)->count(),

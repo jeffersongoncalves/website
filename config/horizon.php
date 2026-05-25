@@ -230,6 +230,24 @@ return [
             'timeout' => 1800,
             'nice' => 0,
         ],
+
+        // Dedicated supervisor for the Google Translate calls. Single
+        // process so the in-job Redis::throttle keeps a meaningful cap;
+        // multi-process would fan out concurrent requests to the same
+        // unofficial endpoint and trip Google's per-IP rate limiter.
+        'supervisor-translations' => [
+            'connection' => 'redis',
+            'queue' => ['translations'],
+            'balance' => 'simple',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 128,
+            'tries' => 3,
+            'timeout' => 120,
+            'nice' => 0,
+        ],
     ],
 
     'environments' => [
@@ -245,6 +263,12 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
+
+            'supervisor-translations' => [
+                'maxProcesses' => 1,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
         ],
 
         'local' => [
@@ -253,6 +277,10 @@ return [
             ],
 
             'supervisor-github' => [
+                'maxProcesses' => 1,
+            ],
+
+            'supervisor-translations' => [
                 'maxProcesses' => 1,
             ],
         ],

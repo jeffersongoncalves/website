@@ -6,6 +6,7 @@ use App\Enums\ProjectStatus;
 use App\Jobs\GenerateSitemapJob;
 use App\Jobs\SendProjectPublishedNotification;
 use App\Jobs\SyncProjectMetricsJob;
+use App\Jobs\TranslateProjectTitleJob;
 use App\Models\Project;
 use App\Support\SiteStats;
 use Illuminate\Support\Facades\Cache;
@@ -24,6 +25,7 @@ class ProjectObserver
     public function created(Project $project): void
     {
         SyncProjectMetricsJob::dispatch($project);
+        TranslateProjectTitleJob::dispatch($project);
 
         // A project created directly as Published fires the push once.
         if ($project->status === ProjectStatus::Published) {
@@ -41,6 +43,12 @@ class ProjectObserver
         // from the job itself are excluded so we don't bounce-loop.
         if ($project->wasChanged(['repo', 'github_url', 'packagist_url', 'npm_url', 'docs_url', 'versions'])) {
             SyncProjectMetricsJob::dispatch($project);
+        }
+
+        // Re-translate when the English source changes; the job itself
+        // skips locales that already hold a manual translation.
+        if ($project->wasChanged('title')) {
+            TranslateProjectTitleJob::dispatch($project);
         }
 
         // Notify subscribers the first time a draft transitions to Published.

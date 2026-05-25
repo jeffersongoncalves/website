@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\ProjectCategory;
 use App\Models\Project;
 use App\Support\GeminiTranslate;
 use Illuminate\Bus\Queueable;
@@ -24,9 +25,17 @@ class TranslateProjectTitleJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 3;
+    // Each rate-limited release counts as an attempt, so the ceiling has
+    // to absorb a long queue (~hundred jobs throttled to 15/min). 25 tries
+    // × 30s release ≈ 12.5 min of patience before a job is marked failed.
+    public int $tries = 25;
 
     public int $backoff = 60;
+
+    // Don't let a sustained Gemini outage poison the whole queue with
+    // permanent failures — give the job two real exception cycles before
+    // burning the remaining tries on retry attempts.
+    public int $maxExceptions = 2;
 
     /**
      * Stored locale → human-readable name fed into the translation prompt.
@@ -53,19 +62,32 @@ class TranslateProjectTitleJob implements ShouldQueue
 
     public function handle(): void
     {
+        // Gemini's free-tier ceiling for 2.5-flash is 15 RPM; the throttle
+        // matches that so a paid-tier upgrade is the only thing we need
+        // to touch when it eventually happens. block(5) lets the worker
+        // wait up to 5s for a slot before releasing, which smooths short
+        // bursts without burning a try.
         Redis::throttle('gemini-translate')
-            ->block(0)
-            ->allow(30)
+            ->block(5)
+            ->allow(15)
             ->every(60)
             ->then(
                 fn () => $this->translate(),
-                fn () => $this->release(30),
+                fn () => $this->release(15),
             );
     }
 
     private function translate(): void
     {
         $project = $this->project->refresh();
+
+        // YouTube channels and external sites carry the channel/owner/site
+        // name verbatim in the title — translating proper nouns turns
+        // "Akitando" or "Beyond Code" into garbage, so skip these
+        // categories entirely.
+        if (in_array($project->category, [ProjectCategory::Website, ProjectCategory::YoutubeChannel], true)) {
+            return;
+        }
 
         $source = is_string($project->getTranslation('title', 'en', false) ?: null)
             ? (string) $project->getTranslation('title', 'en', false)

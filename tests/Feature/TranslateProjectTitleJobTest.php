@@ -74,6 +74,42 @@ it('does nothing when the English title is empty', function (): void {
     expect($project->getTranslation('title', 'es', false))->toBe('');
 });
 
+it('skips Website and YoutubeChannel categories so proper nouns are not translated', function (): void {
+    Prism::fake([
+        TextResponseFake::make()->withText('should not appear'),
+        TextResponseFake::make()->withText('should not appear'),
+        TextResponseFake::make()->withText('should not appear'),
+        TextResponseFake::make()->withText('should not appear'),
+    ]);
+
+    $website = Project::query()->create([
+        'slug' => 'translate-website-skip',
+        'name' => 'Beyond Code',
+        'category' => ProjectCategory::Website,
+        'status' => ProjectStatus::Published,
+        'title' => ['en' => 'Beyond Code'],
+    ]);
+
+    $youtube = Project::query()->create([
+        'slug' => 'translate-youtube-skip',
+        'name' => 'Akitando',
+        'category' => ProjectCategory::YoutubeChannel,
+        'status' => ProjectStatus::Published,
+        'title' => ['en' => 'Akitando'],
+    ]);
+
+    (new TranslateProjectTitleJob($website))->handle();
+    (new TranslateProjectTitleJob($youtube))->handle();
+
+    $website->refresh();
+    $youtube->refresh();
+
+    expect($website->getTranslation('title', 'pt', false))->toBe('');
+    expect($website->getTranslation('title', 'es', false))->toBe('');
+    expect($youtube->getTranslation('title', 'pt', false))->toBe('');
+    expect($youtube->getTranslation('title', 'es', false))->toBe('');
+});
+
 it('strips wrapping quotes from the model output', function (): void {
     Prism::fake([
         TextResponseFake::make()->withText('"Olá mundo"'),

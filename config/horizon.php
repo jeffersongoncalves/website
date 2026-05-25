@@ -231,10 +231,10 @@ return [
             'nice' => 0,
         ],
 
-        // Dedicated supervisor for the Google Translate calls. Single
+        // Dedicated supervisor for Anthropic translation jobs. Single
         // process so the in-job Redis::throttle keeps a meaningful cap;
-        // multi-process would fan out concurrent requests to the same
-        // unofficial endpoint and trip Google's per-IP rate limiter.
+        // multi-process would burst the Anthropic API and risk per-key
+        // rate-limit errors.
         'supervisor-translations' => [
             'connection' => 'redis',
             'queue' => ['translations'],

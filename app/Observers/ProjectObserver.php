@@ -45,8 +45,6 @@ class ProjectObserver
             SyncProjectMetricsJob::dispatch($project);
         }
 
-        // Re-translate when the English source changes; the job itself
-        // skips locales that already hold a manual translation.
         if ($project->wasChanged('title')) {
             TranslateProjectTitleJob::dispatch($project);
         }

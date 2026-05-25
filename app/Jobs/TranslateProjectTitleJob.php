@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Project;
-use App\Support\GoogleTranslate;
+use App\Support\GeminiTranslate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -15,12 +15,10 @@ use Illuminate\Support\Facades\Redis;
 use Throwable;
 
 /**
- * Translate the project's English title into pt-BR and es using the public
- * Google Translate endpoint. The job is rate-limited globally via
- * `Redis::throttle` so we don't fan out concurrent requests to Google when
- * many projects are imported in a single batch — the endpoint is
- * undocumented and aggressive throttling on Google's side will start
- * returning 429s if we burst.
+ * Translate the project's English title into pt-BR and es by prompting
+ * Gemini 2.5 Flash through Prism. Throttled globally via `Redis::throttle`
+ * so a batch import doesn't flood the Gemini API and trip per-key rate
+ * limits.
  */
 class TranslateProjectTitleJob implements ShouldQueue
 {
@@ -31,14 +29,13 @@ class TranslateProjectTitleJob implements ShouldQueue
     public int $backoff = 60;
 
     /**
-     * Google's tl code per stored locale. The DB column uses the bare 'pt'
-     * key but we request 'pt-BR' from Google so the output is Brazilian.
+     * Stored locale → human-readable name fed into the translation prompt.
      *
      * @var array<string, string>
      */
     private const TARGETS = [
-        'pt' => 'pt-BR',
-        'es' => 'es',
+        'pt' => 'Brazilian Portuguese',
+        'es' => 'Spanish',
     ];
 
     public function __construct(public Project $project)
@@ -56,9 +53,9 @@ class TranslateProjectTitleJob implements ShouldQueue
 
     public function handle(): void
     {
-        Redis::throttle('google-translate')
+        Redis::throttle('gemini-translate')
             ->block(0)
-            ->allow(20)
+            ->allow(30)
             ->every(60)
             ->then(
                 fn () => $this->translate(),
@@ -80,19 +77,17 @@ class TranslateProjectTitleJob implements ShouldQueue
 
         $changed = false;
 
-        foreach (self::TARGETS as $localeKey => $googleCode) {
+        foreach (self::TARGETS as $localeKey => $targetLanguage) {
             $current = $project->getTranslation('title', $localeKey, false);
 
-            // Don't overwrite a manual translation, and don't re-translate
-            // when the existing value is already different from the source
-            // (means the editor either translated it or the importer
-            // populated a per-locale value already).
+            // Preserve manual translations; only overwrite when the locale
+            // is empty or still mirrors the English source (importer default).
             if (is_string($current) && trim($current) !== '' && $current !== $source) {
                 continue;
             }
 
             try {
-                $translated = GoogleTranslate::translate($source, $googleCode, 'en');
+                $translated = GeminiTranslate::translate($source, $targetLanguage);
             } catch (Throwable $e) {
                 Log::warning('TranslateProjectTitleJob: translate call threw', [
                     'project' => $project->slug,

@@ -84,6 +84,10 @@ class ListProjects extends ListRecords
 
                 $fields = $result['fields'] ?? [];
                 $attributes = self::normalizeImportedFields($fields);
+                // Defer to HasSlug — drop the importer's slug so duplicates
+                // resolve with `-1`/`-2` instead of hitting a unique
+                // constraint mid-create.
+                unset($attributes['slug']);
                 $attributes['status'] = $data['status'];
                 $attributes['is_daily_driver'] = (bool) ($data['is_daily_driver'] ?? false);
 

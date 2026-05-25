@@ -4,20 +4,13 @@ use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Jobs\TranslateProjectTitleJob;
 use App\Models\Project;
-use Illuminate\Support\Facades\Http;
+use Prism\Prism\Facades\Prism;
+use Prism\Prism\Testing\TextResponseFake;
 
 it('translates the English title into pt-BR and es when the locales are empty', function (): void {
-    Http::fake([
-        'translate.googleapis.com/translate_a/single?*tl=pt-BR*' => Http::response([
-            [['Olá mundo', 'Hello world', null, null, 1]],
-            null,
-            'en',
-        ], 200),
-        'translate.googleapis.com/translate_a/single?*tl=es*' => Http::response([
-            [['Hola mundo', 'Hello world', null, null, 1]],
-            null,
-            'en',
-        ], 200),
+    Prism::fake([
+        TextResponseFake::make()->withText('Olá mundo'),
+        TextResponseFake::make()->withText('Hola mundo'),
     ]);
 
     $project = Project::query()->create([
@@ -37,12 +30,8 @@ it('translates the English title into pt-BR and es when the locales are empty', 
 });
 
 it('skips locales that already hold a different translation', function (): void {
-    Http::fake([
-        'translate.googleapis.com/translate_a/single?*tl=es*' => Http::response([
-            [['Hola mundo', 'Hello world', null, null, 1]],
-            null,
-            'en',
-        ], 200),
+    Prism::fake([
+        TextResponseFake::make()->withText('Hola mundo'),
     ]);
 
     $project = Project::query()->create([
@@ -65,7 +54,9 @@ it('skips locales that already hold a different translation', function (): void 
 });
 
 it('does nothing when the English title is empty', function (): void {
-    Http::fake(fn () => throw new RuntimeException('should not hit the network'));
+    Prism::fake([
+        TextResponseFake::make()->withText('should not appear'),
+    ]);
 
     $project = Project::query()->create([
         'slug' => 'translate-empty',
@@ -81,4 +72,26 @@ it('does nothing when the English title is empty', function (): void {
 
     expect($project->getTranslation('title', 'pt', false))->toBe('');
     expect($project->getTranslation('title', 'es', false))->toBe('');
+});
+
+it('strips wrapping quotes from the model output', function (): void {
+    Prism::fake([
+        TextResponseFake::make()->withText('"Olá mundo"'),
+        TextResponseFake::make()->withText("'Hola mundo'"),
+    ]);
+
+    $project = Project::query()->create([
+        'slug' => 'translate-quotes',
+        'name' => 'Translate Quotes',
+        'category' => ProjectCategory::Tool,
+        'status' => ProjectStatus::Published,
+        'title' => ['en' => 'Hello world'],
+    ]);
+
+    (new TranslateProjectTitleJob($project))->handle();
+
+    $project->refresh();
+
+    expect($project->getTranslation('title', 'pt', false))->toBe('Olá mundo');
+    expect($project->getTranslation('title', 'es', false))->toBe('Hola mundo');
 });

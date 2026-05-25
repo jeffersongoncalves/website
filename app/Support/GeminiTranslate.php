@@ -39,6 +39,19 @@ abstract class GeminiTranslate
         'fio vivo' => 'Livewire',
         'Cabo Vivo' => 'Livewire',
         'cabo vivo' => 'Livewire',
+        'Filament Nativo' => 'Filament Native',
+        'Filament Móvel' => 'Filament Mobile',
+        'Filament Móvil' => 'Filament Mobile',
+        'React Nativo' => 'React Native',
+        'React Móvil' => 'React Native',
+        'Lâmina' => 'Blade',
+        'lâmina' => 'Blade',
+        'Chama' => 'Blaze',
+        'chama' => 'Blaze',
+        'Llama' => 'Blaze',
+        'llama' => 'Blaze',
+        'Resplandor' => 'Blaze',
+        'resplandor' => 'Blaze',
     ];
 
     /**
@@ -58,7 +71,7 @@ abstract class GeminiTranslate
         $prompt = sprintf(
             "Translate the following text into %s.\n".
             "STRICT RULES:\n".
-            "1. The following brand and product names MUST stay in English exactly as written, never translated or transliterated: Laravel, Laravel Nova, Filament, Livewire, Flux, Flux Pro, Tailwind, Tailwind CSS, Alpine, Alpine.js, Vue, React, Svelte, Inertia, Pest, PHPUnit, PHPStan, Composer, npm, pnpm, Vite, GitHub, GitLab, Bitbucket, Docker, Packagist, JetBrains, PhpStorm, VS Code, CakePHP, Symfony, Redis, MySQL, PostgreSQL, MariaDB, SQLite, MongoDB, Elasticsearch, Meilisearch, Typesense, Horizon, Pulse, Reverb, Octane, Sail, Forge, Vapor, Sanctum, Passport, Socialite, Scout, Telescope.\n".
+            "1. The following brand and product names MUST stay in English exactly as written, never translated or transliterated: Laravel, Laravel Nova, Filament, Filament Native, Filament Mobile, Livewire, Volt, Flux, Flux Pro, Blaze, Blade, Native, Mobile, React, React Native, Vue, Svelte, Inertia, Tailwind, Tailwind CSS, Alpine, Alpine.js, Pest, PHPUnit, PHPStan, Composer, npm, pnpm, Vite, GitHub, GitLab, Bitbucket, Docker, Packagist, JetBrains, PhpStorm, VS Code, CakePHP, Symfony, Redis, MySQL, PostgreSQL, MariaDB, SQLite, MongoDB, Elasticsearch, Meilisearch, Typesense, Horizon, Pulse, Reverb, Octane, Sail, Forge, Vapor, Sanctum, Passport, Socialite, Scout, Telescope, Traefik, Nginx, Apache, Caddy, Kubernetes, Helm, Ansible, Terraform.\n".
             "2. Reply with the translation only — no quotes, no preamble, no trailing punctuation that the source did not already have.\n".
             'Text: "%s"',
             $target,

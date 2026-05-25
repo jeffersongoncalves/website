@@ -37,9 +37,5 @@ class DatabaseSeeder extends Seeder
 
             $user->markEmailAsVerified();
         }
-
-        $this->call([
-            ProjectSeeder::class,
-        ]);
     }
 }

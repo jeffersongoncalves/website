@@ -19,6 +19,11 @@ class HorizonDashboard extends Page
 
     protected Width|string|null $maxContentWidth = Width::Full;
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __('admin.navigation.settings');
+    }
+
     public static function getNavigationLabel(): string
     {
         return __('Horizon');

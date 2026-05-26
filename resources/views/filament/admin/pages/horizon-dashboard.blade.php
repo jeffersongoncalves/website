@@ -7,12 +7,12 @@
             },
         }"
         x-init="resize(); window.addEventListener('resize', () => resize())"
-        class="w-full"
+        class="-mx-4 md:-mx-6 lg:-mx-8"
     >
         <iframe
             x-ref="frame"
             src="{{ url('/horizon') }}"
-            class="w-full rounded-xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900"
+            class="block w-full border-0 bg-white dark:bg-gray-900"
             style="height: 80vh;"
             loading="lazy"
             referrerpolicy="same-origin"

@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Pages;
 
 use BackedEnum;
 use Filament\Pages\Page;
+use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 
 class HorizonDashboard extends Page
@@ -15,6 +16,8 @@ class HorizonDashboard extends Page
     protected static ?string $slug = 'horizon';
 
     protected static ?int $navigationSort = 90;
+
+    protected Width|string|null $maxContentWidth = Width::Full;
 
     public static function getNavigationLabel(): string
     {

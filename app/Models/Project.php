@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 use Spatie\Sluggable\HasSlug;
@@ -169,6 +170,19 @@ class Project extends Model
 
     public function buildVendorRepoSlug(): string
     {
+        // npm packages frequently publish from a monorepo subtree (Laravel's
+        // precognition family all live under laravel/framework, for example).
+        // Falling back to the github_url for the slug would collapse every
+        // sibling package onto the same `vendor-repo` and trigger the
+        // projects_slug_unique constraint; prefer the npm package name.
+        if ($this->package_type === PackageType::Npm && $this->npm_url
+            && preg_match('~/package/(.+?)/?$~', $this->npm_url, $npmMatch)
+        ) {
+            $package = rawurldecode($npmMatch[1]);
+
+            return Str::slug(str_replace(['@', '/'], ['', '-'], $package));
+        }
+
         if ($this->github_url && preg_match('~github\.com/([^/]+)/([^/?#]+)~i', $this->github_url, $m)) {
             return $m[1].'-'.rtrim($m[2], '/');
         }

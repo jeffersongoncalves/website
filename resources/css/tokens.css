@@ -110,7 +110,7 @@
   --text-muted:             var(--paper-600);
   --text-dim:               var(--paper-500);
   --text-faint:             var(--paper-400);
-  --text-on-accent:         var(--ink-950);
+  --text-on-accent:         #fff;
 
   --border-soft:            var(--paper-200);
   --border-strong:          var(--paper-300);

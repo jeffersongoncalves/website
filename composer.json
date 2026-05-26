@@ -22,7 +22,6 @@
         "jeffersongoncalves/filament-logo": "^3.0",
         "jeffersongoncalves/filament-one-time-operations": "^3.0",
         "joaopaulolndev/filament-edit-profile": "^3.0",
-        "kronn/observability": "^0.6.3",
         "laravel/framework": "^13.0",
         "laravel/horizon": "^5.46",
         "laravel/tinker": "^3.0",

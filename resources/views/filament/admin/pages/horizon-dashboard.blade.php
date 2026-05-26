@@ -3,7 +3,7 @@
         x-data="{
             resize() {
                 const top = this.$refs.frame.getBoundingClientRect().top;
-                this.$refs.frame.style.height = (window.innerHeight - top - 16) + 'px';
+                this.$refs.frame.style.height = (window.innerHeight - top - 32 - 50) + 'px';
             },
         }"
         x-init="resize(); window.addEventListener('resize', () => resize())"

@@ -43,6 +43,8 @@ return [
         'success' => ':count fields populated',
         'skipped' => ':count fields preserved (already set)',
         'created' => 'Project ":name" created.',
+        'updated' => 'Project ":name" updated (already existed).',
+        'updated_changes' => ':count fields filled on the existing record',
         'error' => [
             'invalid_url' => 'Invalid URL.',
             'repo_not_found' => 'Repository not found or inaccessible.',

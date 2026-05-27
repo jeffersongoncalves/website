@@ -43,6 +43,8 @@ return [
         'success' => ':count campos rellenados',
         'skipped' => ':count campos preservados (ya tenían valor)',
         'created' => 'Proyecto ":name" creado.',
+        'updated' => 'Proyecto ":name" actualizado (ya estaba registrado).',
+        'updated_changes' => ':count campos rellenados en el registro existente',
         'error' => [
             'invalid_url' => 'URL inválida.',
             'repo_not_found' => 'Repositorio no encontrado o inaccesible.',

@@ -43,6 +43,8 @@ return [
         'success' => ':count campos preenchidos',
         'skipped' => ':count campos preservados (já tinham valor)',
         'created' => 'Projeto ":name" criado.',
+        'updated' => 'Projeto ":name" atualizado (já estava cadastrado).',
+        'updated_changes' => ':count campos preenchidos no cadastro existente',
         'error' => [
             'invalid_url' => 'URL inválida.',
             'repo_not_found' => 'Repositório não encontrado ou inacessível.',

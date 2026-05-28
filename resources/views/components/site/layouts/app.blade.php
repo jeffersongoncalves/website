@@ -29,14 +29,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="color-scheme" content="{{ $isDarkInitial ? 'dark' : 'light' }}">
-    {{-- VAPID public key for the Push API subscription handshake. Absent
-         when the env vars aren't set yet — the JS bail outs in that case
-         so a missing key never produces a runtime error. `trim()` handles
-         the common case of an env value that picked up a trailing newline
-         when pasted from `php artisan webpush:vapid` output. --}}
-    @if($vapidPublicKey = trim((string) config('services.webpush.public_key')))
-        <meta name="vapid-public-key" content="{{ $vapidPublicKey }}">
-    @endif
     <x-favicon/>
     {!! seo($resolvedSeo) !!}
     @vite(['resources/css/site.css', 'resources/js/site.js'])

@@ -212,9 +212,5 @@ return [
             'reload' => 'Reload',
             'dismiss' => 'Dismiss',
         ],
-        'notifications' => [
-            'enable' => 'Enable notifications',
-            'disable' => 'Disable notifications',
-        ],
     ],
 ];

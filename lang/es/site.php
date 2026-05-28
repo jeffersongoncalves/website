@@ -212,9 +212,5 @@ return [
             'reload' => 'Recargar',
             'dismiss' => 'Descartar',
         ],
-        'notifications' => [
-            'enable' => 'Activar notificaciones',
-            'disable' => 'Desactivar notificaciones',
-        ],
     ],
 ];

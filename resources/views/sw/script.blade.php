@@ -136,55 +136,6 @@ async function networkFirst(request) {
     }
 }
 
-// Web Push handler. Payloads ship as JSON `{title, body, url, tag}` so
-// `JSON.parse` covers the entire shape; legacy plain-text payloads are
-// rendered as the body. The notification is shown via `showNotification`
-// inside `waitUntil` so the SW stays alive until the OS finishes rendering.
-self.addEventListener('push', (event) => {
-    let payload = { title: 'Jefferson Gonçalves', body: '', url: '/' };
-
-    if (event.data) {
-        try {
-            payload = Object.assign(payload, event.data.json());
-        } catch (e) {
-            payload.body = event.data.text();
-        }
-    }
-
-    event.waitUntil(
-        self.registration.showNotification(payload.title, {
-            body: payload.body || '',
-            icon: '{{ $pushIcon }}',
-            badge: '{{ $pushIcon }}',
-            tag: payload.tag || 'jg-push',
-            data: { url: payload.url || '/' },
-        }),
-    );
-});
-
-// Focus an existing tab on click instead of opening a new one. Falls back
-// to `clients.openWindow` only when no tab is open.
-self.addEventListener('notificationclick', (event) => {
-    event.notification.close();
-
-    const target = (event.notification.data && event.notification.data.url) || '/';
-
-    event.waitUntil(
-        (async () => {
-            const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-            for (const client of all) {
-                if ('focus' in client) {
-                    client.navigate(target);
-                    return client.focus();
-                }
-            }
-            if (self.clients.openWindow) {
-                return self.clients.openWindow(target);
-            }
-        })(),
-    );
-});
-
 async function staleWhileRevalidate(request) {
     const cache = await caches.open(CACHE_NAME);
     const cached = await cache.match(request);

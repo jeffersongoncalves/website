@@ -40,15 +40,4 @@ return [
         'username' => env('GITHUB_USERNAME', 'jeffersongoncalves'),
     ],
 
-    'webpush' => [
-        // VAPID keypair used to sign push payloads. Generate one with
-        // `php artisan webpush:vapid` and set both halves in `.env`. The
-        // public half is shipped to the browser; the private half stays
-        // on the server. Subject identifies the sender — required by the
-        // VAPID spec, can be `mailto:` or an https URL.
-        'public_key' => env('VAPID_PUBLIC_KEY'),
-        'private_key' => env('VAPID_PRIVATE_KEY'),
-        'subject' => env('VAPID_SUBJECT', 'mailto:contato@jeffersongoncalves.dev.br'),
-    ],
-
 ];

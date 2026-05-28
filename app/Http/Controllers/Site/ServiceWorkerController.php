@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Site;
 
 use App\Support\AppVersion;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Vite;
 
 class ServiceWorkerController
 {
@@ -23,7 +22,6 @@ class ServiceWorkerController
     {
         $content = view('sw.script', [
             'version' => AppVersion::current(),
-            'pushIcon' => Vite::asset('resources/favicon/icon-512x512.png'),
         ])->render();
 
         return response($content, 200)

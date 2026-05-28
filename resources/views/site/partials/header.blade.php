@@ -115,27 +115,6 @@
                 </template>
             </div>
 
-            {{-- Push subscribe / unsubscribe. Hidden when the browser
-                 doesn't support Push API or the VAPID key isn't in env. --}}
-            <button type="button"
-                    x-data="pushPermission()"
-                    x-cloak
-                    x-show="supported && permission !== 'denied'"
-                    x-on:click="toggle()"
-                    :disabled="busy"
-                    class="theme-toggle"
-                    :aria-label="subscribed ? @js(__('site.pwa.notifications.disable')) : @js(__('site.pwa.notifications.enable'))"
-                    :title="subscribed ? @js(__('site.pwa.notifications.disable')) : @js(__('site.pwa.notifications.enable'))">
-                <svg x-show="!subscribed" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                </svg>
-                <svg x-show="subscribed" x-cloak xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0" fill="none"/>
-                </svg>
-            </button>
-
             <button type="button"
                     class="theme-toggle"
                     x-data="{ isDark: document.documentElement.classList.contains('dark') }"

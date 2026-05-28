@@ -212,10 +212,4 @@ return [
             'none' => 'None',
         ],
     ],
-
-    'push' => [
-        'project_published' => [
-            'title' => 'New project published',
-        ],
-    ],
 ];

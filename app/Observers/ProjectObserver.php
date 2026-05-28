@@ -4,7 +4,6 @@ namespace App\Observers;
 
 use App\Enums\ProjectStatus;
 use App\Jobs\GenerateSitemapJob;
-use App\Jobs\SendProjectPublishedNotification;
 use App\Jobs\SyncProjectMetricsJob;
 use App\Jobs\TranslateProjectTitleJob;
 use App\Models\Project;
@@ -27,11 +26,6 @@ class ProjectObserver
         SyncProjectMetricsJob::dispatch($project);
         TranslateProjectTitleJob::dispatch($project);
 
-        // A project created directly as Published fires the push once.
-        if ($project->status === ProjectStatus::Published) {
-            SendProjectPublishedNotification::dispatch($project);
-        }
-
         $this->flush();
     }
 
@@ -47,15 +41,6 @@ class ProjectObserver
 
         if ($project->wasChanged('title')) {
             TranslateProjectTitleJob::dispatch($project);
-        }
-
-        // Notify subscribers the first time a draft transitions to Published.
-        // Keyed on the status column changing INTO Published — re-saving an
-        // already-published project (or archived → published again) won't
-        // re-fire because `wasChanged('status')` is false on a no-op, and the
-        // archived→published edge is rare enough to accept a repeat push.
-        if ($project->wasChanged('status') && $project->status === ProjectStatus::Published) {
-            SendProjectPublishedNotification::dispatch($project);
         }
 
         $this->flush();

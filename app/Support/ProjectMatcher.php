@@ -16,7 +16,15 @@ class ProjectMatcher
     public static function findExisting(string $source, array $attrs): ?Project
     {
         if ($source === 'github') {
-            return self::findByGithubUrl(self::stringOrNull($attrs['github_url'] ?? null));
+            $byGithub = self::findByGithubUrl(self::stringOrNull($attrs['github_url'] ?? null));
+            if ($byGithub !== null) {
+                return $byGithub;
+            }
+
+            // Cross-source fallback: same project may already exist as a
+            // website seed (only docs_url populated) — match by canonical
+            // docs_url to collapse the two rows.
+            return self::findByDocsUrl(self::stringOrNull($attrs['docs_url'] ?? null));
         }
 
         if ($source === 'npm') {
@@ -34,19 +42,33 @@ class ProjectMatcher
             // from the repo root.
             $githubUrl = self::stringOrNull($attrs['github_url'] ?? null);
             if ($githubUrl !== null && ! str_contains($githubUrl, '/tree/')) {
-                return self::findByGithubUrl($githubUrl);
+                $byRepo = self::findByGithubUrl($githubUrl);
+                if ($byRepo !== null) {
+                    return $byRepo;
+                }
             }
 
-            return null;
+            return self::findByDocsUrl(self::stringOrNull($attrs['docs_url'] ?? null));
         }
 
         // youtube + url imports both populate docs_url with the canonical link.
-        $docsUrl = self::stringOrNull($attrs['docs_url'] ?? null);
-        if ($docsUrl !== null) {
-            return Project::query()->where('docs_url', $docsUrl)->first();
+        return self::findByDocsUrl(self::stringOrNull($attrs['docs_url'] ?? null));
+    }
+
+    /**
+     * Match against `docs_url` ignoring trailing slash. Website seeds tend to
+     * keep the canonical trailing slash (`https://example.com/`) while the
+     * GitHub importer strips it — both spellings refer to the same site.
+     */
+    public static function findByDocsUrl(?string $url): ?Project
+    {
+        if ($url === null) {
+            return null;
         }
 
-        return null;
+        $variants = array_unique([$url, rtrim($url, '/'), rtrim($url, '/').'/']);
+
+        return Project::query()->whereIn('docs_url', $variants)->first();
     }
 
     public static function findByGithubUrl(?string $url): ?Project
@@ -60,7 +82,10 @@ class ProjectMatcher
         return Project::query()
             ->whereNotNull('github_url')
             ->get()
-            ->first(fn (Project $p) => GithubReadme::repoFromUrl($p->github_url) === $slug);
+            ->first(fn (Project $p) => strcasecmp(
+                (string) GithubReadme::repoFromUrl($p->github_url),
+                $slug
+            ) === 0);
     }
 
     /**

@@ -586,12 +586,17 @@ class ProjectImporter
 
         $category = self::resolveCategory($composer, $repo, $hasDockerCompose || $hasStandaloneDockerfile);
 
-        // Only treat the project as an npm package if it's actually published.
-        // A `package.json` checked into the repo is not enough — many repos
-        // ship one for tooling (eslint, vite, prettier) without ever pushing
-        // to the registry. Hit `registry.npmjs.org` HEAD before claiming npm.
+        // Only treat the project as an npm package if it's actually published
+        // *and* the registry's repository field points back at this github
+        // url. A `package.json` checked into the repo is not enough — many
+        // repos ship one for tooling (eslint, vite, prettier) without ever
+        // pushing to the registry, and others ship a misattributed `name`
+        // (e.g. mpvue ships `"name": "vue"`) that would otherwise claim a
+        // foreign package as their own.
         $npmName = self::extractNpmName($package);
-        $npmPublished = $npmName !== null && self::npmPackageExists($npmName);
+        $npmPublished = $npmName !== null
+            && self::npmPackageExists($npmName)
+            && self::npmPackageBelongsToRepo($npmName, $url);
 
         $packageType = self::resolvePackageType($composer, $package, $repo, $npmPublished);
         // Docker-distributed projects don't fit any of the package-manager
@@ -785,6 +790,60 @@ class ProjectImporter
         }
 
         return $response->successful();
+    }
+
+    /**
+     * Confirm the registry's `repository` field for `$name` points at the
+     * same owner/repo as `$expectedGithubUrl`. Guards against misattributed
+     * package.json `name` fields (e.g. mpvue ships `"name": "vue"`, which
+     * would otherwise advertise the real vue npm package as mpvue's own).
+     * Failures and missing repository data return false — better to skip the
+     * npm_url than to publish a wrong attribution.
+     */
+    private static function npmPackageBelongsToRepo(string $name, string $expectedGithubUrl): bool
+    {
+        $expectedSlug = GithubReadme::repoFromUrl($expectedGithubUrl);
+
+        if ($expectedSlug === null) {
+            return false;
+        }
+
+        $url = 'https://registry.npmjs.org/'.$name;
+
+        try {
+            $response = Http::timeout(6)
+                ->withHeaders([
+                    'User-Agent' => 'jeffersongoncalves-site',
+                    'Accept' => 'application/json',
+                ])
+                ->get($url);
+        } catch (Throwable) {
+            return false;
+        }
+
+        if (! $response->successful()) {
+            return false;
+        }
+
+        $data = $response->json();
+        $repositoryUrl = null;
+
+        if (is_array($data) && isset($data['repository'])) {
+            $repo = $data['repository'];
+            if (is_string($repo)) {
+                $repositoryUrl = $repo;
+            } elseif (is_array($repo) && isset($repo['url']) && is_string($repo['url'])) {
+                $repositoryUrl = $repo['url'];
+            }
+        }
+
+        if ($repositoryUrl === null) {
+            return false;
+        }
+
+        $registrySlug = GithubReadme::repoFromUrl($repositoryUrl);
+
+        return $registrySlug !== null && strcasecmp($registrySlug, $expectedSlug) === 0;
     }
 
     /**

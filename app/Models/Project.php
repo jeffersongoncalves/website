@@ -170,12 +170,16 @@ class Project extends Model
 
     public function buildVendorRepoSlug(): string
     {
-        // npm packages frequently publish from a monorepo subtree (Laravel's
-        // precognition family all live under laravel/framework, for example).
-        // Falling back to the github_url for the slug would collapse every
-        // sibling package onto the same `vendor-repo` and trigger the
-        // projects_slug_unique constraint; prefer the npm package name.
-        if ($this->package_type === PackageType::Npm && $this->npm_url
+        $isGithub = $this->github_url
+            && preg_match('~github\.com/([^/]+)/([^/?#]+)~i', $this->github_url, $m);
+        $isMonorepoSubtree = $isGithub && str_contains((string) $this->github_url, '/tree/');
+
+        // npm packages from monorepo subtrees (e.g. Laravel's precognition
+        // family under laravel/framework) would collapse to the same
+        // owner-repo slug. For those, prefer the npm package name to keep
+        // siblings distinct.
+        if ($isMonorepoSubtree
+            && $this->package_type === PackageType::Npm && $this->npm_url
             && preg_match('~/package/(.+?)/?$~', $this->npm_url, $npmMatch)
         ) {
             $package = rawurldecode($npmMatch[1]);
@@ -183,8 +187,18 @@ class Project extends Model
             return Str::slug(str_replace(['@', '/'], ['', '-'], $package));
         }
 
-        if ($this->github_url && preg_match('~github\.com/([^/]+)/([^/?#]+)~i', $this->github_url, $m)) {
+        if ($isGithub) {
             return $m[1].'-'.rtrim($m[2], '/');
+        }
+
+        // Standalone npm packages without a github_url fall back to the
+        // package name.
+        if ($this->package_type === PackageType::Npm && $this->npm_url
+            && preg_match('~/package/(.+?)/?$~', $this->npm_url, $npmMatch)
+        ) {
+            $package = rawurldecode($npmMatch[1]);
+
+            return Str::slug(str_replace(['@', '/'], ['', '-'], $package));
         }
 
         return (string) ($this->name ?? '');

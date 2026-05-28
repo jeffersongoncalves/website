@@ -427,7 +427,7 @@ class ProjectImporter
 
         $fields = [
             'github_url' => null,
-            'slug' => self::slugFromHost($host),
+            'slug' => self::siteSlugFromUrl($url),
             'name' => $name,
             'repo' => null,
             'license' => null,
@@ -507,11 +507,34 @@ class ProjectImporter
         return ucfirst($first);
     }
 
-    private static function slugFromHost(string $host): string
+    /**
+     * Canonical site slug derived from a URL: `site-<host>[-<path>]`.
+     * The `site-` prefix keeps website rows visually distinct from
+     * github/composer/npm imports, and the path suffix prevents collisions
+     * when several entries share the same host (e.g. `laravel.com/` vs
+     * `laravel.com/docs/master/homestead`).
+     */
+    public static function siteSlugFromUrl(string $url): string
     {
+        $host = parse_url($url, PHP_URL_HOST) ?: '';
         $host = preg_replace('/^www\./i', '', $host) ?? $host;
+        $hostSlug = strtolower(str_replace('.', '-', $host));
 
-        return strtolower(str_replace('.', '-', $host));
+        if ($hostSlug === '') {
+            return '';
+        }
+
+        $slug = 'site-'.$hostSlug;
+
+        $path = parse_url($url, PHP_URL_PATH) ?: '';
+        $path = trim($path, '/');
+        if ($path !== '') {
+            // Str::slug strips slashes instead of treating them as separators,
+            // so collapse path segments to hyphens before slugifying.
+            $slug .= '-'.Str::slug(str_replace('/', '-', $path));
+        }
+
+        return $slug;
     }
 
     /**

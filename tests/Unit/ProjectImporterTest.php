@@ -182,7 +182,7 @@ it('imports from a generic URL using <head> meta tags', function (): void {
     expect($result['error'] ?? null)->toBeNull();
     $fields = $result['fields'];
     expect($fields['name'])->toBe('Linear');
-    expect($fields['slug'])->toBe('linear-app');
+    expect($fields['slug'])->toBe('site-linear-app');
     expect($fields['docs_url'])->toBe('https://linear.app');
     expect($fields['github_url'])->toBeNull();
     expect($fields['category'])->toBe('website');

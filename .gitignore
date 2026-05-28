@@ -27,4 +27,4 @@ phpstan.neon
 /nbproject
 .rnd
 .output.txt
-.claude
+.claude/settings.local.json

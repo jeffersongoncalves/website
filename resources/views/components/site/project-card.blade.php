@@ -46,6 +46,14 @@
         </div>
     @endif
 
+    @if(!empty($project->topics))
+        <div class="flex flex-wrap gap-x-3 gap-y-1 mt-3 mono-meta-sm text-ink-400">
+            @foreach(array_slice($project->topics, 0, 4) as $topic)
+                <a href="{{ route('projects.index', ['topic' => $topic]) }}" class="hover:text-ink-200">#{{ $topic }}</a>
+            @endforeach
+        </div>
+    @endif
+
     <div class="card-foot">
         <div class="card-meta-row">
             @if($isExternalSite)

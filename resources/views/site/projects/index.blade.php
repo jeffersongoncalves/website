@@ -34,6 +34,9 @@
             <x-site.eyebrow num="02" label="catálogo"/>
 
             <form method="GET" action="{{ route('projects.index') }}" class="projects-filters">
+                @if($activeTopic !== '')
+                    <input type="hidden" name="topic" value="{{ $activeTopic }}">
+                @endif
                 <div class="projects-filters-row">
                     <label class="projects-filter">
                         <span class="projects-filter-label">@lang('site.projects.filter_search')</span>
@@ -93,6 +96,14 @@
                     </button>
                 </div>
             </form>
+
+            @if($activeTopic !== '')
+                <div class="mt-6 mono-meta-sm">
+                    <span class="text-ink-400">@lang('site.projects.filtering_by_topic'):</span>
+                    <span class="badge badge-accent ml-2">#{{ $activeTopic }}</span>
+                    <a href="{{ route('projects.index', request()->except(['topic', 'page'])) }}" class="ml-2 text-ink-400 hover:text-ink-200">✕ @lang('site.projects.clear_filter')</a>
+                </div>
+            @endif
 
             @if($projects->isEmpty())
                 <div class="text-center py-16 mono text-sm text-ink-500">@lang('site.common.no_results')</div>

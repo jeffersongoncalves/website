@@ -249,6 +249,17 @@
                             </div>
                         @endif
 
+                        @if(!empty($project->topics))
+                            <div class="project-detail-row project-detail-row-stack">
+                                <span class="project-detail-label">@lang('site.projects.label_topics')</span>
+                                <div class="project-detail-stack">
+                                    @foreach($project->topics as $topic)
+                                        <a href="{{ route('projects.index', ['topic' => $topic]) }}" class="badge">#{{ $topic }}</a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
                         @if($project->updated_at)
                             <div class="project-detail-row project-detail-row-footer">
                                 <span class="project-detail-label">@lang('site.projects.label_updated')</span>

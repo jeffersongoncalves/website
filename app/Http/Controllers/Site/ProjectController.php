@@ -46,6 +46,14 @@ class ProjectController
             $query->byLanguage($activeLanguage);
         }
 
+        // Topic filter is driven by the #topic chips on the cards — a single
+        // slug, matched against the JSON topics array.
+        $topic = $request->string('topic')->toString();
+        $activeTopic = preg_match('/^[a-z0-9-]{1,50}$/', $topic) ? $topic : '';
+        if ($activeTopic !== '') {
+            $query->whereJsonContains('topics', $activeTopic);
+        }
+
         $activeRole = in_array($role, ['authored', 'maintainer', 'daily_driver'], true) ? $role : 'all';
         if ($activeRole === 'maintainer') {
             $query->maintained();
@@ -90,6 +98,7 @@ class ProjectController
             'activeRole' => $activeRole,
             'activeSearch' => $search,
             'activeLanguage' => $activeLanguage,
+            'activeTopic' => $activeTopic,
             'categories' => ProjectCategory::cases(),
             'languages' => $languages,
             'counts' => $counts,

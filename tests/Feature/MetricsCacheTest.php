@@ -61,6 +61,20 @@ it('computes the per-language breakdown busiest first', function () {
     ]);
 });
 
+it('computes the per-topic breakdown busiest first', function () {
+    makeProject(1, ProjectCategory::PhpPackage)->update(['topics' => ['laravel', 'filament']]);
+    makeProject(2, ProjectCategory::PhpPackage)->update(['topics' => ['laravel']]);
+    makeProject(3, ProjectCategory::Application)->update(['topics' => ['cli']]);
+
+    SiteStats::persist();
+
+    expect(SiteStats::all()['topics'])->toBe([
+        ['topic' => 'laravel', 'total' => 2],
+        ['topic' => 'filament', 'total' => 1],
+        ['topic' => 'cli', 'total' => 1],
+    ]);
+});
+
 it('renders the README and writes it to the github disk', function () {
     Storage::fake('github');
 

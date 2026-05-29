@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
  * @property int $repos
  * @property int $catalogue
  * @property array<int, array{language: string, total: int}>|null $languages
+ * @property array<int, array{topic: string, total: int}>|null $topics
  * @property int $filament
  * @property int $laravel
  * @property int $livewire
@@ -54,6 +55,7 @@ class SiteStat extends Model
         'repos',
         'catalogue',
         'languages',
+        'topics',
         'filament',
         'laravel',
         'livewire',
@@ -95,6 +97,7 @@ class SiteStat extends Model
             'repos' => 'integer',
             'catalogue' => 'integer',
             'languages' => 'array',
+            'topics' => 'array',
             'filament' => 'integer',
             'laravel' => 'integer',
             'livewire' => 'integer',

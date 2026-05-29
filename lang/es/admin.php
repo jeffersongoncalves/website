@@ -118,6 +118,10 @@ return [
             'heading' => 'Por lenguaje',
             'desc' => 'proyectos publicados',
         ],
+        'site_topics' => [
+            'heading' => 'Por topic',
+            'desc' => 'proyectos publicados',
+        ],
     ],
 
     'sections' => [

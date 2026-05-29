@@ -29,7 +29,8 @@ class SiteStats
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int},
-     *   languages:list<array{language:string,total:int}>
+     *   languages:list<array{language:string,total:int}>,
+     *   topics:list<array{topic:string,total:int}>
      * }
      */
     public static function all(): array
@@ -54,7 +55,8 @@ class SiteStats
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int},
-     *   languages:list<array{language:string,total:int}>
+     *   languages:list<array{language:string,total:int}>,
+     *   topics:list<array{topic:string,total:int}>
      * }
      */
     private static function empty(): array
@@ -95,6 +97,7 @@ class SiteStats
             'public_sponsors' => 0,
             'contributions' => ['cells' => [], 'total' => 0],
             'languages' => [],
+            'topics' => [],
         ];
     }
 
@@ -147,6 +150,7 @@ class SiteStats
             'downloads_jetbrains' => (int) (clone $base)->where('package_type', PackageType::JetBrains->value)->sum('downloads'),
             'downloads_docker' => (int) (clone $base)->where('package_type', PackageType::Docker->value)->sum('downloads'),
             'languages' => self::languageBreakdown(),
+            'topics' => self::topicBreakdown(),
         ];
 
         $stat = SiteStat::query()->firstOrNew([]);
@@ -171,7 +175,8 @@ class SiteStats
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int},
-     *   languages:list<array{language:string,total:int}>
+     *   languages:list<array{language:string,total:int}>,
+     *   topics:list<array{topic:string,total:int}>
      * }
      */
     public static function persist(): array
@@ -250,7 +255,8 @@ class SiteStats
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int},
-     *   languages:list<array{language:string,total:int}>
+     *   languages:list<array{language:string,total:int}>,
+     *   topics:list<array{topic:string,total:int}>
      * }
      */
     private static function toArray(SiteStat $stat): array
@@ -291,6 +297,7 @@ class SiteStats
             'public_sponsors' => $stat->public_sponsors,
             'contributions' => $stat->contributions ?? ['cells' => [], 'total' => 0],
             'languages' => $stat->languages ?? [],
+            'topics' => $stat->topics ?? [],
         ];
     }
 
@@ -303,7 +310,8 @@ class SiteStats
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
      *   contributions:array{cells:list<int>,total:int},
-     *   languages:list<array{language:string,total:int}>
+     *   languages:list<array{language:string,total:int}>,
+     *   topics:list<array{topic:string,total:int}>
      * }
      */
     private static function compute(): array
@@ -355,7 +363,50 @@ class SiteStats
             'public_sponsors' => self::fetchSponsorCount(self::GITHUB_LOGIN),
             'contributions' => GithubContributions::fetch(self::GITHUB_LOGIN),
             'languages' => self::languageBreakdown(),
+            'topics' => self::topicBreakdown(),
         ];
+    }
+
+    /**
+     * Published-project counts per topic, busiest first (top 30). Aggregated in
+     * PHP so it stays portable across DB engines (no JSON-array SQL functions).
+     * Stored on the SiteStat row — the request path never recomputes.
+     *
+     * @return list<array{topic:string,total:int}>
+     */
+    private static function topicBreakdown(): array
+    {
+        $counts = [];
+
+        DB::table('projects')
+            ->where('status', ProjectStatus::Published->value)
+            ->whereNotNull('topics')
+            ->select('topics')
+            ->orderBy('id')
+            ->chunk(500, function ($rows) use (&$counts): void {
+                foreach ($rows as $row) {
+                    $topics = json_decode((string) $row->topics, true);
+
+                    if (! is_array($topics)) {
+                        continue;
+                    }
+
+                    foreach ($topics as $topic) {
+                        if (is_string($topic) && $topic !== '') {
+                            $counts[$topic] = ($counts[$topic] ?? 0) + 1;
+                        }
+                    }
+                }
+            });
+
+        arsort($counts);
+
+        $out = [];
+        foreach (array_slice($counts, 0, 30, true) as $topic => $total) {
+            $out[] = ['topic' => $topic, 'total' => $total];
+        }
+
+        return $out;
     }
 
     /**

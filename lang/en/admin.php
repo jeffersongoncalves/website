@@ -118,6 +118,10 @@ return [
             'heading' => 'By language',
             'desc' => 'published projects',
         ],
+        'site_topics' => [
+            'heading' => 'By topic',
+            'desc' => 'published projects',
+        ],
     ],
 
     'sections' => [

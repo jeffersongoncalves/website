@@ -114,6 +114,20 @@ it('resolves npm package_type when composer.json is missing but package.json exi
     expect($fields['category'])->toBe('javascript_package');
 });
 
+it('falls back to the repo name for the title when there is no description', function (): void {
+    importerFakes(
+        fakeGithubRepo(['name' => 'cool-tool', 'description' => null, 'topics' => []]),
+        null,
+        null,
+    );
+
+    $fields = ProjectImporter::fromGithub('https://github.com/foo/cool-tool')['fields'];
+
+    expect($fields['title.en'])->toBe('Cool Tool');
+    expect($fields['title.pt'])->toBe('Cool Tool');
+    expect($fields['title.es'])->toBe('Cool Tool');
+});
+
 it('captures the repo primary language from the github metadata', function (): void {
     importerFakes(fakeGithubRepo(['language' => 'PHP']), fakeComposer(), null, ['main']);
 

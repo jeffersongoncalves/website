@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Enums\PackageType;
+use App\Enums\ProjectCategory;
 use App\Models\Project;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
@@ -53,6 +54,19 @@ class ProjectMetrics
             if ($snapshot['language'] !== null && $snapshot['language'] !== $project->language) {
                 $project->language = $snapshot['language'];
                 $changed = true;
+            }
+
+            // Re-classify generic application/tool rows as the repo's topics
+            // evolve — a project later tagged `awesome`/`android`/`database`/etc
+            // gets promoted out of the catch-all on the next sync. Only upgrades
+            // these two buckets; never downgrades a curated category.
+            if (in_array($project->category, [ProjectCategory::Application, ProjectCategory::Tool], true)) {
+                $upgraded = ProjectClassifier::specificFromTopics($snapshot['topics'], (string) $project->repo);
+
+                if ($upgraded !== null && $upgraded !== $project->category->value) {
+                    $project->category = ProjectCategory::from($upgraded);
+                    $changed = true;
+                }
             }
         }
 
@@ -301,11 +315,11 @@ class ProjectMetrics
     }
 
     /**
-     * Fetch stars + primary language in a single /repos call. Returns null
-     * when the request can't be completed; `language` is null for repos
+     * Fetch stars + primary language + topics in a single /repos call. Returns
+     * null when the request can't be completed; `language` is null for repos
      * GitHub reports no language for (docs-only, empty, etc.).
      *
-     * @return array{stars:int, language:?string}|null
+     * @return array{stars:int, language:?string, topics:list<string>}|null
      */
     private static function fetchRepoSnapshot(?string $githubUrl): ?array
     {
@@ -333,9 +347,15 @@ class ProjectMetrics
 
         $language = $response->json('language');
 
+        $topics = $response->json('topics');
+        $topics = is_array($topics)
+            ? array_values(array_filter($topics, 'is_string'))
+            : [];
+
         return [
             'stars' => (int) ($response->json('stargazers_count') ?? 0),
             'language' => is_string($language) && $language !== '' ? $language : null,
+            'topics' => $topics,
         ];
     }
 

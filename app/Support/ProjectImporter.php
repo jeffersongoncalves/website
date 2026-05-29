@@ -163,9 +163,11 @@ class ProjectImporter
             'license' => $license,
             'readme_branch' => null,
             'docs_url' => $docsUrl,
-            'title.en' => $description,
-            'title.pt' => $description,
-            'title.es' => $description,
+            // Fall back to the package name when the registry ships no
+            // description so the title never imports blank.
+            'title.en' => $description ?? self::prettifyNpmName($name),
+            'title.pt' => $description ?? self::prettifyNpmName($name),
+            'title.es' => $description ?? self::prettifyNpmName($name),
             'category' => 'javascript_package',
             'package_type' => 'npm',
             'packagist_url' => null,
@@ -630,10 +632,11 @@ class ProjectImporter
             'docs_url' => self::nullableString($repo['homepage'] ?? null),
             // Mirror the same description across all locales — the importer can't
             // translate, the editor manually edits per-locale later. Same value
-            // beats null fields the editor has to clear.
-            'title.en' => $description,
-            'title.pt' => $description,
-            'title.es' => $description,
+            // beats null fields the editor has to clear. Fall back to the repo
+            // name when there's no description so the title never imports blank.
+            'title.en' => $description ?? self::prettifyName($repoName),
+            'title.pt' => $description ?? self::prettifyName($repoName),
+            'title.es' => $description ?? self::prettifyName($repoName),
             'category' => $category,
             'package_type' => $packageType,
             'language' => self::nullableString($repo['language'] ?? null),

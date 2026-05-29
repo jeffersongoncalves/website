@@ -34,6 +34,7 @@ use Spatie\Translatable\HasTranslations;
  * @property array<array-key, mixed>|null $branch_overrides
  * @property string|null $readme_branch
  * @property array<array-key, mixed>|null $stack
+ * @property array<array-key, mixed>|null $topics
  * @property int $stars
  * @property int $downloads
  * @property string|null $downloads_label
@@ -118,6 +119,7 @@ class Project extends Model
         'branch_overrides',
         'readme_branch',
         'stack',
+        'topics',
         'stars',
         'downloads',
         'downloads_label',
@@ -149,6 +151,7 @@ class Project extends Model
             'versions' => 'array',
             'branch_overrides' => 'array',
             'stack' => 'array',
+            'topics' => 'array',
             'stars' => 'integer',
             'downloads' => 'integer',
             'user_contributions' => 'integer',

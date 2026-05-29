@@ -174,6 +174,7 @@ class ProjectImporter
             'packagist_url' => null,
             'npm_url' => 'https://www.npmjs.com/package/'.$name,
             'stack' => [],
+            'topics' => ProjectTopics::normalize(is_array($data['keywords'] ?? null) ? $data['keywords'] : []),
             'versions' => [],
         ];
 
@@ -644,6 +645,11 @@ class ProjectImporter
             'packagist_url' => self::buildPackagistUrl($composer),
             'npm_url' => $npmPublished ? 'https://www.npmjs.com/package/'.$npmName : null,
             'stack' => self::resolveStack($composer, $package),
+            'topics' => ProjectTopics::normalize(
+                is_array($repo['topics'] ?? null) ? $repo['topics'] : [],
+                is_array($composer['keywords'] ?? null) ? $composer['keywords'] : [],
+                is_array($package['keywords'] ?? null) ? $package['keywords'] : [],
+            ),
             'versions' => self::resolveVersions($composer, $branches, $category),
         ];
 

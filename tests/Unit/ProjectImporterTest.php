@@ -152,6 +152,19 @@ it('keeps the MIT default when github reports no license', function (): void {
     expect($fields['license'])->toBe('MIT');
 });
 
+it('captures and normalizes topics from github + composer keywords', function (): void {
+    importerFakes(
+        fakeGithubRepo(['topics' => ['Filament', 'laravel']]),
+        fakeComposer(['keywords' => ['PHP', 'filament']]),
+        null,
+        ['main'],
+    );
+
+    $fields = ProjectImporter::fromGithub('https://github.com/foo/bar')['fields'];
+
+    expect($fields['topics'])->toBe(['filament', 'laravel', 'php']);
+});
+
 it('captures the repo primary language from the github metadata', function (): void {
     importerFakes(fakeGithubRepo(['language' => 'PHP']), fakeComposer(), null, ['main']);
 

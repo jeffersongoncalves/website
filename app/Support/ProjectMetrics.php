@@ -61,6 +61,15 @@ class ProjectMetrics
                 $changed = true;
             }
 
+            // Capture GitHub topics (the curated source) from the same /repos
+            // call. Only overwrite when GitHub actually has topics, so a
+            // topic-less repo doesn't wipe keywords seeded at import time.
+            $topics = ProjectTopics::normalize($snapshot['topics']);
+            if ($topics !== [] && $topics !== ($project->topics ?? [])) {
+                $project->topics = $topics;
+                $changed = true;
+            }
+
             // Re-classify generic application/tool rows as the repo's topics
             // evolve — a project later tagged `awesome`/`android`/`database`/etc
             // gets promoted out of the catch-all on the next sync. Only upgrades

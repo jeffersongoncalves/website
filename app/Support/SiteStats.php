@@ -20,7 +20,7 @@ class SiteStats
      * still renders; views hide GitHub-dependent pieces when the data is empty.
      *
      * @return array{
-     *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
+     *   repos:int, catalogue:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
      *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int, website:int, youtube_channel:int,
      *   php_package:int, javascript_package:int, css_framework:int, application:int, learning_resource:int, awesome_list:int, mobile_library:int,
      *   maintained:int, daily_drivers:int,
@@ -44,7 +44,7 @@ class SiteStats
      * Zeroed stats — the safe fallback when nothing has been synced yet.
      *
      * @return array{
-     *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
+     *   repos:int, catalogue:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
      *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int, website:int, youtube_channel:int,
      *   php_package:int, javascript_package:int, css_framework:int, application:int, learning_resource:int, awesome_list:int, mobile_library:int,
      *   maintained:int, daily_drivers:int,
@@ -57,6 +57,7 @@ class SiteStats
     {
         return [
             'repos' => 0,
+            'catalogue' => 0,
             'filament' => 0,
             'laravel' => 0,
             'livewire' => 0,
@@ -104,16 +105,13 @@ class SiteStats
     {
         $base = Project::query()->published();
 
-        // "Repos" counts code projects only — external sites and YouTube
-        // channels live in the catalogue but are not repositories, so they
-        // never roll into the headline counter.
-        $codeOnly = (clone $base)->whereNotIn('category', [
-            ProjectCategory::Website->value,
-            ProjectCategory::YoutubeChannel->value,
-        ]);
-
         $data = [
-            'repos' => (int) (clone $codeOnly)->count(),
+            // "Repos" is the headline count of repositories the user actually
+            // owns on GitHub. The full curated catalogue (which mixes in
+            // thousands of third-party projects) is tracked separately as
+            // `catalogue` so the public-repos number stays honest.
+            'repos' => self::ownedReposCount(),
+            'catalogue' => (int) (clone $base)->count(),
             'filament' => (int) (clone $base)->byCategory(ProjectCategory::FilamentPlugin)->count(),
             'laravel' => (int) (clone $base)->byCategory(ProjectCategory::LaravelPackage)->count(),
             'livewire' => (int) (clone $base)->byCategory(ProjectCategory::LivewirePackage)->count(),
@@ -160,7 +158,7 @@ class SiteStats
      * scheduled sync command, not by the request path.
      *
      * @return array{
-     *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
+     *   repos:int, catalogue:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
      *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int, website:int, youtube_channel:int,
      *   php_package:int, javascript_package:int, css_framework:int, application:int, learning_resource:int, awesome_list:int, mobile_library:int,
      *   maintained:int, daily_drivers:int,
@@ -223,6 +221,7 @@ class SiteStats
 
         return [
             ['label_key' => 'os.repos',                'target' => $s['repos']],
+            ['label_key' => 'os.catalogue',            'target' => $s['catalogue']],
             ['label_key' => 'os.followers',            'target' => self::scaleK($s['followers']), 'suffix' => self::suffixK($s['followers']), 'decimals' => 1],
             ['label_key' => 'os.downloads_packagist',  'target' => self::scaleM($s['downloads_packagist']), 'suffix' => self::suffixM($s['downloads_packagist']), 'decimals' => 1],
             ['label_key' => 'os.downloads_npm',        'target' => self::scaleM($s['downloads_npm']), 'suffix' => self::suffixM($s['downloads_npm']), 'decimals' => 1],
@@ -237,7 +236,7 @@ class SiteStats
 
     /**
      * @return array{
-     *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
+     *   repos:int, catalogue:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
      *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int, website:int, youtube_channel:int,
      *   php_package:int, javascript_package:int, css_framework:int, application:int, learning_resource:int, awesome_list:int, mobile_library:int,
      *   maintained:int, daily_drivers:int,
@@ -250,6 +249,7 @@ class SiteStats
     {
         return [
             'repos' => $stat->repos,
+            'catalogue' => $stat->catalogue,
             'filament' => $stat->filament,
             'laravel' => $stat->laravel,
             'livewire' => $stat->livewire,
@@ -287,7 +287,7 @@ class SiteStats
 
     /**
      * @return array{
-     *   repos:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
+     *   repos:int, catalogue:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
      *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int, website:int, youtube_channel:int,
      *   php_package:int, javascript_package:int, css_framework:int, application:int, learning_resource:int, awesome_list:int, mobile_library:int,
      *   maintained:int, daily_drivers:int,
@@ -299,13 +299,6 @@ class SiteStats
     private static function compute(): array
     {
         $base = Project::query()->published();
-        // Catalogue rows that aren't actually code repositories (external
-        // sites + YouTube channels) get pulled out of the headline `repos`
-        // total so the count matches the user's mental model.
-        $codeOnly = (clone $base)->whereNotIn('category', [
-            ProjectCategory::Website->value,
-            ProjectCategory::YoutubeChannel->value,
-        ]);
 
         $stars = (int) (clone $base)->sum('stars');
         $downloads = (int) (clone $base)->sum('downloads');
@@ -317,7 +310,8 @@ class SiteStats
         $github = self::fetchGithubUser(self::GITHUB_LOGIN);
 
         return [
-            'repos' => (int) (clone $codeOnly)->count(),
+            'repos' => self::ownedReposCount(),
+            'catalogue' => (int) (clone $base)->count(),
             'filament' => (int) (clone $base)->byCategory(ProjectCategory::FilamentPlugin)->count(),
             'laravel' => (int) (clone $base)->byCategory(ProjectCategory::LaravelPackage)->count(),
             'livewire' => (int) (clone $base)->byCategory(ProjectCategory::LivewirePackage)->count(),
@@ -409,6 +403,18 @@ class SiteStats
         }
 
         return (int) ($response->json('data.user.sponsorshipsAsMaintainer.totalCount') ?? 0);
+    }
+
+    /**
+     * Count of published projects whose GitHub repo is owned by the site's
+     * own login — the honest "public repositories" headline, distinct from
+     * the curated catalogue total.
+     */
+    private static function ownedReposCount(): int
+    {
+        return (int) Project::query()->published()
+            ->whereRaw('lower(github_url) like ?', ['%github.com/'.self::GITHUB_LOGIN.'/%'])
+            ->count();
     }
 
     private static function scaleK(int $n): float|int

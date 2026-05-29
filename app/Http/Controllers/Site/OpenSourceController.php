@@ -20,6 +20,7 @@ class OpenSourceController
             'osStats' => SiteStats::osCards(),
             'topRepos' => $topRepos,
             'contributions' => SiteStats::contributions(),
+            'reposCount' => SiteStats::all()['repos'],
         ]);
     }
 }

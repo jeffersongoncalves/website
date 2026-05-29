@@ -81,7 +81,7 @@
             </div>
             <div class="flex justify-center mt-12">
                 <a href="{{ route('projects.index') }}" class="btn-ghost mono text-[0.9375rem] text-ink-200">
-                    @lang('site.os.view_all_repos')
+                    {{ __('site.os.view_all_repos', ['count' => $reposCount]) }}
                 </a>
             </div>
         </div>

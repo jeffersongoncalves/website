@@ -81,6 +81,7 @@ return [
 
     'os' => [
         'repos' => 'Repositorios públicos',
+        'catalogue' => 'Proyectos en el catálogo',
         'followers' => 'Seguidores en GitHub',
         'downloads' => 'Descargas',
         'downloads_packagist' => 'Descargas en Packagist',
@@ -102,7 +103,7 @@ return [
         'top_repos' => 'Más usados.',
         'sponsors_count' => '4 sponsors públicos.',
         'sponsors_count_2' => '+ algunos privados.',
-        'view_all_repos' => 'Ver todos los repositorios →',
+        'view_all_repos' => 'Ver todos los :count repositorios →',
     ],
 
     'projects' => [

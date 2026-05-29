@@ -10,36 +10,41 @@ use App\Support\SiteStats;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
-function makeProject(int $i, ProjectCategory $category): Project
+function makeProject(int $i, ProjectCategory $category, ?string $githubUrl = null): Project
 {
     return Project::query()->create([
         'name' => "Project {$i}",
         'slug' => "project-{$i}",
         'category' => $category,
         'status' => ProjectStatus::Published,
+        'github_url' => $githubUrl,
         'stars' => 10,
         'downloads' => 100,
     ]);
 }
 
 it('persists site stats to the database and reads them back without recomputing', function () {
-    makeProject(1, ProjectCategory::FilamentPlugin);
-    makeProject(2, ProjectCategory::FilamentPlugin);
-    makeProject(3, ProjectCategory::LaravelPackage);
+    // Two repos owned by the site login + one third-party repo. `repos` counts
+    // only the owned ones; `catalogue` is the full published total.
+    makeProject(1, ProjectCategory::FilamentPlugin, 'https://github.com/jeffersongoncalves/project-1');
+    makeProject(2, ProjectCategory::FilamentPlugin, 'https://github.com/jeffersongoncalves/project-2');
+    makeProject(3, ProjectCategory::LaravelPackage, 'https://github.com/someoneelse/project-3');
 
     SiteStats::persist();
 
     expect(SiteStat::query()->count())->toBe(1);
 
     $row = SiteStat::query()->first();
-    expect($row->repos)->toBe(3);
+    expect($row->repos)->toBe(2);
+    expect($row->catalogue)->toBe(3);
     expect($row->filament)->toBe(2);
     expect($row->laravel)->toBe(1);
     expect($row->stars)->toBe(30);
     expect($row->synced_at)->not->toBeNull();
 
     Http::fake(fn () => throw new RuntimeException('site stats read should not hit the network'));
-    expect(SiteStats::all()['repos'])->toBe(3);
+    expect(SiteStats::all()['repos'])->toBe(2);
+    expect(SiteStats::all()['catalogue'])->toBe(3);
 });
 
 it('renders the README and writes it to the github disk', function () {

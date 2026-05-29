@@ -70,6 +70,7 @@ class ProjectController
         $stats = SiteStats::all();
         $counts = [
             'total' => $stats['repos'],
+            'catalogue' => $stats['catalogue'],
             'filament' => $stats['filament'],
             'laravel' => $stats['laravel'],
             'starter' => $stats['starter'],

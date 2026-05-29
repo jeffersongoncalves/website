@@ -11,6 +11,7 @@
             @php
                 $countItems = [
                     ['v' => $counts['total'],         'label' => __('site.os.repos')],
+                    ['v' => $counts['catalogue'],     'label' => __('site.os.catalogue')],
                     ['v' => $counts['filament'],      'label' => __('site.os.plugins_filament')],
                     ['v' => $counts['laravel'],       'label' => __('site.os.packages_laravel')],
                     ['v' => $counts['starter'],       'label' => __('site.os.starter_kits')],

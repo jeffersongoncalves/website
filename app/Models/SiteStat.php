@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $repos
+ * @property int $catalogue
  * @property int $filament
  * @property int $laravel
  * @property int $livewire
@@ -50,6 +51,7 @@ class SiteStat extends Model
 {
     protected $fillable = [
         'repos',
+        'catalogue',
         'filament',
         'laravel',
         'livewire',
@@ -89,6 +91,7 @@ class SiteStat extends Model
     {
         return [
             'repos' => 'integer',
+            'catalogue' => 'integer',
             'filament' => 'integer',
             'laravel' => 'integer',
             'livewire' => 'integer',

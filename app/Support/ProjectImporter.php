@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Enums\ProjectLanguage;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -639,7 +640,7 @@ class ProjectImporter
             'title.es' => $description ?? self::prettifyName($repoName),
             'category' => $category,
             'package_type' => $packageType,
-            'language' => self::nullableString($repo['language'] ?? null),
+            'language' => ProjectLanguage::tryFrom((string) ($repo['language'] ?? ''))?->value,
             'packagist_url' => self::buildPackagistUrl($composer),
             'npm_url' => $npmPublished ? 'https://www.npmjs.com/package/'.$npmName : null,
             'stack' => self::resolveStack($composer, $package),

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Site;
 
 use App\Enums\ProjectCategory;
+use App\Enums\ProjectStatus;
 use App\Models\Project;
 use App\Support\SiteStats;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProjectController
 {
@@ -26,8 +28,10 @@ class ProjectController
         }
 
         // Distinct languages present in the published catalogue, busiest first
-        // — drives the language facet dropdown.
-        $languages = Project::query()->published()
+        // — drives the language facet dropdown. Read raw (DB::table, no enum
+        // cast) so the list is plain strings for the <select> + comparison.
+        $languages = DB::table('projects')
+            ->where('status', ProjectStatus::Published->value)
             ->whereNotNull('language')
             ->where('language', '!=', '')
             ->selectRaw('language, count(*) as total')

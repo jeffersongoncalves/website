@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
+use App\Enums\ProjectLanguage;
 use App\Enums\ProjectStatus;
 use App\Observers\ProjectObserver;
 use App\Support\LocaleSupport;
@@ -26,7 +27,7 @@ use Spatie\Translatable\HasTranslations;
  * @property string|null $repo
  * @property ProjectCategory $category
  * @property PackageType|null $package_type
- * @property string|null $language
+ * @property ProjectLanguage|null $language
  * @property array<array-key, mixed>|null $title
  * @property array<array-key, mixed>|null $content
  * @property array<array-key, mixed>|null $versions
@@ -157,6 +158,7 @@ class Project extends Model
             'is_paid' => 'boolean',
             'category' => ProjectCategory::class,
             'package_type' => PackageType::class,
+            'language' => ProjectLanguage::class,
             'status' => ProjectStatus::class,
             'published_at' => 'datetime',
             'last_synced_at' => 'datetime',

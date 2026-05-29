@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Projects\Schemas;
 
 use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
+use App\Enums\ProjectLanguage;
 use App\Enums\ProjectStatus;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\KeyValue;
@@ -61,10 +62,9 @@ class ProjectForm
                                     ->options(PackageType::class)
                                     ->default(PackageType::Composer)
                                     ->helperText(__('admin.helpers.package_type')),
-                                TextInput::make('language')
+                                Select::make('language')
                                     ->label(__('admin.fields.language'))
-                                    ->maxLength(255)
-                                    ->placeholder('PHP')
+                                    ->options(ProjectLanguage::class)
                                     ->helperText(__('admin.helpers.language')),
                             ]),
                         Section::make(__('admin.sections.title'))

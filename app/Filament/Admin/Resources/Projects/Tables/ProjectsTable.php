@@ -36,9 +36,7 @@ class ProjectsTable
                 TextColumn::make('language')
                     ->label(__('admin.fields.language'))
                     ->badge()
-                    ->color('gray')
                     ->placeholder('—')
-                    ->searchable()
                     ->sortable()
                     ->toggleable(),
                 IconColumn::make('featured')

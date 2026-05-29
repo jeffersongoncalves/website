@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
+use App\Enums\ProjectLanguage;
 use App\Models\Project;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
@@ -51,8 +52,12 @@ class ProjectMetrics
             // Capture the repo's primary language for free from the same
             // /repos call — lets the catalogue facet generic applications by
             // language instead of leaving them in one undifferentiated bucket.
-            if ($snapshot['language'] !== null && $snapshot['language'] !== $project->language) {
-                $project->language = $snapshot['language'];
+            // Unknown languages (not in the enum) are ignored.
+            $language = $snapshot['language'] !== null
+                ? ProjectLanguage::tryFrom($snapshot['language'])
+                : null;
+            if ($language !== null && $language !== $project->language) {
+                $project->language = $language;
                 $changed = true;
             }
 

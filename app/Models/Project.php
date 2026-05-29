@@ -26,6 +26,7 @@ use Spatie\Translatable\HasTranslations;
  * @property string|null $repo
  * @property ProjectCategory $category
  * @property PackageType|null $package_type
+ * @property string|null $language
  * @property array<array-key, mixed>|null $title
  * @property array<array-key, mixed>|null $content
  * @property array<array-key, mixed>|null $versions
@@ -57,6 +58,7 @@ use Spatie\Translatable\HasTranslations;
  *
  * @method static Builder<static>|Project authored()
  * @method static Builder<static>|Project byCategory(\App\Enums\ProjectCategory|string $category)
+ * @method static Builder<static>|Project byLanguage(string $language)
  * @method static Builder<static>|Project featured()
  * @method static Builder<static>|Project maintained()
  * @method static Builder<static>|Project newModelQuery()
@@ -108,6 +110,7 @@ class Project extends Model
         'repo',
         'category',
         'package_type',
+        'language',
         'title',
         'content',
         'versions',
@@ -224,6 +227,11 @@ class Project extends Model
         $value = $category instanceof ProjectCategory ? $category->value : $category;
 
         return $query->where('category', $value);
+    }
+
+    public function scopeByLanguage(Builder $query, string $language): Builder
+    {
+        return $query->where('language', $language);
     }
 
     public function scopeMaintained(Builder $query): Builder

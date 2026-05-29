@@ -56,6 +56,18 @@
                         </select>
                     </label>
 
+                    @if(count($languages) > 0)
+                        <label class="projects-filter">
+                            <span class="projects-filter-label">@lang('site.projects.filter_language')</span>
+                            <select name="language" class="projects-filter-select" onchange="this.form.submit()">
+                                <option value="">@lang('site.projects.language_all')</option>
+                                @foreach($languages as $lang)
+                                    <option value="{{ $lang }}" @selected($activeLanguage === $lang)>{{ $lang }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+                    @endif
+
                     <label class="projects-filter">
                         <span class="projects-filter-label">@lang('site.projects.filter_role')</span>
                         <select name="role" class="projects-filter-select" onchange="this.form.submit()">

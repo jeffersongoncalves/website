@@ -61,6 +61,11 @@ class ProjectForm
                                     ->options(PackageType::class)
                                     ->default(PackageType::Composer)
                                     ->helperText(__('admin.helpers.package_type')),
+                                TextInput::make('language')
+                                    ->label(__('admin.fields.language'))
+                                    ->maxLength(255)
+                                    ->placeholder('PHP')
+                                    ->helperText(__('admin.helpers.language')),
                             ]),
                         Section::make(__('admin.sections.title'))
                             ->columnSpanFull()

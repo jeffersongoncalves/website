@@ -636,6 +636,7 @@ class ProjectImporter
             'title.es' => $description,
             'category' => $category,
             'package_type' => $packageType,
+            'language' => self::nullableString($repo['language'] ?? null),
             'packagist_url' => self::buildPackagistUrl($composer),
             'npm_url' => $npmPublished ? 'https://www.npmjs.com/package/'.$npmName : null,
             'stack' => self::resolveStack($composer, $package),

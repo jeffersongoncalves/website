@@ -114,6 +114,22 @@ it('resolves npm package_type when composer.json is missing but package.json exi
     expect($fields['category'])->toBe('javascript_package');
 });
 
+it('captures the repo primary language from the github metadata', function (): void {
+    importerFakes(fakeGithubRepo(['language' => 'PHP']), fakeComposer(), null, ['main']);
+
+    $fields = ProjectImporter::fromGithub('https://github.com/foo/bar')['fields'];
+
+    expect($fields['language'])->toBe('PHP');
+});
+
+it('leaves language null when github reports none', function (): void {
+    importerFakes(fakeGithubRepo(['language' => null]), fakeComposer(), null, ['main']);
+
+    $fields = ProjectImporter::fromGithub('https://github.com/foo/baz')['fields'];
+
+    expect($fields['language'])->toBeNull();
+});
+
 it('drops npm_url and downgrades package_type when package.json exists but the registry has no published package', function (): void {
     importerFakes(
         fakeGithubRepo(['topics' => ['javascript']]),

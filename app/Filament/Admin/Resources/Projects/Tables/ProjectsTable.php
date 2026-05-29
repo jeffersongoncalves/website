@@ -33,6 +33,14 @@ class ProjectsTable
                     ->label(__('admin.fields.status'))
                     ->badge()
                     ->sortable(),
+                TextColumn::make('language')
+                    ->label(__('admin.fields.language'))
+                    ->badge()
+                    ->color('gray')
+                    ->placeholder('—')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
                 IconColumn::make('featured')
                     ->label(__('admin.fields.featured'))
                     ->boolean()

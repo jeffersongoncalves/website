@@ -136,6 +136,7 @@ return [
         'repo' => 'Repositorio',
         'category' => 'Categoría',
         'package_type' => 'Tipo de paquete',
+        'language' => 'Lenguaje',
         'status' => 'Estado',
         'featured' => 'Destacado',
         'sort_order' => 'Orden',
@@ -182,6 +183,7 @@ return [
         'readme_branch' => 'Rama de GitHub usada para obtener el README. Deja en blanco para usar la rama por defecto del repositorio.',
         'downloads_label' => 'Valor mostrado: 21k, 1.2M, —',
         'package_type' => 'Qué manifiesto debe leer el sync para resolver el nombre del paquete: composer.json (Packagist), package.json (npm), JetBrains, o ninguno.',
+        'language' => 'Lenguaje principal del repositorio, detectado por GitHub en el sync. Se usa para filtrar el catálogo.',
     ],
 
     'placeholders' => [

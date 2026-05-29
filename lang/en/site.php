@@ -125,6 +125,8 @@ return [
         'filter_search' => 'Search',
         'filter_search_placeholder' => 'package name...',
         'filter_category' => 'Category',
+        'filter_language' => 'Language',
+        'language_all' => 'All languages',
         'filter_role' => 'Role',
         'filter_apply' => 'Filter',
         'readme_unavailable' => 'README is currently unavailable. View it directly on GitHub:',

@@ -40,10 +40,20 @@ class ProjectMetrics
             $changed = true;
         }
 
-        $stars = self::fetchStars($project->github_url);
-        if ($stars !== null && $stars !== $project->stars) {
-            $project->stars = $stars;
-            $changed = true;
+        $snapshot = self::fetchRepoSnapshot($project->github_url);
+        if ($snapshot !== null) {
+            if ($snapshot['stars'] !== $project->stars) {
+                $project->stars = $snapshot['stars'];
+                $changed = true;
+            }
+
+            // Capture the repo's primary language for free from the same
+            // /repos call — lets the catalogue facet generic applications by
+            // language instead of leaving them in one undifferentiated bucket.
+            if ($snapshot['language'] !== null && $snapshot['language'] !== $project->language) {
+                $project->language = $snapshot['language'];
+                $changed = true;
+            }
         }
 
         $downloads = self::fetchDownloads($project);
@@ -290,7 +300,14 @@ class ProjectMetrics
         return 0;
     }
 
-    private static function fetchStars(?string $githubUrl): ?int
+    /**
+     * Fetch stars + primary language in a single /repos call. Returns null
+     * when the request can't be completed; `language` is null for repos
+     * GitHub reports no language for (docs-only, empty, etc.).
+     *
+     * @return array{stars:int, language:?string}|null
+     */
+    private static function fetchRepoSnapshot(?string $githubUrl): ?array
     {
         $repo = GithubReadme::repoFromUrl($githubUrl);
 
@@ -314,7 +331,12 @@ class ProjectMetrics
             return null;
         }
 
-        return (int) ($response->json('stargazers_count') ?? 0);
+        $language = $response->json('language');
+
+        return [
+            'stars' => (int) ($response->json('stargazers_count') ?? 0),
+            'language' => is_string($language) && $language !== '' ? $language : null,
+        ];
     }
 
     private static function fetchDownloads(Project $project): ?int

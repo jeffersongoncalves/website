@@ -136,6 +136,7 @@ return [
         'repo' => 'Repository',
         'category' => 'Category',
         'package_type' => 'Package type',
+        'language' => 'Language',
         'status' => 'Status',
         'featured' => 'Featured',
         'sort_order' => 'Sort order',
@@ -182,6 +183,7 @@ return [
         'readme_branch' => 'GitHub branch used to fetch the README. Leave blank to use the repository default branch.',
         'downloads_label' => 'Display value: 21k, 1.2M, —',
         'package_type' => 'Which manifest the sync should read to resolve the package name: composer.json (Packagist), package.json (npm), JetBrains, or none.',
+        'language' => 'The repository primary language, detected by GitHub on sync. Used to filter the catalogue.',
     ],
 
     'placeholders' => [

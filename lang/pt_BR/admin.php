@@ -136,6 +136,7 @@ return [
         'repo' => 'Repositório',
         'category' => 'Categoria',
         'package_type' => 'Tipo de pacote',
+        'language' => 'Linguagem',
         'status' => 'Status',
         'featured' => 'Destacado',
         'sort_order' => 'Ordem',
@@ -182,6 +183,7 @@ return [
         'readme_branch' => 'Branch do GitHub usada para buscar o README. Vazio = usa a branch padrão do repositório.',
         'downloads_label' => 'Valor exibido: 21k, 1.2M, —',
         'package_type' => 'Qual manifesto o sync deve ler pra resolver o nome do pacote: composer.json (Packagist), package.json (npm), JetBrains, ou nenhum.',
+        'language' => 'Linguagem principal do repositório, detectada pelo GitHub no sync. Usada para filtrar o catálogo.',
     ],
 
     'placeholders' => [

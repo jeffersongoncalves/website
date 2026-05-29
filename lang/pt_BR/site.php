@@ -125,6 +125,8 @@ return [
         'filter_search' => 'Buscar',
         'filter_search_placeholder' => 'nome do pacote...',
         'filter_category' => 'Categoria',
+        'filter_language' => 'Linguagem',
+        'language_all' => 'Todas as linguagens',
         'filter_role' => 'Papel',
         'filter_apply' => 'Filtrar',
         'readme_unavailable' => 'README indisponível no momento. Veja direto no GitHub:',

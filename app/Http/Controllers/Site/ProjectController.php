@@ -16,12 +16,30 @@ class ProjectController
         $sort = $request->string('sort', 'stars')->toString();
         $role = $request->string('role')->toString();
         $search = trim($request->string('search')->toString());
+        $language = $request->string('language')->toString();
 
         $query = Project::query()->published();
 
         $category = ProjectCategory::tryFrom($cat);
         if ($category) {
             $query->byCategory($category);
+        }
+
+        // Distinct languages present in the published catalogue, busiest first
+        // — drives the language facet dropdown.
+        $languages = Project::query()->published()
+            ->whereNotNull('language')
+            ->where('language', '!=', '')
+            ->selectRaw('language, count(*) as total')
+            ->groupBy('language')
+            ->orderByDesc('total')
+            ->orderBy('language')
+            ->pluck('language')
+            ->all();
+
+        $activeLanguage = in_array($language, $languages, true) ? $language : '';
+        if ($activeLanguage !== '') {
+            $query->byLanguage($activeLanguage);
         }
 
         $activeRole = in_array($role, ['authored', 'maintainer', 'daily_driver'], true) ? $role : 'all';
@@ -66,7 +84,9 @@ class ProjectController
             'activeSort' => $sort,
             'activeRole' => $activeRole,
             'activeSearch' => $search,
+            'activeLanguage' => $activeLanguage,
             'categories' => ProjectCategory::cases(),
+            'languages' => $languages,
             'counts' => $counts,
         ]);
     }

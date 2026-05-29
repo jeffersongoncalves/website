@@ -627,7 +627,7 @@ class ProjectImporter
             'slug' => Str::slug($owner.'-'.$repoName),
             'name' => self::prettifyName($repoName),
             'repo' => $repoName,
-            'license' => is_string($repo['license']['spdx_id'] ?? null) ? $repo['license']['spdx_id'] : 'MIT',
+            'license' => self::normalizeLicense($repo['license'] ?? null),
             'readme_branch' => $branch,
             'docs_url' => self::nullableString($repo['homepage'] ?? null),
             // Mirror the same description across all locales — the importer can't
@@ -1126,6 +1126,29 @@ class ProjectImporter
         $trimmed = trim($value);
 
         return $trimmed === '' ? null : $trimmed;
+    }
+
+    /**
+     * Map GitHub's `license` object to a stored license string. GitHub returns
+     * spdx_id `NOASSERTION` (name "Other") when a repo ships a LICENSE file it
+     * can't match to an SPDX id — store the human "Other" label instead of the
+     * opaque token. Repos with no license object at all keep the MIT default.
+     *
+     * @param  array<string, mixed>|null  $license
+     */
+    private static function normalizeLicense(?array $license): string
+    {
+        $spdx = is_string($license['spdx_id'] ?? null) ? $license['spdx_id'] : null;
+
+        if ($spdx === null) {
+            return 'MIT';
+        }
+
+        if (in_array($spdx, ['NOASSERTION', 'NONE'], true)) {
+            return 'Other';
+        }
+
+        return $spdx;
     }
 
     private static function prettifyName(string $repo): string

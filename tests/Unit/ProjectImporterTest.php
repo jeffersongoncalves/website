@@ -128,6 +128,30 @@ it('falls back to the repo name for the title when there is no description', fun
     expect($fields['title.es'])->toBe('Cool Tool');
 });
 
+it('stores Other for a NOASSERTION license instead of the opaque token', function (): void {
+    importerFakes(
+        fakeGithubRepo(['license' => ['spdx_id' => 'NOASSERTION'], 'topics' => []]),
+        null,
+        null,
+    );
+
+    $fields = ProjectImporter::fromGithub('https://github.com/foo/custom-licensed')['fields'];
+
+    expect($fields['license'])->toBe('Other');
+});
+
+it('keeps the MIT default when github reports no license', function (): void {
+    importerFakes(
+        fakeGithubRepo(['license' => null, 'topics' => []]),
+        null,
+        null,
+    );
+
+    $fields = ProjectImporter::fromGithub('https://github.com/foo/unlicensed')['fields'];
+
+    expect($fields['license'])->toBe('MIT');
+});
+
 it('captures the repo primary language from the github metadata', function (): void {
     importerFakes(fakeGithubRepo(['language' => 'PHP']), fakeComposer(), null, ['main']);
 

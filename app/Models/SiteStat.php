@@ -22,6 +22,13 @@ use Illuminate\Support\Carbon;
  * @property int $database
  * @property int $website
  * @property int $youtube_channel
+ * @property int $php_package
+ * @property int $javascript_package
+ * @property int $css_framework
+ * @property int $application
+ * @property int $learning_resource
+ * @property int $awesome_list
+ * @property int $mobile_library
  * @property int $maintained
  * @property int $daily_drivers
  * @property int $stars
@@ -57,6 +64,13 @@ class SiteStat extends Model
         'database',
         'website',
         'youtube_channel',
+        'php_package',
+        'javascript_package',
+        'css_framework',
+        'application',
+        'learning_resource',
+        'awesome_list',
+        'mobile_library',
         'maintained',
         'daily_drivers',
         'stars',
@@ -89,6 +103,13 @@ class SiteStat extends Model
             'database' => 'integer',
             'website' => 'integer',
             'youtube_channel' => 'integer',
+            'php_package' => 'integer',
+            'javascript_package' => 'integer',
+            'css_framework' => 'integer',
+            'application' => 'integer',
+            'learning_resource' => 'integer',
+            'awesome_list' => 'integer',
+            'mobile_library' => 'integer',
             'maintained' => 'integer',
             'daily_drivers' => 'integer',
             'stars' => 'integer',

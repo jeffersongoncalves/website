@@ -166,7 +166,7 @@ class ProjectImporter
             'title.en' => $description,
             'title.pt' => $description,
             'title.es' => $description,
-            'category' => 'tool',
+            'category' => 'javascript_package',
             'package_type' => 'npm',
             'packagist_url' => null,
             'npm_url' => 'https://www.npmjs.com/package/'.$name,
@@ -606,6 +606,18 @@ class ProjectImporter
         if ($category === 'docker' && $packageType === 'none') {
             $packageType = 'docker';
         }
+        // Generic GitHub imports that fell through to the `tool` fallback are
+        // split by what the repo actually ships: a Composer manifest makes it
+        // a PHP package, a published npm package a JavaScript one, and anything
+        // else a standalone application. `tool` is reserved for CLI utilities
+        // the editor reclassifies by hand.
+        if ($category === 'tool') {
+            $category = match ($packageType) {
+                'composer' => 'php_package',
+                'npm' => 'javascript_package',
+                default => 'application',
+            };
+        }
         $description = self::pickDescription($composer, $package, $repo);
 
         $fields = [
@@ -632,7 +644,7 @@ class ProjectImporter
 
         $warnings = [];
 
-        if ($category === 'tool' && ! isset($composer['type'])) {
+        if ($category === 'application') {
             $warnings[] = 'category_fallback';
         }
 
@@ -923,6 +935,41 @@ class ProjectImporter
         );
         if ($hasDockerCompose || $dockerTopics !== []) {
             return 'docker';
+        }
+
+        $repoName = is_string($repo['name'] ?? null) ? strtolower((string) $repo['name']) : '';
+
+        // Awesome lists — the de-facto convention is an `awesome-` repo name
+        // or an `awesome` / `awesome-list` topic.
+        if (str_starts_with($repoName, 'awesome-')
+            || array_intersect(['awesome', 'awesome-list', 'awesome-lists'], $topics) !== []) {
+            return 'awesome_list';
+        }
+
+        // CSS frameworks — topic-driven so a PHP/JS lib that merely ships a
+        // stylesheet isn't misfiled here.
+        if (array_intersect(['css-framework', 'css-frameworks'], $topics) !== []) {
+            return 'css_framework';
+        }
+
+        // Mobile libraries / SDKs — platform topics are the reliable signal.
+        if (array_intersect(
+            ['android', 'ios', 'kotlin', 'swift', 'swiftui', 'jetpack-compose',
+                'flutter', 'react-native', 'android-library', 'ios-library'],
+            $topics,
+        ) !== []) {
+            return 'mobile_library';
+        }
+
+        // Learning resources — roadmaps, courses, books, cheatsheets.
+        if (array_intersect(
+            ['tutorial', 'tutorials', 'education', 'educational', 'learning',
+                'course', 'courses', 'roadmap', 'roadmaps', 'book', 'books',
+                'curriculum', 'cheatsheet', 'cheatsheets', 'interview',
+                'interview-questions', 'study'],
+            $topics,
+        ) !== []) {
+            return 'learning_resource';
         }
 
         return 'tool';

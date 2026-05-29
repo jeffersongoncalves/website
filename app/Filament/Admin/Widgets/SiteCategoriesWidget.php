@@ -47,9 +47,21 @@ class SiteCategoriesWidget extends StatsOverviewWidget
                 ->description($desc)
                 ->color('gray'),
 
+            Stat::make(__('admin.widgets.site_categories.php_package'), number_format($s['php_package'], 0, ',', '.'))
+                ->description($desc)
+                ->color('info'),
+
+            Stat::make(__('admin.widgets.site_categories.javascript_package'), number_format($s['javascript_package'], 0, ',', '.'))
+                ->description($desc)
+                ->color('warning'),
+
             Stat::make(__('admin.widgets.site_categories.framework'), number_format($s['framework'], 0, ',', '.'))
                 ->description($desc)
                 ->color('primary'),
+
+            Stat::make(__('admin.widgets.site_categories.css_framework'), number_format($s['css_framework'], 0, ',', '.'))
+                ->description($desc)
+                ->color('info'),
 
             Stat::make(__('admin.widgets.site_categories.starter'), number_format($s['starter'], 0, ',', '.'))
                 ->description($desc)
@@ -62,6 +74,22 @@ class SiteCategoriesWidget extends StatsOverviewWidget
             Stat::make(__('admin.widgets.site_categories.tool'), number_format($s['tool'], 0, ',', '.'))
                 ->description($desc)
                 ->color('gray'),
+
+            Stat::make(__('admin.widgets.site_categories.application'), number_format($s['application'], 0, ',', '.'))
+                ->description($desc)
+                ->color('gray'),
+
+            Stat::make(__('admin.widgets.site_categories.learning_resource'), number_format($s['learning_resource'], 0, ',', '.'))
+                ->description($desc)
+                ->color('success'),
+
+            Stat::make(__('admin.widgets.site_categories.awesome_list'), number_format($s['awesome_list'], 0, ',', '.'))
+                ->description($desc)
+                ->color('primary'),
+
+            Stat::make(__('admin.widgets.site_categories.mobile_library'), number_format($s['mobile_library'], 0, ',', '.'))
+                ->description($desc)
+                ->color('success'),
 
             Stat::make(__('admin.widgets.site_categories.docker'), number_format($s['docker'], 0, ',', '.'))
                 ->description($desc)

@@ -57,11 +57,14 @@ function importerFakes(array $repo, ?array $composer, ?array $package, array $br
         'raw.githubusercontent.com/*compose.yml' => Http::response('', 404),
         'raw.githubusercontent.com/*compose.yaml' => Http::response('', 404),
         'raw.githubusercontent.com/*/Dockerfile' => Http::response('', 404),
-        // Stub the npm registry HEAD lookup so tests don't hit real network.
-        // Default OK = pretend the package is published; toggle with the flag
-        // to simulate `package.json` present but no published package.
+        // Stub the npm registry lookup so tests don't hit real network. The
+        // HEAD (npmPackageExists) ignores the body; the GET
+        // (npmPackageBelongsToRepo) needs a `repository` pointing back at the
+        // imported repo, so echo the canonical `foo/bar` slug the github fakes
+        // use. Toggle the flag to simulate `package.json` present but no
+        // published package.
         'registry.npmjs.org/*' => $npmPublished
-            ? Http::response('', 200)
+            ? Http::response(['repository' => ['type' => 'git', 'url' => 'https://github.com/foo/bar']], 200)
             : Http::response('', 404),
     ]);
 }
@@ -108,7 +111,7 @@ it('resolves npm package_type when composer.json is missing but package.json exi
     expect($fields['npm_url'])->toBe('https://www.npmjs.com/package/my-pkg');
     expect($fields['packagist_url'])->toBeNull();
     expect($fields['stack'])->toBe(['Tailwind', 'Alpine.js']);
-    expect($fields['category'])->toBe('tool');
+    expect($fields['category'])->toBe('javascript_package');
 });
 
 it('drops npm_url and downgrades package_type when package.json exists but the registry has no published package', function (): void {
@@ -147,7 +150,7 @@ it('returns repo_not_found when GitHub API 404s', function (): void {
     expect($result)->toBe(['error' => 'repo_not_found']);
 });
 
-it('falls back to tool category and emits a warning when nothing matches', function (): void {
+it('falls back to application category and emits a warning when nothing matches', function (): void {
     importerFakes(
         fakeGithubRepo(['topics' => [], 'description' => null]),
         null,
@@ -156,7 +159,7 @@ it('falls back to tool category and emits a warning when nothing matches', funct
 
     $result = ProjectImporter::fromGithub('https://github.com/foo/bar');
 
-    expect($result['fields']['category'])->toBe('tool');
+    expect($result['fields']['category'])->toBe('application');
     expect($result['warnings'])->toContain('category_fallback');
 });
 

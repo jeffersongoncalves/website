@@ -47,6 +47,20 @@ it('persists site stats to the database and reads them back without recomputing'
     expect(SiteStats::all()['catalogue'])->toBe(3);
 });
 
+it('computes the per-language breakdown busiest first', function () {
+    makeProject(1, ProjectCategory::PhpPackage)->update(['language' => 'PHP']);
+    makeProject(2, ProjectCategory::PhpPackage)->update(['language' => 'PHP']);
+    makeProject(3, ProjectCategory::JavascriptPackage)->update(['language' => 'JavaScript']);
+    makeProject(4, ProjectCategory::Application); // no language
+
+    SiteStats::persist();
+
+    expect(SiteStats::all()['languages'])->toBe([
+        ['language' => 'PHP', 'total' => 2],
+        ['language' => 'JavaScript', 'total' => 1],
+    ]);
+});
+
 it('renders the README and writes it to the github disk', function () {
     Storage::fake('github');
 

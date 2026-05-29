@@ -114,6 +114,10 @@ return [
             'website' => 'External sites',
             'youtube_channel' => 'YouTube channels',
         ],
+        'site_languages' => [
+            'heading' => 'By language',
+            'desc' => 'published projects',
+        ],
     ],
 
     'sections' => [

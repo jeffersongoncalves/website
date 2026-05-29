@@ -4,8 +4,10 @@ namespace App\Support;
 
 use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
+use App\Enums\ProjectStatus;
 use App\Models\Project;
 use App\Models\SiteStat;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 class SiteStats
@@ -26,7 +28,8 @@ class SiteStats
      *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
-     *   contributions:array{cells:list<int>,total:int}
+     *   contributions:array{cells:list<int>,total:int},
+     *   languages:list<array{language:string,total:int}>
      * }
      */
     public static function all(): array
@@ -50,7 +53,8 @@ class SiteStats
      *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
-     *   contributions:array{cells:list<int>,total:int}
+     *   contributions:array{cells:list<int>,total:int},
+     *   languages:list<array{language:string,total:int}>
      * }
      */
     private static function empty(): array
@@ -90,6 +94,7 @@ class SiteStats
             'followers' => 0,
             'public_sponsors' => 0,
             'contributions' => ['cells' => [], 'total' => 0],
+            'languages' => [],
         ];
     }
 
@@ -141,6 +146,7 @@ class SiteStats
             'downloads_npm' => (int) (clone $base)->where('package_type', PackageType::Npm->value)->sum('downloads'),
             'downloads_jetbrains' => (int) (clone $base)->where('package_type', PackageType::JetBrains->value)->sum('downloads'),
             'downloads_docker' => (int) (clone $base)->where('package_type', PackageType::Docker->value)->sum('downloads'),
+            'languages' => self::languageBreakdown(),
         ];
 
         $stat = SiteStat::query()->firstOrNew([]);
@@ -164,7 +170,8 @@ class SiteStats
      *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
-     *   contributions:array{cells:list<int>,total:int}
+     *   contributions:array{cells:list<int>,total:int},
+     *   languages:list<array{language:string,total:int}>
      * }
      */
     public static function persist(): array
@@ -242,7 +249,8 @@ class SiteStats
      *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
-     *   contributions:array{cells:list<int>,total:int}
+     *   contributions:array{cells:list<int>,total:int},
+     *   languages:list<array{language:string,total:int}>
      * }
      */
     private static function toArray(SiteStat $stat): array
@@ -282,6 +290,7 @@ class SiteStats
             'followers' => $stat->followers,
             'public_sponsors' => $stat->public_sponsors,
             'contributions' => $stat->contributions ?? ['cells' => [], 'total' => 0],
+            'languages' => $stat->languages ?? [],
         ];
     }
 
@@ -293,7 +302,8 @@ class SiteStats
      *   maintained:int, daily_drivers:int,
      *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
      *   followers:int, public_sponsors:int,
-     *   contributions:array{cells:list<int>,total:int}
+     *   contributions:array{cells:list<int>,total:int},
+     *   languages:list<array{language:string,total:int}>
      * }
      */
     private static function compute(): array
@@ -344,7 +354,35 @@ class SiteStats
             'followers' => $github['followers'] ?? 0,
             'public_sponsors' => self::fetchSponsorCount(self::GITHUB_LOGIN),
             'contributions' => GithubContributions::fetch(self::GITHUB_LOGIN),
+            'languages' => self::languageBreakdown(),
         ];
+    }
+
+    /**
+     * Published-project counts per language, busiest first — drives the
+     * admin language metrics widget. Stored on the SiteStat row so the request
+     * path never recomputes.
+     *
+     * @return list<array{language:string,total:int}>
+     */
+    private static function languageBreakdown(): array
+    {
+        // DB::table (not Eloquent) so `language` comes back as the raw string,
+        // not the ProjectLanguage enum cast.
+        return DB::table('projects')
+            ->where('status', ProjectStatus::Published->value)
+            ->whereNotNull('language')
+            ->where('language', '!=', '')
+            ->selectRaw('language, count(*) as total')
+            ->groupBy('language')
+            ->orderByDesc('total')
+            ->orderBy('language')
+            ->get()
+            ->map(fn ($row): array => [
+                'language' => (string) $row->language,
+                'total' => (int) $row->total,
+            ])
+            ->all();
     }
 
     /**

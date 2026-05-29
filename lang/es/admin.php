@@ -114,6 +114,10 @@ return [
             'website' => 'Sitios externos',
             'youtube_channel' => 'Canales de YouTube',
         ],
+        'site_languages' => [
+            'heading' => 'Por lenguaje',
+            'desc' => 'proyectos publicados',
+        ],
     ],
 
     'sections' => [

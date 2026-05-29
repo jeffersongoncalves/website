@@ -141,6 +141,7 @@ return [
         'category' => 'Categoría',
         'package_type' => 'Tipo de paquete',
         'language' => 'Lenguaje',
+        'topics' => 'Topics',
         'status' => 'Estado',
         'featured' => 'Destacado',
         'sort_order' => 'Orden',
@@ -188,6 +189,7 @@ return [
         'downloads_label' => 'Valor mostrado: 21k, 1.2M, —',
         'package_type' => 'Qué manifiesto debe leer el sync para resolver el nombre del paquete: composer.json (Packagist), package.json (npm), JetBrains, o ninguno.',
         'language' => 'Lenguaje principal del repositorio, detectado por GitHub en el sync. Se usa para filtrar el catálogo.',
+        'topics' => 'Etiquetas del proyecto. Se completan automáticamente desde los topics de GitHub y keywords de composer/npm en el sync.',
     ],
 
     'placeholders' => [

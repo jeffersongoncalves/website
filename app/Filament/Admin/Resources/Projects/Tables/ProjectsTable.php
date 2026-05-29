@@ -39,6 +39,12 @@ class ProjectsTable
                     ->placeholder('—')
                     ->sortable()
                     ->toggleable(),
+                TextColumn::make('topics')
+                    ->label(__('admin.fields.topics'))
+                    ->badge()
+                    ->placeholder('—')
+                    ->limitList(5)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('featured')
                     ->label(__('admin.fields.featured'))
                     ->boolean()

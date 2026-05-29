@@ -108,6 +108,10 @@ class ProjectForm
                                 TagsInput::make('stack')
                                     ->label(__('admin.fields.stack'))
                                     ->placeholder(__('admin.placeholders.stack')),
+                                TagsInput::make('topics')
+                                    ->label(__('admin.fields.topics'))
+                                    ->helperText(__('admin.helpers.topics'))
+                                    ->columnSpanFull(),
                                 KeyValue::make('branch_overrides')
                                     ->label(__('admin.fields.branch_overrides'))
                                     ->keyLabel(__('admin.fields.auto_branch'))

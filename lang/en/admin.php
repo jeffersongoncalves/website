@@ -141,6 +141,7 @@ return [
         'category' => 'Category',
         'package_type' => 'Package type',
         'language' => 'Language',
+        'topics' => 'Topics',
         'status' => 'Status',
         'featured' => 'Featured',
         'sort_order' => 'Sort order',
@@ -188,6 +189,7 @@ return [
         'downloads_label' => 'Display value: 21k, 1.2M, —',
         'package_type' => 'Which manifest the sync should read to resolve the package name: composer.json (Packagist), package.json (npm), JetBrains, or none.',
         'language' => 'The repository primary language, detected by GitHub on sync. Used to filter the catalogue.',
+        'topics' => 'Project tags. Filled automatically from GitHub topics and composer/npm keywords on sync.',
     ],
 
     'placeholders' => [

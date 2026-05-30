@@ -9,6 +9,7 @@ use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -351,6 +352,15 @@ class ProjectMetrics
      * `default_branch` is reused by the URL-resolvers and branch repair so they
      * don't each re-fetch /repos/{repo}.
      *
+     * Two layers cut quota use:
+     *  - 6h freshness window: a recently-fetched snapshot is served from cache
+     *    with zero network, absorbing the admin-save bursts the ProjectObserver
+     *    triggers.
+     *  - ETag conditional request once stale: GitHub answers `304 Not Modified`
+     *    without charging the rate limit, so an unchanged repo costs nothing on
+     *    the daily sync. The cache entry (payload + ETag) is kept 7 days so the
+     *    conditional survives between daily runs.
+     *
      * @return array{stars:int, language:?string, topics:list<string>, default_branch:?string}|null
      */
     private static function fetchRepoSnapshot(?string $githubUrl): ?array
@@ -361,10 +371,28 @@ class ProjectMetrics
             return null;
         }
 
+        $cacheKey = "github:repo-snapshot:{$repo}";
+
+        $cached = Cache::get($cacheKey);
+        $cached = is_array($cached) ? $cached : [];
+        $cachedPayload = is_array($cached['payload'] ?? null) ? self::normalizeSnapshot($cached['payload']) : null;
+        $cachedEtag = is_string($cached['etag'] ?? null) && $cached['etag'] !== '' ? $cached['etag'] : null;
+        $fetchedAt = is_int($cached['fetched_at'] ?? null) ? $cached['fetched_at'] : 0;
+
+        // Fresh within 6h → serve cached payload, no network at all.
+        if ($cachedPayload !== null && (time() - $fetchedAt) < 6 * 3600) {
+            return $cachedPayload;
+        }
+
         $headers = ['User-Agent' => 'jeffersongoncalves-site', 'Accept' => 'application/vnd.github+json'];
 
         if ($token = config('services.github.token')) {
             $headers['Authorization'] = "Bearer {$token}";
+        }
+
+        // Conditional request: a matching ETag yields a quota-free 304.
+        if ($cachedEtag !== null) {
+            $headers['If-None-Match'] = $cachedEtag;
         }
 
         $response = self::http()
@@ -373,27 +401,74 @@ class ProjectMetrics
 
         self::throwIfRateLimited($response);
 
+        // Unchanged since last fetch — refresh freshness, reuse cached payload.
+        if ($response->status() === 304 && $cachedPayload !== null) {
+            self::storeSnapshot($cacheKey, $cachedPayload, $cachedEtag);
+
+            return $cachedPayload;
+        }
+
         if (! $response->successful()) {
             Log::warning('GitHub API failed', ['repo' => $repo, 'status' => $response->status()]);
 
-            return null;
+            // Serve the last good snapshot if we have one rather than wiping
+            // the project's metrics on a transient failure.
+            return $cachedPayload;
         }
 
-        $language = $response->json('language');
+        $payload = self::normalizeSnapshot([
+            'stars' => $response->json('stargazers_count'),
+            'language' => $response->json('language'),
+            'topics' => $response->json('topics'),
+            'default_branch' => $response->json('default_branch'),
+        ]);
 
-        $topics = $response->json('topics');
+        $etag = $response->header('ETag');
+        self::storeSnapshot($cacheKey, $payload, $etag !== '' ? $etag : null);
+
+        return $payload;
+    }
+
+    /**
+     * Coerce a raw repo payload (live response or cached entry) into the strict
+     * snapshot shape. Used on both read paths so cached and freshly-fetched
+     * snapshots are provably identical in type.
+     *
+     * @param  array<string, mixed>  $raw
+     * @return array{stars:int, language:?string, topics:list<string>, default_branch:?string}
+     */
+    private static function normalizeSnapshot(array $raw): array
+    {
+        $language = $raw['language'] ?? null;
+        $defaultBranch = $raw['default_branch'] ?? null;
+
+        $topics = $raw['topics'] ?? [];
         $topics = is_array($topics)
             ? array_values(array_filter($topics, 'is_string'))
             : [];
 
-        $defaultBranch = $response->json('default_branch');
-
         return [
-            'stars' => (int) ($response->json('stargazers_count') ?? 0),
+            'stars' => (int) ($raw['stars'] ?? 0),
             'language' => is_string($language) && $language !== '' ? $language : null,
             'topics' => $topics,
             'default_branch' => is_string($defaultBranch) && $defaultBranch !== '' ? $defaultBranch : null,
         ];
+    }
+
+    /**
+     * Persist a snapshot + its ETag for 7 days. The TTL outlives the 6h
+     * freshness window on purpose: the ETag must survive between daily syncs so
+     * the next run can issue a quota-free conditional request.
+     *
+     * @param  array{stars:int, language:?string, topics:list<string>, default_branch:?string}  $payload
+     */
+    private static function storeSnapshot(string $cacheKey, array $payload, ?string $etag): void
+    {
+        Cache::put($cacheKey, [
+            'payload' => $payload,
+            'etag' => $etag,
+            'fetched_at' => time(),
+        ], now()->addDays(7));
     }
 
     private static function fetchDownloads(Project $project): ?int

@@ -9,6 +9,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +33,10 @@ class SyncProjectMetricsJob implements ShouldQueue
      */
     public function middleware(): array
     {
-        return [(new WithoutOverlapping("project-metrics:{$this->project->getKey()}"))->dontRelease()];
+        return [
+            (new WithoutOverlapping("project-metrics:{$this->project->getKey()}"))->dontRelease(),
+            new RateLimited('github-api'),
+        ];
     }
 
     public function handle(): void

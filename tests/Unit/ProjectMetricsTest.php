@@ -6,10 +6,15 @@ use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use App\Support\ProjectMetrics;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 
 uses(RefreshDatabase::class);
+
+// The snapshot cache persists across tests on the array store — flush it so
+// one test's cached repo can't suppress another's HTTP-call assertions.
+beforeEach(fn () => Cache::flush());
 
 function metricsProject(array $attributes = []): Project
 {
@@ -87,4 +92,45 @@ it('does not treat an ordinary 403 as a rate limit', function () {
     // Forbidden-but-not-limited resolves to null inside the fetchers, so sync
     // completes without throwing.
     expect(ProjectMetrics::sync(metricsProject()))->toBeBool();
+});
+
+it('serves the cached snapshot without touching the network while fresh', function () {
+    Queue::fake();
+    Cache::put('github:repo-snapshot:owner/repo', [
+        'payload' => ['stars' => 9, 'language' => null, 'topics' => [], 'default_branch' => 'main'],
+        'etag' => null,
+        'fetched_at' => time(),
+    ], now()->addDays(7));
+
+    Http::fake([
+        'api.github.com/repos/owner/repo/contributors*' => Http::response([]),
+        // No /repos fake registered — the fresh cache entry must short-circuit it.
+    ]);
+
+    ProjectMetrics::sync(metricsProject());
+
+    Http::assertNotSent(fn ($request) => $request->url() === 'https://api.github.com/repos/owner/repo');
+});
+
+it('sends a conditional request once stale and reuses the payload on a 304', function () {
+    Queue::fake();
+    Cache::put('github:repo-snapshot:owner/repo', [
+        'payload' => ['stars' => 7, 'language' => 'PHP', 'topics' => ['laravel'], 'default_branch' => 'main'],
+        'etag' => 'W/"abc"',
+        'fetched_at' => time() - 7 * 3600, // stale → triggers the conditional fetch
+    ], now()->addDays(7));
+
+    Http::fake([
+        'api.github.com/repos/owner/repo/contributors*' => Http::response([]),
+        'api.github.com/repos/owner/repo' => Http::response('', 304, ['ETag' => 'W/"abc"']),
+    ]);
+
+    $project = metricsProject(['stars' => 0]);
+    ProjectMetrics::sync($project);
+
+    Http::assertSent(fn ($request) => $request->url() === 'https://api.github.com/repos/owner/repo'
+        && $request->hasHeader('If-None-Match', 'W/"abc"'));
+
+    // 304 → cached snapshot re-applied to the project.
+    expect($project->fresh()->stars)->toBe(7);
 });

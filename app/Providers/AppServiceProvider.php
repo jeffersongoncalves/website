@@ -14,9 +14,11 @@ use Filament\Support\Facades\FilamentView;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\View\PanelsRenderHook;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -70,6 +72,7 @@ class AppServiceProvider extends ServiceProvider
         Paginator::defaultSimpleView('pagination.site-simple');
 
         $this->configureSeo();
+        $this->configureRateLimiting();
 
         $this->configureActions();
         $this->configureSchema();
@@ -88,6 +91,18 @@ class AppServiceProvider extends ServiceProvider
 
             return $data;
         });
+    }
+
+    /**
+     * Cap GitHub-API job throughput so parallel Horizon workers can't trip
+     * GitHub's *secondary* rate limit (~900 pts/min, separate from the 5000/h
+     * primary). 60 jobs/min × ~3 calls ≈ 180 calls/min — wide margin. The
+     * `RateLimited('github-api')` middleware on SyncProjectMetricsJob releases
+     * over-limit jobs back to the queue instead of failing them.
+     */
+    private function configureRateLimiting(): void
+    {
+        RateLimiter::for('github-api', fn () => Limit::perMinute(60));
     }
 
     private function configureActions(): void

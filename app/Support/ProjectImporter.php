@@ -915,7 +915,12 @@ class ProjectImporter
             return 'starter_kit';
         }
 
-        if (in_array('laravel', $topics, true) || isset($require['laravel/framework'])) {
+        // A bare `laravel` topic is not enough — multi-framework JS/TS
+        // projects (e.g. shadcn-ui/ui) tag `laravel` because they *support*
+        // Laravel, not because they're a PHP package. Require a composer
+        // manifest (the `laravel/framework` require already implies one).
+        if (isset($require['laravel/framework'])
+            || (in_array('laravel', $topics, true) && $composer !== null)) {
             return 'laravel_package';
         }
 

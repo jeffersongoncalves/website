@@ -41,3 +41,11 @@ it('returns null when no topic or name signal matches', function (): void {
     expect(ProjectClassifier::specificFromTopics(['cli', 'utility'], 'some-tool'))
         ->toBeNull();
 });
+
+it('does not promote a bare laravel topic to laravel_package', function (): void {
+    // Multi-framework JS/TS projects (e.g. shadcn-ui/ui) tag `laravel`
+    // because they support it, not because they're a PHP package. This
+    // topic-only path can't see a composer.json, so it must not claim them.
+    expect(ProjectClassifier::specificFromTopics(['react', 'nextjs', 'laravel', 'tailwindcss'], 'ui'))
+        ->toBeNull();
+});

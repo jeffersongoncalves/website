@@ -78,10 +78,13 @@ class ProjectClassifier
             return 'framework';
         }
 
-        if (in_array('laravel', $topics, true)) {
-            return 'laravel_package';
-        }
-
+        // Deliberately no bare `laravel` topic → laravel_package rule here.
+        // This path has no composer.json to confirm a PHP package, and a real
+        // Laravel package always imports as laravel_package via its composer
+        // manifest (so it never lands in the generic application/tool bucket
+        // this method upgrades). A `laravel` topic alone only ever appears on
+        // false positives — multi-framework JS/TS projects that merely support
+        // Laravel (e.g. shadcn-ui/ui).
         return null;
     }
 }

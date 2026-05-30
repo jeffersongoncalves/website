@@ -60,6 +60,17 @@
 @push('head')
     <x-site.json-ld :data="$softwareLd"/>
     <x-site.json-ld :data="$breadcrumbLd"/>
+    @if($readmeHtml)
+        {{-- README images load from these hosts — warm the connections early.
+             No crossorigin: <img> uses anonymous connections that wouldn't
+             reuse a CORS-warmed socket. --}}
+        <link rel="preconnect" href="https://raw.githubusercontent.com">
+        <link rel="preconnect" href="https://user-images.githubusercontent.com">
+        <link rel="preconnect" href="https://img.shields.io">
+        <link rel="dns-prefetch" href="https://raw.githubusercontent.com">
+        <link rel="dns-prefetch" href="https://user-images.githubusercontent.com">
+        <link rel="dns-prefetch" href="https://img.shields.io">
+    @endif
 @endpush
 
 <x-site.layouts.app :title="$project->name" :breadcrumbs="$breadcrumbs" :seoData="$project">

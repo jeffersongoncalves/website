@@ -36,4 +36,6 @@ it('emits SoftwareSourceCode + BreadcrumbList JSON-LD and a per-repo OG image on
     $response->assertSee('"codeRepository":"https://github.com/mbostock/d3"', false);
     // Per-project Open Graph image points at GitHub's repo social card.
     $response->assertSee('opengraph.githubassets.com/1/mbostock/d3', false);
+    // README image CDNs are preconnected on pages that render a README.
+    $response->assertSee('rel="preconnect" href="https://raw.githubusercontent.com"', false);
 });

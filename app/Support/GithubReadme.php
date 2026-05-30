@@ -235,6 +235,45 @@ class GithubReadme
         ) ?? $html;
     }
 
+    /**
+     * Defer README images: `decoding="async"` on all, `loading="lazy"` on every
+     * image except the first. The first image (usually the project's hero/logo
+     * banner) stays eager so it isn't deprioritised as the LCP candidate; the
+     * rest load as they near the viewport, cutting bandwidth and the layout
+     * shift from many below-the-fold images decoding at once. Existing
+     * loading/decoding attributes are preserved (never duplicated).
+     */
+    public static function lazyloadImages(string $html): string
+    {
+        $index = 0;
+
+        return preg_replace_callback(
+            '~<img\b([^>]*?)>~i',
+            function (array $m) use (&$index): string {
+                $attrs = $m[1];
+                $isFirst = $index === 0;
+                $index++;
+
+                $extras = '';
+
+                if (! preg_match('/\bdecoding\s*=/i', $attrs)) {
+                    $extras .= ' decoding="async"';
+                }
+
+                if (! $isFirst && ! preg_match('/\bloading\s*=/i', $attrs)) {
+                    $extras .= ' loading="lazy"';
+                }
+
+                if ($extras === '') {
+                    return $m[0];
+                }
+
+                return '<img'.$attrs.$extras.'>';
+            },
+            $html
+        ) ?? $html;
+    }
+
     public static function repoFromUrl(?string $url): ?string
     {
         if (! $url) {

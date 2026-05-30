@@ -62,6 +62,7 @@ class ProjectViewController
 
             $selfHost = (string) parse_url(config('app.url'), PHP_URL_HOST);
             $readmeHtml = GithubReadme::markExternalLinks($readmeHtml, $selfHost);
+            $readmeHtml = GithubReadme::lazyloadImages($readmeHtml);
         }
 
         return view('site.projects.show', compact('project', 'readmeHtml', 'versions', 'activeVersion', 'ref'));

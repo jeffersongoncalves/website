@@ -207,3 +207,28 @@ it('leaves absolute, data and root-relative asset sources alone', function () {
 
     expect($out)->toBe($md);
 });
+
+it('keeps the first README image eager and lazy-loads the rest', function () {
+    $html = '<img src="https://img.shields.io/badge/a.svg">'
+        .'<p>x</p><img src="https://user-images.githubusercontent.com/b.png">';
+
+    $out = GithubReadme::lazyloadImages($html);
+
+    // First image: decoding async, but NOT lazy (protects the LCP candidate).
+    expect($out)->toContain('<img src="https://img.shields.io/badge/a.svg" decoding="async">');
+    // Second image: lazy + async.
+    expect($out)
+        ->toContain('src="https://user-images.githubusercontent.com/b.png"')
+        ->toContain('loading="lazy"');
+});
+
+it('does not duplicate existing loading or decoding attributes on README images', function () {
+    $html = '<img src="a.png" loading="eager">'
+        .'<img src="b.png" decoding="sync" loading="lazy">';
+
+    $out = GithubReadme::lazyloadImages($html);
+
+    expect(substr_count($out, 'loading='))->toBe(2);
+    expect(substr_count($out, 'decoding='))->toBe(2);
+    expect($out)->toContain('loading="eager"')->toContain('decoding="sync"');
+});

@@ -22,7 +22,7 @@
       @class(['dark' => $isDarkInitial])
       style="background: {{ $isDarkInitial ? '#0B0A09' : '#FFFEF9' }}; color-scheme: {{ $isDarkInitial ? 'dark' : 'light' }};">
 <head>
-    <x-gtm/>
+    @include('gtm::head')
     <meta charset="UTF-8">
     {{-- viewport-fit=cover lets the page paint into the iOS safe-area
          (notch/dynamic island) when running as a standalone PWA with
@@ -36,7 +36,7 @@
     @stack('head')
 </head>
 <body>
-    <x-gtm-noscript/>
+    @include('gtm::body')
     <a href="#top"
        class="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-3 focus:left-3 focus:rounded focus:px-4 focus:py-2 focus:bg-ink-900 focus:text-ink-100 focus:ring-2">@lang('site.common.skip_to_content')</a>
     @include('site.partials.header')

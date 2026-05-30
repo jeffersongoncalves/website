@@ -13,7 +13,7 @@
             <span>Jefferson Gonçalves</span>
         </a>
 
-        <nav class="hidden md:flex items-center gap-8 text-[0.9375rem]" aria-label="@lang('site.nav.about')">
+        <nav class="hidden md:flex items-center gap-8 text-[0.9375rem]" aria-label="@lang('site.common.nav_primary')">
             <a href="{{ route('about') }}" class="nav-link">@lang('site.nav.about')</a>
             <a href="{{ route('projects.index') }}" class="nav-link">@lang('site.nav.projects')</a>
             <a href="{{ route('open-source') }}" class="nav-link">@lang('site.nav.open_source')</a>
@@ -181,7 +181,7 @@
                     <svg x-show="open" x-cloak xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
                 <nav class="mobile-nav-panel"
-                     aria-label="@lang('site.nav.about')"
+                     aria-label="@lang('site.common.nav_mobile')"
                      x-show="open"
                      x-transition:enter="transition ease-out duration-150"
                      x-transition:enter-start="opacity-0 -translate-y-1"

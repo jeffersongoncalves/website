@@ -38,6 +38,8 @@ return [
     'common' => [
         'home' => 'Início',
         'skip_to_content' => 'Pular para o conteúdo',
+        'nav_primary' => 'Principal',
+        'nav_mobile' => 'Móvel',
         'all' => 'Todos',
         'view_all' => 'Ver todos',
         'read_more' => 'Ler mais',

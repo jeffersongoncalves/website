@@ -38,6 +38,8 @@ return [
     'common' => [
         'home' => 'Home',
         'skip_to_content' => 'Skip to content',
+        'nav_primary' => 'Primary',
+        'nav_mobile' => 'Mobile',
         'all' => 'All',
         'view_all' => 'View all',
         'read_more' => 'Read more',

@@ -37,6 +37,7 @@ return [
 
     'common' => [
         'home' => 'Início',
+        'skip_to_content' => 'Pular para o conteúdo',
         'all' => 'Todos',
         'view_all' => 'Ver todos',
         'read_more' => 'Ler mais',

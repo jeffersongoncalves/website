@@ -23,7 +23,44 @@
     } else {
         $externalHost = $externalUrl ? (parse_url($externalUrl, PHP_URL_HOST) ?: $externalUrl) : null;
     }
+
+    $showUrl = route('projects.show', ['slug' => $project->slug]);
+
+    $softwareLd = array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'SoftwareSourceCode',
+        'name' => $project->name,
+        'description' => $title,
+        'url' => $showUrl,
+        'codeRepository' => $project->github_url,
+        'programmingLanguage' => $project->language?->value,
+        'author' => [
+            '@type' => 'Person',
+            'name' => 'Jefferson Gonçalves',
+            'url' => route('home'),
+        ],
+    ], fn ($v) => $v !== null && $v !== '');
+
+    $crumbItems = [];
+    foreach (array_merge([['name' => __('site.common.home'), 'url' => route('home')]], $breadcrumbs) as $i => $crumb) {
+        $crumbItems[] = [
+            '@type' => 'ListItem',
+            'position' => $i + 1,
+            'name' => $crumb['name'],
+            'item' => $crumb['url'],
+        ];
+    }
+    $breadcrumbLd = [
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => $crumbItems,
+    ];
 @endphp
+
+@push('head')
+    <x-site.json-ld :data="$softwareLd"/>
+    <x-site.json-ld :data="$breadcrumbLd"/>
+@endpush
 
 <x-site.layouts.app :title="$project->name" :breadcrumbs="$breadcrumbs" :seoData="$project">
 

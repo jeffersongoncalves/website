@@ -263,11 +263,21 @@ class Project extends Model
     public function getDynamicSEOData(): SEOData
     {
         $locale = LocaleSupport::short();
-        $title = $this->getTranslation('title', $locale, false) ?: $this->name;
+        $description = $this->getTranslation('title', $locale, false) ?: $this->name;
+
+        // GitHub renders a rich per-repo social card at this endpoint — a far
+        // better OG image than the one generic site banner. Non-GitHub projects
+        // fall back to that banner via the SEO transformer in AppServiceProvider.
+        $image = null;
+        if ($this->github_url && preg_match('~github\.com/([^/?#]+/[^/?#]+)~i', $this->github_url, $m)) {
+            $image = 'https://opengraph.githubassets.com/1/'.rtrim($m[1], '/');
+        }
 
         return new SEOData(
-            title: $title,
+            title: $this->name,
+            description: $description,
             author: 'Jefferson Gonçalves',
+            image: $image,
             published_time: $this->published_at,
             modified_time: $this->updated_at,
             type: 'article',

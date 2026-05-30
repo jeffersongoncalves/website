@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Site;
 
 use App\Enums\ProjectCategory;
-use App\Enums\ProjectStatus;
 use App\Models\Project;
 use App\Support\SiteStats;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ProjectController
 {
@@ -27,19 +25,11 @@ class ProjectController
             $query->byCategory($category);
         }
 
-        // Distinct languages present in the published catalogue, busiest first
-        // — drives the language facet dropdown. Read raw (DB::table, no enum
-        // cast) so the list is plain strings for the <select> + comparison.
-        $languages = DB::table('projects')
-            ->where('status', ProjectStatus::Published->value)
-            ->whereNotNull('language')
-            ->where('language', '!=', '')
-            ->selectRaw('language, count(*) as total')
-            ->groupBy('language')
-            ->orderByDesc('total')
-            ->orderBy('language')
-            ->pluck('language')
-            ->all();
+        // The language facet (and the count cards) reuse the persisted SiteStats
+        // breakdown — already computed busiest-first on sync — instead of
+        // re-running a GROUP BY on every request.
+        $stats = SiteStats::all();
+        $languages = array_column($stats['languages'], 'language');
 
         $activeLanguage = in_array($language, $languages, true) ? $language : '';
         if ($activeLanguage !== '') {
@@ -79,7 +69,6 @@ class ProjectController
 
         $projects = $query->paginate(10)->withQueryString();
 
-        $stats = SiteStats::all();
         $counts = [
             'total' => $stats['repos'],
             'catalogue' => $stats['catalogue'],

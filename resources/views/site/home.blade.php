@@ -1,7 +1,24 @@
 @php
     $locale = \App\Support\LocaleSupport::short();
     $statsJson = collect($homeStats)->map(fn ($s) => array_merge($s, ['label' => __('site.' . $s['label_key'])]))->values()->toJson();
+
+    $personLd = [
+        '@context' => 'https://schema.org',
+        '@type' => 'Person',
+        'name' => 'Jefferson Gonçalves',
+        'url' => route('home'),
+        'jobTitle' => __('site.home.hero_l1'),
+        'sameAs' => [
+            'https://github.com/jeffersongoncalves',
+            'https://www.linkedin.com/in/jeffersonsimaogoncalves/',
+            'https://x.com/gersonsimao92',
+        ],
+    ];
 @endphp
+
+@push('head')
+    <x-site.json-ld :data="$personLd"/>
+@endpush
 
 <x-site.layouts.app :title="__('site.home.hero_l1')" :description="__('site.seo.home')">
 

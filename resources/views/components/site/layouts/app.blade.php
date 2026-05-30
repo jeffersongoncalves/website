@@ -35,6 +35,8 @@
     @stack('head')
 </head>
 <body>
+    <a href="#top"
+       class="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:top-3 focus:left-3 focus:rounded focus:px-4 focus:py-2 focus:bg-ink-900 focus:text-ink-100 focus:ring-2">@lang('site.common.skip_to_content')</a>
     @include('site.partials.header')
 
     <main id="top">

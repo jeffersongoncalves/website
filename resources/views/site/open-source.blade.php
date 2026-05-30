@@ -47,7 +47,7 @@
                     @lang('site.os.contributions')<br>
                     <span class="h-sub">{{ number_format($contributions['total'], 0, ',', '.') }} @lang('site.os.contributions_2')</span>
                 </h2>
-                <div class="flex items-center gap-2 mono-meta">
+                <div class="flex items-center gap-2 mono-meta" aria-hidden="true">
                     <span>@lang('site.common.less')</span>
                     <span class="hm-cell"></span>
                     <span class="hm-cell" data-level="1"></span>
@@ -57,10 +57,15 @@
                     <span>@lang('site.common.more')</span>
                 </div>
             </div>
+            {{-- The per-day cells encode count by colour only, so they're hidden
+                 from assistive tech; the grid as a whole carries one descriptive
+                 label with the yearly total instead. --}}
             <div class="overflow-x-auto no-scrollbar">
-                <div class="grid grid-rows-7 grid-flow-col gap-[3px] w-max">
+                <div class="grid grid-rows-7 grid-flow-col gap-[3px] w-max"
+                     role="img"
+                     aria-label="{{ number_format($contributions['total'], 0, ',', '.') }} @lang('site.os.contributions_2')">
                     <template x-for="(c, i) in cells" :key="i">
-                        <span class="hm-cell" :style="`background: ${bgFor(c)}`"></span>
+                        <span class="hm-cell" :style="`background: ${bgFor(c)}`" aria-hidden="true"></span>
                     </template>
                 </div>
             </div>

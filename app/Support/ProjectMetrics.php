@@ -71,9 +71,9 @@ class ProjectMetrics
     {
         $changed = false;
 
-        // Fetch the repo snapshot first: it already carries `default_branch`,
-        // so the URL-resolvers and branch repair below reuse it instead of each
-        // re-issuing their own GET /repos/{repo} (3 redundant calls/project).
+        // One GraphQL call carries stars + language + topics + default branch +
+        // the branch list, so the URL-resolvers and branch repair below reuse it
+        // instead of issuing their own REST calls.
         $snapshot = self::fetchRepoSnapshot($project->github_url);
         $defaultBranch = $snapshot['default_branch'] ?? null;
 
@@ -96,7 +96,7 @@ class ProjectMetrics
             }
 
             // Capture the repo's primary language for free from the same
-            // /repos call — lets the catalogue facet generic applications by
+            // GraphQL query — lets the catalogue facet generic applications by
             // language instead of leaving them in one undifferentiated bucket.
             // Unknown languages (not in the enum) are ignored.
             $language = $snapshot['language'] !== null
@@ -141,7 +141,7 @@ class ProjectMetrics
             $changed = true;
         }
 
-        $repairedOverrides = self::repairBranchOverrides($project, $defaultBranch);
+        $repairedOverrides = self::repairBranchOverrides($project, $defaultBranch, $snapshot['branches'] ?? null);
         if ($repairedOverrides !== null) {
             $project->branch_overrides = $repairedOverrides;
             $changed = true;
@@ -178,20 +178,23 @@ class ProjectMetrics
      * repaired — first by trying the auto-branch (1.x, 2.x, ...), then
      * the repo's default branch (typically `main` or `master`).
      *
+     * @param  list<string>|null  $branches  branch names from the GraphQL
+     *                                       snapshot (null/empty = no data)
      * @return array<string,string>|null the repaired map, or null when no
      *                                   change is needed / when verification
-     *                                   cannot be performed (network error,
-     *                                   no GitHub URL, non-Filament project)
+     *                                   cannot be performed (no branch data,
+     *                                   non-Filament project)
      */
-    private static function repairBranchOverrides(Project $project, ?string $defaultBranch): ?array
+    private static function repairBranchOverrides(Project $project, ?string $defaultBranch, ?array $branches): ?array
     {
         if (! is_array($project->versions) || $project->versions === []) {
             return null;
         }
 
-        $branches = self::fetchBranches($project->github_url);
-
-        if ($branches === null) {
+        // Empty/missing branch list means we couldn't read the repo this run —
+        // skip rather than rewriting every override to a fallback. A real repo
+        // always has at least one branch.
+        if ($branches === null || $branches === []) {
             return null;
         }
 
@@ -248,52 +251,6 @@ class ProjectMetrics
     }
 
     /**
-     * @return list<string>|null branch names, or null when the GitHub API
-     *                           request cannot be completed.
-     */
-    private static function fetchBranches(?string $githubUrl): ?array
-    {
-        $repo = GithubReadme::repoFromUrl($githubUrl);
-
-        if (! $repo) {
-            return null;
-        }
-
-        $headers = ['User-Agent' => 'jeffersongoncalves-site', 'Accept' => 'application/vnd.github+json'];
-
-        if ($token = config('services.github.token')) {
-            $headers['Authorization'] = "Bearer {$token}";
-        }
-
-        // Single page of 100 covers every real case: the version branches we
-        // resolve against are a handful (1.x..5.x, main, master, develop). The
-        // old 5-page loop spent up to 4 extra calls/project chasing branches we
-        // never match — a meaningful slice of the GitHub rate-limit budget.
-        $response = self::http()
-            ->withHeaders($headers)
-            ->get("https://api.github.com/repos/{$repo}/branches", [
-                'per_page' => 100,
-            ]);
-
-        self::throwIfRateLimited($response);
-
-        if (! $response->successful()) {
-            Log::warning('GitHub branches API failed', ['repo' => $repo, 'status' => $response->status()]);
-
-            return null;
-        }
-
-        $names = [];
-        foreach ((array) $response->json() as $branch) {
-            if (is_array($branch) && isset($branch['name']) && is_string($branch['name'])) {
-                $names[] = $branch['name'];
-            }
-        }
-
-        return $names;
-    }
-
-    /**
      * Count the configured GitHub user's commits to a repo via the
      * /repos/{repo}/contributors endpoint. Returns null when verification
      * cannot be performed (no URL, no username, network error).
@@ -346,22 +303,13 @@ class ProjectMetrics
     }
 
     /**
-     * Fetch stars + primary language + topics + default branch in a single
-     * /repos call. Returns null when the request can't be completed; `language`
-     * is null for repos GitHub reports no language for (docs-only, empty, etc.).
-     * `default_branch` is reused by the URL-resolvers and branch repair so they
-     * don't each re-fetch /repos/{repo}.
+     * Fetch stars + primary language + topics + default branch + branch list in
+     * a single GraphQL call. The 6h freshness window serves a recently-fetched
+     * snapshot from cache with zero network, absorbing the admin-save bursts the
+     * ProjectObserver triggers. Returns null when the snapshot can't be
+     * (re)fetched and nothing is cached.
      *
-     * Two layers cut quota use:
-     *  - 6h freshness window: a recently-fetched snapshot is served from cache
-     *    with zero network, absorbing the admin-save bursts the ProjectObserver
-     *    triggers.
-     *  - ETag conditional request once stale: GitHub answers `304 Not Modified`
-     *    without charging the rate limit, so an unchanged repo costs nothing on
-     *    the daily sync. The cache entry (payload + ETag) is kept 7 days so the
-     *    conditional survives between daily runs.
-     *
-     * @return array{stars:int, language:?string, topics:list<string>, default_branch:?string}|null
+     * @return array{stars:int, language:?string, topics:list<string>, default_branch:?string, branches:list<string>}|null
      */
     private static function fetchRepoSnapshot(?string $githubUrl): ?array
     {
@@ -376,7 +324,6 @@ class ProjectMetrics
         $cached = Cache::get($cacheKey);
         $cached = is_array($cached) ? $cached : [];
         $cachedPayload = is_array($cached['payload'] ?? null) ? self::normalizeSnapshot($cached['payload']) : null;
-        $cachedEtag = is_string($cached['etag'] ?? null) && $cached['etag'] !== '' ? $cached['etag'] : null;
         $fetchedAt = is_int($cached['fetched_at'] ?? null) ? $cached['fetched_at'] : 0;
 
         // Fresh within 6h → serve cached payload, no network at all.
@@ -384,49 +331,113 @@ class ProjectMetrics
             return $cachedPayload;
         }
 
-        $headers = ['User-Agent' => 'jeffersongoncalves-site', 'Accept' => 'application/vnd.github+json'];
+        [$owner, $name] = explode('/', $repo, 2);
+        $payload = self::fetchRepoGraphql($owner, $name);
 
-        if ($token = config('services.github.token')) {
-            $headers['Authorization'] = "Bearer {$token}";
+        if ($payload === null) {
+            // GraphQL unavailable (no token, network error, repo missing) —
+            // serve the last good snapshot rather than wiping the project's
+            // metrics on a transient failure.
+            return $cachedPayload;
         }
 
-        // Conditional request: a matching ETag yields a quota-free 304.
-        if ($cachedEtag !== null) {
-            $headers['If-None-Match'] = $cachedEtag;
+        self::storeSnapshot($cacheKey, $payload);
+
+        return $payload;
+    }
+
+    /**
+     * One POST /graphql for the whole snapshot. GraphQL has its own
+     * 5000-point/hour budget, independent of the REST primary limit — moving
+     * this load off REST keeps the REST budget (now just the contributors call)
+     * far from the ceiling that triggered the original incident.
+     *
+     * Returns null when unavailable: no token (GraphQL always requires auth), a
+     * network/HTTP error, or a null `repository` (not found / GraphQL error). A
+     * rate-limit response — HTTP 403/429, or a 200 carrying a `RATE_LIMITED`
+     * error — throws GithubRateLimitException, same as the REST path.
+     *
+     * @return array{stars:int, language:?string, topics:list<string>, default_branch:?string, branches:list<string>}|null
+     */
+    private static function fetchRepoGraphql(string $owner, string $name): ?array
+    {
+        $token = config('services.github.token');
+
+        if (! $token) {
+            return null;
         }
+
+        $query = <<<'GQL'
+        query($owner: String!, $name: String!) {
+          repository(owner: $owner, name: $name) {
+            stargazerCount
+            primaryLanguage { name }
+            repositoryTopics(first: 20) { nodes { topic { name } } }
+            defaultBranchRef { name }
+            refs(refPrefix: "refs/heads/", first: 100) { nodes { name } }
+          }
+        }
+        GQL;
 
         $response = self::http()
-            ->withHeaders($headers)
-            ->get("https://api.github.com/repos/{$repo}");
+            ->withHeaders([
+                'User-Agent' => 'jeffersongoncalves-site',
+                'Authorization' => "Bearer {$token}",
+            ])
+            ->post('https://api.github.com/graphql', [
+                'query' => $query,
+                'variables' => ['owner' => $owner, 'name' => $name],
+            ]);
 
         self::throwIfRateLimited($response);
 
-        // Unchanged since last fetch — refresh freshness, reuse cached payload.
-        if ($response->status() === 304 && $cachedPayload !== null) {
-            self::storeSnapshot($cacheKey, $cachedPayload, $cachedEtag);
-
-            return $cachedPayload;
-        }
-
         if (! $response->successful()) {
-            Log::warning('GitHub API failed', ['repo' => $repo, 'status' => $response->status()]);
+            Log::warning('GitHub GraphQL failed', ['repo' => "{$owner}/{$name}", 'status' => $response->status()]);
 
-            // Serve the last good snapshot if we have one rather than wiping
-            // the project's metrics on a transient failure.
-            return $cachedPayload;
+            return null;
         }
 
-        $payload = self::normalizeSnapshot([
-            'stars' => $response->json('stargazers_count'),
-            'language' => $response->json('language'),
-            'topics' => $response->json('topics'),
-            'default_branch' => $response->json('default_branch'),
+        // A primary-limit hit comes back as HTTP 200 with a RATE_LIMITED error.
+        $errors = $response->json('errors');
+        if (is_array($errors)) {
+            foreach ($errors as $error) {
+                if (is_array($error) && ($error['type'] ?? null) === 'RATE_LIMITED') {
+                    $retryAfter = ((int) $response->header('X-RateLimit-Reset')) - time();
+
+                    throw new GithubRateLimitException(max(60, $retryAfter));
+                }
+            }
+        }
+
+        $repository = $response->json('data.repository');
+
+        if (! is_array($repository)) {
+            return null;
+        }
+
+        $topics = [];
+        foreach ((array) ($repository['repositoryTopics']['nodes'] ?? []) as $node) {
+            $topic = is_array($node) ? ($node['topic']['name'] ?? null) : null;
+            if (is_string($topic) && $topic !== '') {
+                $topics[] = $topic;
+            }
+        }
+
+        $branches = [];
+        foreach ((array) ($repository['refs']['nodes'] ?? []) as $node) {
+            $branch = is_array($node) ? ($node['name'] ?? null) : null;
+            if (is_string($branch) && $branch !== '') {
+                $branches[] = $branch;
+            }
+        }
+
+        return self::normalizeSnapshot([
+            'stars' => $repository['stargazerCount'] ?? 0,
+            'language' => $repository['primaryLanguage']['name'] ?? null,
+            'topics' => $topics,
+            'default_branch' => $repository['defaultBranchRef']['name'] ?? null,
+            'branches' => $branches,
         ]);
-
-        $etag = $response->header('ETag');
-        self::storeSnapshot($cacheKey, $payload, $etag !== '' ? $etag : null);
-
-        return $payload;
     }
 
     /**
@@ -435,7 +446,7 @@ class ProjectMetrics
      * snapshots are provably identical in type.
      *
      * @param  array<string, mixed>  $raw
-     * @return array{stars:int, language:?string, topics:list<string>, default_branch:?string}
+     * @return array{stars:int, language:?string, topics:list<string>, default_branch:?string, branches:list<string>}
      */
     private static function normalizeSnapshot(array $raw): array
     {
@@ -447,26 +458,31 @@ class ProjectMetrics
             ? array_values(array_filter($topics, 'is_string'))
             : [];
 
+        $branches = $raw['branches'] ?? [];
+        $branches = is_array($branches)
+            ? array_values(array_filter($branches, 'is_string'))
+            : [];
+
         return [
             'stars' => (int) ($raw['stars'] ?? 0),
             'language' => is_string($language) && $language !== '' ? $language : null,
             'topics' => $topics,
             'default_branch' => is_string($defaultBranch) && $defaultBranch !== '' ? $defaultBranch : null,
+            'branches' => $branches,
         ];
     }
 
     /**
-     * Persist a snapshot + its ETag for 7 days. The TTL outlives the 6h
-     * freshness window on purpose: the ETag must survive between daily syncs so
-     * the next run can issue a quota-free conditional request.
+     * Persist a snapshot for 7 days. The TTL outlives the 6h freshness window so
+     * a stale-but-present snapshot can still be served if a later GraphQL fetch
+     * fails, rather than wiping the project's metrics.
      *
-     * @param  array{stars:int, language:?string, topics:list<string>, default_branch:?string}  $payload
+     * @param  array{stars:int, language:?string, topics:list<string>, default_branch:?string, branches:list<string>}  $payload
      */
-    private static function storeSnapshot(string $cacheKey, array $payload, ?string $etag): void
+    private static function storeSnapshot(string $cacheKey, array $payload): void
     {
         Cache::put($cacheKey, [
             'payload' => $payload,
-            'etag' => $etag,
             'fetched_at' => time(),
         ], now()->addDays(7));
     }

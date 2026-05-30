@@ -12,9 +12,16 @@ use Illuminate\Support\Facades\Queue;
 
 uses(RefreshDatabase::class);
 
-// The snapshot cache persists across tests on the array store — flush it so
-// one test's cached repo can't suppress another's HTTP-call assertions.
-beforeEach(fn () => Cache::flush());
+beforeEach(function () {
+    // The snapshot cache persists across tests on the array store — flush it so
+    // one test's cached repo can't suppress another's HTTP-call assertions.
+    Cache::flush();
+    // The post-save observer dispatches another sync — fake the queue so it
+    // doesn't recurse on the sync driver and double the call counts.
+    Queue::fake();
+    // GraphQL always requires auth; without a token fetchRepoGraphql bails early.
+    config(['services.github.token' => 'test-token']);
+});
 
 function metricsProject(array $attributes = []): Project
 {
@@ -29,51 +36,80 @@ function metricsProject(array $attributes = []): Project
     ], $attributes));
 }
 
-it('reuses default_branch from the repo snapshot instead of refetching /repos', function () {
-    // The post-save observer dispatches another sync — fake the queue so it
-    // doesn't recurse on the sync driver and double the call counts.
-    Queue::fake();
+/**
+ * @param  list<string>  $branches
+ */
+function graphqlRepo(int $stars = 1, ?string $language = null, array $topics = [], string $defaultBranch = 'main', array $branches = ['main']): array
+{
+    return ['data' => ['repository' => [
+        'stargazerCount' => $stars,
+        'primaryLanguage' => $language !== null ? ['name' => $language] : null,
+        'repositoryTopics' => ['nodes' => array_map(fn ($t) => ['topic' => ['name' => $t]], $topics)],
+        'defaultBranchRef' => ['name' => $defaultBranch],
+        'refs' => ['nodes' => array_map(fn ($b) => ['name' => $b], $branches)],
+    ]]];
+}
+
+it('applies stars, language and topics from one GraphQL call (no REST snapshot/branches)', function () {
     Http::fake([
-        'api.github.com/repos/owner/repo/branches*' => Http::response([['name' => '3.x'], ['name' => 'main']]),
-        'api.github.com/repos/owner/repo/contributors*' => Http::response([]),
-        'api.github.com/repos/owner/repo' => Http::response(['default_branch' => 'main', 'stargazers_count' => 5, 'topics' => []]),
+        'api.github.com/repos/*/contributors*' => Http::response([]),
+        'api.github.com/graphql' => Http::response(graphqlRepo(stars: 5, language: 'PHP', topics: ['laravel'])),
     ]);
 
-    // versions present so branch repair runs — previously that path issued a
-    // second GET /repos just to read default_branch.
-    ProjectMetrics::sync(metricsProject(['versions' => ['v3']]));
+    $project = metricsProject(['versions' => ['v3'], 'stars' => 0]);
+    ProjectMetrics::sync($project);
 
-    $repoSnapshotCalls = 0;
-    Http::assertSent(function ($request) use (&$repoSnapshotCalls) {
-        if ($request->url() === 'https://api.github.com/repos/owner/repo') {
-            $repoSnapshotCalls++;
-        }
+    expect($project->fresh()->stars)->toBe(5);
 
-        return true;
-    });
-
-    expect($repoSnapshotCalls)->toBe(1);
+    Http::assertSent(fn ($request) => $request->url() === 'https://api.github.com/graphql');
+    // No REST snapshot or branches endpoints are hit anymore.
+    Http::assertNotSent(fn ($request) => $request->url() === 'https://api.github.com/repos/owner/repo');
+    Http::assertNotSent(fn ($request) => str_contains($request->url(), '/repos/owner/repo/branches'));
 });
 
-it('caps contributors and branches at a single page', function () {
-    Queue::fake();
+it('repairs branch overrides from the branches in the GraphQL snapshot', function () {
     Http::fake([
-        'api.github.com/repos/owner/repo/branches*' => Http::response([['name' => 'main']]),
-        'api.github.com/repos/owner/repo/contributors*' => Http::response(
-            array_map(fn ($i) => ['login' => "user{$i}", 'contributions' => 1], range(1, 100))
-        ),
-        'api.github.com/repos/owner/repo' => Http::response(['default_branch' => 'main', 'stargazers_count' => 1, 'topics' => []]),
+        'api.github.com/repos/*/contributors*' => Http::response([]),
+        'api.github.com/graphql' => Http::response(graphqlRepo(branches: ['3.x', 'main'])),
     ]);
 
-    ProjectMetrics::sync(metricsProject(['versions' => ['v3']]));
+    // v3 resolves to its literal 3.x branch; v4 falls back to the default main.
+    $project = metricsProject(['versions' => ['v3', 'v4']]);
+    ProjectMetrics::sync($project);
 
-    // No page=2 fan-out on either paginated endpoint.
+    expect($project->fresh()->branch_overrides)->toBe(['1.x' => '3.x', '2.x' => 'main']);
+});
+
+it('skips branch repair when the snapshot has no branches', function () {
+    Http::fake([
+        'api.github.com/repos/*/contributors*' => Http::response([]),
+        'api.github.com/graphql' => Http::response(graphqlRepo(branches: [])),
+    ]);
+
+    $project = metricsProject(['versions' => ['v3'], 'branch_overrides' => ['1.x' => 'custom']]);
+    ProjectMetrics::sync($project);
+
+    // Empty branch list = no data this run; existing overrides are left intact.
+    expect($project->fresh()->branch_overrides)->toBe(['1.x' => 'custom']);
+});
+
+it('reads user contributions from a single contributors page', function () {
+    config(['services.github.username' => 'owner']);
+    Http::fake([
+        'api.github.com/repos/*/contributors*' => Http::response([['login' => 'owner', 'contributions' => 42]]),
+        'api.github.com/graphql' => Http::response(graphqlRepo()),
+    ]);
+
+    $project = metricsProject();
+    ProjectMetrics::sync($project);
+
+    expect($project->fresh()->user_contributions)->toBe(42);
     Http::assertNotSent(fn ($request) => str_contains($request->url(), 'page=2'));
 });
 
-it('throws GithubRateLimitException when GitHub reports the primary limit exhausted', function () {
+it('throws GithubRateLimitException on a GraphQL 403 rate limit', function () {
     Http::fake([
-        'api.github.com/*' => Http::response('', 403, [
+        'api.github.com/graphql' => Http::response('', 403, [
             'X-RateLimit-Remaining' => '0',
             'X-RateLimit-Reset' => (string) (time() + 120),
         ]),
@@ -83,54 +119,40 @@ it('throws GithubRateLimitException when GitHub reports the primary limit exhaus
         ->toThrow(GithubRateLimitException::class);
 });
 
-it('does not treat an ordinary 403 as a rate limit', function () {
+it('throws when GraphQL returns a RATE_LIMITED error on a 200', function () {
     Http::fake([
-        'api.github.com/repos/owner/repo/contributors*' => Http::response([]),
-        'api.github.com/repos/owner/repo' => Http::response('', 403, ['X-RateLimit-Remaining' => '42']),
+        'api.github.com/graphql' => Http::response(
+            ['errors' => [['type' => 'RATE_LIMITED', 'message' => 'rate limited']]],
+            200,
+            ['X-RateLimit-Reset' => (string) (time() + 90)],
+        ),
     ]);
 
-    // Forbidden-but-not-limited resolves to null inside the fetchers, so sync
-    // completes without throwing.
+    expect(fn () => ProjectMetrics::sync(metricsProject()))
+        ->toThrow(GithubRateLimitException::class);
+});
+
+it('completes without throwing on a non-rate-limit GraphQL failure', function () {
+    Http::fake([
+        'api.github.com/repos/*/contributors*' => Http::response([]),
+        'api.github.com/graphql' => Http::response('', 500),
+    ]);
+
     expect(ProjectMetrics::sync(metricsProject()))->toBeBool();
 });
 
-it('serves the cached snapshot without touching the network while fresh', function () {
-    Queue::fake();
+it('serves the cached snapshot without hitting GraphQL while fresh', function () {
     Cache::put('github:repo-snapshot:owner/repo', [
-        'payload' => ['stars' => 9, 'language' => null, 'topics' => [], 'default_branch' => 'main'],
-        'etag' => null,
+        'payload' => ['stars' => 9, 'language' => null, 'topics' => [], 'default_branch' => 'main', 'branches' => []],
         'fetched_at' => time(),
     ], now()->addDays(7));
 
     Http::fake([
-        'api.github.com/repos/owner/repo/contributors*' => Http::response([]),
-        // No /repos fake registered — the fresh cache entry must short-circuit it.
+        'api.github.com/repos/*/contributors*' => Http::response([]),
+        // No graphql fake registered — the fresh cache entry must short-circuit it.
     ]);
 
     ProjectMetrics::sync(metricsProject());
 
-    Http::assertNotSent(fn ($request) => $request->url() === 'https://api.github.com/repos/owner/repo');
-});
-
-it('sends a conditional request once stale and reuses the payload on a 304', function () {
-    Queue::fake();
-    Cache::put('github:repo-snapshot:owner/repo', [
-        'payload' => ['stars' => 7, 'language' => 'PHP', 'topics' => ['laravel'], 'default_branch' => 'main'],
-        'etag' => 'W/"abc"',
-        'fetched_at' => time() - 7 * 3600, // stale → triggers the conditional fetch
-    ], now()->addDays(7));
-
-    Http::fake([
-        'api.github.com/repos/owner/repo/contributors*' => Http::response([]),
-        'api.github.com/repos/owner/repo' => Http::response('', 304, ['ETag' => 'W/"abc"']),
-    ]);
-
-    $project = metricsProject(['stars' => 0]);
-    ProjectMetrics::sync($project);
-
-    Http::assertSent(fn ($request) => $request->url() === 'https://api.github.com/repos/owner/repo'
-        && $request->hasHeader('If-None-Match', 'W/"abc"'));
-
-    // 304 → cached snapshot re-applied to the project.
-    expect($project->fresh()->stars)->toBe(7);
+    Http::assertNotSent(fn ($request) => str_contains($request->url(), 'graphql'));
 });

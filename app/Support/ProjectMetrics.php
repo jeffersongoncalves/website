@@ -5,8 +5,10 @@ namespace App\Support;
 use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectLanguage;
+use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -23,26 +25,69 @@ class ProjectMetrics
      */
     private static function http(): PendingRequest
     {
-        return Http::retry(3, 200)->connectTimeout(4)->timeout(8);
+        // throw: false keeps a 4xx/5xx as a returned Response instead of raising
+        // RequestException — callers inspect $response->successful() themselves
+        // (and throwIfRateLimited() turns a 403 rate-limit into a typed signal).
+        // Connection-level failures still throw and are what the 3× retry covers.
+        return Http::retry(3, 200, throw: false)->connectTimeout(4)->timeout(8);
+    }
+
+    /**
+     * Abort the whole sync the moment GitHub signals a rate limit, rather than
+     * letting every remaining call 403 in turn and spam the log. Covers both
+     * the primary limit (403 + `X-RateLimit-Remaining: 0`) and the secondary /
+     * abuse limit (403/429 carrying a `Retry-After`). The thrown exception is
+     * caught by SyncProjectMetricsJob, which releases back to the queue with a
+     * delay until the window resets.
+     *
+     * @throws GithubRateLimitException
+     */
+    private static function throwIfRateLimited(Response $response): void
+    {
+        $status = $response->status();
+
+        if ($status !== 403 && $status !== 429) {
+            return;
+        }
+
+        $retryAfterHeader = $response->header('Retry-After');
+        $remaining = $response->header('X-RateLimit-Remaining');
+
+        if ($remaining !== '0' && $retryAfterHeader === '') {
+            return;
+        }
+
+        if ($retryAfterHeader !== '') {
+            $retryAfter = (int) $retryAfterHeader;
+        } else {
+            $retryAfter = ((int) $response->header('X-RateLimit-Reset')) - time();
+        }
+
+        throw new GithubRateLimitException(max(60, $retryAfter));
     }
 
     public static function sync(Project $project): bool
     {
         $changed = false;
 
-        $resolvedPackagistUrl = self::resolvePackagistUrl($project);
+        // Fetch the repo snapshot first: it already carries `default_branch`,
+        // so the URL-resolvers and branch repair below reuse it instead of each
+        // re-issuing their own GET /repos/{repo} (3 redundant calls/project).
+        $snapshot = self::fetchRepoSnapshot($project->github_url);
+        $defaultBranch = $snapshot['default_branch'] ?? null;
+
+        $resolvedPackagistUrl = self::resolvePackagistUrl($project, $defaultBranch);
         if ($resolvedPackagistUrl !== null && $resolvedPackagistUrl !== $project->packagist_url) {
             $project->packagist_url = $resolvedPackagistUrl;
             $changed = true;
         }
 
-        $resolvedNpmUrl = self::resolveNpmUrl($project);
+        $resolvedNpmUrl = self::resolveNpmUrl($project, $defaultBranch);
         if ($resolvedNpmUrl !== null && $resolvedNpmUrl !== $project->npm_url) {
             $project->npm_url = $resolvedNpmUrl;
             $changed = true;
         }
 
-        $snapshot = self::fetchRepoSnapshot($project->github_url);
         if ($snapshot !== null) {
             if ($snapshot['stars'] !== $project->stars) {
                 $project->stars = $snapshot['stars'];
@@ -95,7 +140,7 @@ class ProjectMetrics
             $changed = true;
         }
 
-        $repairedOverrides = self::repairBranchOverrides($project);
+        $repairedOverrides = self::repairBranchOverrides($project, $defaultBranch);
         if ($repairedOverrides !== null) {
             $project->branch_overrides = $repairedOverrides;
             $changed = true;
@@ -137,7 +182,7 @@ class ProjectMetrics
      *                                   cannot be performed (network error,
      *                                   no GitHub URL, non-Filament project)
      */
-    private static function repairBranchOverrides(Project $project): ?array
+    private static function repairBranchOverrides(Project $project, ?string $defaultBranch): ?array
     {
         if (! is_array($project->versions) || $project->versions === []) {
             return null;
@@ -150,7 +195,6 @@ class ProjectMetrics
         }
 
         $current = is_array($project->branch_overrides) ? $project->branch_overrides : [];
-        $defaultBranch = self::fetchDefaultBranch($project->github_url);
         $versions = array_values($project->versions);
         $lastIndex = count($versions) - 1;
 
@@ -220,61 +264,32 @@ class ProjectMetrics
             $headers['Authorization'] = "Bearer {$token}";
         }
 
-        $names = [];
-        $page = 1;
-
-        do {
-            $response = self::http()
-                ->withHeaders($headers)
-                ->get("https://api.github.com/repos/{$repo}/branches", [
-                    'per_page' => 100,
-                    'page' => $page,
-                ]);
-
-            if (! $response->successful()) {
-                Log::warning('GitHub branches API failed', ['repo' => $repo, 'status' => $response->status()]);
-
-                return null;
-            }
-
-            $batch = (array) $response->json();
-            foreach ($batch as $branch) {
-                if (is_array($branch) && isset($branch['name']) && is_string($branch['name'])) {
-                    $names[] = $branch['name'];
-                }
-            }
-
-            $page++;
-        } while (count($batch) === 100 && $page <= 5);
-
-        return $names;
-    }
-
-    private static function fetchDefaultBranch(?string $githubUrl): ?string
-    {
-        $repo = GithubReadme::repoFromUrl($githubUrl);
-
-        if (! $repo) {
-            return null;
-        }
-
-        $headers = ['User-Agent' => 'jeffersongoncalves-site', 'Accept' => 'application/vnd.github+json'];
-
-        if ($token = config('services.github.token')) {
-            $headers['Authorization'] = "Bearer {$token}";
-        }
-
+        // Single page of 100 covers every real case: the version branches we
+        // resolve against are a handful (1.x..5.x, main, master, develop). The
+        // old 5-page loop spent up to 4 extra calls/project chasing branches we
+        // never match — a meaningful slice of the GitHub rate-limit budget.
         $response = self::http()
             ->withHeaders($headers)
-            ->get("https://api.github.com/repos/{$repo}");
+            ->get("https://api.github.com/repos/{$repo}/branches", [
+                'per_page' => 100,
+            ]);
+
+        self::throwIfRateLimited($response);
 
         if (! $response->successful()) {
+            Log::warning('GitHub branches API failed', ['repo' => $repo, 'status' => $response->status()]);
+
             return null;
         }
 
-        $branch = $response->json('default_branch');
+        $names = [];
+        foreach ((array) $response->json() as $branch) {
+            if (is_array($branch) && isset($branch['name']) && is_string($branch['name'])) {
+                $names[] = $branch['name'];
+            }
+        }
 
-        return is_string($branch) && $branch !== '' ? $branch : null;
+        return $names;
     }
 
     /**
@@ -297,47 +312,46 @@ class ProjectMetrics
             $headers['Authorization'] = "Bearer {$token}";
         }
 
-        $page = 1;
+        // Contributors come ordered by commit count desc, so the top 100 holds
+        // anyone with a meaningful contribution. The old 5-page walk burned up
+        // to 4 extra calls/project on popular repos hunting a user who, if
+        // absent from page 1, contributed too little to matter (result: 0).
+        $response = self::http()
+            ->withHeaders($headers)
+            ->get("https://api.github.com/repos/{$repo}/contributors", [
+                'per_page' => 100,
+                'anon' => 'false',
+            ]);
 
-        do {
-            $response = self::http()
-                ->withHeaders($headers)
-                ->get("https://api.github.com/repos/{$repo}/contributors", [
-                    'per_page' => 100,
-                    'page' => $page,
-                    'anon' => 'false',
-                ]);
+        self::throwIfRateLimited($response);
 
-            if (! $response->successful()) {
-                Log::warning('GitHub contributors API failed', ['repo' => $repo, 'status' => $response->status()]);
+        if (! $response->successful()) {
+            Log::warning('GitHub contributors API failed', ['repo' => $repo, 'status' => $response->status()]);
 
-                return null;
+            return null;
+        }
+
+        foreach ((array) $response->json() as $contributor) {
+            if (! is_array($contributor) || ! isset($contributor['login'])) {
+                continue;
             }
 
-            $batch = (array) $response->json();
-
-            foreach ($batch as $contributor) {
-                if (! is_array($contributor) || ! isset($contributor['login'])) {
-                    continue;
-                }
-
-                if (strtolower((string) $contributor['login']) === $username) {
-                    return (int) ($contributor['contributions'] ?? 0);
-                }
+            if (strtolower((string) $contributor['login']) === $username) {
+                return (int) ($contributor['contributions'] ?? 0);
             }
-
-            $page++;
-        } while (count($batch) === 100 && $page <= 5);
+        }
 
         return 0;
     }
 
     /**
-     * Fetch stars + primary language + topics in a single /repos call. Returns
-     * null when the request can't be completed; `language` is null for repos
-     * GitHub reports no language for (docs-only, empty, etc.).
+     * Fetch stars + primary language + topics + default branch in a single
+     * /repos call. Returns null when the request can't be completed; `language`
+     * is null for repos GitHub reports no language for (docs-only, empty, etc.).
+     * `default_branch` is reused by the URL-resolvers and branch repair so they
+     * don't each re-fetch /repos/{repo}.
      *
-     * @return array{stars:int, language:?string, topics:list<string>}|null
+     * @return array{stars:int, language:?string, topics:list<string>, default_branch:?string}|null
      */
     private static function fetchRepoSnapshot(?string $githubUrl): ?array
     {
@@ -357,6 +371,8 @@ class ProjectMetrics
             ->withHeaders($headers)
             ->get("https://api.github.com/repos/{$repo}");
 
+        self::throwIfRateLimited($response);
+
         if (! $response->successful()) {
             Log::warning('GitHub API failed', ['repo' => $repo, 'status' => $response->status()]);
 
@@ -370,10 +386,13 @@ class ProjectMetrics
             ? array_values(array_filter($topics, 'is_string'))
             : [];
 
+        $defaultBranch = $response->json('default_branch');
+
         return [
             'stars' => (int) ($response->json('stargazers_count') ?? 0),
             'language' => is_string($language) && $language !== '' ? $language : null,
             'topics' => $topics,
+            'default_branch' => is_string($defaultBranch) && $defaultBranch !== '' ? $defaultBranch : null,
         ];
     }
 
@@ -493,7 +512,7 @@ class ProjectMetrics
      * packagist_url. Returns null when verification is skipped (no current
      * packagist_url, no GitHub URL, no composer.json, fetch error).
      */
-    private static function resolvePackagistUrl(Project $project): ?string
+    private static function resolvePackagistUrl(Project $project, ?string $defaultBranch): ?string
     {
         if ($project->package_type !== PackageType::Composer || ! $project->github_url) {
             return null;
@@ -505,7 +524,7 @@ class ProjectMetrics
             return null;
         }
 
-        $branch = self::fetchDefaultBranch($project->github_url) ?? 'main';
+        $branch = $defaultBranch ?? 'main';
 
         $headers = ['User-Agent' => 'jeffersongoncalves-site'];
 
@@ -532,7 +551,7 @@ class ProjectMetrics
      * can differ from the GitHub repo name, especially for scoped packages
      * like `@scope/name`).
      */
-    private static function resolveNpmUrl(Project $project): ?string
+    private static function resolveNpmUrl(Project $project, ?string $defaultBranch): ?string
     {
         if ($project->package_type !== PackageType::Npm || ! $project->github_url) {
             return null;
@@ -544,7 +563,7 @@ class ProjectMetrics
             return null;
         }
 
-        $branch = self::fetchDefaultBranch($project->github_url) ?? 'main';
+        $branch = $defaultBranch ?? 'main';
 
         $response = self::http()
             ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])

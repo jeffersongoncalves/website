@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
@@ -215,6 +216,16 @@ class Project extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /**
+     * Retired slugs that 301-redirect to this project's current slug.
+     *
+     * @return HasMany<ProjectSlugAlias, $this>
+     */
+    public function slugAliases(): HasMany
+    {
+        return $this->hasMany(ProjectSlugAlias::class);
     }
 
     public function scopePublished(Builder $query): Builder

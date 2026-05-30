@@ -4,19 +4,27 @@ namespace App\Http\Controllers\Site;
 
 use App\Enums\ProjectCategory;
 use App\Models\Project;
+use App\Models\ProjectSlugAlias;
 use App\Support\GithubReadme;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class ProjectViewController
 {
-    public function __invoke(Request $request, string $slug): View
+    public function __invoke(Request $request, string $slug): View|RedirectResponse
     {
-        /** @var Project $project */
         $project = Project::query()
             ->published()
             ->where('slug', $slug)
-            ->firstOrFail();
+            ->first();
+
+        // No live project on this slug — it may be a retired slug. 301 to the
+        // project's current slug (preserving the ?v= readme-version param)
+        // instead of 404-ing every old bookmark/backlink.
+        if ($project === null) {
+            return $this->redirectFromAlias($slug, $request);
+        }
 
         $isFilamentPlugin = $project->category === ProjectCategory::FilamentPlugin;
         $versions = $isFilamentPlugin && is_array($project->versions) ? $project->versions : [];
@@ -57,5 +65,28 @@ class ProjectViewController
         }
 
         return view('site.projects.show', compact('project', 'readmeHtml', 'versions', 'activeVersion', 'ref'));
+    }
+
+    /**
+     * Resolve a retired slug to its project and 301 to the current slug. Aborts
+     * 404 when the slug is unknown or its project is no longer published.
+     */
+    private function redirectFromAlias(string $slug, Request $request): RedirectResponse
+    {
+        $alias = ProjectSlugAlias::query()->where('slug', $slug)->first();
+
+        $target = $alias === null
+            ? null
+            : Project::query()->published()->whereKey($alias->project_id)->first();
+
+        abort_if($target === null, 404);
+
+        $url = route('projects.show', ['slug' => $target->slug]);
+
+        if (($query = $request->getQueryString()) !== null && $query !== '') {
+            $url .= '?'.$query;
+        }
+
+        return redirect($url, 301);
     }
 }

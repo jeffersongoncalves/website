@@ -39,6 +39,8 @@ class AppServiceProvider extends ServiceProvider
             FilamentView::registerRenderHook(PanelsRenderHook::HEAD_START, fn (): View => view('components.favicon'));
         }
         FilamentView::registerRenderHook(PanelsRenderHook::HEAD_START, fn (): View => view('components.js-md5'));
+        FilamentView::registerRenderHook(PanelsRenderHook::HEAD_START, fn (): View => view('components.gtm'));
+        FilamentView::registerRenderHook(PanelsRenderHook::BODY_START, fn (): View => view('components.gtm-noscript'));
     }
 
     /**

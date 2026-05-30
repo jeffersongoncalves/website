@@ -11,6 +11,12 @@ return [
     'defaultIsoTimeDisplayFormat' => 'LT',
     'admin_panel_enabled' => true,
     'logo' => 'resources/images/admin-logo.png',
+    // Google Tag Manager. Only emitted in production (see the gtm /
+    // gtm-noscript Blade components). Disable per-env via GTM_ENABLED.
+    'gtm' => [
+        'enabled' => env('GTM_ENABLED', true),
+        'id' => env('GTM_ID', 'GTM-MR8KB3FM'),
+    ],
     'favicon' => [
         'enabled' => true,
         'manifest' => [

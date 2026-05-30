@@ -97,6 +97,16 @@
                 </div>
             </form>
 
+            @if(count($popularTopics) > 0)
+                <div class="flex flex-wrap items-center gap-2 mt-6 mono-meta-sm">
+                    <span class="text-ink-400">@lang('site.projects.popular_topics'):</span>
+                    @foreach($popularTopics as $t)
+                        <a href="{{ route('projects.index', ['topic' => $t['topic']]) }}"
+                           class="badge {{ $activeTopic === $t['topic'] ? 'badge-accent' : '' }}">#{{ $t['topic'] }}</a>
+                    @endforeach
+                </div>
+            @endif
+
             @if($activeTopic !== '')
                 <div class="mt-6 mb-8 mono-meta-sm">
                     <span class="text-ink-400">@lang('site.projects.filtering_by_topic'):</span>

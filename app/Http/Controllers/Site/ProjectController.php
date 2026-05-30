@@ -101,6 +101,7 @@ class ProjectController
             'activeTopic' => $activeTopic,
             'categories' => ProjectCategory::cases(),
             'languages' => $languages,
+            'popularTopics' => array_slice($stats['topics'], 0, 15),
             'counts' => $counts,
         ]);
     }

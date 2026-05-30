@@ -61,15 +61,6 @@ class ProjectMetrics
                 $changed = true;
             }
 
-            // Capture GitHub topics (the curated source) from the same /repos
-            // call. Only overwrite when GitHub actually has topics, so a
-            // topic-less repo doesn't wipe keywords seeded at import time.
-            $topics = ProjectTopics::normalize($snapshot['topics']);
-            if ($topics !== [] && $topics !== ($project->topics ?? [])) {
-                $project->topics = $topics;
-                $changed = true;
-            }
-
             // Re-classify generic application/tool rows as the repo's topics
             // evolve — a project later tagged `awesome`/`android`/`database`/etc
             // gets promoted out of the catch-all on the next sync. Only upgrades
@@ -82,6 +73,19 @@ class ProjectMetrics
                     $changed = true;
                 }
             }
+        }
+
+        // Merge topics from every source we can reach: GitHub topics (curated)
+        // and Packagist keywords. Only overwrites when something was found so a
+        // source-less refresh doesn't wipe import-seeded topics.
+        $rawTopics = $snapshot !== null ? $snapshot['topics'] : [];
+        if ($project->packagist_url) {
+            $rawTopics = array_merge($rawTopics, self::fetchPackagistKeywords($project->packagist_url));
+        }
+        $topics = ProjectTopics::normalize($rawTopics);
+        if ($topics !== [] && $topics !== ($project->topics ?? [])) {
+            $project->topics = $topics;
+            $changed = true;
         }
 
         $downloads = self::fetchDownloads($project);
@@ -585,6 +589,56 @@ class ProjectMetrics
         $total = $response->json('package.downloads.total');
 
         return is_numeric($total) ? (int) $total : null;
+    }
+
+    /**
+     * Pull `keywords` off the Packagist package document so they can feed the
+     * project's topics. Merges keywords across versions (deduped/capped later by
+     * ProjectTopics). Empty on any failure.
+     *
+     * @return list<string>
+     */
+    private static function fetchPackagistKeywords(?string $packagistUrl): array
+    {
+        $package = self::packageFromPackagistUrl($packagistUrl);
+
+        if (! $package) {
+            return [];
+        }
+
+        $response = self::http()
+            ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
+            ->get("https://packagist.org/packages/{$package}.json");
+
+        if (! $response->successful()) {
+            return [];
+        }
+
+        $versions = $response->json('package.versions');
+
+        if (! is_array($versions)) {
+            return [];
+        }
+
+        $keywords = [];
+
+        foreach ($versions as $version) {
+            if (! is_array($version) || ! is_array($version['keywords'] ?? null)) {
+                continue;
+            }
+
+            foreach ($version['keywords'] as $keyword) {
+                if (is_string($keyword) && $keyword !== '') {
+                    $keywords[$keyword] = true;
+                }
+            }
+
+            if (count($keywords) >= 30) {
+                break;
+            }
+        }
+
+        return array_keys($keywords);
     }
 
     private static function packageFromPackagistUrl(?string $url): ?string

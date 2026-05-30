@@ -130,6 +130,7 @@ return [
         'language_all' => 'Todos los lenguajes',
         'filtering_by_topic' => 'Filtrando por topic',
         'clear_filter' => 'limpiar',
+        'popular_topics' => 'Topics populares',
         'filter_role' => 'Rol',
         'filter_apply' => 'Filtrar',
         'readme_unavailable' => 'README no disponible por el momento. Vea directamente en GitHub:',

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "72a14db563a72f32751dfd29535bc03d",
+    "content-hash": "4afbe35ab6f1da9d8d29d8dfc9cf7611",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2255,6 +2255,78 @@
             "time": "2026-05-10T14:08:06+00:00"
         },
         {
+            "name": "jeffersongoncalves/filament-gtag",
+            "version": "v3.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/filament-gtag.git",
+                "reference": "7d5e1e1f8244edbe7649d800f930d62d5ae41f5a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-gtag/zipball/7d5e1e1f8244edbe7649d800f930d62d5ae41f5a",
+                "reference": "7d5e1e1f8244edbe7649d800f930d62d5ae41f5a",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.3",
+                "filament/spatie-laravel-settings-plugin": "^5.0",
+                "jeffersongoncalves/laravel-gtag": "^2.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\Filament\\Gtag\\GtagServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\Filament\\Gtag\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Filament plugin for managing Google Analytics (Gtag) settings with a Settings Page powered by spatie/laravel-settings.",
+            "homepage": "https://github.com/jeffersongoncalves/filament-gtag",
+            "keywords": [
+                "filament",
+                "filament-gtag",
+                "google-analytics",
+                "gtag",
+                "jeffersongoncalves",
+                "laravel",
+                "spatie-settings"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/filament-gtag/issues",
+                "source": "https://github.com/jeffersongoncalves/filament-gtag/tree/v3.1.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-03-04T03:13:37+00:00"
+        },
+        {
             "name": "jeffersongoncalves/filament-gtm",
             "version": "3.1.1",
             "source": {
@@ -2463,6 +2535,82 @@
                 }
             ],
             "time": "2026-03-04T03:17:04+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-gtag",
+            "version": "v2.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-gtag.git",
+                "reference": "3247ee6cb687d6c28d0df5668692761afbddc277"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-gtag/zipball/3247ee6cb687d6c28d0df5668692761afbddc277",
+                "reference": "3247ee6cb687d6c28d0df5668692761afbddc277",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^11.0|^12.0|^13.0",
+                "php": "^8.2|^8.3",
+                "spatie/laravel-package-tools": "^1.14.0",
+                "spatie/laravel-settings": "^3.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.27",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Gtag": "JeffersonGoncalves\\Gtag\\Facades\\Gtag"
+                    },
+                    "providers": [
+                        "JeffersonGoncalves\\Gtag\\GtagServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "JeffersonGoncalves\\Gtag\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This Laravel package provides a straightforward integration of Google Analytics using Gtag into your Blade templates. It enables you to easily track website visits and user engagement, offering valuable insights into your site's performance. With minimal setup, you can leverage Gtag's powerful analytics features to better understand your audience and improve your website's effectiveness.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-gtag",
+            "keywords": [
+                "jeffersongoncalves",
+                "laravel",
+                "laravel-gtag"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-gtag/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-gtag/tree/v2.0.3"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-05-23T16:59:43+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-gtm",

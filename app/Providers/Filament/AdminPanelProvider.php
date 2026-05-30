@@ -24,6 +24,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use JeffersonGoncalves\Filament\Gtag\GtagPlugin;
 use JeffersonGoncalves\Filament\Gtm\GtmPlugin;
 use JeffersonGoncalves\Filament\OneTimeOperations\OneTimeOperationsPlugin;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
@@ -130,6 +131,7 @@ class AdminPanelProvider extends PanelProvider
                     ->navigationGroup(__('admin.navigation.settings')),
                 OneTimeOperationsPlugin::make(),
                 GtmPlugin::make(),
+                GtagPlugin::make(),
                 FilamentEditProfilePlugin::make()
                     ->slug('my-profile')
                     ->setTitle(__('admin.profile.title'))

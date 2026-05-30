@@ -23,6 +23,7 @@
       style="background: {{ $isDarkInitial ? '#0B0A09' : '#FFFEF9' }}; color-scheme: {{ $isDarkInitial ? 'dark' : 'light' }};">
 <head>
     @include('gtm::head')
+    @include('gtag::script')
     <meta charset="UTF-8">
     {{-- viewport-fit=cover lets the page paint into the iOS safe-area
          (notch/dynamic island) when running as a standalone PWA with

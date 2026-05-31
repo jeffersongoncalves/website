@@ -127,6 +127,20 @@ return [
             'heading' => 'By topic',
             'desc' => 'published projects',
         ],
+        'project_imports' => [
+            'heading' => 'Projects & imports',
+            'new_week' => 'New this week',
+            'delta' => ':delta vs last week',
+            'starred_total' => 'Imported from stars',
+            'starred_week' => ':count this week',
+            'total' => 'Total projects',
+            'total_desc' => 'in the catalogue',
+        ],
+        'projects_per_day' => [
+            'heading' => 'New projects per day (last 30 days)',
+            'all' => 'New projects',
+            'starred' => 'From stars',
+        ],
     ],
 
     'sections' => [

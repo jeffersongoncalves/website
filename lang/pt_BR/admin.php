@@ -39,6 +39,8 @@ return [
         'quick_create_help' => 'Escolha o tipo de importação, cole a URL e defina status + uso diário. Persiste em um único passo.',
         'publish' => 'Publicar',
         'publish_success' => ':count projetos publicados',
+        'import_from_article' => 'Importar de artigo',
+        'import_from_article_help' => 'Cole a URL do artigo / post. Lê o título e a descrição do <head> da página.',
     ],
 
     'import' => [
@@ -167,6 +169,7 @@ return [
         'license' => 'Licença',
         'github_url' => 'URL do GitHub',
         'youtube_url' => 'URL do canal',
+        'article_url' => 'URL do artigo',
         'import_source' => 'Tipo de importação',
         'import_url' => 'URL',
         'packagist_url' => 'URL do Packagist',
@@ -226,6 +229,7 @@ return [
             'database' => 'Banco de dados',
             'website' => 'Site externo',
             'youtube_channel' => 'Canal do YouTube',
+            'article' => 'Artigo',
         ],
         'status' => [
             'draft' => 'Rascunho',

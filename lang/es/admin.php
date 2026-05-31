@@ -39,6 +39,8 @@ return [
         'quick_create_help' => 'Elige el origen, pega la URL y define estado + uso diario. Persiste en un solo paso.',
         'publish' => 'Publicar',
         'publish_success' => ':count proyectos publicados',
+        'import_from_article' => 'Importar desde artículo',
+        'import_from_article_help' => 'Pega la URL del artículo / entrada. Lee el título y la descripción del <head> de la página.',
     ],
 
     'import' => [
@@ -167,6 +169,7 @@ return [
         'license' => 'Licencia',
         'github_url' => 'URL de GitHub',
         'youtube_url' => 'URL del canal',
+        'article_url' => 'URL del artículo',
         'import_source' => 'Origen',
         'import_url' => 'URL',
         'packagist_url' => 'URL de Packagist',
@@ -226,6 +229,7 @@ return [
             'database' => 'Base de datos',
             'website' => 'Sitio externo',
             'youtube_channel' => 'Canal de YouTube',
+            'article' => 'Artículo',
         ],
         'status' => [
             'draft' => 'Borrador',

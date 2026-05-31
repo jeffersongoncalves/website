@@ -91,6 +91,117 @@ class ProjectImporter
     }
 
     /**
+     * Fetch a single article/blog-post URL and map its <head> metadata to form
+     * fields under the `article` category. Unlike fromUrl (which represents a
+     * whole site and names the row after the host), this names the row after
+     * the post title and keeps the deep link in docs_url. Cached for an hour
+     * per URL. Returns `['error' => '<key>']` on failure.
+     *
+     * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
+     */
+    public static function fromArticle(string $url): array
+    {
+        $url = trim($url);
+
+        if (! filter_var($url, FILTER_VALIDATE_URL) || ! preg_match('#^https?://#i', $url)) {
+            return ['error' => 'invalid_url'];
+        }
+
+        $host = parse_url($url, PHP_URL_HOST);
+
+        if (! is_string($host) || $host === '') {
+            return ['error' => 'invalid_url'];
+        }
+
+        return Cache::remember(
+            'project_importer:article:'.sha1($url),
+            now()->addHour(),
+            fn () => self::buildArticleResult($url, $host)
+        );
+    }
+
+    /**
+     * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
+     */
+    private static function buildArticleResult(string $url, string $host): array
+    {
+        try {
+            $response = Http::timeout(8)
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+                    'Accept' => 'text/html,application/xhtml+xml',
+                    'Accept-Language' => 'en-US,en;q=0.9',
+                ])
+                ->get($url);
+        } catch (Throwable) {
+            return ['error' => 'fetch_failed'];
+        }
+
+        if (! $response->successful()) {
+            return ['error' => 'fetch_failed'];
+        }
+
+        $meta = self::parseMeta($response->body());
+
+        $rawTitle = $meta['og:title'] ?? $meta['title'] ?? null;
+        $title = is_string($rawTitle) && trim($rawTitle) !== ''
+            ? trim($rawTitle)
+            : self::nameFromHost($host);
+        $description = self::nullableString($meta['og:description'] ?? $meta['description'] ?? null);
+
+        $fields = [
+            'github_url' => null,
+            'slug' => self::articleSlugFromUrl($url),
+            'name' => $title,
+            'repo' => null,
+            'license' => null,
+            'readme_branch' => null,
+            'docs_url' => $url,
+            'title.en' => $description ?? $title,
+            'title.pt' => $description ?? $title,
+            'title.es' => $description ?? $title,
+            'category' => 'article',
+            'package_type' => 'none',
+            'packagist_url' => null,
+            'npm_url' => null,
+            'stack' => [],
+            'versions' => [],
+        ];
+
+        $warnings = [];
+
+        if ($description === null) {
+            $warnings[] = 'no_description';
+        }
+
+        return ['fields' => $fields, 'warnings' => $warnings];
+    }
+
+    /**
+     * Article slug derived from the post's own last path segment when present
+     * (`/blog/automate-your-php-security-updates` → that segment), prefixed
+     * `article-` to stay visually distinct and collision-safe. Falls back to
+     * the host when the URL has no path.
+     */
+    public static function articleSlugFromUrl(string $url): string
+    {
+        $path = parse_url($url, PHP_URL_PATH) ?: '';
+        $segments = array_values(array_filter(explode('/', $path), fn (string $s): bool => $s !== ''));
+        $last = end($segments);
+
+        $host = parse_url($url, PHP_URL_HOST) ?: '';
+        $host = preg_replace('/^www\./i', '', $host) ?? $host;
+
+        // array_filter already dropped empty segments, so a string $last is
+        // non-empty; end() only yields false when there were no segments.
+        $basis = is_string($last) ? $last : $host;
+
+        // Map dots to hyphens first (mirrors siteSlugFromUrl) so a host
+        // fallback reads example-com, not examplecom.
+        return 'article-'.Str::slug(str_replace('.', '-', $basis));
+    }
+
+    /**
      * Fetch an npm package from the public registry and map its manifest to
      * form fields. Mirrors fromGithub's shape: name/description/license come
      * from the registry document, github_url is recovered from the

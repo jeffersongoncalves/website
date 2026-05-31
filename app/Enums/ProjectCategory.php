@@ -28,6 +28,7 @@ enum ProjectCategory: string implements HasColor, HasLabel
     case Database = 'database';
     case Website = 'website';
     case YoutubeChannel = 'youtube_channel';
+    case Article = 'article';
 
     public function getLabel(): string
     {
@@ -53,6 +54,7 @@ enum ProjectCategory: string implements HasColor, HasLabel
             self::Database => __('admin.enums.category.database'),
             self::Website => __('admin.enums.category.website'),
             self::YoutubeChannel => __('admin.enums.category.youtube_channel'),
+            self::Article => __('admin.enums.category.article'),
         };
     }
 
@@ -80,6 +82,7 @@ enum ProjectCategory: string implements HasColor, HasLabel
             self::Database => 'success',
             self::Website => 'primary',
             self::YoutubeChannel => 'danger',
+            self::Article => 'info',
         };
     }
 }

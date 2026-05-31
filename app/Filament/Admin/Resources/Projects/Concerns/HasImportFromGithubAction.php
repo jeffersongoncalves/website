@@ -20,6 +20,7 @@ trait HasImportFromGithubAction
             $this->importFromGithubAction(),
             $this->importFromNpmAction(),
             $this->importFromYoutubeAction(),
+            $this->importFromArticleAction(),
             $this->importFromUrlAction(),
         ])
             ->label(__('admin.actions.import_group'))
@@ -90,6 +91,28 @@ trait HasImportFromGithubAction
             ])
             ->action(function (array $data): void {
                 $result = ProjectImporter::fromYoutube($data['youtube_url']);
+                $this->applyImporterResult($result);
+            });
+    }
+
+    protected function importFromArticleAction(): Action
+    {
+        return Action::make('importFromArticle')
+            ->label(__('admin.actions.import_from_article'))
+            ->icon('heroicon-o-document-text')
+            ->color('info')
+            ->modalHeading(__('admin.actions.import_from_article'))
+            ->modalDescription(__('admin.actions.import_from_article_help'))
+            ->modalSubmitActionLabel(__('admin.actions.import'))
+            ->schema([
+                TextInput::make('article_url')
+                    ->label(__('admin.fields.article_url'))
+                    ->placeholder('https://example.com/blog/post-title')
+                    ->url()
+                    ->required(),
+            ])
+            ->action(function (array $data): void {
+                $result = ProjectImporter::fromArticle($data['article_url']);
                 $this->applyImporterResult($result);
             });
     }

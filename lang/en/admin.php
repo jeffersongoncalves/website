@@ -39,6 +39,8 @@ return [
         'quick_create_help' => 'Pick a source, paste the URL, set status + daily-driver. Persists in a single step.',
         'publish' => 'Publish',
         'publish_success' => ':count projects published',
+        'import_from_article' => 'Import from article',
+        'import_from_article_help' => 'Paste the article / blog-post URL. Reads its title and description from the page <head>.',
     ],
 
     'import' => [
@@ -167,6 +169,7 @@ return [
         'license' => 'License',
         'github_url' => 'GitHub URL',
         'youtube_url' => 'Channel URL',
+        'article_url' => 'Article URL',
         'import_source' => 'Source',
         'import_url' => 'URL',
         'packagist_url' => 'Packagist URL',
@@ -226,6 +229,7 @@ return [
             'database' => 'Database',
             'website' => 'External site',
             'youtube_channel' => 'YouTube channel',
+            'article' => 'Article',
         ],
         'status' => [
             'draft' => 'Draft',

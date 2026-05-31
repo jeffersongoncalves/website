@@ -32,6 +32,10 @@ class SyncStarredReposJob implements ShouldQueue
 
     public int $backoff = 30;
 
+    // 0 = unlimited attempts; retryUntil() bounds the retries by time. Avoids
+    // MaxAttemptsExceededException when GitHub rate-limit releases pile up.
+    public int $tries = 0;
+
     private const EPOCH = '1970-01-01T00:00:00Z';
 
     private const PER_PAGE = 100;

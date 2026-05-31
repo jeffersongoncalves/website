@@ -26,6 +26,11 @@ class PurgeMisattributedPackagistUrlJob implements ShouldQueue
 
     public int $backoff = 60;
 
+    // 0 = unlimited attempts. Without this the job inherits the worker/Horizon
+    // tries (3) and a rate-limit release trips MaxAttemptsExceededException;
+    // retryUntil() below is what actually bounds the retries (by time).
+    public int $tries = 0;
+
     public function __construct(public int $projectId) {}
 
     /**

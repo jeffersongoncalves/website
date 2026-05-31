@@ -21,6 +21,11 @@ class SyncProjectMetricsJob implements ShouldQueue
 
     public int $backoff = 30;
 
+    // 0 = unlimited attempts. Without this the job inherits the worker/Horizon
+    // tries and a rate-limit release trips MaxAttemptsExceededException at the
+    // inherited limit; retryUntil() below bounds the retries by time instead.
+    public int $tries = 0;
+
     public function __construct(public Project $project)
     {
         $this->onQueue('github');
@@ -29,9 +34,8 @@ class SyncProjectMetricsJob implements ShouldQueue
     /**
      * Time-based retries instead of a fixed attempt count: a GitHub rate limit
      * releases the job repeatedly, and each release would otherwise burn an
-     * attempt — exhausting `tries=3` and failing the job at attempt 4 while it
-     * was only waiting for the window to reset. retryUntil keeps it retrying
-     * until the deadline regardless of how many releases the limit forced.
+     * attempt and fail the job while it was only waiting for the window to
+     * reset. retryUntil keeps it retrying until the deadline.
      */
     public function retryUntil(): \DateTimeInterface
     {

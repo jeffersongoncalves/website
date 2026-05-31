@@ -31,6 +31,10 @@ class ImportStarredRepoJob implements ShouldQueue
 
     public int $backoff = 30;
 
+    // 0 = unlimited attempts; retryUntil() bounds the retries by time. Avoids
+    // MaxAttemptsExceededException when GitHub rate-limit releases pile up.
+    public int $tries = 0;
+
     public function __construct(public string $htmlUrl, public string $starredAt)
     {
         $this->onQueue('github');

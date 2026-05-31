@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Jobs\PurgeMisattributedPackagistUrlJob;
@@ -25,13 +26,14 @@ function packagistProject(): Project
         'status' => ProjectStatus::Published,
         'github_url' => 'https://github.com/savanihd/Laravel-11-Livewire-CRUD',
         'packagist_url' => 'https://packagist.org/packages/laravel/laravel',
-        // Download metrics pulled from the wrong (laravel/laravel) package.
+        // package_type + download metrics derived from the wrong package.
+        'package_type' => PackageType::Composer,
         'downloads' => 123456789,
         'downloads_label' => '123M',
     ]);
 }
 
-it('purges a packagist_url owned by a different repo and clears its download metrics', function (): void {
+it('purges a foreign packagist_url and clears the package_type + download metrics', function (): void {
     $project = packagistProject();
 
     Http::fake(['packagist.org/*' => Http::response(['package' => ['repository' => 'https://github.com/laravel/laravel']], 200)]);
@@ -40,6 +42,7 @@ it('purges a packagist_url owned by a different repo and clears its download met
 
     $fresh = $project->fresh();
     expect($fresh->packagist_url)->toBeNull()
+        ->and($fresh->package_type)->toBe(PackageType::None)
         ->and($fresh->downloads)->toBe(0)
         ->and($fresh->downloads_label)->toBeNull();
 });
@@ -53,6 +56,7 @@ it('purges a packagist_url for an unpublished package (404)', function (): void 
 
     $fresh = $project->fresh();
     expect($fresh->packagist_url)->toBeNull()
+        ->and($fresh->package_type)->toBe(PackageType::None)
         ->and($fresh->downloads)->toBe(0)
         ->and($fresh->downloads_label)->toBeNull();
 });
@@ -77,6 +81,7 @@ it('keeps a packagist_url the repo genuinely owns', function (): void {
         'status' => ProjectStatus::Published,
         'github_url' => 'https://github.com/jeffersongoncalves/filament-gtag',
         'packagist_url' => 'https://packagist.org/packages/jeffersongoncalves/filament-gtag',
+        'package_type' => PackageType::Composer,
         'downloads' => 4200,
         'downloads_label' => '4.2k',
     ]);
@@ -85,9 +90,10 @@ it('keeps a packagist_url the repo genuinely owns', function (): void {
 
     (new PurgeMisattributedPackagistUrlJob($project->id))->handle();
 
-    // Owned → nothing touched, including the legitimate download metrics.
+    // Owned → nothing touched, including package_type + legitimate metrics.
     $fresh = $project->fresh();
     expect($fresh->packagist_url)->toBe('https://packagist.org/packages/jeffersongoncalves/filament-gtag')
+        ->and($fresh->package_type)->toBe(PackageType::Composer)
         ->and($fresh->downloads)->toBe(4200)
         ->and($fresh->downloads_label)->toBe('4.2k');
 });

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\PackageType;
 use App\Models\Project;
 use App\Support\ProjectImporter;
 use Illuminate\Bus\Queueable;
@@ -77,13 +78,15 @@ class PurgeMisattributedPackagistUrlJob implements ShouldQueue
 
         if ($status === ProjectImporter::PACKAGIST_FOREIGN) {
             $was = $project->packagist_url;
-            // Drop the link AND the download metrics it produced — those counts
-            // were pulled from the wrong package (e.g. laravel/laravel's millions
-            // of installs). The next projects:sync-metrics run refetches the
-            // correct numbers (none, now that packagist_url is gone).
+            // Drop the link, the package_type it implied, AND the download
+            // metrics it produced — all three came from the borrowed composer.json
+            // name (e.g. laravel/laravel's millions of installs), so a `composer`
+            // type and those counts are wrong. The next projects:sync-metrics run
+            // refetches the correct numbers (none, now that packagist_url is gone).
             // Per-record update so ProjectObserver flushes caches / site stats.
             $project->update([
                 'packagist_url' => null,
+                'package_type' => PackageType::None,
                 'downloads' => 0,
                 'downloads_label' => null,
             ]);

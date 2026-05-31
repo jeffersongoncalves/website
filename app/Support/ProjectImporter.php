@@ -1000,9 +1000,7 @@ class ProjectImporter
             return self::LINK_UNKNOWN;
         }
 
-        $registrySlug = GithubReadme::repoFromUrl($repositoryUrl);
-
-        return $registrySlug !== null && strcasecmp($registrySlug, $expectedSlug) === 0
+        return self::sameGithubOwner(GithubReadme::repoFromUrl($repositoryUrl), $expectedSlug)
             ? self::LINK_OWNED
             : self::LINK_FOREIGN;
     }
@@ -1338,11 +1336,29 @@ class ProjectImporter
             return self::LINK_UNKNOWN;
         }
 
-        $packagistSlug = GithubReadme::repoFromUrl($repositoryUrl);
-
-        return $packagistSlug !== null && strcasecmp($packagistSlug, $expectedSlug) === 0
+        return self::sameGithubOwner(GithubReadme::repoFromUrl($repositoryUrl), $expectedSlug)
             ? self::LINK_OWNED
             : self::LINK_FOREIGN;
+    }
+
+    /**
+     * Two repo slugs (`owner/repo`) belong to the same project when they share
+     * the GitHub OWNER, not necessarily the exact repo. Monorepos split-publish
+     * to per-package read-only repos under the same org — e.g. the github repo
+     * filamentphp/filament's `filament/filament` package lists its repository as
+     * filamentphp/panels. Same owner (filamentphp) → ours. A borrowed name from
+     * a different org (savanihd shipping laravel/laravel) → different owner → not.
+     */
+    private static function sameGithubOwner(?string $slugA, ?string $slugB): bool
+    {
+        if ($slugA === null || $slugB === null) {
+            return false;
+        }
+
+        $ownerA = strtolower(explode('/', $slugA, 2)[0]);
+        $ownerB = strtolower(explode('/', $slugB, 2)[0]);
+
+        return $ownerA !== '' && $ownerA === $ownerB;
     }
 
     /**

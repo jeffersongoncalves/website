@@ -114,11 +114,27 @@ describe('packagistUrlOwnershipStatus', function (): void {
             ->toBe(ProjectImporter::LINK_OWNED);
     });
 
-    it('is foreign when the repository points at a different repo', function () use ($url, $repo): void {
+    it('is foreign when the repository belongs to a different owner', function () use ($url, $repo): void {
         Http::fake(['packagist.org/*' => Http::response(['package' => ['repository' => 'https://github.com/laravel/laravel']], 200)]);
 
         expect(ProjectImporter::packagistUrlOwnershipStatus($url, $repo))
             ->toBe(ProjectImporter::LINK_FOREIGN);
+    });
+
+    it('is owned when only the owner matches — monorepo split-repo (filament)', function (): void {
+        // filament/filament package lists its repository as filamentphp/panels,
+        // a split read-only repo under the same filamentphp org.
+        Http::fake(['packagist.org/*' => Http::response(['package' => ['repository' => 'https://github.com/filamentphp/panels']], 200)]);
+
+        expect(ProjectImporter::packagistUrlOwnershipStatus('https://packagist.org/packages/filament/filament', 'https://github.com/filamentphp/filament'))
+            ->toBe(ProjectImporter::LINK_OWNED);
+    });
+
+    it('matches the owner even when the repository url carries a .git suffix', function (): void {
+        Http::fake(['packagist.org/*' => Http::response(['package' => ['repository' => 'https://github.com/filamentphp/filament.git']], 200)]);
+
+        expect(ProjectImporter::packagistUrlOwnershipStatus('https://packagist.org/packages/filament/filament', 'https://github.com/filamentphp/filament'))
+            ->toBe(ProjectImporter::LINK_OWNED);
     });
 
     it('is foreign when the package is unpublished (404)', function () use ($url, $repo): void {

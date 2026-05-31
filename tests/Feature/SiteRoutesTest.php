@@ -92,6 +92,24 @@ it('renders project show', function () {
         ->assertSee('my-plugin');
 });
 
+it('gives an article an article- slug and renders it as an external link card', function () {
+    $project = Project::query()->create([
+        'name' => 'Automate your PHP security updates',
+        'category' => ProjectCategory::Article,
+        'status' => ProjectStatus::Published,
+        'docs_url' => 'https://yoeri.me/blog/automate-your-php-security-updates',
+        'published_at' => now(),
+    ]);
+
+    expect($project->slug)->toBe('article-automate-your-php-security-updates');
+
+    $this->get('/projects/'.$project->slug)
+        ->assertOk()
+        // Renders the external "visit" card (host + deep link), not a README.
+        ->assertSee('yoeri.me')
+        ->assertSee('https://yoeri.me/blog/automate-your-php-security-updates', false);
+});
+
 it('404s on draft project show', function () {
     Project::query()->create([
         'slug' => 'draft-plugin',

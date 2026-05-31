@@ -8,9 +8,12 @@
     ];
 
     $initial = strtoupper(mb_substr($project->name, 0, 1));
+    // External-link projects (no repo, no stars/license) — render a "visit"
+    // card pointing at docs_url and skip the GitHub README / stats grid.
     $isExternalSite = in_array($project->category, [
         \App\Enums\ProjectCategory::Website,
         \App\Enums\ProjectCategory::YoutubeChannel,
+        \App\Enums\ProjectCategory::Article,
     ], true);
     $externalUrl = $isExternalSite ? ($project->docs_url ?: $project->demo_url ?: $project->github_url) : null;
     // YouTube channels label with the handle (`@channel`) — the host is

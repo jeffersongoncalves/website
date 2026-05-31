@@ -212,6 +212,12 @@ class Project extends Model
             return Str::slug(str_replace(['@', '/'], ['', '-'], $package));
         }
 
+        // Articles carry the `article-` prefix so the URL stays visually
+        // distinct from packages/sites — mirrors the importer's slug.
+        if ($this->category === ProjectCategory::Article) {
+            return 'article-'.Str::slug((string) ($this->name ?? ''));
+        }
+
         return (string) ($this->name ?? '');
     }
 

@@ -7,7 +7,7 @@ use App\Filament\Admin\Widgets\ProjectsPerDayChart;
 use App\Models\Project;
 use Livewire\Livewire;
 
-function makeProjectAt(string $slug, \DateTimeInterface $createdAt, bool $starred = false): Project
+function makeProjectAt(string $slug, DateTimeInterface $createdAt, bool $starred = false): Project
 {
     $project = Project::query()->create([
         'slug' => $slug,

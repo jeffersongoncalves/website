@@ -944,18 +944,25 @@ class ProjectImporter
      * same owner/repo as `$expectedGithubUrl`. Guards against misattributed
      * package.json `name` fields (e.g. mpvue ships `"name": "vue"`, which
      * would otherwise advertise the real vue npm package as mpvue's own).
-     * Failures and missing repository data return false — better to skip the
-     * npm_url than to publish a wrong attribution.
+     * Only a definitive `owned` is trusted.
      */
     private static function npmPackageBelongsToRepo(string $name, string $expectedGithubUrl): bool
+    {
+        return self::npmOwnershipForName($name, $expectedGithubUrl) === self::LINK_OWNED;
+    }
+
+    /**
+     * Tri-state npm ownership of `$name` relative to `$expectedGithubUrl`. Same
+     * OWNED/FOREIGN/UNKNOWN semantics as packagistOwnershipForName — the cleanup
+     * job must not treat a transient UNKNOWN as FOREIGN.
+     */
+    private static function npmOwnershipForName(string $name, string $expectedGithubUrl): string
     {
         $expectedSlug = GithubReadme::repoFromUrl($expectedGithubUrl);
 
         if ($expectedSlug === null) {
-            return false;
+            return self::LINK_UNKNOWN;
         }
-
-        $url = 'https://registry.npmjs.org/'.$name;
 
         try {
             $response = Http::timeout(6)
@@ -963,13 +970,18 @@ class ProjectImporter
                     'User-Agent' => 'jeffersongoncalves-site',
                     'Accept' => 'application/json',
                 ])
-                ->get($url);
+                ->get('https://registry.npmjs.org/'.$name);
         } catch (Throwable) {
-            return false;
+            return self::LINK_UNKNOWN;
+        }
+
+        // 404 = the package genuinely isn't published → safe to call foreign.
+        if ($response->status() === 404) {
+            return self::LINK_FOREIGN;
         }
 
         if (! $response->successful()) {
-            return false;
+            return self::LINK_UNKNOWN;
         }
 
         $data = $response->json();
@@ -985,12 +997,28 @@ class ProjectImporter
         }
 
         if ($repositoryUrl === null) {
-            return false;
+            return self::LINK_UNKNOWN;
         }
 
         $registrySlug = GithubReadme::repoFromUrl($repositoryUrl);
 
-        return $registrySlug !== null && strcasecmp($registrySlug, $expectedSlug) === 0;
+        return $registrySlug !== null && strcasecmp($registrySlug, $expectedSlug) === 0
+            ? self::LINK_OWNED
+            : self::LINK_FOREIGN;
+    }
+
+    /**
+     * Public tri-state check for a stored `npm_url` against a project's
+     * `github_url` — used by the cleanup job. A malformed npm_url is UNKNOWN
+     * (never purge what we can't parse).
+     */
+    public static function npmUrlOwnershipStatus(string $npmUrl, string $githubUrl): string
+    {
+        if (! preg_match('~npmjs\.com/package/(@[^/?#]+/[^/?#]+|[^/?#]+)~i', $npmUrl, $m)) {
+            return self::LINK_UNKNOWN;
+        }
+
+        return self::npmOwnershipForName(rtrim($m[1], '/'), $githubUrl);
     }
 
     /**
@@ -1243,14 +1271,14 @@ class ProjectImporter
         return strtolower($name);
     }
 
-    /** Packagist `repository` resolves to the imported repo. */
-    public const PACKAGIST_OWNED = 'owned';
+    /** The registry's `repository` resolves to the imported repo. */
+    public const LINK_OWNED = 'owned';
 
     /** Package is unpublished (404) or owned by a different repo. */
-    public const PACKAGIST_FOREIGN = 'foreign';
+    public const LINK_FOREIGN = 'foreign';
 
     /** Couldn't verify — network error, rate limit (429/5xx), or no repository. */
-    public const PACKAGIST_UNKNOWN = 'unknown';
+    public const LINK_UNKNOWN = 'unknown';
 
     /**
      * Whether the package is published under the imported repo. Guards against
@@ -1260,7 +1288,7 @@ class ProjectImporter
      */
     private static function packagistPackageBelongsToRepo(string $name, string $expectedGithubUrl): bool
     {
-        return self::packagistOwnershipForName($name, $expectedGithubUrl) === self::PACKAGIST_OWNED;
+        return self::packagistOwnershipForName($name, $expectedGithubUrl) === self::LINK_OWNED;
     }
 
     /**
@@ -1277,7 +1305,7 @@ class ProjectImporter
         $expectedSlug = GithubReadme::repoFromUrl($expectedGithubUrl);
 
         if ($expectedSlug === null) {
-            return self::PACKAGIST_UNKNOWN;
+            return self::LINK_UNKNOWN;
         }
 
         try {
@@ -1288,17 +1316,17 @@ class ProjectImporter
                 ])
                 ->get("https://packagist.org/packages/{$name}.json");
         } catch (Throwable) {
-            return self::PACKAGIST_UNKNOWN;
+            return self::LINK_UNKNOWN;
         }
 
         // 404 = the package genuinely isn't published → safe to call foreign.
         if ($response->status() === 404) {
-            return self::PACKAGIST_FOREIGN;
+            return self::LINK_FOREIGN;
         }
 
         // Anything else non-2xx (429 rate limit, 5xx) is inconclusive.
         if (! $response->successful()) {
-            return self::PACKAGIST_UNKNOWN;
+            return self::LINK_UNKNOWN;
         }
 
         $data = $response->json();
@@ -1307,26 +1335,26 @@ class ProjectImporter
             : null;
 
         if ($repositoryUrl === null) {
-            return self::PACKAGIST_UNKNOWN;
+            return self::LINK_UNKNOWN;
         }
 
         $packagistSlug = GithubReadme::repoFromUrl($repositoryUrl);
 
         return $packagistSlug !== null && strcasecmp($packagistSlug, $expectedSlug) === 0
-            ? self::PACKAGIST_OWNED
-            : self::PACKAGIST_FOREIGN;
+            ? self::LINK_OWNED
+            : self::LINK_FOREIGN;
     }
 
     /**
      * Public tri-state check for an already-stored `packagist_url` against a
      * project's `github_url` — used by the cleanup job. Returns one of the
-     * PACKAGIST_* constants. A malformed packagist_url is UNKNOWN (never purge
-     * on something we can't even parse).
+     * LINK_* constants. A malformed packagist_url is UNKNOWN (never purge on
+     * something we can't even parse).
      */
     public static function packagistUrlOwnershipStatus(string $packagistUrl, string $githubUrl): string
     {
         if (! preg_match('~packagist\.org/packages/([a-z0-9_.-]+/[a-z0-9_.-]+)~i', $packagistUrl, $m)) {
-            return self::PACKAGIST_UNKNOWN;
+            return self::LINK_UNKNOWN;
         }
 
         return self::packagistOwnershipForName(strtolower($m[1]), $githubUrl);

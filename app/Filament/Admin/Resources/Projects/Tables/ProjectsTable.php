@@ -4,14 +4,19 @@ namespace App\Filament\Admin\Resources\Projects\Tables;
 
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 
 class ProjectsTable
 {
@@ -83,6 +88,34 @@ class ProjectsTable
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('publish')
+                        ->label(__('admin.actions.publish'))
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->deselectRecordsAfterCompletion()
+                        ->action(function (Collection $records): void {
+                            $count = 0;
+
+                            foreach ($records as $record) {
+                                if ($record->getAttribute('status') !== ProjectStatus::Published) {
+                                    // Per-record update so the observer stamps
+                                    // published_at and flushes the count/cards cache.
+                                    $record->update(['status' => ProjectStatus::Published]);
+                                    $count++;
+                                }
+                            }
+
+                            Notification::make()
+                                ->success()
+                                ->title(__('admin.actions.publish_success', ['count' => $count]))
+                                ->send();
+                        }),
+                    DeleteBulkAction::make(),
+                ]),
             ]);
     }
 }

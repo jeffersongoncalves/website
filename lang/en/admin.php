@@ -37,6 +37,8 @@ return [
         'import' => 'Import',
         'quick_create' => 'Quick create',
         'quick_create_help' => 'Pick a source, paste the URL, set status + daily-driver. Persists in a single step.',
+        'publish' => 'Publish',
+        'publish_success' => ':count projects published',
     ],
 
     'import' => [

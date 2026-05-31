@@ -37,6 +37,8 @@ return [
         'import' => 'Importar',
         'quick_create' => 'Alta rápida',
         'quick_create_help' => 'Elige el origen, pega la URL y define estado + uso diario. Persiste en un solo paso.',
+        'publish' => 'Publicar',
+        'publish_success' => ':count proyectos publicados',
     ],
 
     'import' => [

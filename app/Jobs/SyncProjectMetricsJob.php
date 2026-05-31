@@ -19,13 +19,23 @@ class SyncProjectMetricsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 3;
-
     public int $backoff = 30;
 
     public function __construct(public Project $project)
     {
         $this->onQueue('github');
+    }
+
+    /**
+     * Time-based retries instead of a fixed attempt count: a GitHub rate limit
+     * releases the job repeatedly, and each release would otherwise burn an
+     * attempt — exhausting `tries=3` and failing the job at attempt 4 while it
+     * was only waiting for the window to reset. retryUntil keeps it retrying
+     * until the deadline regardless of how many releases the limit forced.
+     */
+    public function retryUntil(): \DateTimeInterface
+    {
+        return now()->addHours(2);
     }
 
     /**

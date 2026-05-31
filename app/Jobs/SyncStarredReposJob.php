@@ -30,8 +30,6 @@ class SyncStarredReposJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 3;
-
     public int $backoff = 30;
 
     private const EPOCH = '1970-01-01T00:00:00Z';
@@ -41,6 +39,15 @@ class SyncStarredReposJob implements ShouldQueue
     public function __construct(public bool $full = false)
     {
         $this->onQueue('github');
+    }
+
+    /**
+     * Time-based retries so GitHub rate-limit releases don't exhaust a fixed
+     * attempt budget — see SyncProjectMetricsJob::retryUntil for the rationale.
+     */
+    public function retryUntil(): \DateTimeInterface
+    {
+        return now()->addHours(2);
     }
 
     /**

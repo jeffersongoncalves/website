@@ -29,13 +29,21 @@ class ImportStarredRepoJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 3;
-
     public int $backoff = 30;
 
     public function __construct(public string $htmlUrl, public string $starredAt)
     {
         $this->onQueue('github');
+    }
+
+    /**
+     * Time-based retries so a GitHub rate limit (the RateLimited middleware
+     * releases the job) doesn't exhaust a fixed attempt budget — see
+     * SyncProjectMetricsJob::retryUntil for the rationale.
+     */
+    public function retryUntil(): \DateTimeInterface
+    {
+        return now()->addHours(2);
     }
 
     /**

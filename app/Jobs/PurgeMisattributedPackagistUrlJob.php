@@ -24,11 +24,19 @@ class PurgeMisattributedPackagistUrlJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 5;
-
     public int $backoff = 60;
 
     public function __construct(public int $projectId) {}
+
+    /**
+     * Time-based retries so a Packagist rate limit (UNKNOWN → release) doesn't
+     * exhaust a fixed attempt budget before the window resets — see
+     * SyncProjectMetricsJob::retryUntil for the rationale.
+     */
+    public function retryUntil(): \DateTimeInterface
+    {
+        return now()->addHours(2);
+    }
 
     /**
      * @return array<int, object>

@@ -139,6 +139,7 @@ class Project extends Model
         'is_paid',
         'published_at',
         'last_synced_at',
+        'starred_at',
     ];
 
     public array $translatable = [
@@ -166,6 +167,7 @@ class Project extends Model
             'status' => ProjectStatus::class,
             'published_at' => 'datetime',
             'last_synced_at' => 'datetime',
+            'starred_at' => 'datetime',
         ];
     }
 

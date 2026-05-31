@@ -156,7 +156,7 @@ it('follows pagination past a full page', function (): void {
     Bus::assertDispatchedTimes(ImportStarredRepoJob::class, 101);
 });
 
-it('creates a draft project for a new starred repo and never duplicates it', function (): void {
+it('creates a published project for a new starred repo and never duplicates it', function (): void {
     Http::fake([
         '*api.github.com/repos/acme/widget' => Http::response([
             'default_branch' => 'main',
@@ -176,7 +176,7 @@ it('creates a draft project for a new starred repo and never duplicates it', fun
 
     $rows = Project::query()->where('github_url', 'https://github.com/acme/widget')->get();
     expect($rows)->toHaveCount(1);
-    expect($rows->first()->status)->toBe(ProjectStatus::Draft);
+    expect($rows->first()->status)->toBe(ProjectStatus::Published);
     expect($rows->first()->is_maintainer)->toBeFalse();
     expect(storedStarredAtUtc('https://github.com/acme/widget'))->toBe('2026-05-25T10:00:00Z');
 });

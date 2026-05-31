@@ -18,12 +18,12 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Enrich and persist a single starred repo as a draft Project.
+ * Enrich and persist a single starred repo as a published Project.
  *
  * Dedup key is the canonical GitHub owner/repo URL. A repo that already exists
  * (a curated row, possibly one the account also starred) is never duplicated
- * and never downgraded — only its starred_at is back-filled. Brand-new rows
- * land as draft, never auto-published; curation happens in the admin.
+ * and never touched beyond back-filling its starred_at. Brand-new rows are
+ * published straight away.
  */
 class ImportStarredRepoJob implements ShouldQueue
 {
@@ -91,7 +91,7 @@ class ImportStarredRepoJob implements ShouldQueue
 
         $attributes['github_url'] = $canonical;
         $attributes['starred_at'] = $starredAt;
-        $attributes['status'] = 'draft';
+        $attributes['status'] = 'published';
         $attributes['is_maintainer'] = false;
         $attributes['is_daily_driver'] = false;
 

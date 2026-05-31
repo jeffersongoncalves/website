@@ -25,17 +25,23 @@ function packagistProject(): Project
         'status' => ProjectStatus::Published,
         'github_url' => 'https://github.com/savanihd/Laravel-11-Livewire-CRUD',
         'packagist_url' => 'https://packagist.org/packages/laravel/laravel',
+        // Download metrics pulled from the wrong (laravel/laravel) package.
+        'downloads' => 123456789,
+        'downloads_label' => '123M',
     ]);
 }
 
-it('purges a packagist_url owned by a different repo', function (): void {
+it('purges a packagist_url owned by a different repo and clears its download metrics', function (): void {
     $project = packagistProject();
 
     Http::fake(['packagist.org/*' => Http::response(['package' => ['repository' => 'https://github.com/laravel/laravel']], 200)]);
 
     (new PurgeMisattributedPackagistUrlJob($project->id))->handle();
 
-    expect($project->fresh()->packagist_url)->toBeNull();
+    $fresh = $project->fresh();
+    expect($fresh->packagist_url)->toBeNull()
+        ->and($fresh->downloads)->toBe(0)
+        ->and($fresh->downloads_label)->toBeNull();
 });
 
 it('purges a packagist_url for an unpublished package (404)', function (): void {
@@ -45,7 +51,10 @@ it('purges a packagist_url for an unpublished package (404)', function (): void 
 
     (new PurgeMisattributedPackagistUrlJob($project->id))->handle();
 
-    expect($project->fresh()->packagist_url)->toBeNull();
+    $fresh = $project->fresh();
+    expect($fresh->packagist_url)->toBeNull()
+        ->and($fresh->downloads)->toBe(0)
+        ->and($fresh->downloads_label)->toBeNull();
 });
 
 it('keeps the packagist_url when Packagist rate-limits the check (429)', function (): void {
@@ -68,11 +77,17 @@ it('keeps a packagist_url the repo genuinely owns', function (): void {
         'status' => ProjectStatus::Published,
         'github_url' => 'https://github.com/jeffersongoncalves/filament-gtag',
         'packagist_url' => 'https://packagist.org/packages/jeffersongoncalves/filament-gtag',
+        'downloads' => 4200,
+        'downloads_label' => '4.2k',
     ]);
 
     Http::fake(['packagist.org/*' => Http::response(['package' => ['repository' => 'https://github.com/jeffersongoncalves/filament-gtag']], 200)]);
 
     (new PurgeMisattributedPackagistUrlJob($project->id))->handle();
 
-    expect($project->fresh()->packagist_url)->toBe('https://packagist.org/packages/jeffersongoncalves/filament-gtag');
+    // Owned → nothing touched, including the legitimate download metrics.
+    $fresh = $project->fresh();
+    expect($fresh->packagist_url)->toBe('https://packagist.org/packages/jeffersongoncalves/filament-gtag')
+        ->and($fresh->downloads)->toBe(4200)
+        ->and($fresh->downloads_label)->toBe('4.2k');
 });

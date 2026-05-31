@@ -713,6 +713,15 @@ class ProjectImporter
             && self::npmPackageExists($npmName)
             && self::npmPackageBelongsToRepo($npmName, $url);
 
+        // A composer.json `name` alone is not proof the package is published as
+        // that vendor/name — app skeletons and forks ship `"name": "laravel/laravel"`
+        // (or similar) without owning the package. Only advertise packagist_url
+        // when the package exists AND its Packagist `repository` points back at
+        // this repo, same guard as the npm path.
+        $packagistName = self::packagistNameFromComposer($composer);
+        $packagistOwned = $packagistName !== null
+            && self::packagistPackageBelongsToRepo($packagistName, $url);
+
         $packageType = self::resolvePackageType($composer, $package, $repo, $npmPublished);
         // Docker-distributed projects don't fit any of the package-manager
         // types resolvePackageType knows about, but they still ship as an
@@ -753,7 +762,7 @@ class ProjectImporter
             'category' => $category,
             'package_type' => $packageType,
             'language' => ProjectLanguage::tryFrom((string) ($repo['language'] ?? ''))?->value,
-            'packagist_url' => self::buildPackagistUrl($composer),
+            'packagist_url' => $packagistOwned ? 'https://packagist.org/packages/'.$packagistName : null,
             'npm_url' => $npmPublished ? 'https://www.npmjs.com/package/'.$npmName : null,
             'stack' => self::resolveStack($composer, $package),
             'topics' => ProjectTopics::normalize(
@@ -776,6 +785,10 @@ class ProjectImporter
 
         if ($npmName !== null && ! $npmPublished) {
             $warnings[] = 'npm_not_published';
+        }
+
+        if ($packagistName !== null && ! $packagistOwned) {
+            $warnings[] = 'packagist_not_owned';
         }
 
         return ['fields' => $fields, 'warnings' => $warnings];
@@ -1213,9 +1226,13 @@ class ProjectImporter
     }
 
     /**
+     * The normalised `vendor/name` from a composer.json, or null when absent /
+     * malformed. Does NOT prove the package is published — callers must verify
+     * ownership with packagistPackageBelongsToRepo before trusting it.
+     *
      * @param  array<string, mixed>|null  $composer
      */
-    private static function buildPackagistUrl(?array $composer): ?string
+    private static function packagistNameFromComposer(?array $composer): ?string
     {
         $name = $composer['name'] ?? null;
 
@@ -1223,7 +1240,96 @@ class ProjectImporter
             return null;
         }
 
-        return 'https://packagist.org/packages/'.strtolower($name);
+        return strtolower($name);
+    }
+
+    /** Packagist `repository` resolves to the imported repo. */
+    public const PACKAGIST_OWNED = 'owned';
+
+    /** Package is unpublished (404) or owned by a different repo. */
+    public const PACKAGIST_FOREIGN = 'foreign';
+
+    /** Couldn't verify — network error, rate limit (429/5xx), or no repository. */
+    public const PACKAGIST_UNKNOWN = 'unknown';
+
+    /**
+     * Whether the package is published under the imported repo. Guards against
+     * app skeletons / forks that ship a borrowed composer.json `name` (e.g.
+     * `"name": "laravel/laravel"`). Only a definitive `owned` is trusted — any
+     * uncertainty skips packagist_url rather than risk a wrong attribution.
+     */
+    private static function packagistPackageBelongsToRepo(string $name, string $expectedGithubUrl): bool
+    {
+        return self::packagistOwnershipForName($name, $expectedGithubUrl) === self::PACKAGIST_OWNED;
+    }
+
+    /**
+     * Tri-state ownership of `$name` relative to `$expectedGithubUrl`:
+     *  - OWNED   — Packagist `repository` matches the repo.
+     *  - FOREIGN — a 404 (unpublished) or a repository pointing elsewhere.
+     *  - UNKNOWN — network failure, rate limit (429/5xx), or missing repository.
+     *
+     * The distinction matters for the cleanup job: a transient UNKNOWN must NOT
+     * be treated as FOREIGN, or a Packagist rate-limit would nuke valid links.
+     */
+    private static function packagistOwnershipForName(string $name, string $expectedGithubUrl): string
+    {
+        $expectedSlug = GithubReadme::repoFromUrl($expectedGithubUrl);
+
+        if ($expectedSlug === null) {
+            return self::PACKAGIST_UNKNOWN;
+        }
+
+        try {
+            $response = Http::timeout(6)
+                ->withHeaders([
+                    'User-Agent' => 'jeffersongoncalves-site',
+                    'Accept' => 'application/json',
+                ])
+                ->get("https://packagist.org/packages/{$name}.json");
+        } catch (Throwable) {
+            return self::PACKAGIST_UNKNOWN;
+        }
+
+        // 404 = the package genuinely isn't published → safe to call foreign.
+        if ($response->status() === 404) {
+            return self::PACKAGIST_FOREIGN;
+        }
+
+        // Anything else non-2xx (429 rate limit, 5xx) is inconclusive.
+        if (! $response->successful()) {
+            return self::PACKAGIST_UNKNOWN;
+        }
+
+        $data = $response->json();
+        $repositoryUrl = is_array($data) && isset($data['package']['repository']) && is_string($data['package']['repository'])
+            ? $data['package']['repository']
+            : null;
+
+        if ($repositoryUrl === null) {
+            return self::PACKAGIST_UNKNOWN;
+        }
+
+        $packagistSlug = GithubReadme::repoFromUrl($repositoryUrl);
+
+        return $packagistSlug !== null && strcasecmp($packagistSlug, $expectedSlug) === 0
+            ? self::PACKAGIST_OWNED
+            : self::PACKAGIST_FOREIGN;
+    }
+
+    /**
+     * Public tri-state check for an already-stored `packagist_url` against a
+     * project's `github_url` — used by the cleanup job. Returns one of the
+     * PACKAGIST_* constants. A malformed packagist_url is UNKNOWN (never purge
+     * on something we can't even parse).
+     */
+    public static function packagistUrlOwnershipStatus(string $packagistUrl, string $githubUrl): string
+    {
+        if (! preg_match('~packagist\.org/packages/([a-z0-9_.-]+/[a-z0-9_.-]+)~i', $packagistUrl, $m)) {
+            return self::PACKAGIST_UNKNOWN;
+        }
+
+        return self::packagistOwnershipForName(strtolower($m[1]), $githubUrl);
     }
 
     /**

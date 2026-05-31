@@ -102,3 +102,55 @@ describe('fromArticle', function (): void {
             ->toBe(['error' => 'fetch_failed']);
     });
 });
+
+describe('packagistUrlOwnershipStatus', function (): void {
+    $url = 'https://packagist.org/packages/vendor/pkg';
+    $repo = 'https://github.com/vendor/pkg';
+
+    it('is owned when the Packagist repository matches the repo', function () use ($url, $repo): void {
+        Http::fake(['packagist.org/*' => Http::response(['package' => ['repository' => 'https://github.com/vendor/pkg']], 200)]);
+
+        expect(ProjectImporter::packagistUrlOwnershipStatus($url, $repo))
+            ->toBe(ProjectImporter::PACKAGIST_OWNED);
+    });
+
+    it('is foreign when the repository points at a different repo', function () use ($url, $repo): void {
+        Http::fake(['packagist.org/*' => Http::response(['package' => ['repository' => 'https://github.com/laravel/laravel']], 200)]);
+
+        expect(ProjectImporter::packagistUrlOwnershipStatus($url, $repo))
+            ->toBe(ProjectImporter::PACKAGIST_FOREIGN);
+    });
+
+    it('is foreign when the package is unpublished (404)', function () use ($url, $repo): void {
+        Http::fake(['packagist.org/*' => Http::response('', 404)]);
+
+        expect(ProjectImporter::packagistUrlOwnershipStatus($url, $repo))
+            ->toBe(ProjectImporter::PACKAGIST_FOREIGN);
+    });
+
+    it('is unknown on a rate limit (429) so valid links are never purged', function () use ($url, $repo): void {
+        Http::fake(['packagist.org/*' => Http::response('', 429)]);
+
+        expect(ProjectImporter::packagistUrlOwnershipStatus($url, $repo))
+            ->toBe(ProjectImporter::PACKAGIST_UNKNOWN);
+    });
+
+    it('is unknown on a server error (5xx)', function () use ($url, $repo): void {
+        Http::fake(['packagist.org/*' => Http::response('', 503)]);
+
+        expect(ProjectImporter::packagistUrlOwnershipStatus($url, $repo))
+            ->toBe(ProjectImporter::PACKAGIST_UNKNOWN);
+    });
+
+    it('is unknown when the response has no repository', function () use ($url, $repo): void {
+        Http::fake(['packagist.org/*' => Http::response(['package' => ['downloads' => ['total' => 0]]], 200)]);
+
+        expect(ProjectImporter::packagistUrlOwnershipStatus($url, $repo))
+            ->toBe(ProjectImporter::PACKAGIST_UNKNOWN);
+    });
+
+    it('is unknown for a malformed packagist url (never purge what we cannot parse)', function () use ($repo): void {
+        expect(ProjectImporter::packagistUrlOwnershipStatus('https://packagist.org/explore', $repo))
+            ->toBe(ProjectImporter::PACKAGIST_UNKNOWN);
+    });
+});

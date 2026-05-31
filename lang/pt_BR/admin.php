@@ -58,6 +58,7 @@ return [
             'category_fallback' => 'Categoria caiu para "ferramenta" — sem sinais para classificar.',
             'no_description' => 'Sem descrição no manifesto — preencha manualmente.',
             'npm_not_published' => 'package.json existe mas o pacote não foi publicado no npm.',
+            'packagist_not_owned' => 'composer.json existe mas o pacote não está publicado sob este repositório no Packagist.',
             'no_directory_readme' => 'O subdiretório informado não tem README — a renderização vai usar o README do repositório raiz.',
         ],
     ],

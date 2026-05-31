@@ -35,9 +35,18 @@ function fakeComposer(array $overrides = []): array
     ], $overrides);
 }
 
-function importerFakes(array $repo, ?array $composer, ?array $package, array $branches = [], bool $npmPublished = true, bool $hasDockerCompose = false): void
+function importerFakes(array $repo, ?array $composer, ?array $package, array $branches = [], bool $npmPublished = true, bool $hasDockerCompose = false, bool $packagistPublished = true): void
 {
+    // Packagist ownership check echoes the repo's own full_name as the
+    // package `repository`, so a composer.json name that matches the imported
+    // repo verifies as owned. Toggle the flag (or import a different repo) to
+    // simulate a borrowed `name` (e.g. an app skeleton shipping laravel/laravel).
+    $packagistRepository = 'https://github.com/'.($repo['full_name'] ?? 'foo/bar');
+
     Http::fake([
+        'packagist.org/packages/*.json' => $packagistPublished
+            ? Http::response(['package' => ['repository' => $packagistRepository]], 200)
+            : Http::response('', 404),
         'api.github.com/repos/*/branches*' => Http::response(array_map(fn ($b) => ['name' => $b], $branches)),
         'api.github.com/repos/*' => Http::response($repo),
         'raw.githubusercontent.com/*/composer.json' => $composer !== null
@@ -95,6 +104,34 @@ it('imports a Filament plugin with composer.json', function (): void {
     expect($fields['npm_url'])->toBeNull();
     expect($fields['stack'])->toBe(['Laravel', 'Filament']);
     expect($fields['versions'])->toBe(['v3', 'v4', 'v5']);
+});
+
+it('does not attach packagist_url when composer.json ships a borrowed name (app skeleton)', function (): void {
+    // Real-world bug: savanihd/Laravel-11-Livewire-CRUD ships composer.json with
+    // "name": "laravel/laravel". laravel/laravel IS a real package, but its
+    // Packagist repository is laravel/laravel — not the imported fork — so the
+    // link must be dropped, not advertised.
+    Http::fake([
+        'api.github.com/repos/*/branches*' => Http::response([['name' => 'main']]),
+        'api.github.com/repos/*' => Http::response(fakeGithubRepo([
+            'name' => 'Laravel-11-Livewire-CRUD',
+            'full_name' => 'savanihd/Laravel-11-Livewire-CRUD',
+            'topics' => [],
+        ])),
+        'raw.githubusercontent.com/*/composer.json' => Http::response(fakeComposer(['name' => 'laravel/laravel', 'type' => 'project'])),
+        'raw.githubusercontent.com/*/package.json' => Http::response('', 404),
+        // Packagist returns the real laravel/laravel, whose repository points at
+        // laravel/laravel — NOT the imported repo.
+        'packagist.org/packages/*.json' => Http::response(['package' => ['repository' => 'https://github.com/laravel/laravel']], 200),
+        // Docker probes / any other raw path.
+        'raw.githubusercontent.com/*' => Http::response('', 404),
+    ]);
+
+    $result = ProjectImporter::fromGithub('https://github.com/savanihd/Laravel-11-Livewire-CRUD');
+    $fields = $result['fields'];
+
+    expect($fields['packagist_url'])->toBeNull()
+        ->and($result['warnings'])->toContain('packagist_not_owned');
 });
 
 it('resolves npm package_type when composer.json is missing but package.json exists', function (): void {

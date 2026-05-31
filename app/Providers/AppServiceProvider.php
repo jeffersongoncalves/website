@@ -103,6 +103,8 @@ class AppServiceProvider extends ServiceProvider
     private function configureRateLimiting(): void
     {
         RateLimiter::for('github-api', fn () => Limit::perMinute(60));
+        // Packagist also rate-limits; keep verification jobs well under it.
+        RateLimiter::for('packagist-api', fn () => Limit::perMinute(30));
     }
 
     private function configureActions(): void

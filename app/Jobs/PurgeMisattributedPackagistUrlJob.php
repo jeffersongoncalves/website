@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Models\Project;
+use App\Support\ProjectImporter;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\RateLimited;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+
+/**
+ * Re-verify one project's stored packagist_url against its github_url and drop
+ * the link only when Packagist definitively disowns it (a 404, or a repository
+ * pointing at a different repo). A transient/unknown result (rate limit, network
+ * error, missing repository) releases the job to retry later — it must never
+ * purge a valid link just because Packagist was unreachable.
+ */
+class PurgeMisattributedPackagistUrlJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $tries = 5;
+
+    public int $backoff = 60;
+
+    public function __construct(public int $projectId) {}
+
+    /**
+     * @return array<int, object>
+     */
+    public function middleware(): array
+    {
+        return [
+            (new WithoutOverlapping("packagist-verify:{$this->projectId}"))->dontRelease(),
+            new RateLimited('packagist-api'),
+        ];
+    }
+
+    public function handle(): void
+    {
+        $project = Project::query()->find($this->projectId);
+
+        if ($project === null || $project->packagist_url === null || $project->github_url === null) {
+            return;
+        }
+
+        $status = ProjectImporter::packagistUrlOwnershipStatus(
+            (string) $project->packagist_url,
+            (string) $project->github_url,
+        );
+
+        if ($status === ProjectImporter::PACKAGIST_UNKNOWN) {
+            // Couldn't verify (likely a rate limit) — try again shortly rather
+            // than risk purging a valid link.
+            $this->release($this->backoff);
+
+            return;
+        }
+
+        if ($status === ProjectImporter::PACKAGIST_FOREIGN) {
+            $was = $project->packagist_url;
+            // Per-record update so ProjectObserver flushes caches / site stats.
+            $project->update(['packagist_url' => null]);
+
+            Log::info('Purged mis-attributed packagist_url', [
+                'project' => $project->slug,
+                'was' => $was,
+                'github' => $project->github_url,
+            ]);
+        }
+    }
+}

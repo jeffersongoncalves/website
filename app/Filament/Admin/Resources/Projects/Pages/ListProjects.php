@@ -49,7 +49,7 @@ class ListProjects extends ListRecords
                         'github' => 'GitHub',
                         'npm' => 'npm',
                         'youtube' => 'YouTube',
-                        'article' => 'Article',
+                        'article' => __('admin.enums.category.article'),
                         'url' => 'URL',
                     ])
                     ->default('github')

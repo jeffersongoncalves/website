@@ -3,9 +3,12 @@
 @php
     $locale = \App\Support\LocaleSupport::short();
     $title = $project->getTranslation('title', $locale, false) ?: $project->getTranslation('title', 'pt', false);
+    // External-link projects (no repo → no stars/license): show the host
+    // instead of the stars/license meta, same as the show page.
     $isExternalSite = in_array($project->category, [
         \App\Enums\ProjectCategory::Website,
         \App\Enums\ProjectCategory::YoutubeChannel,
+        \App\Enums\ProjectCategory::Article,
     ], true);
 @endphp
 

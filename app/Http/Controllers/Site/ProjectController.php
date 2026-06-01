@@ -18,10 +18,14 @@ class ProjectController
         $search = trim($request->string('search')->toString());
         $language = $request->string('language')->toString();
 
-        $query = Project::query()->published();
+        // Articles live on their own /articles landing — keep them out of the
+        // code-project catalogue (they have stars=0 and would just be noise).
+        $query = Project::query()
+            ->published()
+            ->where('category', '!=', ProjectCategory::Article->value);
 
         $category = ProjectCategory::tryFrom($cat);
-        if ($category) {
+        if ($category && $category !== ProjectCategory::Article) {
             $query->byCategory($category);
         }
 
@@ -92,14 +96,17 @@ class ProjectController
 
         return view('site.projects.index', [
             'projects' => $projects,
-            'activeCat' => $category ? $category->value : 'all',
+            'activeCat' => ($category && $category !== ProjectCategory::Article) ? $category->value : 'all',
             'activeSort' => $sort,
             'activeRole' => $activeRole,
             'activeSource' => $activeSource,
             'activeSearch' => $search,
             'activeLanguage' => $activeLanguage,
             'activeTopic' => $activeTopic,
-            'categories' => ProjectCategory::cases(),
+            'categories' => array_filter(
+                ProjectCategory::cases(),
+                fn (ProjectCategory $c): bool => $c !== ProjectCategory::Article,
+            ),
             'languages' => $languages,
             'popularTopics' => array_slice($stats['topics'], 0, 15),
             'counts' => $counts,

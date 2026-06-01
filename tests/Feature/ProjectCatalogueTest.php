@@ -17,6 +17,25 @@ function publishedProject(string $name, array $attrs = []): Project
     ], $attrs));
 }
 
+it('excludes articles from the projects catalogue', function () {
+    publishedProject('a-real-tool');
+    publishedProject('some-article', [
+        'slug' => 'article-some-article',
+        'category' => ProjectCategory::Article,
+        'docs_url' => 'https://blog.test/some-article',
+    ]);
+
+    $this->get('/projects')
+        ->assertOk()
+        ->assertSee('a-real-tool')
+        ->assertDontSee('some-article');
+
+    // Even an explicit cat=article filter shows nothing in the catalogue.
+    $this->get('/projects?cat=article')
+        ->assertOk()
+        ->assertDontSee('some-article');
+});
+
 it('finds projects by free-text search on name and repo', function () {
     publishedProject('alpha-widget', ['repo' => 'alpha-widget']);
     publishedProject('beta-gadget', ['repo' => 'beta-gadget']);

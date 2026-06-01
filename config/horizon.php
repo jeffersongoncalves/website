@@ -248,27 +248,6 @@ return [
             'timeout' => 120,
             'nice' => 0,
         ],
-
-        // Dedicated supervisor for massive one-time-operation imports (e.g.
-        // seeding hundreds of awesome-list repos). One such job loops over
-        // every repo making many sequential GitHub calls, so it gets its own
-        // `bulk` queue with a long timeout and its own worker — keeping it off
-        // the scarce `github` workers so star-sync / metrics / purge jobs don't
-        // stall for the entire import. The ops loop is idempotent (skips repos
-        // already imported), so a retry resumes cheaply.
-        'supervisor-bulk' => [
-            'connection' => 'redis',
-            'queue' => ['bulk'],
-            'balance' => 'simple',
-            'autoScalingStrategy' => 'time',
-            'maxProcesses' => 1,
-            'maxTime' => 0,
-            'maxJobs' => 0,
-            'memory' => 512,
-            'tries' => 3,
-            'timeout' => 3600,
-            'nice' => 0,
-        ],
     ],
 
     'environments' => [
@@ -290,12 +269,6 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
-
-            'supervisor-bulk' => [
-                'maxProcesses' => 1,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
-            ],
         ],
 
         'local' => [
@@ -308,10 +281,6 @@ return [
             ],
 
             'supervisor-translations' => [
-                'maxProcesses' => 1,
-            ],
-
-            'supervisor-bulk' => [
                 'maxProcesses' => 1,
             ],
         ],

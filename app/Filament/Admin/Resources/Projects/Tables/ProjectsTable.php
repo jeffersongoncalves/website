@@ -83,6 +83,10 @@ class ProjectsTable
                     ->options(ProjectStatus::class),
                 TernaryFilter::make('featured')
                     ->label(__('admin.fields.featured')),
+                TernaryFilter::make('is_daily_driver')
+                    ->label(__('admin.fields.is_daily_driver')),
+                TernaryFilter::make('is_maintainer')
+                    ->label(__('admin.fields.is_maintainer')),
             ])
             ->recordActions([
                 ViewAction::make(),

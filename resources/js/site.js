@@ -337,4 +337,27 @@ function markExternalLinks(root) {
 
 document.addEventListener('DOMContentLoaded', () => markExternalLinks());
 
+// Hide README images that fail to load (empty/broken sponsor logos, dead
+// hotlinks) so the article doesn't show broken-image icons. `error` doesn't
+// bubble, so listen in the capture phase; also sweep already-failed (cached)
+// images once the DOM is ready. Scoped to `.markdown-body` so only rendered
+// README content is touched, never site chrome.
+function hideBrokenImage(img) {
+    if (!(img instanceof HTMLImageElement) || !img.closest('.markdown-body')) return;
+    img.style.display = 'none';
+    // Collapse an anchor wrapper left holding nothing but the hidden image.
+    const a = img.closest('a');
+    if (a && a.textContent.trim() === '' && !a.querySelector('svg')) {
+        a.style.display = 'none';
+    }
+}
+
+document.addEventListener('error', (e) => hideBrokenImage(e.target), true);
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.markdown-body img').forEach((img) => {
+        if (img.complete && img.naturalWidth === 0) hideBrokenImage(img);
+    });
+});
+
 Alpine.start();

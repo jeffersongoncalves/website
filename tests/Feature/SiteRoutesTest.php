@@ -29,6 +29,18 @@ it('renders about page', function () {
     $this->get('/about')->assertOk();
 });
 
+it('marks the current page in the nav with aria-current and is-active', function () {
+    $this->get('/about')
+        ->assertOk()
+        ->assertSee('aria-current="page"', false)
+        ->assertSee('nav-link is-active', false);
+
+    // The articles page activates the Articles item, not Projects.
+    $this->get('/articles')
+        ->assertOk()
+        ->assertSee('aria-current="page"', false);
+});
+
 it('renders projects index', function () {
     $this->get('/projects')->assertOk();
 });

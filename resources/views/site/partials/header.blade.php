@@ -2,6 +2,7 @@
     $locale = \App\Support\LocaleSupport::short();
     $locales = \App\Http\Middleware\SetLocale::SUPPORTED;
     $localeUrl = fn (string $target) => route('locale.switch', ['locale' => $target]);
+    $active = fn (string ...$patterns): bool => request()->routeIs(...$patterns);
 @endphp
 
 <header class="site-header" x-data="stickyHeader()" :class="{ 'scrolled': scrolled }">
@@ -14,11 +15,11 @@
         </a>
 
         <nav class="hidden md:flex items-center gap-8 text-[0.9375rem]" aria-label="@lang('site.common.nav_primary')">
-            <a href="{{ route('about') }}" class="nav-link">@lang('site.nav.about')</a>
-            <a href="{{ route('projects.index') }}" class="nav-link">@lang('site.nav.projects')</a>
-            <a href="{{ route('articles.index') }}" class="nav-link">@lang('site.nav.articles')</a>
-            <a href="{{ route('open-source') }}" class="nav-link">@lang('site.nav.open_source')</a>
-            <a href="{{ route('sponsors') }}" class="nav-link">@lang('site.nav.sponsors')</a>
+            <a href="{{ route('about') }}" @class(['nav-link', 'is-active' => $active('about')]) @if($active('about')) aria-current="page" @endif>@lang('site.nav.about')</a>
+            <a href="{{ route('projects.index') }}" @class(['nav-link', 'is-active' => $active('projects.*')]) @if($active('projects.*')) aria-current="page" @endif>@lang('site.nav.projects')</a>
+            <a href="{{ route('articles.index') }}" @class(['nav-link', 'is-active' => $active('articles.*')]) @if($active('articles.*')) aria-current="page" @endif>@lang('site.nav.articles')</a>
+            <a href="{{ route('open-source') }}" @class(['nav-link', 'is-active' => $active('open-source')]) @if($active('open-source')) aria-current="page" @endif>@lang('site.nav.open_source')</a>
+            <a href="{{ route('sponsors') }}" @class(['nav-link', 'is-active' => $active('sponsors')]) @if($active('sponsors')) aria-current="page" @endif>@lang('site.nav.sponsors')</a>
             {{-- Demos: live demo subdomains, one per starter kit. Dropdown
                  reuses `lang-dropdown-menu` styling (same anchored panel
                  pattern as the locale switcher) so no new CSS is required. --}}
@@ -191,11 +192,11 @@
                      x-transition:leave-start="opacity-100"
                      x-transition:leave-end="opacity-0"
                      x-cloak>
-                    <a href="{{ route('about') }}" class="mobile-nav-link">@lang('site.nav.about')</a>
-                    <a href="{{ route('projects.index') }}" class="mobile-nav-link">@lang('site.nav.projects')</a>
-                    <a href="{{ route('articles.index') }}" class="mobile-nav-link">@lang('site.nav.articles')</a>
-                    <a href="{{ route('open-source') }}" class="mobile-nav-link">@lang('site.nav.open_source')</a>
-                    <a href="{{ route('sponsors') }}" class="mobile-nav-link">@lang('site.nav.sponsors')</a>
+                    <a href="{{ route('about') }}" @class(['mobile-nav-link', 'is-active' => $active('about')]) @if($active('about')) aria-current="page" @endif>@lang('site.nav.about')</a>
+                    <a href="{{ route('projects.index') }}" @class(['mobile-nav-link', 'is-active' => $active('projects.*')]) @if($active('projects.*')) aria-current="page" @endif>@lang('site.nav.projects')</a>
+                    <a href="{{ route('articles.index') }}" @class(['mobile-nav-link', 'is-active' => $active('articles.*')]) @if($active('articles.*')) aria-current="page" @endif>@lang('site.nav.articles')</a>
+                    <a href="{{ route('open-source') }}" @class(['mobile-nav-link', 'is-active' => $active('open-source')]) @if($active('open-source')) aria-current="page" @endif>@lang('site.nav.open_source')</a>
+                    <a href="{{ route('sponsors') }}" @class(['mobile-nav-link', 'is-active' => $active('sponsors')]) @if($active('sponsors')) aria-current="page" @endif>@lang('site.nav.sponsors')</a>
                     {{-- Demos rendered inline (not a nested disclosure) — mobile
                          already collapses the nav, so a second level of
                          expand/collapse adds taps for no real gain. --}}

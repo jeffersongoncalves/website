@@ -284,9 +284,26 @@ class Project extends Model
         return $query->where('is_maintainer', true);
     }
 
+    /**
+     * Projects the owner actually authored — the repo lives under his GitHub
+     * account (same rule as isCreatedByOwner / the "creator" badge). NOT merely
+     * `is_maintainer = false`, which also matched every starred third-party repo
+     * and wrongly listed them as authored.
+     */
     public function scopeAuthored(Builder $query): Builder
     {
-        return $query->where('is_maintainer', false);
+        $username = config('services.github.username');
+
+        if (! is_string($username) || $username === '') {
+            // No owner configured — nothing can be proven authored.
+            return $query->whereRaw('1 = 0');
+        }
+
+        // Match `https://github.com/<username>/...` case-insensitively. The
+        // trailing slash in the pattern stops a prefix collision (e.g. `jeff`
+        // matching `jeffrey/...`).
+        return $query->whereNotNull('github_url')
+            ->whereRaw('lower(github_url) like ?', ['https://github.com/'.strtolower($username).'/%']);
     }
 
     /** Third-party repos imported from the GitHub stars feed (starred_at set). */

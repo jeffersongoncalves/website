@@ -164,6 +164,8 @@ return [
         'label_contributions' => 'Contribuciones',
         'badge_daily_driver' => 'uso diario',
         'badge_paid' => 'de pago',
+        'badge_creator' => 'creador',
+        'badge_creator_help' => 'Un paquete que creé y mantengo',
         'badge_starred' => 'por star',
         'badge_starred_help' => 'Repositorio de terceros al que di star en GitHub',
         'filter_source' => 'Origen',

@@ -108,6 +108,39 @@ it('filters projects by origin (own vs starred) and badges starred ones', functi
         ->assertDontSee('starred-thing');
 });
 
+it('badges the owner-created packages as creator, third-party as not', function () {
+    config(['services.github.username' => 'jeffersongoncalves']);
+
+    Project::query()->create([
+        'slug' => 'my-pkg',
+        'name' => 'my-pkg',
+        'category' => ProjectCategory::FilamentPlugin,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/jeffersongoncalves/my-pkg',
+        'published_at' => now(),
+    ]);
+    Project::query()->create([
+        'slug' => 'their-pkg',
+        'name' => 'their-pkg',
+        'category' => ProjectCategory::Tool,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/someoneelse/their-pkg',
+        'published_at' => now(),
+    ]);
+
+    $this->get('/projects')
+        ->assertOk()
+        ->assertSee(__('site.projects.badge_creator'));
+
+    $this->get('/projects/my-pkg')
+        ->assertOk()
+        ->assertSee(__('site.projects.badge_creator'));
+
+    $this->get('/projects/their-pkg')
+        ->assertOk()
+        ->assertDontSee(__('site.projects.badge_creator'));
+});
+
 it('renders project show', function () {
     Project::query()->create([
         'slug' => 'my-plugin',

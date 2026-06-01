@@ -256,7 +256,12 @@
                             <span class="project-detail-value">{{ $project->category->getLabel() }}</span>
                         </div>
 
-                        @if($project->is_maintainer)
+                        @if($project->isCreatedByOwner())
+                            <div class="project-detail-row">
+                                <span class="project-detail-label">@lang('site.projects.label_role')</span>
+                                <span class="badge badge-success">@lang('site.projects.badge_creator')</span>
+                            </div>
+                        @elseif($project->is_maintainer)
                             <div class="project-detail-row">
                                 <span class="project-detail-label">@lang('site.projects.label_role')</span>
                                 <span class="badge badge-success">@lang('maintainer')</span>

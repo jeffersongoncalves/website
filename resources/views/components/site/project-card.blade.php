@@ -23,7 +23,9 @@
                class="mono text-[0.95rem] font-semibold text-ink-100 break-words">{{ $project->name }}</a>
         </h3>
         <div class="flex items-center gap-2 flex-wrap sm:justify-end">
-            @if($project->is_maintainer)
+            @if($project->isCreatedByOwner())
+                <span class="badge badge-success" title="{{ __('site.projects.badge_creator_help') }}">@lang('site.projects.badge_creator')</span>
+            @elseif($project->is_maintainer)
                 <span class="badge badge-success" title="{{ __('Maintainer, not original author') }}">{{ __('maintainer') }}</span>
             @endif
             @if($project->is_daily_driver)

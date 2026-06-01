@@ -7,6 +7,7 @@ use App\Enums\ProjectCategory;
 use App\Enums\ProjectLanguage;
 use App\Enums\ProjectStatus;
 use App\Observers\ProjectObserver;
+use App\Support\GithubReadme;
 use App\Support\LocaleSupport;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -285,6 +286,24 @@ class Project extends Model
     public function scopeOwn(Builder $query): Builder
     {
         return $query->whereNull('starred_at');
+    }
+
+    /**
+     * Whether this repo lives under the site owner's GitHub account — i.e. a
+     * package Jefferson created himself, as opposed to one he only maintains or
+     * starred. Drives the "creator" badge.
+     */
+    public function isCreatedByOwner(): bool
+    {
+        $username = config('services.github.username');
+
+        if (! is_string($username) || $username === '' || empty($this->github_url)) {
+            return false;
+        }
+
+        $slug = GithubReadme::repoFromUrl($this->github_url);
+
+        return $slug !== null && strcasecmp(explode('/', $slug, 2)[0], $username) === 0;
     }
 
     public function getDynamicSEOData(): SEOData

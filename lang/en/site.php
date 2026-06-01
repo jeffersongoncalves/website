@@ -171,6 +171,14 @@ return [
         'source_starred' => 'From stars',
     ],
 
+    'articles' => [
+        'title' => 'Articles',
+        'sub' => 'Posts and articles I wrote or worth reading.',
+        'eyebrow' => 'articles',
+        'feed_link' => 'RSS feed',
+        'empty' => 'No articles yet.',
+    ],
+
     'about' => [
         'title_1' => 'Jefferson',
         'title_2' => 'Gonçalves.',

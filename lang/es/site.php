@@ -171,6 +171,14 @@ return [
         'source_starred' => 'Por star',
     ],
 
+    'articles' => [
+        'title' => 'Artículos',
+        'sub' => 'Posts y artículos que escribí o que vale la pena leer.',
+        'eyebrow' => 'artículos',
+        'feed_link' => 'Feed RSS',
+        'empty' => 'Aún no hay artículos.',
+    ],
+
     'about' => [
         'title_1' => 'Jefferson',
         'title_2' => 'Gonçalves.',

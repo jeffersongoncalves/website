@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Site\AboutController;
+use App\Http\Controllers\Site\ArticlesController;
+use App\Http\Controllers\Site\ArticlesFeedController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\OfflineController;
 use App\Http\Controllers\Site\OpenSourceController;
@@ -25,6 +27,9 @@ Route::middleware('set.locale')->group(function () {
 
     Route::get('/projects', ProjectController::class)->name('projects.index');
     Route::get('/projects/{slug}', ProjectViewController::class)->name('projects.show');
+
+    Route::get('/articles', ArticlesController::class)->name('articles.index');
+    Route::get('/articles/feed', ArticlesFeedController::class)->name('articles.feed');
 
     Route::get('/open-source', OpenSourceController::class)->name('open-source');
 

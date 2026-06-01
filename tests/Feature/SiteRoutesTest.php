@@ -169,6 +169,57 @@ it('404s on draft project show', function () {
     $this->get('/projects/draft-plugin')->assertNotFound();
 });
 
+it('renders the articles index listing only articles, newest first', function () {
+    Project::query()->create([
+        'name' => 'Older Post',
+        'category' => ProjectCategory::Article,
+        'status' => ProjectStatus::Published,
+        'docs_url' => 'https://blog.test/older',
+        'published_at' => now()->subDays(5),
+    ]);
+    Project::query()->create([
+        'name' => 'Newer Post',
+        'category' => ProjectCategory::Article,
+        'status' => ProjectStatus::Published,
+        'docs_url' => 'https://blog.test/newer',
+        'published_at' => now(),
+    ]);
+    Project::query()->create([
+        'slug' => 'a-plugin-not-article',
+        'name' => 'a-plugin-not-article',
+        'category' => ProjectCategory::FilamentPlugin,
+        'status' => ProjectStatus::Published,
+        'published_at' => now(),
+    ]);
+
+    $response = $this->get('/articles')->assertOk()
+        ->assertSee('Newer Post')
+        ->assertSee('Older Post')
+        ->assertDontSee('a-plugin-not-article');
+
+    // Newest first.
+    expect(strpos($response->getContent(), 'Newer Post'))
+        ->toBeLessThan(strpos($response->getContent(), 'Older Post'));
+});
+
+it('serves a valid RSS feed of articles', function () {
+    Project::query()->create([
+        'name' => 'Feed Post',
+        'category' => ProjectCategory::Article,
+        'status' => ProjectStatus::Published,
+        'docs_url' => 'https://blog.test/feed-post',
+        'title' => ['pt' => 'Resumo do post'],
+        'published_at' => now(),
+    ]);
+
+    $response = $this->get('/articles/feed')->assertOk();
+
+    expect($response->headers->get('Content-Type'))->toContain('application/rss+xml');
+    $response->assertSee('<rss version="2.0"', false)
+        ->assertSee('<title>Feed Post</title>', false)
+        ->assertSee('Resumo do post', false);
+});
+
 it('renders open-source page', function () {
     $this->get('/open-source')->assertOk();
 });

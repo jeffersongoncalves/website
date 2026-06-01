@@ -9,6 +9,11 @@ return [
     'defaultNumberLocale' => null,
     'defaultTimeDisplayFormat' => 'H:i:s',
     'defaultIsoTimeDisplayFormat' => 'LT',
+    // Full-page response cache for the public (guest) site. Cached HTML is
+    // keyed by locale + URL and busted whenever a Project changes (see
+    // ProjectObserver). TTL in seconds.
+    'page_cache_enabled' => env('PAGE_CACHE_ENABLED', true),
+    'page_cache_ttl' => (int) env('PAGE_CACHE_TTL', 3600),
     'admin_panel_enabled' => true,
     'logo' => 'resources/images/admin-logo.png',
     'favicon' => [

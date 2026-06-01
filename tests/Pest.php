@@ -11,6 +11,10 @@ uses(RefreshDatabase::class)->in('Feature');
 pest()->beforeEach(function () {
     Queue::fake();
 
+    // Full-page response cache off by default so tests assert freshly-rendered
+    // output; the dedicated CachePublicPageTest re-enables it explicitly.
+    config(['filakit.page_cache_enabled' => false]);
+
     Http::preventStrayRequests();
     Http::fake([
         'api.github.com/users/*' => Http::response(['followers' => 0, 'public_repos' => 0]),

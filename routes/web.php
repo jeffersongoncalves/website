@@ -11,6 +11,7 @@ use App\Http\Controllers\Site\ProjectViewController;
 use App\Http\Controllers\Site\ServiceWorkerController;
 use App\Http\Controllers\Site\SponsorsController;
 use App\Http\Controllers\Site\SwitchLocaleController;
+use App\Http\Middleware\CachePublicPage;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/sw.js', ServiceWorkerController::class)->name('pwa.sw');
 Route::get('/offline', OfflineController::class)->name('pwa.offline');
 
-Route::middleware('set.locale')->group(function () {
+Route::middleware(['set.locale', CachePublicPage::class])->group(function () {
     Route::get('/', HomeController::class)->name('home');
     Route::get('/about', AboutController::class)->name('about');
 

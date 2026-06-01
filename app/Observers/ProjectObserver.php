@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Enums\ProjectStatus;
+use App\Http\Middleware\CachePublicPage;
 use App\Jobs\GenerateSitemapJob;
 use App\Jobs\SyncProjectMetricsJob;
 use App\Jobs\TranslateProjectTitleJob;
@@ -68,6 +69,9 @@ class ProjectObserver
             Cache::delete('featured_projects');
         } catch (InvalidArgumentException) {
         }
+
+        // Invalidate the full-page response cache so edits surface immediately.
+        CachePublicPage::flush();
 
         // Recompute the local-only columns of the SiteStat singleton so the
         // admin metrics widget + public landing cards reflect the change

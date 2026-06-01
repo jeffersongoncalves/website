@@ -967,6 +967,19 @@
     text-align: left;
   }
   .markdown-body th { background: var(--surface-elevated); color: var(--text-strong); font-weight: 500; }
+  /* Images inside README table cells (sponsor/logo/avatar grids) — clamp to a
+     small uniform thumbnail so an inline width="160" attr doesn't blow the
+     cells (and the table) up. Aspect ratio preserved; overrides the attr. */
+  .markdown-body td img,
+  .markdown-body th img {
+    width: auto;
+    height: auto;
+    max-width: 96px;
+    max-height: 32px;
+    object-fit: contain;
+    margin: 0;
+    border-radius: var(--r-xs);
+  }
   .markdown-body :not(pre) > code {
     font-family: var(--font-mono);
     font-size: 0.875em;

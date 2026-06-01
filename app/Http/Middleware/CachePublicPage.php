@@ -63,7 +63,12 @@ class CachePublicPage
 
     private function cacheKey(Request $request): string
     {
-        return 'page:'.self::version().':'.app()->getLocale().':'.sha1($request->fullUrl());
+        // Fold the deployed app version into the key so a new release
+        // invalidates every cached page automatically — otherwise stale HTML
+        // (e.g. the old version in the footer) survives the deploy until TTL.
+        $build = (string) config('app.version', '');
+
+        return 'page:'.$build.':'.self::version().':'.app()->getLocale().':'.sha1($request->fullUrl());
     }
 
     private static function version(): int

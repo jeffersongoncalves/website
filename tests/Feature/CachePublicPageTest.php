@@ -37,6 +37,16 @@ it('busts the cache when a project changes', function (): void {
         ->assertSee('fresh-project');
 });
 
+it('busts the cache on a new app version (deploy)', function (): void {
+    config(['app.version' => '1.0.0']);
+    $this->get('/about')->assertHeader('X-Page-Cache', 'MISS');
+    $this->get('/about')->assertHeader('X-Page-Cache', 'HIT');
+
+    // A deploy bumps APP_VERSION → different key → fresh render.
+    config(['app.version' => '1.0.1']);
+    $this->get('/about')->assertHeader('X-Page-Cache', 'MISS');
+});
+
 it('does not cache when disabled', function (): void {
     config(['filakit.page_cache_enabled' => false]);
 

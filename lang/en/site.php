@@ -180,6 +180,7 @@ return [
         'eyebrow' => 'articles',
         'feed_link' => 'RSS feed',
         'empty' => 'No articles yet.',
+        'back_to_list' => '← Back to articles',
     ],
 
     'about' => [

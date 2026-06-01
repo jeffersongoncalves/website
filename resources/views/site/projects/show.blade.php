@@ -2,8 +2,17 @@
     $locale  = \App\Support\LocaleSupport::short();
     $title   = $project->getTranslation('title', $locale, false) ?: $project->name;
 
+    // Articles belong to /articles — send the breadcrumb and the back link
+    // there instead of the projects catalogue.
+    $isArticleCategory = $project->category === \App\Enums\ProjectCategory::Article;
+    $backUrl = $isArticleCategory ? route('articles.index') : route('projects.index');
+    $backLabel = $isArticleCategory ? __('site.articles.back_to_list') : __('site.projects.back_to_list');
+    $parentCrumb = $isArticleCategory
+        ? ['name' => __('site.nav.articles'), 'url' => route('articles.index')]
+        : ['name' => __('site.nav.projects'), 'url' => route('projects.index')];
+
     $breadcrumbs = [
-        ['name' => __('site.nav.projects'), 'url' => route('projects.index')],
+        $parentCrumb,
         ['name' => $title, 'url' => route('projects.show', ['slug' => $project->slug])],
     ];
 
@@ -94,8 +103,8 @@
         <div class="wrap">
 
             {{-- Breadcrumb back link --}}
-            <a href="{{ route('projects.index') }}" class="project-back" id="top">
-                @lang('site.projects.back_to_list')
+            <a href="{{ $backUrl }}" class="project-back" id="top">
+                {{ $backLabel }}
             </a>
 
             {{-- Compact project header --}}

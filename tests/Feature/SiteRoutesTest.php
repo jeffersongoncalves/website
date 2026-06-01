@@ -189,7 +189,9 @@ it('renders the article body as content and emits Article JSON-LD', function () 
         ->assertSee('Why patch')                          // rendered markdown body
         ->assertSee(__('site.projects.article_read'))     // "read article" CTA
         ->assertSee('"@type":"Article"', false)           // correct JSON-LD type
-        ->assertSee('https://yoeri.me/og/automate.png', false); // per-article og:image
+        ->assertSee('https://yoeri.me/og/automate.png', false) // per-article og:image
+        ->assertSee(__('site.articles.back_to_list'))     // back link goes to /articles
+        ->assertSee(route('articles.index'), false);
 });
 
 it('404s on draft project show', function () {

@@ -180,6 +180,7 @@ return [
         'eyebrow' => 'artigos',
         'feed_link' => 'Feed RSS',
         'empty' => 'Nenhum artigo ainda.',
+        'back_to_list' => '← Voltar para artigos',
     ],
 
     'about' => [

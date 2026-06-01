@@ -34,8 +34,10 @@ it('emits SoftwareSourceCode + BreadcrumbList JSON-LD and a per-repo OG image on
     $response->assertSee('"@type":"SoftwareSourceCode"', false);
     $response->assertSee('"@type":"BreadcrumbList"', false);
     $response->assertSee('"codeRepository":"https://github.com/mbostock/d3"', false);
-    // Per-project Open Graph image points at GitHub's repo social card.
-    $response->assertSee('opengraph.githubassets.com/1/mbostock/d3', false);
+    // Per-project Open Graph image points at our cached proxy, not GitHub
+    // directly (opengraph.githubassets.com rate-limits crawlers).
+    $response->assertSee(route('og.show', ['slug' => $project->slug]), false);
+    $response->assertDontSee('opengraph.githubassets.com', false);
     // README image CDNs are preconnected on pages that render a README.
     $response->assertSee('rel="preconnect" href="https://raw.githubusercontent.com"', false);
 });

@@ -5,6 +5,7 @@ use App\Http\Controllers\Site\ArticlesController;
 use App\Http\Controllers\Site\ArticlesFeedController;
 use App\Http\Controllers\Site\HomeController;
 use App\Http\Controllers\Site\OfflineController;
+use App\Http\Controllers\Site\OgImageController;
 use App\Http\Controllers\Site\OpenSourceController;
 use App\Http\Controllers\Site\ProjectController;
 use App\Http\Controllers\Site\ProjectViewController;
@@ -21,6 +22,10 @@ use Illuminate\Support\Facades\Route;
 // pre-cached by the SW and served as the fallback for navigation failures.
 Route::get('/sw.js', ServiceWorkerController::class)->name('pwa.sw');
 Route::get('/offline', OfflineController::class)->name('pwa.offline');
+
+// Cached social-card proxy. Outside the locale/page-cache group: it's a binary
+// response and the image is locale-independent.
+Route::get('/og/{slug}.png', OgImageController::class)->name('og.show');
 
 Route::middleware(['set.locale', CachePublicPage::class])->group(function () {
     Route::get('/', HomeController::class)->name('home');

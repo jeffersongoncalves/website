@@ -311,17 +311,17 @@ class Project extends Model
         $locale = LocaleSupport::short();
         $description = $this->getTranslation('title', $locale, false) ?: $this->name;
 
-        // GitHub renders a rich per-repo social card at this endpoint — a far
-        // better OG image than the one generic site banner. Non-GitHub projects
-        // (articles, external sites) fall back to the og:image captured from the
-        // source page at import time, then to the generic banner via the SEO
-        // transformer in AppServiceProvider.
-        $image = null;
-        if ($this->github_url && preg_match('~github\.com/([^/?#]+/[^/?#]+)~i', $this->github_url, $m)) {
-            $image = 'https://opengraph.githubassets.com/1/'.rtrim($m[1], '/');
-        } elseif (! empty($this->social_image)) {
-            $image = $this->social_image;
-        }
+        // Point og:image at our own cached proxy (/og/{slug}.png) rather than
+        // GitHub's opengraph endpoint directly — that endpoint 429s crawlers.
+        // The proxy resolves the GitHub card or the imported social_image and
+        // caches it; with neither, it redirects to the generic banner. Only set
+        // it when there's a source so the SEO transformer's banner is used.
+        $hasGithub = $this->github_url
+            && preg_match('~github\.com/[^/?#]+/[^/?#]+~i', $this->github_url) === 1;
+
+        $image = ($hasGithub || ! empty($this->social_image))
+            ? route('og.show', ['slug' => $this->slug])
+            : null;
 
         return new SEOData(
             title: $this->name,

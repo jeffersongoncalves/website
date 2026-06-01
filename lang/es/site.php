@@ -30,6 +30,7 @@ return [
     'nav' => [
         'about' => 'Acerca',
         'projects' => 'Proyectos',
+        'articles' => 'Artículos',
         'open_source' => 'Open Source',
         'sponsors' => 'Sponsors',
         'demos' => 'Demos',

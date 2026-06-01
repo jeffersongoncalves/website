@@ -16,6 +16,7 @@
         <nav class="hidden md:flex items-center gap-8 text-[0.9375rem]" aria-label="@lang('site.common.nav_primary')">
             <a href="{{ route('about') }}" class="nav-link">@lang('site.nav.about')</a>
             <a href="{{ route('projects.index') }}" class="nav-link">@lang('site.nav.projects')</a>
+            <a href="{{ route('articles.index') }}" class="nav-link">@lang('site.nav.articles')</a>
             <a href="{{ route('open-source') }}" class="nav-link">@lang('site.nav.open_source')</a>
             <a href="{{ route('sponsors') }}" class="nav-link">@lang('site.nav.sponsors')</a>
             {{-- Demos: live demo subdomains, one per starter kit. Dropdown
@@ -192,6 +193,7 @@
                      x-cloak>
                     <a href="{{ route('about') }}" class="mobile-nav-link">@lang('site.nav.about')</a>
                     <a href="{{ route('projects.index') }}" class="mobile-nav-link">@lang('site.nav.projects')</a>
+                    <a href="{{ route('articles.index') }}" class="mobile-nav-link">@lang('site.nav.articles')</a>
                     <a href="{{ route('open-source') }}" class="mobile-nav-link">@lang('site.nav.open_source')</a>
                     <a href="{{ route('sponsors') }}" class="mobile-nav-link">@lang('site.nav.sponsors')</a>
                     {{-- Demos rendered inline (not a nested disclosure) — mobile

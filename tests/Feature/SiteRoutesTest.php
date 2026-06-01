@@ -21,7 +21,8 @@ it('renders home', function () {
 
     $this->get('/')
         ->assertOk()
-        ->assertSee('sample-plugin');
+        ->assertSee('sample-plugin')
+        ->assertSee(__('site.nav.articles'));   // Articles nav link present
 });
 
 it('renders about page', function () {

@@ -163,6 +163,12 @@ return [
         'label_contributions' => 'Contributions',
         'badge_daily_driver' => 'daily driver',
         'badge_paid' => 'paid',
+        'badge_starred' => 'starred',
+        'badge_starred_help' => 'Third-party repo I starred on GitHub',
+        'filter_source' => 'Origin',
+        'source_all' => 'All',
+        'source_own' => 'My projects',
+        'source_starred' => 'From stars',
     ],
 
     'about' => [

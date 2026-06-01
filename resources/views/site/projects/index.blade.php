@@ -83,6 +83,15 @@
                     </label>
 
                     <label class="projects-filter">
+                        <span class="projects-filter-label">@lang('site.projects.filter_source')</span>
+                        <select name="source" class="projects-filter-select" onchange="this.form.submit()">
+                            <option value="">@lang('site.projects.source_all')</option>
+                            <option value="own"     @selected($activeSource === 'own')>@lang('site.projects.source_own')</option>
+                            <option value="starred" @selected($activeSource === 'starred')>@lang('site.projects.source_starred')</option>
+                        </select>
+                    </label>
+
+                    <label class="projects-filter">
                         <span class="projects-filter-label">@lang('site.common.sort_by')</span>
                         <select name="sort" class="projects-filter-select" onchange="this.form.submit()">
                             <option value="stars"     @selected($activeSort === 'stars')>@lang('site.common.sort_stars')</option>

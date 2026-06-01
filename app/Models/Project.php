@@ -274,6 +274,18 @@ class Project extends Model
         return $query->where('is_maintainer', false);
     }
 
+    /** Third-party repos imported from the GitHub stars feed (starred_at set). */
+    public function scopeStarred(Builder $query): Builder
+    {
+        return $query->whereNotNull('starred_at');
+    }
+
+    /** Curated/own projects — everything that did NOT come from a star import. */
+    public function scopeOwn(Builder $query): Builder
+    {
+        return $query->whereNull('starred_at');
+    }
+
     public function getDynamicSEOData(): SEOData
     {
         $locale = LocaleSupport::short();

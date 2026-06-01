@@ -53,6 +53,16 @@ class ProjectController
             $query->where('is_daily_driver', true);
         }
 
+        // Origin facet — separate Jefferson's own/curated catalogue from the
+        // third-party repos imported off the GitHub stars feed.
+        $source = $request->string('source')->toString();
+        $activeSource = in_array($source, ['own', 'starred'], true) ? $source : 'all';
+        if ($activeSource === 'own') {
+            $query->own();
+        } elseif ($activeSource === 'starred') {
+            $query->starred();
+        }
+
         if ($search !== '') {
             $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $search).'%';
             $query->where(function ($q) use ($like) {
@@ -85,6 +95,7 @@ class ProjectController
             'activeCat' => $category ? $category->value : 'all',
             'activeSort' => $sort,
             'activeRole' => $activeRole,
+            'activeSource' => $activeSource,
             'activeSearch' => $search,
             'activeLanguage' => $activeLanguage,
             'activeTopic' => $activeTopic,

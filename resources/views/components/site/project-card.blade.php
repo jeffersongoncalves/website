@@ -32,6 +32,9 @@
             @if($project->is_paid)
                 <span class="badge badge-warning" title="{{ __('site.projects.badge_paid') }}">@lang('site.projects.badge_paid')</span>
             @endif
+            @if($project->starred_at)
+                <span class="badge" title="{{ __('site.projects.badge_starred_help') }}"><span aria-hidden="true">★</span> @lang('site.projects.badge_starred')</span>
+            @endif
             <span class="badge">{{ $project->category->getLabel() }}</span>
         </div>
     </div>

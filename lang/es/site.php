@@ -163,6 +163,12 @@ return [
         'label_contributions' => 'Contribuciones',
         'badge_daily_driver' => 'uso diario',
         'badge_paid' => 'de pago',
+        'badge_starred' => 'por star',
+        'badge_starred_help' => 'Repositorio de terceros al que di star en GitHub',
+        'filter_source' => 'Origen',
+        'source_all' => 'Todas',
+        'source_own' => 'Mis proyectos',
+        'source_starred' => 'Por star',
     ],
 
     'about' => [

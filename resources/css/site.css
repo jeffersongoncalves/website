@@ -921,6 +921,21 @@
     margin: 0;
     border-radius: 3px;
   }
+  /* Contributor / avatar images — clamp to 48x48 so a missing width attr or a
+     full-resolution avatar URL (e.g. the `?s=` param ignored) doesn't blow one
+     up to giant size and break the contributors grid. Scoped to avatar hosts so
+     badges and screenshots keep their natural size. */
+  .markdown-body img[src*="avatars.githubusercontent.com"],
+  .markdown-body img[src*="gravatar.com"],
+  .markdown-body img[src*="avatars0.githubusercontent.com"],
+  .markdown-body img[src*="avatars1.githubusercontent.com"],
+  .markdown-body img[src*="avatars2.githubusercontent.com"],
+  .markdown-body img[src*="avatars3.githubusercontent.com"] {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
   .markdown-body hr { border: 0; border-top: 1px solid var(--border-soft); margin: var(--s-7) 0; }
   .markdown-body table {
     width: 100%;

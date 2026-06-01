@@ -717,14 +717,29 @@ class ProjectImporter
 
         // A composer.json `name` alone is not proof the package is published as
         // that vendor/name — app skeletons and forks ship `"name": "laravel/laravel"`
-        // (or similar) without owning the package. Only advertise packagist_url
-        // when the package exists AND its Packagist `repository` points back at
-        // this repo, same guard as the npm path.
+        // (or similar) without owning the package. Resolve the tri-state Packagist
+        // ownership once: only a definitive OWNED advertises packagist_url, and a
+        // definitive FOREIGN means the repo is an application, not a package.
         $packagistName = self::packagistNameFromComposer($composer);
-        $packagistOwned = $packagistName !== null
-            && self::packagistPackageBelongsToRepo($packagistName, $url);
+        $packagistStatus = $packagistName !== null
+            ? self::packagistOwnershipForName($packagistName, $url)
+            : null;
+        $packagistOwned = $packagistStatus === self::LINK_OWNED;
 
-        $packageType = self::resolvePackageType($composer, $package, $repo, $npmPublished);
+        // A checked-in composer.json only makes the repo a Composer *package* when
+        // it actually owns the published package. App skeletons / tutorials with a
+        // borrowed `laravel/laravel` name are applications — type them `none` so no
+        // packagist link or download count is ever derived (the metrics sync gates
+        // packagist re-derivation on package_type === composer). A transient UNKNOWN
+        // (rate limit) keeps `composer` so a genuine package isn't downgraded
+        // mid-bulk-import; the cleanup job re-verifies later.
+        $packageType = self::resolvePackageType(
+            $composer,
+            $package,
+            $repo,
+            $npmPublished,
+            $packagistStatus !== self::LINK_FOREIGN,
+        );
         // Docker-distributed projects don't fit any of the package-manager
         // types resolvePackageType knows about, but they still ship as an
         // image — flip the type so the badge + downloads tracker uses the
@@ -879,9 +894,11 @@ class ProjectImporter
      * @param  array<string, mixed>|null  $package
      * @param  array<string, mixed>  $repo
      */
-    private static function resolvePackageType(?array $composer, ?array $package, array $repo, bool $npmPublished): string
+    private static function resolvePackageType(?array $composer, ?array $package, array $repo, bool $npmPublished, bool $composerOwned = true): string
     {
-        if ($composer !== null) {
+        // Skeletons/tutorials that ship a borrowed composer name (definitively
+        // FOREIGN on Packagist) are applications, not Composer packages.
+        if ($composer !== null && $composerOwned) {
             return 'composer';
         }
 
@@ -1256,7 +1273,7 @@ class ProjectImporter
     /**
      * The normalised `vendor/name` from a composer.json, or null when absent /
      * malformed. Does NOT prove the package is published — callers must verify
-     * ownership with packagistPackageBelongsToRepo before trusting it.
+     * ownership with packagistOwnershipForName before trusting it.
      *
      * @param  array<string, mixed>|null  $composer
      */
@@ -1279,17 +1296,6 @@ class ProjectImporter
 
     /** Couldn't verify — network error, rate limit (429/5xx), or no repository. */
     public const LINK_UNKNOWN = 'unknown';
-
-    /**
-     * Whether the package is published under the imported repo. Guards against
-     * app skeletons / forks that ship a borrowed composer.json `name` (e.g.
-     * `"name": "laravel/laravel"`). Only a definitive `owned` is trusted — any
-     * uncertainty skips packagist_url rather than risk a wrong attribution.
-     */
-    private static function packagistPackageBelongsToRepo(string $name, string $expectedGithubUrl): bool
-    {
-        return self::packagistOwnershipForName($name, $expectedGithubUrl) === self::LINK_OWNED;
-    }
 
     /**
      * Tri-state ownership of `$name` relative to `$expectedGithubUrl`:

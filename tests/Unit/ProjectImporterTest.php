@@ -130,7 +130,11 @@ it('does not attach packagist_url when composer.json ships a borrowed name (app 
     $result = ProjectImporter::fromGithub('https://github.com/savanihd/Laravel-11-Livewire-CRUD');
     $fields = $result['fields'];
 
+    // A borrowed name is definitively FOREIGN → the repo is an application, not
+    // a Composer package: no packagist_url AND package_type downgraded to none so
+    // no future metrics sync re-derives a link or counts foreign downloads.
     expect($fields['packagist_url'])->toBeNull()
+        ->and($fields['package_type'])->toBe('none')
         ->and($result['warnings'])->toContain('packagist_not_owned');
 });
 

@@ -229,6 +229,19 @@ class Project extends Model
     }
 
     /**
+     * The canonical public URL for this project: articles live under
+     * /articles/{slug}, every other category under /projects/{slug}. Mirrors
+     * the canonical-section routing in ProjectViewController.
+     */
+    public function publicUrl(): string
+    {
+        return route(
+            $this->category === ProjectCategory::Article ? 'articles.show' : 'projects.show',
+            ['slug' => $this->slug],
+        );
+    }
+
+    /**
      * Retired slugs that 301-redirect to this project's current slug.
      *
      * @return HasMany<ProjectSlugAlias, $this>

@@ -31,7 +31,7 @@
 
     <section class="section">
         <div class="wrap">
-            <x-site.eyebrow num="02" label="catálogo"/>
+            <x-site.eyebrow num="02" :label="__('site.projects.eyebrow_catalogue')"/>
 
             <form method="GET" action="{{ route('projects.index') }}" class="projects-filters">
                 @if($activeTopic !== '')
@@ -135,7 +135,7 @@
 
     <section class="section">
         <div class="wrap">
-            <x-site.eyebrow num="03" label="contribuir"/>
+            <x-site.eyebrow num="03" :label="__('site.projects.eyebrow_contribute')"/>
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
                 <div class="lg:col-span-7">
                     <h2 class="h-section">@lang('site.projects.cta_title')</h2>

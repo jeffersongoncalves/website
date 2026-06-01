@@ -74,16 +74,16 @@
                             $extLabel = parse_url($project->docs_url, PHP_URL_HOST) ?: $project->docs_url;
                         }
                     @endphp
-                    <span class="mono-meta-sm">↗ {{ $extLabel }}</span>
+                    <span class="mono-meta-sm"><span aria-hidden="true">↗</span> {{ $extLabel }}</span>
                 @endif
             @elseif(! $project->is_paid)
-                <span>★ {{ $project->stars }}</span>
+                <span aria-label="{{ $project->stars }} @lang('site.projects.label_stars')"><span aria-hidden="true">★</span> {{ $project->stars }}</span>
                 @if($project->downloads_label)
-                    <span>↓ {{ $project->downloads_label }}</span>
+                    <span aria-label="{{ $project->downloads_label }} @lang('site.projects.label_downloads')"><span aria-hidden="true">↓</span> {{ $project->downloads_label }}</span>
                 @endif
-                <span>⎘ {{ $project->license }}</span>
+                <span aria-label="@lang('site.projects.label_license'): {{ $project->license }}"><span aria-hidden="true">⎘</span> {{ $project->license }}</span>
                 @if($project->is_maintainer && $project->user_contributions > 0)
-                    <span title="@lang('site.projects.label_contributions')">⎇ {{ number_format($project->user_contributions, 0, ',', '.') }}</span>
+                    <span aria-label="{{ number_format($project->user_contributions, 0, ',', '.') }} @lang('site.projects.label_contributions')"><span aria-hidden="true">⎇</span> {{ number_format($project->user_contributions, 0, ',', '.') }}</span>
                 @endif
             @endif
         </div>

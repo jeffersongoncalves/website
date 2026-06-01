@@ -29,14 +29,26 @@
 
     $showUrl = route('projects.show', ['slug' => $project->slug]);
 
-    $softwareLd = array_filter([
+    // Emit the schema.org type that actually matches the project: an Article for
+    // imported blog posts, a WebSite for external sites / YouTube channels, and
+    // SoftwareSourceCode for the code repositories.
+    $ldType = match ($project->category) {
+        \App\Enums\ProjectCategory::Article => 'Article',
+        \App\Enums\ProjectCategory::Website, \App\Enums\ProjectCategory::YoutubeChannel => 'WebSite',
+        default => 'SoftwareSourceCode',
+    };
+    $isArticleLd = $ldType === 'Article';
+    $mainLd = array_filter([
         '@context' => 'https://schema.org',
-        '@type' => 'SoftwareSourceCode',
+        '@type' => $ldType,
         'name' => $project->name,
+        'headline' => $isArticleLd ? $project->name : null,
         'description' => $title,
-        'url' => $showUrl,
-        'codeRepository' => $project->github_url,
-        'programmingLanguage' => $project->language?->value,
+        'url' => ($isArticleLd || $ldType === 'WebSite') ? ($project->docs_url ?: $showUrl) : $showUrl,
+        'codeRepository' => $ldType === 'SoftwareSourceCode' ? $project->github_url : null,
+        'programmingLanguage' => $ldType === 'SoftwareSourceCode' ? $project->language?->value : null,
+        'datePublished' => $isArticleLd ? $project->published_at?->toIso8601String() : null,
+        'dateModified' => $isArticleLd ? $project->updated_at?->toIso8601String() : null,
         'author' => [
             '@type' => 'Person',
             'name' => 'Jefferson Gonçalves',
@@ -61,7 +73,7 @@
 @endphp
 
 @push('head')
-    <x-site.json-ld :data="$softwareLd"/>
+    <x-site.json-ld :data="$mainLd"/>
     <x-site.json-ld :data="$breadcrumbLd"/>
     @if($readmeHtml)
         {{-- README images load from these hosts — warm the connections early.
@@ -160,10 +172,24 @@
                             {!! $readmeHtml !!}
                         </div>
                     @elseif($isExternalSite && $externalUrl)
-                        <div class="card flex flex-col gap-5">
-                            <p class="body-text">@lang('site.projects.external_site_blurb')</p>
+                        @php
+                            $isArticle = $project->category === \App\Enums\ProjectCategory::Article;
+                            // Articles carry an authored body in the translatable
+                            // `content` column — render it as the page content,
+                            // with the external link as a "read original" CTA.
+                            $articleBody = $isArticle
+                                ? ($project->getTranslation('content', $locale, false) ?: $project->getTranslation('content', 'pt', false))
+                                : null;
+                        @endphp
+                        @if($articleBody)
+                            <article class="markdown-body">{!! \Illuminate\Support\Str::markdown($articleBody) !!}</article>
+                        @endif
+                        <div class="card flex flex-col gap-5 {{ $articleBody ? 'mt-8' : '' }}">
+                            @unless($articleBody)
+                                <p class="body-text">@lang($isArticle ? 'site.projects.article_blurb' : 'site.projects.external_site_blurb')</p>
+                            @endunless
                             <a href="{{ $externalUrl }}" rel="noopener" target="_blank" class="btn btn-primary self-start inline-flex items-center gap-3">
-                                <span>@lang('site.projects.external_site_visit')</span>
+                                <span>@lang($isArticle ? 'site.projects.article_read' : 'site.projects.external_site_visit')</span>
                                 <span class="mono-meta-sm opacity-70">{{ $externalHost }}</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                             </a>
@@ -207,16 +233,16 @@
                                 </a>
                             @endif
                             @if($project->packagist_url)
-                                <a href="{{ $project->packagist_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Packagist ↗</a>
+                                <a href="{{ $project->packagist_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Packagist <span aria-hidden="true">↗</span></a>
                             @endif
                             @if($project->docker_url)
-                                <a href="{{ $project->docker_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Docker ↗</a>
+                                <a href="{{ $project->docker_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Docker <span aria-hidden="true">↗</span></a>
                             @endif
                             @if($project->docs_url)
-                                <a href="{{ $project->docs_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Docs ↗</a>
+                                <a href="{{ $project->docs_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">@lang('site.projects.action_docs') <span aria-hidden="true">↗</span></a>
                             @endif
                             @if($project->demo_url)
-                                <a href="{{ $project->demo_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Demo ↗</a>
+                                <a href="{{ $project->demo_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">@lang('site.projects.action_demo') <span aria-hidden="true">↗</span></a>
                             @endif
                         @endif
                     </div>
@@ -261,12 +287,12 @@
                                 @if($showStatsGrid)
                                     <div class="project-detail-stat">
                                         <small>@lang('site.projects.label_stars')</small>
-                                        <strong>★ {{ $project->stars }}</strong>
+                                        <strong><span aria-hidden="true">★</span> {{ $project->stars }}</strong>
                                     </div>
                                     @if($project->downloads_label)
                                         <div class="project-detail-stat">
                                             <small>@lang('site.projects.label_downloads')</small>
-                                            <strong>↓ {{ $project->downloads_label }}</strong>
+                                            <strong><span aria-hidden="true">↓</span> {{ $project->downloads_label }}</strong>
                                         </div>
                                     @endif
                                     <div class="project-detail-stat">
@@ -283,7 +309,7 @@
                                 @if($showContribStat)
                                     <div class="project-detail-stat">
                                         <small>@lang('site.projects.label_contributions')</small>
-                                        <strong>⎘ {{ number_format($project->user_contributions, 0, ',', '.') }}</strong>
+                                        <strong><span aria-hidden="true">⎘</span> {{ number_format($project->user_contributions, 0, ',', '.') }}</strong>
                                     </div>
                                 @endif
                             </div>

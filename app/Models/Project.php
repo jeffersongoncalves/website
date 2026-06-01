@@ -238,7 +238,13 @@ class Project extends Model
 
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('status', ProjectStatus::Published);
+        return $query->where('status', ProjectStatus::Published)
+            // Hide rows scheduled for a future publish date. Legacy rows with a
+            // null published_at stay visible (the observer only stamps it going
+            // forward), so null is treated as "already live".
+            ->where(function (Builder $q): void {
+                $q->whereNull('published_at')->orWhere('published_at', '<=', now());
+            });
     }
 
     public function scopeFeatured(Builder $query): Builder

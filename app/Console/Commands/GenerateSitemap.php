@@ -41,8 +41,11 @@ class GenerateSitemap extends Command
     {
         $sitemap = Sitemap::create();
 
-        Project::query()->published()->orderBy('slug')->pluck('slug')->each(
-            fn (string $slug) => $sitemap->add(Url::create(route('projects.show', ['slug' => $slug])))
+        Project::query()->published()->orderBy('slug')->get(['slug', 'updated_at'])->each(
+            fn (Project $project) => $sitemap->add(
+                Url::create(route('projects.show', ['slug' => $project->slug]))
+                    ->setLastModificationDate($project->updated_at ?? now())
+            )
         );
 
         $sitemap->writeToFile(public_path('sitemap-projects.xml'));

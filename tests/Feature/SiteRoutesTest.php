@@ -110,6 +110,23 @@ it('gives an article an article- slug and renders it as an external link card', 
         ->assertSee('https://yoeri.me/blog/automate-your-php-security-updates', false);
 });
 
+it('renders the article body as content and emits Article JSON-LD', function () {
+    $project = Project::query()->create([
+        'name' => 'Automate your PHP security updates',
+        'category' => ProjectCategory::Article,
+        'status' => ProjectStatus::Published,
+        'docs_url' => 'https://yoeri.me/blog/automate-your-php-security-updates',
+        'content' => ['pt' => "## Why patch\n\nKeep deps current to avoid CVEs."],
+        'published_at' => now(),
+    ]);
+
+    $this->get('/projects/'.$project->slug)
+        ->assertOk()
+        ->assertSee('Why patch')                          // rendered markdown body
+        ->assertSee(__('site.projects.article_read'))     // "read article" CTA
+        ->assertSee('"@type":"Article"', false);          // correct JSON-LD type
+});
+
 it('404s on draft project show', function () {
     Project::query()->create([
         'slug' => 'draft-plugin',

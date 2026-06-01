@@ -178,7 +178,11 @@ it('gives an article an article- slug and renders it as an external link card', 
 
     expect($project->slug)->toBe('article-automate-your-php-security-updates');
 
+    // Articles are canonical under /articles/{slug}; the old /projects path 301s.
     $this->get('/projects/'.$project->slug)
+        ->assertRedirect(route('articles.show', ['slug' => $project->slug]));
+
+    $this->get('/articles/'.$project->slug)
         ->assertOk()
         // Renders the external "visit" card (host + deep link), not a README.
         ->assertSee('yoeri.me')
@@ -196,7 +200,7 @@ it('renders the article body as content and emits Article JSON-LD', function () 
         'published_at' => now(),
     ]);
 
-    $this->get('/projects/'.$project->slug)
+    $this->get('/articles/'.$project->slug)
         ->assertOk()
         ->assertSee('Why patch')                          // rendered markdown body
         ->assertSee(__('site.projects.article_read'))     // "read article" CTA
@@ -204,6 +208,10 @@ it('renders the article body as content and emits Article JSON-LD', function () 
         ->assertSee(route('og.show', ['slug' => $project->slug]), false) // og:image via proxy
         ->assertSee(__('site.articles.back_to_list'))     // back link goes to /articles
         ->assertSee(route('articles.index'), false);
+
+    // The legacy /projects path 301s to the canonical /articles URL.
+    $this->get('/projects/'.$project->slug)
+        ->assertRedirect(route('articles.show', ['slug' => $project->slug]));
 });
 
 it('404s on draft project show', function () {

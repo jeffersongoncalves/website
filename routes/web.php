@@ -36,6 +36,11 @@ Route::middleware(['set.locale', CachePublicPage::class])->group(function () {
 
     Route::get('/articles', ArticlesController::class)->name('articles.index');
     Route::get('/articles/feed', ArticlesFeedController::class)->name('articles.feed');
+    // Articles share ProjectViewController (they're Project rows) but live under
+    // /articles/{slug} so the Articles nav highlights instead of Projects. The
+    // controller 301s any project to its canonical section. Registered after
+    // /articles/feed so the static segment still wins.
+    Route::get('/articles/{slug}', ProjectViewController::class)->name('articles.show');
 
     Route::get('/open-source', OpenSourceController::class)->name('open-source');
 

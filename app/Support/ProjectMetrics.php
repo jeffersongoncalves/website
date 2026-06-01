@@ -633,7 +633,19 @@ class ProjectMetrics
             return null;
         }
 
-        return 'https://packagist.org/packages/'.strtolower($name);
+        $candidate = 'https://packagist.org/packages/'.strtolower($name);
+
+        // A composer.json `name` alone does not prove the package is published as
+        // that vendor/name — app skeletons and tutorials ship `laravel/laravel`
+        // without owning it. Only adopt the derived URL when Packagist's
+        // `repository` points back at this repo (same guard the importer uses).
+        // A transient UNKNOWN (rate limit) returns null = no change, leaving the
+        // existing value untouched rather than risking a wrong attribution.
+        if (ProjectImporter::packagistUrlOwnershipStatus($candidate, (string) $project->github_url) !== ProjectImporter::LINK_OWNED) {
+            return null;
+        }
+
+        return $candidate;
     }
 
     /**
@@ -677,7 +689,16 @@ class ProjectMetrics
             return null;
         }
 
-        return 'https://www.npmjs.com/package/'.$name;
+        $candidate = 'https://www.npmjs.com/package/'.$name;
+
+        // Same ownership guard as the packagist path: a borrowed package.json
+        // `name` (e.g. mpvue shipping `"name": "vue"`) must not claim a foreign
+        // npm package. UNKNOWN returns null = no change.
+        if (ProjectImporter::npmUrlOwnershipStatus($candidate, (string) $project->github_url) !== ProjectImporter::LINK_OWNED) {
+            return null;
+        }
+
+        return $candidate;
     }
 
     private static function fetchPackagistDownloads(?string $packagistUrl): ?int

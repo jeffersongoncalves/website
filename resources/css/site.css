@@ -896,10 +896,12 @@
   }
   .markdown-body img { max-width: 100%; height: auto; border-radius: var(--r-sm); margin: var(--s-3) 0; }
 
-  /* Badge row — when a paragraph only holds anchor-wrapped images (shields.io
-     badges, CI status badges, etc) keep them on one inline row instead of
-     letting each badge stack on its own line. */
-  .markdown-body p:has(> a > img) {
+  /* Badge row — when a paragraph holds images (shields.io badges, CI status
+     badges, etc), whether anchor-wrapped (`> a > img`) or bare (`> img`, e.g.
+     a `<p align="center">` of <img> badges), keep them on one inline row
+     instead of letting each badge stack on its own line. */
+  .markdown-body p:has(> a > img),
+  .markdown-body p:has(> img) {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -911,7 +913,9 @@
     margin: 0;
   }
   .markdown-body p:has(> a > img) > a > img,
-  .markdown-body p > a > img {
+  .markdown-body p:has(> img) > img,
+  .markdown-body p > a > img,
+  .markdown-body p > img {
     display: inline-block;
     vertical-align: middle;
     margin: 0;

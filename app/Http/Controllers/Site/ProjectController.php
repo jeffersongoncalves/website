@@ -6,6 +6,7 @@ use App\Enums\ProjectCategory;
 use App\Models\Project;
 use App\Support\SiteStats;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Http\Request;
 
 class ProjectController
@@ -69,9 +70,12 @@ class ProjectController
 
         if ($search !== '') {
             $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $search).'%';
-            $query->where(function ($q) use ($like) {
-                $q->where('name', 'like', $like)
-                    ->orWhere('repo', 'like', $like);
+            // Postgres LIKE is case-sensitive — use ILIKE there so a search for
+            // "filament" matches "Filament". MySQL/SQLite LIKE already folds case.
+            $operator = $query->getConnection() instanceof PostgresConnection ? 'ilike' : 'like';
+            $query->where(function ($q) use ($like, $operator) {
+                $q->where('name', $operator, $like)
+                    ->orWhere('repo', $operator, $like);
             });
         }
 

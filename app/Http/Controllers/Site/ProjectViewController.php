@@ -26,6 +26,14 @@ class ProjectViewController
             return $this->redirectFromAlias($slug, $request);
         }
 
+        // Each project has one canonical section: articles → /articles/{slug},
+        // everything else → /projects/{slug}. A request under the wrong section
+        // 301s to the right one so the nav highlights correctly and old
+        // /projects/{article-slug} links keep resolving.
+        if ($this->canonicalRouteName($project) !== $request->route()?->getName()) {
+            return $this->redirectToCanonical($project, $request);
+        }
+
         $isFilamentPlugin = $project->category === ProjectCategory::FilamentPlugin;
         $versions = $isFilamentPlugin && is_array($project->versions) ? $project->versions : [];
 
@@ -82,12 +90,33 @@ class ProjectViewController
 
         abort_if($target === null, 404);
 
-        $url = route('projects.show', ['slug' => $target->slug]);
+        return $this->redirectToCanonical($target, $request);
+    }
+
+    /**
+     * 301 to the project's canonical section URL, preserving the query string
+     * (e.g. the ?v= readme-version param). Used both for retired-slug aliases
+     * and to move a project served under the wrong section.
+     */
+    private function redirectToCanonical(Project $project, Request $request): RedirectResponse
+    {
+        $url = route($this->canonicalRouteName($project), ['slug' => $project->slug]);
 
         if (($query = $request->getQueryString()) !== null && $query !== '') {
             $url .= '?'.$query;
         }
 
         return redirect($url, 301);
+    }
+
+    /**
+     * Articles render under /articles/{slug}; every other category under
+     * /projects/{slug}.
+     */
+    private function canonicalRouteName(Project $project): string
+    {
+        return $project->category === ProjectCategory::Article
+            ? 'articles.show'
+            : 'projects.show';
     }
 }

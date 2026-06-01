@@ -5,6 +5,9 @@
     // Articles belong to /articles — send the breadcrumb and the back link
     // there instead of the projects catalogue.
     $isArticleCategory = $project->category === \App\Enums\ProjectCategory::Article;
+    // Each project is served under its own section so the nav highlights match:
+    // articles live at /articles/{slug}, everything else at /projects/{slug}.
+    $showRoute = $isArticleCategory ? 'articles.show' : 'projects.show';
     $backUrl = $isArticleCategory ? route('articles.index') : route('projects.index');
     $backLabel = $isArticleCategory ? __('site.articles.back_to_list') : __('site.projects.back_to_list');
     $parentCrumb = $isArticleCategory
@@ -13,7 +16,7 @@
 
     $breadcrumbs = [
         $parentCrumb,
-        ['name' => $title, 'url' => route('projects.show', ['slug' => $project->slug])],
+        ['name' => $title, 'url' => route($showRoute, ['slug' => $project->slug])],
     ];
 
     $initial = strtoupper(mb_substr($project->name, 0, 1));
@@ -36,7 +39,7 @@
         $externalHost = $externalUrl ? (parse_url($externalUrl, PHP_URL_HOST) ?: $externalUrl) : null;
     }
 
-    $showUrl = route('projects.show', ['slug' => $project->slug]);
+    $showUrl = route($showRoute, ['slug' => $project->slug]);
 
     // Emit the schema.org type that actually matches the project: an Article for
     // imported blog posts, a WebSite for external sites / YouTube channels, and

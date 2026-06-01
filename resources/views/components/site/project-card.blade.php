@@ -10,6 +10,8 @@
         \App\Enums\ProjectCategory::YoutubeChannel,
         \App\Enums\ProjectCategory::Article,
     ], true);
+    // Articles live under /articles/{slug}; everything else under /projects/{slug}.
+    $showRoute = $project->category === \App\Enums\ProjectCategory::Article ? 'articles.show' : 'projects.show';
 @endphp
 
 <article class="card project-card">
@@ -19,7 +21,7 @@
 
     <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 pr-6">
         <h3 class="flex-1 min-w-0 m-0">
-            <a href="{{ route('projects.show', ['slug' => $project->slug]) }}"
+            <a href="{{ route($showRoute, ['slug' => $project->slug]) }}"
                class="mono text-[0.95rem] font-semibold text-ink-100 break-words">{{ $project->name }}</a>
         </h3>
         <div class="flex items-center gap-2 flex-wrap sm:justify-end">

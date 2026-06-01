@@ -11,8 +11,8 @@
 @php($description = $article->getTranslation('title', $locale, false) ?: $article->name)
 <item>
 <title>{{ $article->name }}</title>
-<link>{{ route('projects.show', ['slug' => $article->slug]) }}</link>
-<guid isPermaLink="true">{{ route('projects.show', ['slug' => $article->slug]) }}</guid>
+<link>{{ route('articles.show', ['slug' => $article->slug]) }}</link>
+<guid isPermaLink="true">{{ route('articles.show', ['slug' => $article->slug]) }}</guid>
 @if($article->published_at)<pubDate>{{ $article->published_at->toRssString() }}</pubDate>@endif
 <description>{{ $description }}</description>
 </item>

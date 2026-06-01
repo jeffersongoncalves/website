@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\ProjectCategory;
 use App\Models\Project;
 use Illuminate\Console\Command;
 use Spatie\Sitemap\Sitemap;
@@ -42,10 +43,15 @@ class GenerateSitemap extends Command
     {
         $sitemap = Sitemap::create();
 
-        Project::query()->published()->orderBy('slug')->get(['slug', 'updated_at'])->each(
+        Project::query()->published()->orderBy('slug')->get(['slug', 'category', 'updated_at'])->each(
             fn (Project $project) => $sitemap->add(
-                Url::create(route('projects.show', ['slug' => $project->slug]))
-                    ->setLastModificationDate($project->updated_at ?? now())
+                // Articles are canonical under /articles/{slug}; the rest under
+                // /projects/{slug} — emit the canonical URL so the sitemap never
+                // lists a link that just 301s elsewhere.
+                Url::create(route(
+                    $project->category === ProjectCategory::Article ? 'articles.show' : 'projects.show',
+                    ['slug' => $project->slug],
+                ))->setLastModificationDate($project->updated_at ?? now())
             )
         );
 

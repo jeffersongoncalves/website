@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Exceptions\GithubRateLimitException;
@@ -139,6 +140,48 @@ it('completes without throwing on a non-rate-limit GraphQL failure', function ()
     ]);
 
     expect(ProjectMetrics::sync(metricsProject()))->toBeBool();
+});
+
+it('does not attach a packagist_url for a borrowed composer name the repo does not own', function () {
+    // A tutorial / app-skeleton repo ships `composer.json` `name: laravel/laravel`
+    // without owning the package. The metrics sync must not re-derive a
+    // packagist_url from that borrowed name — Packagist's repository field for
+    // laravel/laravel points at laravel/laravel, a foreign owner.
+    Http::fake([
+        'api.github.com/repos/*/contributors*' => Http::response([]),
+        'api.github.com/graphql' => Http::response(graphqlRepo()),
+        'raw.githubusercontent.com/owner/repo/main/composer.json' => Http::response(['name' => 'laravel/laravel']),
+        'packagist.org/packages/laravel/laravel.json' => Http::response([
+            'package' => ['repository' => 'https://github.com/laravel/laravel'],
+        ]),
+    ]);
+
+    $project = metricsProject(['category' => ProjectCategory::LaravelPackage, 'package_type' => PackageType::Composer]);
+    ProjectMetrics::sync($project);
+
+    expect($project->fresh()->packagist_url)->toBeNull();
+});
+
+it('attaches a packagist_url when Packagist points back at the repo', function () {
+    // A genuinely-published package: Packagist's repository field resolves to the
+    // same GitHub owner, so the derived URL is adopted.
+    Http::fake([
+        'api.github.com/repos/*/contributors*' => Http::response([]),
+        'api.github.com/graphql' => Http::response(graphqlRepo()),
+        'raw.githubusercontent.com/owner/repo/main/composer.json' => Http::response(['name' => 'owner/repo']),
+        'packagist.org/packages/owner/repo.json' => Http::response([
+            'package' => [
+                'repository' => 'https://github.com/owner/repo',
+                'downloads' => ['total' => 123],
+                'versions' => [],
+            ],
+        ]),
+    ]);
+
+    $project = metricsProject(['category' => ProjectCategory::LaravelPackage, 'package_type' => PackageType::Composer]);
+    ProjectMetrics::sync($project);
+
+    expect($project->fresh()->packagist_url)->toBe('https://packagist.org/packages/owner/repo');
 });
 
 it('serves the cached snapshot without hitting GraphQL while fresh', function () {

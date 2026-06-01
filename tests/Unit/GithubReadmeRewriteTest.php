@@ -232,3 +232,17 @@ it('does not duplicate existing loading or decoding attributes on README images'
     expect(substr_count($out, 'decoding='))->toBe(2);
     expect($out)->toContain('loading="eager"')->toContain('decoding="sync"');
 });
+
+it('wraps each README table in a horizontal-scroll container', function () {
+    $html = '<p>intro</p><table><thead><tr><th>A</th></tr></thead>'
+        ."<tbody><tr><td>1</td></tr></tbody></table>\n"
+        .'<table><tr><td>x</td></tr></table>';
+
+    $out = GithubReadme::wrapTables($html);
+
+    // Both tables wrapped, paragraph untouched, no double-wrapping.
+    expect(substr_count($out, '<div class="md-table-scroll">'))->toBe(2)
+        ->and($out)->toContain('<div class="md-table-scroll"><table><thead>')
+        ->and($out)->toContain('</tbody></table></div>')
+        ->and($out)->toContain('<p>intro</p>');
+});

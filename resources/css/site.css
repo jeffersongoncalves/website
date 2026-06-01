@@ -937,12 +937,29 @@
     border-radius: 50%;
   }
   .markdown-body hr { border: 0; border-top: 1px solid var(--border-soft); margin: var(--s-7) 0; }
+  /* Wide README tables scroll horizontally inside the article column instead
+     of overflowing the page (GithubReadme::wrapTables adds this wrapper). */
+  .markdown-body .md-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+    margin: var(--s-5) 0;
+  }
   .markdown-body table {
     width: 100%;
     border-collapse: collapse;
     margin: var(--s-5) 0;
     font-size: 0.9375rem;
   }
+  /* Inside the scroll wrapper: keep the table at least full-width, but let it
+     grow past the container (triggering the scroll) rather than squishing. */
+  .markdown-body .md-table-scroll > table {
+    width: auto;
+    min-width: 100%;
+    margin: 0;
+  }
+  .markdown-body .md-table-scroll th,
+  .markdown-body .md-table-scroll td { white-space: nowrap; }
   .markdown-body th,
   .markdown-body td {
     padding: var(--s-3) var(--s-4);

@@ -274,6 +274,21 @@ class GithubReadme
         ) ?? $html;
     }
 
+    /**
+     * Wrap every rendered README `<table>` in a horizontally-scrollable
+     * container so wide tables (e.g. a 16-column comparison matrix) scroll
+     * inside the article column instead of overflowing the page. Markdown
+     * tables never nest, so a non-greedy match is safe.
+     */
+    public static function wrapTables(string $html): string
+    {
+        return preg_replace(
+            '~<table\b[^>]*>.*?</table>~is',
+            '<div class="md-table-scroll">$0</div>',
+            $html
+        ) ?? $html;
+    }
+
     public static function repoFromUrl(?string $url): ?string
     {
         if (! $url) {

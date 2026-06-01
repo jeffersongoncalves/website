@@ -146,6 +146,7 @@ it('renders the article body as content and emits Article JSON-LD', function () 
         'status' => ProjectStatus::Published,
         'docs_url' => 'https://yoeri.me/blog/automate-your-php-security-updates',
         'content' => ['pt' => "## Why patch\n\nKeep deps current to avoid CVEs."],
+        'social_image' => 'https://yoeri.me/og/automate.png',
         'published_at' => now(),
     ]);
 
@@ -153,7 +154,8 @@ it('renders the article body as content and emits Article JSON-LD', function () 
         ->assertOk()
         ->assertSee('Why patch')                          // rendered markdown body
         ->assertSee(__('site.projects.article_read'))     // "read article" CTA
-        ->assertSee('"@type":"Article"', false);          // correct JSON-LD type
+        ->assertSee('"@type":"Article"', false)           // correct JSON-LD type
+        ->assertSee('https://yoeri.me/og/automate.png', false); // per-article og:image
 });
 
 it('404s on draft project show', function () {

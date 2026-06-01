@@ -131,6 +131,7 @@ class Project extends Model
         'npm_url',
         'docker_url',
         'docs_url',
+        'social_image',
         'demo_url',
         'status',
         'featured',
@@ -293,10 +294,14 @@ class Project extends Model
 
         // GitHub renders a rich per-repo social card at this endpoint — a far
         // better OG image than the one generic site banner. Non-GitHub projects
-        // fall back to that banner via the SEO transformer in AppServiceProvider.
+        // (articles, external sites) fall back to the og:image captured from the
+        // source page at import time, then to the generic banner via the SEO
+        // transformer in AppServiceProvider.
         $image = null;
         if ($this->github_url && preg_match('~github\.com/([^/?#]+/[^/?#]+)~i', $this->github_url, $m)) {
             $image = 'https://opengraph.githubassets.com/1/'.rtrim($m[1], '/');
+        } elseif (! empty($this->social_image)) {
+            $image = $this->social_image;
         }
 
         return new SEOData(

@@ -73,6 +73,7 @@ describe('fromArticle', function (): void {
                 '<html><head><title>ignored</title>'
                 .'<meta property="og:title" content="Automate your PHP security updates">'
                 .'<meta property="og:description" content="A short guide to keeping deps patched.">'
+                .'<meta property="og:image" content="https://yoeri.me/og/automate.png">'
                 .'</head><body></body></html>',
                 200,
                 ['Content-Type' => 'text/html']
@@ -88,7 +89,8 @@ describe('fromArticle', function (): void {
             ->and($fields['docs_url'])->toBe('https://yoeri.me/blog/automate-your-php-security-updates')
             ->and($fields['slug'])->toBe('article-automate-your-php-security-updates')
             ->and($fields['github_url'])->toBeNull()
-            ->and($fields['package_type'])->toBe('none');
+            ->and($fields['package_type'])->toBe('none')
+            ->and($fields['social_image'])->toBe('https://yoeri.me/og/automate.png');
     });
 
     it('rejects a non-http url', function (): void {

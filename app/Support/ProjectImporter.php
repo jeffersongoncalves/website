@@ -164,6 +164,7 @@ class ProjectImporter
             'package_type' => 'none',
             'packagist_url' => null,
             'npm_url' => null,
+            'social_image' => self::nullableString($meta['og:image'] ?? null),
             'stack' => [],
             'versions' => [],
         ];
@@ -559,6 +560,7 @@ class ProjectImporter
             'package_type' => 'none',
             'packagist_url' => null,
             'npm_url' => null,
+            'social_image' => self::nullableString($meta['og:image'] ?? null),
             'stack' => [],
             'versions' => [],
         ];
@@ -603,7 +605,7 @@ class ProjectImporter
                 continue;
             }
             $key = strtolower($property);
-            if (in_array($key, ['title', 'description', 'og:title', 'og:description'], true)) {
+            if (in_array($key, ['title', 'description', 'og:title', 'og:description', 'og:image'], true)) {
                 $meta[$key] = $content;
             }
         }

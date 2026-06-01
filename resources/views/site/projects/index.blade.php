@@ -37,6 +37,14 @@
                 @if($activeTopic !== '')
                     <input type="hidden" name="topic" value="{{ $activeTopic }}">
                 @endif
+                {{-- Role/source live as badge chips below; carry their active
+                     value through the form so a search/category submit keeps them. --}}
+                @if($activeRole !== 'all')
+                    <input type="hidden" name="role" value="{{ $activeRole }}">
+                @endif
+                @if($activeSource !== 'all')
+                    <input type="hidden" name="source" value="{{ $activeSource }}">
+                @endif
                 <div class="projects-filters-row">
                     <label class="projects-filter">
                         <span class="projects-filter-label">@lang('site.projects.filter_search')</span>
@@ -73,25 +81,6 @@
                     @endif
 
                     <label class="projects-filter">
-                        <span class="projects-filter-label">@lang('site.projects.filter_role')</span>
-                        <select name="role" class="projects-filter-select" onchange="this.form.submit()">
-                            <option value="">@lang('site.projects.role_all')</option>
-                            <option value="authored"     @selected($activeRole === 'authored')>@lang('site.projects.role_authored')</option>
-                            <option value="maintainer"   @selected($activeRole === 'maintainer')>@lang('site.projects.role_maintainer')</option>
-                            <option value="daily_driver" @selected($activeRole === 'daily_driver')>@lang('site.projects.role_daily_driver')</option>
-                        </select>
-                    </label>
-
-                    <label class="projects-filter">
-                        <span class="projects-filter-label">@lang('site.projects.filter_source')</span>
-                        <select name="source" class="projects-filter-select" onchange="this.form.submit()">
-                            <option value="">@lang('site.projects.source_all')</option>
-                            <option value="own"     @selected($activeSource === 'own')>@lang('site.projects.source_own')</option>
-                            <option value="starred" @selected($activeSource === 'starred')>@lang('site.projects.source_starred')</option>
-                        </select>
-                    </label>
-
-                    <label class="projects-filter">
                         <span class="projects-filter-label">@lang('site.common.sort_by')</span>
                         <select name="sort" class="projects-filter-select" onchange="this.form.submit()">
                             <option value="stars"     @selected($activeSort === 'stars')>@lang('site.common.sort_stars')</option>
@@ -105,6 +94,38 @@
                     </button>
                 </div>
             </form>
+
+            @php
+                // Badge facets toggle a single query param while preserving the
+                // other active filters; drop `page` so a new filter resets to p1.
+                $roleBase = request()->except(['page', 'role']);
+                $sourceBase = request()->except(['page', 'source']);
+                $roleOpts = [
+                    'authored' => __('site.projects.role_authored'),
+                    'maintainer' => __('site.projects.role_maintainer'),
+                    'daily_driver' => __('site.projects.role_daily_driver'),
+                ];
+                $sourceOpts = [
+                    'own' => __('site.projects.source_own'),
+                    'starred' => __('site.projects.source_starred'),
+                ];
+            @endphp
+            <div class="flex flex-wrap items-center gap-2 mt-6 mono-meta-sm">
+                <span class="text-ink-400">@lang('site.projects.filter_role'):</span>
+                <a href="{{ route('projects.index', $roleBase) }}" class="badge {{ $activeRole === 'all' ? 'badge-accent' : '' }}">@lang('site.projects.role_all')</a>
+                @foreach($roleOpts as $val => $label)
+                    <a href="{{ route('projects.index', array_merge($roleBase, ['role' => $val])) }}"
+                       class="badge {{ $activeRole === $val ? 'badge-accent' : '' }}">{{ $label }}</a>
+                @endforeach
+            </div>
+            <div class="flex flex-wrap items-center gap-2 mt-3 mb-2 mono-meta-sm">
+                <span class="text-ink-400">@lang('site.projects.filter_source'):</span>
+                <a href="{{ route('projects.index', $sourceBase) }}" class="badge {{ $activeSource === 'all' ? 'badge-accent' : '' }}">@lang('site.projects.source_all')</a>
+                @foreach($sourceOpts as $val => $label)
+                    <a href="{{ route('projects.index', array_merge($sourceBase, ['source' => $val])) }}"
+                       class="badge {{ $activeSource === $val ? 'badge-accent' : '' }}">{{ $label }}</a>
+                @endforeach
+            </div>
 
             @if(count($popularTopics) > 0)
                 <div class="flex flex-wrap items-center gap-2 mt-6 mb-6 mono-meta-sm">

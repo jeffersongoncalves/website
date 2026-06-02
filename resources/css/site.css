@@ -921,6 +921,31 @@
     margin: 0;
     border-radius: 3px;
   }
+  /* Badges crammed into a heading — some READMEs (e.g. React) put the title
+     plus a row of shields.io / CI badges inside the H1. Clamp those images to
+     a small inline height so the heading keeps the title large but the badges
+     don't balloon to heading size; they flow inline and wrap onto the same
+     line as the title. */
+  .markdown-body h1 img,
+  .markdown-body h2 img,
+  .markdown-body h3 img,
+  .markdown-body h4 img,
+  .markdown-body h5 img,
+  .markdown-body h6 img {
+    display: inline-block;
+    height: auto;
+    max-height: 20px;
+    width: auto;
+    max-width: 100%;
+    margin: 0 0 0 6px;
+    vertical-align: middle;
+    border-radius: 3px;
+  }
+  .markdown-body h1:has(img),
+  .markdown-body h2:has(img),
+  .markdown-body h3:has(img) {
+    line-height: 1.4;
+  }
   /* Contributor / avatar images — clamp to 48x48 so a missing width attr or a
      full-resolution avatar URL (e.g. the `?s=` param ignored) doesn't blow one
      up to giant size and break the contributors grid. Scoped to avatar hosts so

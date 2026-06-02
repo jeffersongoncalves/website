@@ -79,6 +79,14 @@
                         </div>
                     @endif
 
+                    @if($activeTopic !== '')
+                        <div class="mt-6 mb-8 mono-meta-sm">
+                            <span class="text-ink-400">@lang('site.projects.filtering_by_topic'):</span>
+                            <span class="badge badge-accent ml-2">#{{ $activeTopic }}</span>
+                            <a href="{{ route('links.index', $topicBase).'#'.$anchor }}" class="ml-2 text-ink-400 hover:text-ink-200">✕ @lang('site.projects.clear_filter')</a>
+                        </div>
+                    @endif
+
                     @if($projects->isEmpty())
                         <div class="text-center py-12 mono text-sm text-ink-500">@lang('site.common.no_results')</div>
                     @else

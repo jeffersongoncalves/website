@@ -14,7 +14,7 @@ return [
     'stack' => [
         'title' => 'Technologies',
         'sub' => 'The tools that build and run this site, from the backend to deploy.',
-        'version_note' => 'Versions shown by major line only (e.g. 13.x) — the exact production version is not exposed.',
+        'mine' => 'My package',
     ],
 
     'errors' => [

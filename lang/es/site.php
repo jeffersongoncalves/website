@@ -14,7 +14,7 @@ return [
     'stack' => [
         'title' => 'Tecnologías',
         'sub' => 'Las herramientas que construyen y sostienen este sitio, del backend al deploy.',
-        'version_note' => 'Versiones indicadas solo por la línea principal (ej.: 13.x) — sin exponer la versión exacta en producción.',
+        'mine' => 'De mi autoría',
     ],
 
     'errors' => [

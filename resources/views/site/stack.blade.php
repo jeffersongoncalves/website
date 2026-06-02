@@ -7,7 +7,6 @@
             <x-site.eyebrow num="01" :label="__('site.nav.stack')"/>
             <h1>@lang('site.stack.title')</h1>
             <p class="lede mt-6 max-w-[60ch]">@lang('site.stack.sub')</p>
-            <p class="mt-4 mono-meta-sm text-ink-500 max-w-[60ch]">@lang('site.stack.version_note')</p>
         </div>
     </section>
 
@@ -22,11 +21,20 @@
                         @foreach($group['items'] as $item)
                             <div class="card">
                                 <div class="flex items-baseline justify-between gap-3">
-                                    <h3 class="h-card">{{ $item['name'] }}</h3>
-                                    @if($item['version'])
-                                        <span class="badge badge-accent">{{ $item['version'] }}</span>
+                                    <h3 class="h-card break-words min-w-0">
+                                        @if(!empty($item['url']))
+                                            <a href="{{ $item['url'] }}" class="hover:text-amber" @unless(!empty($item['internal'])) rel="noopener" target="_blank" @endunless>{{ $item['name'] }}</a>
+                                        @else
+                                            {{ $item['name'] }}
+                                        @endif
+                                    </h3>
+                                    @if(!empty($item['version']))
+                                        <span class="badge badge-accent shrink-0">{{ $item['version'] }}</span>
                                     @endif
                                 </div>
+                                @if(!empty($item['author']))
+                                    <span class="badge badge-success mt-3 inline-block" title="{{ __('site.stack.mine') }}">@lang('site.stack.mine')</span>
+                                @endif
                                 <p class="body-sm mt-3">{{ $item[$locale] ?? $item['en'] }}</p>
                             </div>
                         @endforeach

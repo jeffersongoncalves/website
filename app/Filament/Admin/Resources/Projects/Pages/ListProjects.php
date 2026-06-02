@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Projects\Pages;
 
 use App\Enums\ProjectStatus;
+use App\Exceptions\GithubRateLimitException;
 use App\Filament\Admin\Resources\Projects\ProjectResource;
 use App\Models\Project;
 use App\Support\ProjectAttributes;
@@ -69,13 +70,17 @@ class ListProjects extends ListRecords
                     ->helperText(__('admin.helpers.is_daily_driver')),
             ])
             ->action(function (array $data): void {
-                $result = match ($data['source']) {
-                    'github' => ProjectImporter::fromGithub($data['url']),
-                    'npm' => ProjectImporter::fromNpm($data['url']),
-                    'youtube' => ProjectImporter::fromYoutube($data['url']),
-                    'article' => ProjectImporter::fromArticle($data['url']),
-                    default => ProjectImporter::fromUrl($data['url']),
-                };
+                try {
+                    $result = match ($data['source']) {
+                        'github' => ProjectImporter::fromGithub($data['url']),
+                        'npm' => ProjectImporter::fromNpm($data['url']),
+                        'youtube' => ProjectImporter::fromYoutube($data['url']),
+                        'article' => ProjectImporter::fromArticle($data['url']),
+                        default => ProjectImporter::fromUrl($data['url']),
+                    };
+                } catch (GithubRateLimitException) {
+                    $result = ['error' => 'rate_limited'];
+                }
 
                 if (isset($result['error'])) {
                     Notification::make()

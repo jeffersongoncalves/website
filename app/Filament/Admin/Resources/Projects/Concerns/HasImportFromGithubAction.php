@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Projects\Concerns;
 
+use App\Exceptions\GithubRateLimitException;
 use App\Support\ProjectImporter;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -46,8 +47,7 @@ trait HasImportFromGithubAction
                     ->required(),
             ])
             ->action(function (array $data): void {
-                $result = ProjectImporter::fromGithub($data['github_url']);
-                $this->applyImporterResult($result);
+                $this->runImport(fn () => ProjectImporter::fromGithub($data['github_url']));
             });
     }
 
@@ -68,8 +68,7 @@ trait HasImportFromGithubAction
                     ->required(),
             ])
             ->action(function (array $data): void {
-                $result = ProjectImporter::fromNpm($data['npm_url']);
-                $this->applyImporterResult($result);
+                $this->runImport(fn () => ProjectImporter::fromNpm($data['npm_url']));
             });
     }
 
@@ -90,8 +89,7 @@ trait HasImportFromGithubAction
                     ->required(),
             ])
             ->action(function (array $data): void {
-                $result = ProjectImporter::fromYoutube($data['youtube_url']);
-                $this->applyImporterResult($result);
+                $this->runImport(fn () => ProjectImporter::fromYoutube($data['youtube_url']));
             });
     }
 
@@ -112,8 +110,7 @@ trait HasImportFromGithubAction
                     ->required(),
             ])
             ->action(function (array $data): void {
-                $result = ProjectImporter::fromArticle($data['article_url']);
-                $this->applyImporterResult($result);
+                $this->runImport(fn () => ProjectImporter::fromArticle($data['article_url']));
             });
     }
 
@@ -134,8 +131,7 @@ trait HasImportFromGithubAction
                     ->required(),
             ])
             ->action(function (array $data): void {
-                $result = ProjectImporter::fromUrl($data['docs_url']);
-                $this->applyImporterResult($result);
+                $this->runImport(fn () => ProjectImporter::fromUrl($data['docs_url']));
             });
     }
 
@@ -146,6 +142,25 @@ trait HasImportFromGithubAction
      * detected.
      */
     private const OVERWRITE_KEYS = ['category', 'package_type'];
+
+    /**
+     * Run an importer call and feed its result to applyImporterResult. A
+     * GitHub rate-limit surfaces as the regular `rate_limited` error notice
+     * (the importer throws rather than returning incomplete data), so the
+     * synchronous admin action degrades gracefully instead of 500-ing.
+     *
+     * @param  callable():array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}  $importer
+     */
+    private function runImport(callable $importer): void
+    {
+        try {
+            $result = $importer();
+        } catch (GithubRateLimitException) {
+            $result = ['error' => 'rate_limited'];
+        }
+
+        $this->applyImporterResult($result);
+    }
 
     /**
      * @param  array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}  $result

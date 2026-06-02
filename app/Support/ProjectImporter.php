@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Enums\ProjectLanguage;
+use App\Exceptions\GithubRateLimitException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -20,6 +21,8 @@ class ProjectImporter
      * API. Returns `['error' => '<key>']` on any unrecoverable failure.
      *
      * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
+     *
+     * @throws GithubRateLimitException when GitHub is rate-limiting the API
      */
     public static function fromGithub(string $url): array
     {
@@ -213,6 +216,8 @@ class ProjectImporter
      * package. Returns `['error' => '<key>']` on failure.
      *
      * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
+     *
+     * @throws GithubRateLimitException when recovering the GitHub repo hits a rate limit
      */
     public static function fromNpm(string $url): array
     {
@@ -901,6 +906,8 @@ class ProjectImporter
 
     /**
      * @param  array<string, mixed>  $params
+     *
+     * @throws GithubRateLimitException when GitHub answers with a rate-limit 403/429
      */
     private static function githubGet(string $url, array $params = []): ?Response
     {
@@ -911,12 +918,54 @@ class ProjectImporter
         }
 
         try {
-            return Http::timeout(8)->withHeaders($headers)->get($url, $params);
+            $response = Http::timeout(8)->withHeaders($headers)->get($url, $params);
         } catch (Throwable $e) {
             self::logFetchFailure('github_api', $url, $e);
 
             return null;
         }
+
+        // Rate-limit detection runs OUTSIDE the catch above so the thrown
+        // exception propagates to the caller instead of being swallowed and
+        // logged as a generic fetch failure. A null/incomplete repo during a
+        // rate-limit window would otherwise let the import silently fall back
+        // to a default category — the queued jobs catch this and release.
+        self::throwIfRateLimited($response);
+
+        return $response;
+    }
+
+    /**
+     * Raise GithubRateLimitException when GitHub signals a rate limit: the
+     * primary limit (403 + `X-RateLimit-Remaining: 0`) or the secondary/abuse
+     * limit (403/429 carrying a `Retry-After`). Mirrors the detection in
+     * ProjectMetrics so the importer degrades the same way under pressure —
+     * the dispatching job releases back to the queue until the window resets.
+     *
+     * @throws GithubRateLimitException
+     */
+    private static function throwIfRateLimited(Response $response): void
+    {
+        $status = $response->status();
+
+        if ($status !== 403 && $status !== 429) {
+            return;
+        }
+
+        $retryAfterHeader = $response->header('Retry-After');
+        $remaining = $response->header('X-RateLimit-Remaining');
+
+        if ($remaining !== '0' && $retryAfterHeader === '') {
+            return;
+        }
+
+        if ($retryAfterHeader !== '') {
+            $retryAfter = (int) $retryAfterHeader;
+        } else {
+            $retryAfter = ((int) $response->header('X-RateLimit-Reset')) - time();
+        }
+
+        throw new GithubRateLimitException(max(60, $retryAfter));
     }
 
     /**

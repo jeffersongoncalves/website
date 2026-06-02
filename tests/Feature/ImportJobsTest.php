@@ -2,14 +2,18 @@
 
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
+use App\Exceptions\GithubRateLimitException;
 use App\Jobs\ImportGithubRepoJob;
 use App\Jobs\ImportNpmPackageJob;
 use App\Jobs\ImportWebsiteJob;
 use App\Jobs\ImportYoutubeChannelJob;
 use App\Jobs\RefreshProjectStatsJob;
 use App\Models\Project;
+use App\Support\ProjectImporter;
 use App\Support\SiteStats;
+use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
@@ -98,6 +102,42 @@ it('skips an npm import when the package is already cadastrado', function () {
 
     expect(Project::query()->where('npm_url', 'https://www.npmjs.com/package/some-pkg')->count())->toBe(1);
     Http::assertNothingSent();
+});
+
+it('throws a rate-limit exception from the importer instead of degrading to incomplete data', function () {
+    // Swap a clean factory: the global beforeEach registers a permissive
+    // `api.github.com/repos/*` 200 stub, and first-registered-stub wins, so a
+    // later override would never be reached. The fresh factory has only our
+    // rate-limit stub.
+    Http::swap(new Factory);
+    Http::fake([
+        'api.github.com/*' => Http::response('', 403, [
+            'X-RateLimit-Remaining' => '0',
+            'X-RateLimit-Reset' => (string) (time() + 90),
+        ]),
+    ]);
+
+    ProjectImporter::fromGithub('https://github.com/acme/widget');
+})->throws(GithubRateLimitException::class);
+
+it('releases the github import job back to the queue when GitHub is rate-limiting, creating nothing', function () {
+    Http::swap(new Factory);
+    Http::fake([
+        'api.github.com/*' => Http::response('', 403, [
+            'X-RateLimit-Remaining' => '0',
+            'X-RateLimit-Reset' => (string) (time() + 120),
+        ]),
+    ]);
+
+    // InteractsWithQueue::release() delegates to the underlying queue Job —
+    // mock just that so the real job constructor/onQueue run untouched.
+    $queueJob = Mockery::mock(Job::class);
+    $queueJob->shouldReceive('release')->once();
+
+    $job = (new ImportGithubRepoJob('https://github.com/acme/widget'))->setJob($queueJob);
+    $job->handle();
+
+    expect(Project::query()->where('github_url', 'https://github.com/acme/widget')->count())->toBe(0);
 });
 
 it('refreshes the derived site stats without error', function () {

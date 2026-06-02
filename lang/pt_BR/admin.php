@@ -53,6 +53,7 @@ return [
             'invalid_url' => 'URL inválida.',
             'repo_not_found' => 'Repositório não encontrado ou inacessível.',
             'fetch_failed' => 'Não foi possível buscar a página informada.',
+            'rate_limited' => 'Limite de requisições do GitHub atingido — tente novamente em alguns minutos.',
         ],
         'warning' => [
             'category_fallback' => 'Categoria caiu para "ferramenta" — sem sinais para classificar.',

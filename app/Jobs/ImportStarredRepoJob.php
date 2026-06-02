@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use App\Support\GithubReadme;
 use App\Support\ProjectAttributes;
@@ -82,7 +83,14 @@ class ImportStarredRepoJob implements ShouldQueue
             return;
         }
 
-        $result = ProjectImporter::fromGithub($canonical);
+        try {
+            $result = ProjectImporter::fromGithub($canonical);
+        } catch (GithubRateLimitException $e) {
+            $this->release($e->retryAfter);
+
+            return;
+        }
+
         $fields = $result['fields'] ?? null;
 
         if (! is_array($fields)) {

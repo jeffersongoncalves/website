@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use App\Support\ProjectAttributes;
 use App\Support\ProjectImporter;
@@ -62,7 +63,14 @@ class ImportNpmPackageJob implements ShouldQueue
             return;
         }
 
-        $result = ProjectImporter::fromNpm($npmUrl);
+        try {
+            $result = ProjectImporter::fromNpm($npmUrl);
+        } catch (GithubRateLimitException $e) {
+            $this->release($e->retryAfter);
+
+            return;
+        }
+
         $fields = $result['fields'] ?? null;
 
         if (! is_array($fields)) {

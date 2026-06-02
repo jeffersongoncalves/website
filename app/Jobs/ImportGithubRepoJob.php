@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use App\Support\GithubReadme;
 use App\Support\ProjectAttributes;
@@ -71,7 +72,14 @@ class ImportGithubRepoJob implements ShouldQueue
             return;
         }
 
-        $result = ProjectImporter::fromGithub($this->githubUrl);
+        try {
+            $result = ProjectImporter::fromGithub($this->githubUrl);
+        } catch (GithubRateLimitException $e) {
+            $this->release($e->retryAfter);
+
+            return;
+        }
+
         $fields = $result['fields'] ?? null;
 
         if (! is_array($fields)) {

@@ -53,6 +53,7 @@ return [
             'invalid_url' => 'Invalid URL.',
             'repo_not_found' => 'Repository not found or inaccessible.',
             'fetch_failed' => 'Could not fetch the given page.',
+            'rate_limited' => 'GitHub rate limit hit — try again in a few minutes.',
         ],
         'warning' => [
             'category_fallback' => 'Category fell back to "tool" — no signals to classify by.',

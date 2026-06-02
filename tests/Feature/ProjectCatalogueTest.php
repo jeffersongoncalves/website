@@ -2,9 +2,11 @@
 
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
+use App\Livewire\Site\ProjectsList;
 use App\Models\Project;
 use App\Support\SiteStats;
 use Illuminate\Support\Str;
+use Livewire\Livewire;
 
 function publishedProject(string $name, array $attrs = []): Project
 {
@@ -74,15 +76,19 @@ it('paginates and preserves filters on page 2', function () {
         ]);
     }
 
+    // Page 1 of the filtered catalogue shows the high-stars plugins (10/page).
+    // (plugin-2 has stars=2 so it falls to page 2 — and isn't a substring of
+    // any page-1 name, unlike plugin-1 which lives inside plugin-1{0,1,2}.)
     $this->get('/projects?cat=filament_plugin')
         ->assertOk()
-        // Page-2 link must carry the category filter through.
-        ->assertSee('cat=filament_plugin', false)
-        ->assertSee('page=2', false);
+        ->assertSee('plugin-12')
+        ->assertDontSee('plugin-2');
 
+    // Deep-linking ?page=2 (Livewire's WithPagination reads it on mount) still
+    // applies the cat filter and lands on the lowest-stars plugins.
     $this->get('/projects?cat=filament_plugin&page=2')
         ->assertOk()
-        ->assertSee('plugin-1'); // lowest stars lands on the last page
+        ->assertSee('plugin-2'); // lowest stars land on the last page
 });
 
 it('sorts by name, stars and downloads', function () {
@@ -143,4 +149,48 @@ it('filters by language when the language is in the persisted facet', function (
         ->assertOk()
         ->assertSee('php-lib')
         ->assertDontSee('js-lib');
+});
+
+it('reacts to live search on the ProjectsList component', function () {
+    publishedProject('alpha-widget', ['repo' => 'alpha-widget']);
+    publishedProject('beta-gadget', ['repo' => 'beta-gadget']);
+
+    Livewire::test(ProjectsList::class)
+        ->assertSee('alpha-widget')
+        ->assertSee('beta-gadget')
+        ->set('search', 'widget')
+        ->assertSee('alpha-widget')
+        ->assertDontSee('beta-gadget');
+});
+
+it('toggles the topic filter via wire actions and clears it', function () {
+    publishedProject('laravel-thing', ['slug' => 'laravel-thing', 'topics' => ['laravel']]);
+    publishedProject('vue-thing', ['slug' => 'vue-thing', 'topics' => ['vue']]);
+
+    Livewire::test(ProjectsList::class)
+        ->call('setTopic', 'laravel')
+        ->assertSet('topic', 'laravel')
+        ->assertSee('laravel-thing')
+        ->assertDontSee('vue-thing')
+        ->call('clearTopic')
+        ->assertSet('topic', '')
+        ->assertSee('vue-thing');
+});
+
+it('resets to page 1 when a facet changes', function () {
+    for ($i = 1; $i <= 12; $i++) {
+        publishedProject("plugin-{$i}", [
+            'slug' => "plugin-{$i}",
+            'category' => ProjectCategory::FilamentPlugin,
+            'stars' => $i,
+        ]);
+    }
+
+    Livewire::test(ProjectsList::class)
+        ->set('cat', 'filament_plugin')
+        ->call('nextPage', 'page')
+        ->assertSet('paginators.page', 2)
+        // Changing a facet on page 2 snaps back to page 1.
+        ->set('sort', 'name')
+        ->assertSet('paginators.page', 1);
 });

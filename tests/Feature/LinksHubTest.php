@@ -2,8 +2,10 @@
 
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
+use App\Livewire\Site\LinksSection;
 use App\Models\Project;
 use Illuminate\Support\Str;
+use Livewire\Livewire;
 
 function externalLink(string $name, ProjectCategory $category, array $attrs = []): Project
 {
@@ -136,13 +138,14 @@ it('paginates each link group independently', function () {
         ]);
     }
 
-    // Each section pages on its own query param (PER_PAGE = 6).
+    // Each section shows its own page 1 (PER_PAGE = 6); Livewire paginates via
+    // wire:click, so the page number lives in the action, not an href.
     $this->get('/links')
         ->assertOk()
-        ->assertSee('sites=2', false)
-        ->assertSee('watch=2', false)
         ->assertSee('site-01')   // page 1 of the Sites group
-        ->assertDontSee('site-07'); // page 2 only
+        ->assertDontSee('site-07') // page 2 only
+        ->assertSee('chan-01')   // page 1 of the YouTube group
+        ->assertDontSee('chan-07');
 
     // Paging the Sites group must not move the YouTube group off its page 1.
     $this->get('/links?sites=2')
@@ -151,4 +154,24 @@ it('paginates each link group independently', function () {
         ->assertDontSee('site-01')
         ->assertSee('chan-01')   // YouTube untouched, still page 1
         ->assertDontSee('chan-07');
+});
+
+it('drives a section search and topic filter through wire actions', function () {
+    externalLink('alpha-site', ProjectCategory::Website, ['topics' => ['design']]);
+    externalLink('beta-site', ProjectCategory::Website);
+
+    Livewire::test(LinksSection::class, ['category' => ProjectCategory::Website, 'index' => 0])
+        ->assertSee('alpha-site')
+        ->assertSee('beta-site')
+        ->set('search', 'alpha')
+        ->assertSee('alpha-site')
+        ->assertDontSee('beta-site')
+        ->set('search', '')
+        ->call('setTopic', 'design')
+        ->assertSet('topic', 'design')
+        ->assertSee('alpha-site')
+        ->assertDontSee('beta-site')
+        ->call('clearTopic')
+        ->assertSet('topic', '')
+        ->assertSee('beta-site');
 });

@@ -1,0 +1,9 @@
+<div>
+    <x-site.project-detail
+        :project="$project"
+        :readmeHtml="$readmeHtml"
+        :versions="$versions"
+        :activeVersion="$activeVersion"
+        :ref="$ref"
+    />
+</div>

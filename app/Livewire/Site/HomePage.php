@@ -1,14 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\Site;
+namespace App\Livewire\Site;
 
 use App\Models\Project;
 use App\Support\SiteStats;
 use Illuminate\Contracts\View\View;
+use Livewire\Component;
 
-class HomeController
+/**
+ * Full-page Livewire component for the homepage. Static content (no wire
+ * actions), so the route stays in the page cache.
+ */
+class HomePage extends Component
 {
-    public function __invoke(): View
+    public function render(): View
     {
         $featured = Project::query()
             ->published()
@@ -18,11 +23,14 @@ class HomeController
             ->take(6)
             ->get();
 
-        return view('site.home', [
+        return view('livewire.site.home-page', [
             'featured' => $featured,
             'homeStats' => SiteStats::homeCards(),
             'stack' => config('site.stack'),
             'contributions' => SiteStats::contributions(),
+        ])->layout('components.site.layouts.app', [
+            'title' => __('site.home.hero_l1'),
+            'description' => __('site.seo.home'),
         ]);
     }
 }

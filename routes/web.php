@@ -1,22 +1,22 @@
 <?php
 
-use App\Http\Controllers\Site\AboutController;
-use App\Http\Controllers\Site\ArticlesController;
 use App\Http\Controllers\Site\ArticlesFeedController;
-use App\Http\Controllers\Site\HomeController;
-use App\Http\Controllers\Site\LinksController;
 use App\Http\Controllers\Site\OfflineController;
 use App\Http\Controllers\Site\OgImageController;
-use App\Http\Controllers\Site\OpenSourceController;
-use App\Http\Controllers\Site\ProjectController;
-use App\Http\Controllers\Site\ProjectViewController;
 use App\Http\Controllers\Site\ServiceWorkerController;
-use App\Http\Controllers\Site\SponsorsController;
-use App\Http\Controllers\Site\StackController;
 use App\Http\Controllers\Site\SwitchLocaleController;
 use App\Http\Middleware\CachePublicPage;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocale;
+use App\Livewire\Site\AboutPage;
+use App\Livewire\Site\ArticlesPage;
+use App\Livewire\Site\HomePage;
+use App\Livewire\Site\LinksPage;
+use App\Livewire\Site\OpenSourcePage;
+use App\Livewire\Site\ProjectShowPage;
+use App\Livewire\Site\ProjectsPage;
+use App\Livewire\Site\SponsorsPage;
+use App\Livewire\Site\StackPage;
 use Illuminate\Support\Facades\Route;
 
 // PWA infrastructure. `/sw.js` must live at the site root (not behind the
@@ -31,31 +31,37 @@ Route::get('/offline', OfflineController::class)->name('pwa.offline');
 Route::get('/og/{slug}.png', OgImageController::class)->name('og.show');
 
 Route::middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class])->group(function () {
-    Route::get('/', HomeController::class)->name('home');
-    Route::get('/about', AboutController::class)->name('about');
+    Route::get('/', HomePage::class)->name('home');
+    Route::get('/about', AboutPage::class)->name('about');
 
-    Route::get('/projects', ProjectController::class)->name('projects.index');
-    Route::get('/projects/{slug}', ProjectViewController::class)->name('projects.show');
+    Route::get('/projects', ProjectsPage::class)->name('projects.index')
+        ->withoutMiddleware(CachePublicPage::class);
+    Route::get('/projects/{slug}', ProjectShowPage::class)->name('projects.show')
+        ->withoutMiddleware(CachePublicPage::class);
 
-    Route::get('/articles', ArticlesController::class)->name('articles.index');
+    Route::get('/articles', ArticlesPage::class)->name('articles.index')
+        ->withoutMiddleware(CachePublicPage::class);
     Route::get('/articles/feed', ArticlesFeedController::class)->name('articles.feed');
-    // Articles share ProjectViewController (they're Project rows) but live under
-    // /articles/{slug} so the Articles nav highlights instead of Projects. The
-    // controller 301s any project to its canonical section. Registered after
-    // /articles/feed so the static segment still wins.
-    Route::get('/articles/{slug}', ProjectViewController::class)->name('articles.show');
+    // Articles are Project rows but live under /articles/{slug} so the Articles
+    // nav highlights instead of Projects. ProjectShowPage 301s any project to
+    // its canonical section. Registered after /articles/feed so the static
+    // segment still wins.
+    Route::get('/articles/{slug}', ProjectShowPage::class)->name('articles.show')
+        ->withoutMiddleware(CachePublicPage::class);
 
-    Route::get('/links', LinksController::class)->name('links.index');
+    Route::get('/links', LinksPage::class)->name('links.index')
+        ->withoutMiddleware(CachePublicPage::class);
     // External-link projects (sites, channels, learning resources, awesome
-    // lists) are canonical under /links/{slug}; ProjectViewController 301s any
-    // served under the wrong section. Registered after the static /links route.
-    Route::get('/links/{slug}', ProjectViewController::class)->name('links.show');
+    // lists) are canonical under /links/{slug}; ProjectShowPage 301s any served
+    // under the wrong section. Registered after the static /links route.
+    Route::get('/links/{slug}', ProjectShowPage::class)->name('links.show')
+        ->withoutMiddleware(CachePublicPage::class);
 
-    Route::get('/open-source', OpenSourceController::class)->name('open-source');
+    Route::get('/open-source', OpenSourcePage::class)->name('open-source');
 
-    Route::get('/stack', StackController::class)->name('stack');
+    Route::get('/stack', StackPage::class)->name('stack');
 
-    Route::get('/sponsors', SponsorsController::class)->name('sponsors');
+    Route::get('/sponsors', SponsorsPage::class)->name('sponsors');
 
     Route::get('/locale/{locale}', SwitchLocaleController::class)
         ->whereIn('locale', SetLocale::SUPPORTED)

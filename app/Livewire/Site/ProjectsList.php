@@ -1,28 +1,88 @@
 <?php
 
-namespace App\Http\Controllers\Site;
+namespace App\Livewire\Site;
 
 use App\Enums\ProjectCategory;
 use App\Models\Project;
 use App\Support\SiteStats;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\PostgresConnection;
-use Illuminate\Http\Request;
+use Livewire\Attributes\Url;
+use Livewire\Component;
+use Livewire\WithPagination;
 
-class ProjectController
+/**
+ * The interactive /projects catalogue: code only (packages, plugins, starter
+ * kits, tools) — articles live on /articles and external links on /links. Every
+ * facet is a #[Url] property so the filtered state stays shareable/bookmarkable
+ * and survives back/forward, exactly like the old query-string controller did.
+ */
+class ProjectsList extends Component
 {
-    public function __invoke(Request $request): View
-    {
-        $cat = $request->string('cat')->toString();
-        $sort = $request->string('sort', 'stars')->toString();
-        $role = $request->string('role')->toString();
-        $search = trim($request->string('search')->toString());
-        $language = $request->string('language')->toString();
+    use WithPagination;
 
-        // The /projects catalogue is code only — packages, plugins, starter
-        // kits, tools. Articles live on /articles and external reference links
-        // (sites, YouTube channels, learning resources, awesome lists) on the
-        // /links hub; both carry stars=0 and would only be noise here.
+    #[Url]
+    public string $search = '';
+
+    #[Url]
+    public string $cat = '';
+
+    #[Url]
+    public string $language = '';
+
+    #[Url]
+    public string $sort = 'stars';
+
+    #[Url]
+    public string $role = 'all';
+
+    #[Url]
+    public string $source = 'all';
+
+    #[Url]
+    public string $topic = '';
+
+    public function paginationView(): string
+    {
+        return 'pagination.site-livewire';
+    }
+
+    /** Any facet change (search/cat/language/sort bound via wire:model) resets to page 1. */
+    public function updated(string $property): void
+    {
+        if ($property !== 'page') {
+            $this->resetPage();
+        }
+    }
+
+    public function setRole(string $role): void
+    {
+        $this->role = $role;
+        $this->resetPage();
+    }
+
+    public function setSource(string $source): void
+    {
+        $this->source = $source;
+        $this->resetPage();
+    }
+
+    public function setTopic(string $topic): void
+    {
+        $this->topic = $topic;
+        $this->resetPage();
+    }
+
+    public function clearTopic(): void
+    {
+        $this->topic = '';
+        $this->resetPage();
+    }
+
+    public function render(): View
+    {
+        $search = trim($this->search);
+
         $query = Project::query()
             ->published()
             ->whereIn('category', array_map(
@@ -30,7 +90,7 @@ class ProjectController
                 ProjectCategory::catalogueCases(),
             ));
 
-        $category = ProjectCategory::tryFrom($cat);
+        $category = ProjectCategory::tryFrom($this->cat);
         if ($category && ! $category->isExternalLink() && $category !== ProjectCategory::Article) {
             $query->byCategory($category);
         }
@@ -41,20 +101,19 @@ class ProjectController
         $stats = SiteStats::all();
         $languages = array_column($stats['languages'], 'language');
 
-        $activeLanguage = in_array($language, $languages, true) ? $language : '';
+        $activeLanguage = in_array($this->language, $languages, true) ? $this->language : '';
         if ($activeLanguage !== '') {
             $query->byLanguage($activeLanguage);
         }
 
         // Topic filter is driven by the #topic chips on the cards — a single
         // slug, matched against the JSON topics array.
-        $topic = $request->string('topic')->toString();
-        $activeTopic = preg_match('/^[a-z0-9-]{1,50}$/', $topic) ? $topic : '';
+        $activeTopic = preg_match('/^[a-z0-9-]{1,50}$/', $this->topic) ? $this->topic : '';
         if ($activeTopic !== '') {
             $query->whereJsonContains('topics', $activeTopic);
         }
 
-        $activeRole = in_array($role, ['authored', 'maintainer', 'daily_driver'], true) ? $role : 'all';
+        $activeRole = in_array($this->role, ['authored', 'maintainer', 'daily_driver'], true) ? $this->role : 'all';
         if ($activeRole === 'maintainer') {
             $query->maintained();
         } elseif ($activeRole === 'authored') {
@@ -65,8 +124,7 @@ class ProjectController
 
         // Origin facet — separate Jefferson's own/curated catalogue from the
         // third-party repos imported off the GitHub stars feed.
-        $source = $request->string('source')->toString();
-        $activeSource = in_array($source, ['own', 'starred'], true) ? $source : 'all';
+        $activeSource = in_array($this->source, ['own', 'starred'], true) ? $this->source : 'all';
         if ($activeSource === 'own') {
             $query->own();
         } elseif ($activeSource === 'starred') {
@@ -78,46 +136,30 @@ class ProjectController
             // Postgres LIKE is case-sensitive — use ILIKE there so a search for
             // "filament" matches "Filament". MySQL/SQLite LIKE already folds case.
             $operator = $query->getConnection() instanceof PostgresConnection ? 'ilike' : 'like';
-            $query->where(function ($q) use ($like, $operator) {
+            $query->where(function ($q) use ($like, $operator): void {
                 $q->where('name', $operator, $like)
                     ->orWhere('repo', $operator, $like);
             });
         }
 
-        match ($sort) {
+        match ($this->sort) {
             'downloads' => $query->orderByDesc('downloads'),
             'name' => $query->orderBy('name'),
             default => $query->orderByDesc('stars'),
         };
 
-        $projects = $query->paginate(10)->withQueryString()
-            // Anchor pagination to the catalogue so paging doesn't jump to top.
-            ->fragment('catalogue');
+        $projects = $query->paginate(10);
 
-        $counts = [
-            'total' => $stats['repos'],
-            'catalogue' => $stats['catalogue'],
-            'filament' => $stats['filament'],
-            'laravel' => $stats['laravel'],
-            'starter' => $stats['starter'],
-            'tool' => $stats['tool'],
-            'maintained' => $stats['maintained'],
-            'daily_drivers' => $stats['daily_drivers'],
-        ];
-
-        return view('site.projects.index', [
+        return view('livewire.site.projects-list', [
             'projects' => $projects,
             'activeCat' => ($category && ! $category->isExternalLink() && $category !== ProjectCategory::Article) ? $category->value : 'all',
-            'activeSort' => $sort,
             'activeRole' => $activeRole,
             'activeSource' => $activeSource,
-            'activeSearch' => $search,
             'activeLanguage' => $activeLanguage,
             'activeTopic' => $activeTopic,
             'categories' => ProjectCategory::catalogueCases(),
             'languages' => $languages,
             'popularTopics' => array_slice($stats['topics'], 0, 15),
-            'counts' => $counts,
         ]);
     }
 }

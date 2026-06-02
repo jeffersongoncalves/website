@@ -255,6 +255,9 @@
   .badge-accent  { background: var(--accent-bg-soft); color: var(--accent-text); }
   .badge-success { background: var(--surface-elevated-alt); color: var(--success); }
   .badge-warning { background: var(--surface-elevated-alt); color: var(--warning); }
+  /* Filter chips render as <button> under Livewire — strip the UA border so
+     they match the anchor-styled badges they replaced. */
+  button.badge { border: 0; cursor: pointer; }
 
   /* Field */
   .field-line {

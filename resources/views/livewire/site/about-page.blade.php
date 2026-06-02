@@ -1,7 +1,6 @@
 @php $locale = \App\Support\LocaleSupport::short(); @endphp
 
-<x-site.layouts.app :title="__('site.about.title_1') . ' ' . __('site.about.title_2')" :description="__('site.seo.about')">
-
+<div>
     <section class="section section-first">
         <div class="wrap">
             <x-site.eyebrow num="01" :label="__('site.nav.about')"/>
@@ -128,5 +127,4 @@
             </div>
         </div>
     </section>
-
-</x-site.layouts.app>
+</div>

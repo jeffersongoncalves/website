@@ -6,7 +6,11 @@
 ])
 @php
     $resolvedSeo = $seoData ?? new \RalphJSmit\Laravel\SEO\Support\SEOData(
-        title: $title,
+        // Concatenate the page title with the site name; pages with no title
+        // (e.g. the homepage) fall back to the site name alone. Trailing dots
+        // are a heading flourish (e.g. "Projetos.") — strip them from the SEO
+        // title so it doesn't read "Projetos. — …".
+        title: $title ? rtrim($title, '.').' — '.config('app.name') : config('app.name'),
         description: $description ?: __('site.seo.default_description'),
     );
 
@@ -33,6 +37,7 @@
     <meta name="color-scheme" content="{{ $isDarkInitial ? 'dark' : 'light' }}">
     <x-favicon/>
     {!! seo($resolvedSeo) !!}
+    @livewireStyles
     @vite(['resources/css/site.css', 'resources/js/site.js'])
     @stack('head')
 </head>
@@ -79,5 +84,10 @@
     </div>
 
     @stack('scripts')
+
+    {{-- Manual Livewire bundle (config/livewire.php inject_assets=false): the
+         runtime is shipped via @vite(site.js); this only emits the JSON config
+         (update endpoint, csrf) the bundle reads. No @livewireScripts here. --}}
+    @livewireScriptConfig
 </body>
 </html>

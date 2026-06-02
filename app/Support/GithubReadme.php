@@ -51,7 +51,13 @@ class GithubReadme
             return $disk->get($cache->html_path);
         }
 
-        $result = self::fetchConditional($repo, $ref, $cache->etag);
+        // Only send If-None-Match when the cached file is actually on disk.
+        // Otherwise a 304 (etag still matches) would leave us with no body to
+        // render and no file to fall back on — yielding a permanent null. This
+        // happens whenever the ReadmeCache row survives but its file doesn't
+        // (e.g. a fresh deploy disk with the DB carried over). Forcing a full
+        // 200 in that case re-renders and re-persists the file.
+        $result = self::fetchConditional($repo, $ref, $hasFile ? $cache->etag : null);
 
         // 304 Not Modified — README unchanged, reuse the cached file.
         if ($result['status'] === 304 && $hasFile) {

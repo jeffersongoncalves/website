@@ -1,4 +1,9 @@
-import Alpine from 'alpinejs';
+// Livewire ships Alpine bundled. We import the ESM build and drive Alpine
+// through it (registering data components before Livewire.start()) instead of
+// booting a second standalone Alpine — two Alpine instances on one page break
+// each other. config/livewire.php sets inject_assets=false so the only Livewire
+// runtime on the page is this bundle; the layout emits @livewireScriptConfig.
+import { Livewire, Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm';
 
 window.Alpine = Alpine;
 Alpine.data('terminalTyping', ({ target = '', delay = 600, speed = 60 } = {}) => ({
@@ -360,4 +365,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-Alpine.start();
+// Boots Alpine too — do not call Alpine.start() separately.
+Livewire.start();

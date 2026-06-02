@@ -3,8 +3,7 @@
     $statsJson = collect($osStats)->map(fn ($s) => array_merge($s, ['label' => __('site.' . $s['label_key'])]))->values()->toJson();
 @endphp
 
-<x-site.layouts.app :title="__('site.os.page_title')" :description="__('site.seo.open_source')">
-
+<div>
     <section class="section section-first">
         <div class="wrap">
             <x-site.eyebrow num="01" label="open source"/>
@@ -112,5 +111,4 @@
             </div>
         </div>
     </section>
-
-</x-site.layouts.app>
+</div>

@@ -1,13 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\Site;
+namespace App\Livewire\Site;
 
 use App\Models\Project;
 use Illuminate\Contracts\View\View;
+use Livewire\Component;
 
-class StackController
+/**
+ * Full-page Livewire component for /stack. Static content (no wire actions), so
+ * the route stays in the page cache. The group data and the Packagist→catalogue
+ * slug mapping are unchanged from the old StackController.
+ */
+class StackPage extends Component
 {
-    public function __invoke(): View
+    public function render(): View
     {
         $groups = $this->groups();
 
@@ -43,7 +49,11 @@ class StackController
             }
         }
 
-        return view('site.stack', ['groups' => $groups]);
+        return view('livewire.site.stack-page', ['groups' => $groups])
+            ->layout('components.site.layouts.app', [
+                'title' => __('site.stack.title'),
+                'description' => __('site.seo.stack'),
+            ]);
     }
 
     /**

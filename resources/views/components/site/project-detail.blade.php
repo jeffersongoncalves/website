@@ -119,8 +119,9 @@
     @endif
 @endpush
 
-<x-site.layouts.app :title="$project->name" :breadcrumbs="$breadcrumbs" :seoData="$project">
-
+{{-- Layout is supplied by the Livewire full-page component (ProjectShowPage)
+     via ->layout(..., ['seoData' => $project]); this partial renders only the
+     page body so it isn't double-wrapped. --}}
     <section class="section project-page-section">
         <div class="wrap">
 
@@ -185,7 +186,10 @@
                         <div class="version-selector">
                             <span class="mono-meta">@lang('site.projects.version_label')</span>
                             @foreach($versions as $v)
+                                {{-- wire:click switches the README in place; the href keeps it a
+                                     real, shareable ?v= URL (and a no-JS fallback). --}}
                                 <a href="{{ route($showRoute, ['slug' => $project->slug, 'v' => $v]) }}#top"
+                                   wire:click.prevent="setVersion(@js($v))"
                                    class="chip {{ $activeVersion === $v ? 'chip-active' : '' }}">
                                     {{ $v }}
                                 </a>
@@ -396,5 +400,3 @@
 
         </div>
     </section>
-
-</x-site.layouts.app>

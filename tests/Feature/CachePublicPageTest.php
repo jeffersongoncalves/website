@@ -20,10 +20,12 @@ it('serves a MISS then a HIT for the same public page', function (): void {
 });
 
 it('busts the cache when a project changes', function (): void {
-    $this->get('/projects')->assertHeader('X-Page-Cache', 'MISS');
-    $this->get('/projects')->assertHeader('X-Page-Cache', 'HIT');
+    // /projects is excluded from the page cache (it's a Livewire component), so
+    // assert against /about, which stays cached. A project mutation bumps the
+    // shared page-cache version via ProjectObserver and invalidates every page.
+    $this->get('/about')->assertHeader('X-Page-Cache', 'MISS');
+    $this->get('/about')->assertHeader('X-Page-Cache', 'HIT');
 
-    // Any project mutation bumps the page-cache version via ProjectObserver.
     Project::query()->create([
         'slug' => 'fresh',
         'name' => 'fresh-project',
@@ -32,9 +34,7 @@ it('busts the cache when a project changes', function (): void {
         'published_at' => now(),
     ]);
 
-    $this->get('/projects')
-        ->assertHeader('X-Page-Cache', 'MISS')
-        ->assertSee('fresh-project');
+    $this->get('/about')->assertHeader('X-Page-Cache', 'MISS');
 });
 
 it('busts the cache on a new app version (deploy)', function (): void {

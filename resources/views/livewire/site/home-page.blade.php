@@ -20,8 +20,7 @@
     <x-site.json-ld :data="$personLd"/>
 @endpush
 
-<x-site.layouts.app :title="__('site.home.hero_l1')" :description="__('site.seo.home')">
-
+<div>
     <section class="section section-first" id="hero">
         <div class="wrap">
             <x-site.eyebrow num="01" :label="__('site.nav.about')"/>
@@ -210,5 +209,4 @@
             </div>
         </div>
     </section>
-
-</x-site.layouts.app>
+</div>

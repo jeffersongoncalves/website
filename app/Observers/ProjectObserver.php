@@ -5,9 +5,9 @@ namespace App\Observers;
 use App\Enums\ProjectStatus;
 use App\Http\Middleware\CachePublicPage;
 use App\Jobs\GenerateSitemapJob;
+use App\Jobs\RefreshProjectStatsJob;
 use App\Jobs\SyncProjectMetricsJob;
 use App\Models\Project;
-use App\Support\SiteStats;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;
 
@@ -68,10 +68,13 @@ class ProjectObserver
         CachePublicPage::flush();
 
         // Recompute the local-only columns of the SiteStat singleton so the
-        // admin metrics widget + public landing cards reflect the change
-        // immediately. GitHub-sourced fields stay untouched — those refresh
-        // on the scheduled sync.
-        SiteStats::refreshProjectDerived();
+        // admin metrics widget + public landing cards reflect the change.
+        // GitHub-sourced fields stay untouched — those refresh on the scheduled
+        // sync. Dispatched (not run inline) and debounced via the job's
+        // ShouldBeUniqueUntilProcessing lock + this delay, so a bulk import that
+        // saves hundreds of rows collapses into ~one recompute instead of one
+        // per row on the worker path.
+        RefreshProjectStatsJob::dispatch()->delay(now()->addSeconds(10));
 
         GenerateSitemapJob::dispatch();
     }

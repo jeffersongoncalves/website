@@ -49,19 +49,6 @@
 
     @push('scripts')
         <script>
-            // No-op Alpine stubs for site components inlined into the login preview.
-            // Prevents ReferenceErrors from leaking into the admin console.
-            document.addEventListener('alpine:init', () => {
-                const noop = () => ({ init() {} });
-                window.Alpine.data('stickyHeader',    () => ({ scrolled: false, init() {} }));
-                window.Alpine.data('terminalTyping',  () => ({ typed: '', typingDone: false, init() {} }));
-                window.Alpine.data('countUp',         () => ({ stats: {}, init() {} }));
-                window.Alpine.data('heatmap',         () => ({ cells: [], init() {} }));
-                window.Alpine.data('markdownCopy',    noop);
-            });
-        </script>
-
-        <script>
             (function () {
                 const TYPE_SPEED = 55;
                 const PAUSE_AFTER = 320;

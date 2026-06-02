@@ -823,38 +823,6 @@ html {
     transition: none !important;
 }
 
-/* Login preview · ALWAYS rendered dark (site public has no light variant).
-   Heavy filter darkening + overlay covers light-mode bleed-through. */
-.login-preview-bg {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-    pointer-events: none;
-    user-select: none;
-    -webkit-user-select: none;
-    filter: blur(5px) brightness(0.35) saturate(0.6) contrast(1.1);
-    transform: scale(1.03);
-    transform-origin: 50%;
-    animation: editorial-kenburns 40s ease-in-out infinite;
-    background: #0B0A09;
-    color-scheme: dark;
-}
-
-.login-preview-bg::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(11, 10, 9, 0.45);
-    pointer-events: none;
-}
-
-@keyframes editorial-kenburns {
-    0%   { transform: scale(1.03) translate(0, 0); }
-    50%  { transform: scale(1.06) translate(-0.5%, -0.3%); }
-    100% { transform: scale(1.03) translate(0, 0); }
-}
-
 @keyframes login-caret {
     0%, 49%   { opacity: 1; }
     50%, 100% { opacity: 0; }
@@ -880,18 +848,6 @@ html {
 
 .login-terminal-form {
     opacity: 0;
-}
-
-.login-preview-scrim {
-    position: absolute; inset: 0;
-    background: transparent;
-}
-
-.login-preview-grain {
-    position: absolute; inset: 0;
-    opacity: 0.08;
-    background-image: var(--paper-grain);
-    mix-blend-mode: overlay;
 }
 
 @keyframes login-modal-in {
@@ -1013,18 +969,5 @@ html {
 }
 
 @media (max-width: 640px) {
-    .login-preview-frame { display: none; }
-    .login-preview-bg::after {
-        content: "";
-        position: absolute; inset: 0;
-        background:
-            radial-gradient(at 30% 20%, var(--bg-glow-accent-strong), transparent 50%),
-            radial-gradient(at 70% 80%, var(--bg-glow-moss-strong), transparent 50%),
-            var(--color-ink-950);
-    }
     .login-terminal-body { padding: 20px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .login-preview-frame { animation: none; }
 }

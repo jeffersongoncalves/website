@@ -79,16 +79,6 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(Width::ScreenTwoExtraLarge)
             ->sidebarCollapsibleOnDesktop()
             ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                fn () => view('filament.admin.partials.login-styles'),
-                scopes: [Login::class],
-            )
-            ->renderHook(
-                PanelsRenderHook::BODY_START,
-                fn () => view('filament.admin.partials.login-preview'),
-                scopes: [Login::class],
-            )
-            ->renderHook(
                 PanelsRenderHook::SIDEBAR_FOOTER,
                 fn () => view('filament.partials.sidebar-status'),
             )

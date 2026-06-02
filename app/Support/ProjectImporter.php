@@ -6,6 +6,7 @@ use App\Enums\ProjectLanguage;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -133,7 +134,9 @@ class ProjectImporter
                     'Accept-Language' => 'en-US,en;q=0.9',
                 ])
                 ->get($url);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            self::logFetchFailure('article', $url, $e);
+
             return ['error' => 'fetch_failed'];
         }
 
@@ -318,7 +321,9 @@ class ProjectImporter
                     'Accept-Language' => 'en-US,en;q=0.9',
                 ])
                 ->get($url);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            self::logFetchFailure('youtube', $url, $e);
+
             return ['error' => 'fetch_failed'];
         }
 
@@ -386,6 +391,23 @@ class ProjectImporter
     }
 
     /**
+     * Log an outbound-fetch exception with enough context to tell a timeout /
+     * DNS / TLS failure apart from a clean non-2xx response (those return their
+     * own error codes without throwing). Keeps the swallow-and-degrade
+     * behaviour the callers rely on — this only adds the breadcrumb that was
+     * missing, so a failed import is no longer a silent dead end in the log.
+     */
+    private static function logFetchFailure(string $context, string $target, Throwable $e): void
+    {
+        Log::warning('ProjectImporter outbound fetch failed', [
+            'context' => $context,
+            'target' => $target,
+            'exception' => $e::class,
+            'message' => $e->getMessage(),
+        ]);
+    }
+
+    /**
      * Extract the package identifier (`name` or `@scope/name`) from an
      * npmjs.com/package URL. Returns null for anything else.
      */
@@ -410,7 +432,9 @@ class ProjectImporter
                     'Accept' => 'application/json',
                 ])
                 ->get('https://registry.npmjs.org/'.$package);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            self::logFetchFailure('npm_registry', $package, $e);
+
             return null;
         }
 
@@ -527,7 +551,9 @@ class ProjectImporter
                     'Accept' => 'text/html,application/xhtml+xml',
                 ])
                 ->get($url);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            self::logFetchFailure('website', $url, $e);
+
             return ['error' => 'fetch_failed'];
         }
 
@@ -836,7 +862,9 @@ class ProjectImporter
             $response = Http::timeout(8)
                 ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
                 ->get("https://raw.githubusercontent.com/{$repoSlug}/{$branch}/{$file}");
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            self::logFetchFailure('github_manifest', "{$repoSlug}/{$branch}/{$file}", $e);
+
             return null;
         }
 
@@ -884,7 +912,9 @@ class ProjectImporter
 
         try {
             return Http::timeout(8)->withHeaders($headers)->get($url, $params);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            self::logFetchFailure('github_api', $url, $e);
+
             return null;
         }
     }
@@ -951,7 +981,9 @@ class ProjectImporter
                     'Accept' => 'application/json',
                 ])
                 ->head($url);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            self::logFetchFailure('npm_head', $url, $e);
+
             return false;
         }
 
@@ -990,7 +1022,9 @@ class ProjectImporter
                     'Accept' => 'application/json',
                 ])
                 ->get('https://registry.npmjs.org/'.$name);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            self::logFetchFailure('npm_ownership', $name, $e);
+
             return self::LINK_UNKNOWN;
         }
 
@@ -1171,7 +1205,9 @@ class ProjectImporter
             $response = Http::timeout(6)
                 ->withHeaders(['User-Agent' => 'jeffersongoncalves-site'])
                 ->head("https://raw.githubusercontent.com/{$repoSlug}/{$branch}/{$file}");
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            self::logFetchFailure('github_file_head', "{$repoSlug}/{$branch}/{$file}", $e);
+
             return false;
         }
 
@@ -1321,7 +1357,9 @@ class ProjectImporter
                     'Accept' => 'application/json',
                 ])
                 ->get("https://packagist.org/packages/{$name}.json");
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            self::logFetchFailure('packagist_ownership', $name, $e);
+
             return self::LINK_UNKNOWN;
         }
 

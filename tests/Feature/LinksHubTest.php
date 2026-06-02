@@ -87,6 +87,45 @@ it('301s a code project served under /links back to /projects', function () {
         ->assertRedirect(route('projects.show', ['slug' => 'a-real-tool']));
 });
 
+it('searches within a single section without touching the others', function () {
+    externalLink('alpha-site', ProjectCategory::Website);
+    externalLink('beta-site', ProjectCategory::Website);
+    externalLink('alpha-channel', ProjectCategory::YoutubeChannel, [
+        'docs_url' => 'https://www.youtube.com/@alpha-channel',
+    ]);
+
+    $this->get('/links?q_sites=alpha')
+        ->assertOk()
+        ->assertSee('alpha-site')
+        ->assertDontSee('beta-site')
+        // The YouTube section is untouched by the Sites search.
+        ->assertSee('alpha-channel');
+});
+
+it('sorts a section by name descending', function () {
+    externalLink('aaa-site', ProjectCategory::Website);
+    externalLink('zzz-site', ProjectCategory::Website);
+
+    $html = $this->get('/links?sort_sites=desc')->getContent();
+
+    expect(strpos($html, 'zzz-site'))->toBeLessThan(strpos($html, 'aaa-site'));
+});
+
+it('filters a section by topic and points card topic links into /links', function () {
+    externalLink('topic-site', ProjectCategory::Website, ['topics' => ['design']]);
+    externalLink('plain-site', ProjectCategory::Website);
+
+    // The card's topic chip links into the Sites section, not /projects.
+    $this->get('/links')
+        ->assertOk()
+        ->assertSee('topic_sites=design', false);
+
+    $this->get('/links?topic_sites=design')
+        ->assertOk()
+        ->assertSee('topic-site')
+        ->assertDontSee('plain-site');
+});
+
 it('paginates each link group independently', function () {
     for ($i = 1; $i <= 8; $i++) {
         externalLink(sprintf('site-%02d', $i), ProjectCategory::Website);

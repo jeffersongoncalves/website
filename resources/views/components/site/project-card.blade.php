@@ -60,9 +60,22 @@
     @endif
 
     @if(!empty($project->topics))
+        @php
+            // External-link cards live on /links — point their topic chips at
+            // that project's section there (?topic_<anchor>=…#<anchor>) instead
+            // of /projects, which excludes external links entirely.
+            $topicAnchor = $project->category->isExternalLink()
+                ? ($project->category->linksSection() ?? $project->category->value)
+                : null;
+        @endphp
         <div class="flex flex-wrap gap-x-3 gap-y-1 mt-3 mono-meta-sm text-ink-400">
             @foreach(array_slice($project->topics, 0, 4) as $topic)
-                <a href="{{ route('projects.index', ['topic' => $topic]) }}" class="hover:text-ink-200">#{{ $topic }}</a>
+                @php
+                    $topicHref = $topicAnchor !== null
+                        ? route('links.index', ['topic_'.$topicAnchor => $topic]).'#'.$topicAnchor
+                        : route('projects.index', ['topic' => $topic]);
+                @endphp
+                <a href="{{ $topicHref }}" class="hover:text-ink-200">#{{ $topic }}</a>
             @endforeach
         </div>
     @endif

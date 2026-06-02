@@ -366,8 +366,18 @@
                             <div class="project-detail-row project-detail-row-stack">
                                 <span class="project-detail-label">@lang('site.projects.label_topics')</span>
                                 <div class="project-detail-stack">
+                                    @php
+                                        $topicAnchor = $isExternalLink
+                                            ? ($project->category->linksSection() ?? $project->category->value)
+                                            : null;
+                                    @endphp
                                     @foreach($project->topics as $topic)
-                                        <a href="{{ route('projects.index', ['topic' => $topic]) }}" class="badge">#{{ $topic }}</a>
+                                        @php
+                                            $topicHref = $topicAnchor !== null
+                                                ? route('links.index', ['topic_'.$topicAnchor => $topic]).'#'.$topicAnchor
+                                                : route('projects.index', ['topic' => $topic]);
+                                        @endphp
+                                        <a href="{{ $topicHref }}" class="badge">#{{ $topic }}</a>
                                     @endforeach
                                 </div>
                             </div>

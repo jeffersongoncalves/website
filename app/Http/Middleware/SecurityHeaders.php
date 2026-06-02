@@ -13,7 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * The CSP is deliberately permissive on script/style: Alpine.js evaluates
  * expressions via `new Function` (needs 'unsafe-eval') and the page ships
- * inline handlers + Google Tag Manager / gtag. The value is in the structural
+ * inline handlers + Google Tag Manager / gtag + Cloudflare Web Analytics
+ * (edge-injected beacon.min.js). The value is in the structural
  * directives — frame-ancestors (clickjacking), object-src none, base-uri and
  * form-action lock-down, and upgrade-insecure-requests.
  */
@@ -42,11 +43,11 @@ class SecurityHeaders
     {
         return implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com",
             "style-src 'self' 'unsafe-inline'",
             "img-src 'self' data: https:",
             "font-src 'self' data:",
-            "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
+            "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://cloudflareinsights.com",
             "frame-src 'self' https://www.googletagmanager.com",
             "frame-ancestors 'self'",
             "base-uri 'self'",

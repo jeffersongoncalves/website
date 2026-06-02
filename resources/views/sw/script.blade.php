@@ -96,13 +96,20 @@ async function cacheFirst(request) {
         return cached;
     }
 
-    const fresh = await fetch(request);
+    try {
+        const fresh = await fetch(request);
 
-    if (fresh && fresh.ok) {
-        cache.put(request, fresh.clone());
+        if (fresh && fresh.ok) {
+            cache.put(request, fresh.clone());
+        }
+
+        return fresh;
+    } catch (error) {
+        // Offline with nothing cached for an immutable asset. Resolve to a
+        // synthetic error Response rather than rejecting — a rejected
+        // respondWith() surfaces as "Failed to convert value to 'Response'".
+        return Response.error();
     }
-
-    return fresh;
 }
 
 async function networkFirst(request) {
@@ -147,7 +154,10 @@ async function staleWhileRevalidate(request) {
             }
             return response;
         })
-        .catch(() => cached);
+        .catch(() => null);
 
-    return cached || fetchPromise;
+    // Always resolve to a Response: cached hit, then the network result, then
+    // a synthetic error Response. Returning `undefined` from respondWith()
+    // throws "Failed to convert value to 'Response'" and breaks the fetch.
+    return cached || (await fetchPromise) || Response.error();
 }

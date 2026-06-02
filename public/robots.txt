@@ -1,4 +1,7 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin
+Disallow: /app
+Disallow: /horizon
 
 Sitemap: https://jeffersongoncalves.dev.br/sitemap.xml

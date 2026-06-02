@@ -14,6 +14,7 @@ use App\Http\Controllers\Site\SponsorsController;
 use App\Http\Controllers\Site\StackController;
 use App\Http\Controllers\Site\SwitchLocaleController;
 use App\Http\Middleware\CachePublicPage;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
@@ -28,7 +29,7 @@ Route::get('/offline', OfflineController::class)->name('pwa.offline');
 // response and the image is locale-independent.
 Route::get('/og/{slug}.png', OgImageController::class)->name('og.show');
 
-Route::middleware(['set.locale', CachePublicPage::class])->group(function () {
+Route::middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class])->group(function () {
     Route::get('/', HomeController::class)->name('home');
     Route::get('/about', AboutController::class)->name('about');
 

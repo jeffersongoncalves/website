@@ -29,6 +29,15 @@ it('renders about page', function () {
     $this->get('/about')->assertOk();
 });
 
+it('sends security headers on public pages', function () {
+    $this->get('/about')
+        ->assertOk()
+        ->assertHeader('X-Content-Type-Options', 'nosniff')
+        ->assertHeader('X-Frame-Options', 'SAMEORIGIN')
+        ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+        ->assertHeader('Content-Security-Policy');
+});
+
 it('renders the stack page with masked major versions', function () {
     $this->get('/stack')
         ->assertOk()

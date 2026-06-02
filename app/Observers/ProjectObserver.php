@@ -6,7 +6,6 @@ use App\Enums\ProjectStatus;
 use App\Http\Middleware\CachePublicPage;
 use App\Jobs\GenerateSitemapJob;
 use App\Jobs\SyncProjectMetricsJob;
-use App\Jobs\TranslateProjectTitleJob;
 use App\Models\Project;
 use App\Support\SiteStats;
 use Illuminate\Support\Facades\Cache;
@@ -25,7 +24,6 @@ class ProjectObserver
     public function created(Project $project): void
     {
         SyncProjectMetricsJob::dispatch($project);
-        TranslateProjectTitleJob::dispatch($project);
 
         $this->flush();
     }
@@ -38,10 +36,6 @@ class ProjectObserver
         // from the job itself are excluded so we don't bounce-loop.
         if ($project->wasChanged(['repo', 'github_url', 'packagist_url', 'npm_url', 'docs_url', 'versions'])) {
             SyncProjectMetricsJob::dispatch($project);
-        }
-
-        if ($project->wasChanged('title')) {
-            TranslateProjectTitleJob::dispatch($project);
         }
 
         $this->flush();

@@ -230,24 +230,6 @@ return [
             'timeout' => 1800,
             'nice' => 0,
         ],
-
-        // Dedicated supervisor for Anthropic translation jobs. Single
-        // process so the in-job Redis::throttle keeps a meaningful cap;
-        // multi-process would burst the Anthropic API and risk per-key
-        // rate-limit errors.
-        'supervisor-translations' => [
-            'connection' => 'redis',
-            'queue' => ['translations'],
-            'balance' => 'simple',
-            'autoScalingStrategy' => 'time',
-            'maxProcesses' => 1,
-            'maxTime' => 0,
-            'maxJobs' => 0,
-            'memory' => 128,
-            'tries' => 3,
-            'timeout' => 120,
-            'nice' => 0,
-        ],
     ],
 
     'environments' => [
@@ -263,12 +245,6 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
-
-            'supervisor-translations' => [
-                'maxProcesses' => 1,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
-            ],
         ],
 
         'local' => [
@@ -277,10 +253,6 @@ return [
             ],
 
             'supervisor-github' => [
-                'maxProcesses' => 1,
-            ],
-
-            'supervisor-translations' => [
                 'maxProcesses' => 1,
             ],
         ],

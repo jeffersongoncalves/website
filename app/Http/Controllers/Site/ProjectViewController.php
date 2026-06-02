@@ -30,7 +30,7 @@ class ProjectViewController
         // everything else → /projects/{slug}. A request under the wrong section
         // 301s to the right one so the nav highlights correctly and old
         // /projects/{article-slug} links keep resolving.
-        if ($this->canonicalRouteName($project) !== $request->route()?->getName()) {
+        if ($project->canonicalRouteName() !== $request->route()?->getName()) {
             return $this->redirectToCanonical($project, $request);
         }
 
@@ -101,23 +101,12 @@ class ProjectViewController
      */
     private function redirectToCanonical(Project $project, Request $request): RedirectResponse
     {
-        $url = route($this->canonicalRouteName($project), ['slug' => $project->slug]);
+        $url = route($project->canonicalRouteName(), ['slug' => $project->slug]);
 
         if (($query = $request->getQueryString()) !== null && $query !== '') {
             $url .= '?'.$query;
         }
 
         return redirect($url, 301);
-    }
-
-    /**
-     * Articles render under /articles/{slug}; every other category under
-     * /projects/{slug}.
-     */
-    private function canonicalRouteName(Project $project): string
-    {
-        return $project->category === ProjectCategory::Article
-            ? 'articles.show'
-            : 'projects.show';
     }
 }

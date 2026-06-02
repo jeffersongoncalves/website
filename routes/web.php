@@ -4,6 +4,7 @@ use App\Http\Controllers\Site\AboutController;
 use App\Http\Controllers\Site\ArticlesController;
 use App\Http\Controllers\Site\ArticlesFeedController;
 use App\Http\Controllers\Site\HomeController;
+use App\Http\Controllers\Site\LinksController;
 use App\Http\Controllers\Site\OfflineController;
 use App\Http\Controllers\Site\OgImageController;
 use App\Http\Controllers\Site\OpenSourceController;
@@ -43,6 +44,12 @@ Route::middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class]
     // controller 301s any project to its canonical section. Registered after
     // /articles/feed so the static segment still wins.
     Route::get('/articles/{slug}', ProjectViewController::class)->name('articles.show');
+
+    Route::get('/links', LinksController::class)->name('links.index');
+    // External-link projects (sites, channels, learning resources, awesome
+    // lists) are canonical under /links/{slug}; ProjectViewController 301s any
+    // served under the wrong section. Registered after the static /links route.
+    Route::get('/links/{slug}', ProjectViewController::class)->name('links.show');
 
     Route::get('/open-source', OpenSourceController::class)->name('open-source');
 

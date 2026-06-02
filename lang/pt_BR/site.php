@@ -9,6 +9,7 @@ return [
         'open_source' => '20+ plugins Filament, 15 pacotes Laravel, 7 starter kits. Contribuições open source em números — estrelas, downloads e seguidores.',
         'sponsors' => 'Patrocine o trabalho — financie novos releases, documentação em português e suporte para a comunidade Laravel e Filament brasileira.',
         'stack' => 'A stack por trás deste site — Laravel, Filament, Livewire, Tailwind e a infraestrutura que mantém tudo no ar.',
+        'links' => 'Links selecionados — sites, canais do YouTube, recursos de aprendizado e listas que vale a pena acompanhar.',
     ],
 
     'stack' => [
@@ -38,6 +39,7 @@ return [
         'about' => 'Sobre',
         'projects' => 'Projetos',
         'articles' => 'Artigos',
+        'links' => 'Links',
         'open_source' => 'Open Source',
         'stack' => 'Tecnologias',
         'sponsors' => 'Sponsors',
@@ -122,6 +124,9 @@ return [
         'title' => 'Projetos.',
         'sub' => 'Plugins Filament, pacotes Laravel e starter kits open source mantidos ativamente. Tudo MIT, com releases para v3, v4 e v5 quando aplicável.',
         'category_all' => 'Todos',
+        'family_php_laravel' => 'PHP & Laravel',
+        'family_js_css' => 'JavaScript & CSS',
+        'family_apps_tools' => 'Apps & Ferramentas',
         'category_filament' => 'Filament Plugins',
         'category_laravel' => 'Laravel Packages',
         'category_starter' => 'Starter Kits',
@@ -189,6 +194,17 @@ return [
         'feed_link' => 'Feed RSS',
         'empty' => 'Nenhum artigo ainda.',
         'back_to_list' => '← Voltar para artigos',
+    ],
+
+    'links' => [
+        'title' => 'Links.',
+        'sub' => 'Sites, canais do YouTube, recursos de aprendizado e listas que vale a pena acompanhar — selecionados, fora do catálogo de código.',
+        'eyebrow' => 'links',
+        'section_website' => 'Sites',
+        'section_youtube_channel' => 'YouTube',
+        'section_learning_resource' => 'Aprendizado',
+        'section_awesome_list' => 'Listas',
+        'back_to_list' => '← Voltar para links',
     ],
 
     'about' => [

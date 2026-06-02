@@ -299,6 +299,12 @@ it('renders open-source page', function () {
     $this->get('/open-source')->assertOk();
 });
 
+it('renders the links hub with the nav link present', function () {
+    $this->get('/links')
+        ->assertOk()
+        ->assertSee(__('site.nav.links'));
+});
+
 it('renders sponsors page', function () {
     $this->get('/sponsors')->assertOk();
 });

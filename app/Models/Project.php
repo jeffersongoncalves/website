@@ -229,16 +229,26 @@ class Project extends Model
     }
 
     /**
-     * The canonical public URL for this project: articles live under
-     * /articles/{slug}, every other category under /projects/{slug}. Mirrors
-     * the canonical-section routing in ProjectViewController.
+     * The route name for this project's canonical public section: articles →
+     * articles.show, external links (sites, channels, learning resources,
+     * awesome lists) → links.show, code projects → projects.show. Single source
+     * of truth for the card, sitemap and ProjectViewController's 301.
+     */
+    public function canonicalRouteName(): string
+    {
+        return match (true) {
+            $this->category === ProjectCategory::Article => 'articles.show',
+            $this->category->isExternalLink() => 'links.show',
+            default => 'projects.show',
+        };
+    }
+
+    /**
+     * The canonical public URL for this project, in its proper section.
      */
     public function publicUrl(): string
     {
-        return route(
-            $this->category === ProjectCategory::Article ? 'articles.show' : 'projects.show',
-            ['slug' => $this->slug],
-        );
+        return route($this->canonicalRouteName(), ['slug' => $this->slug]);
     }
 
     /**

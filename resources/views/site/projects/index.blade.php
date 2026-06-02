@@ -58,12 +58,22 @@
 
                     <label class="projects-filter">
                         <span class="projects-filter-label">@lang('site.projects.filter_category')</span>
+                        @php
+                            // Collapse the ~17 catalogue categories into their
+                            // ProjectFamily <optgroup>s; cases() order keeps the
+                            // families in a stable, curated sequence.
+                            $catsByFamily = collect($categories)->groupBy(fn (\App\Enums\ProjectCategory $c) => $c->family()->value);
+                        @endphp
                         <select name="cat" class="projects-filter-select" onchange="this.form.submit()">
                             <option value="">@lang('site.projects.category_all')</option>
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat->value }}" @selected($activeCat === $cat->value)>
-                                    {{ $cat->getLabel() }}
-                                </option>
+                            @foreach($catsByFamily as $familyValue => $cats)
+                                <optgroup label="{{ \App\Enums\ProjectFamily::from($familyValue)->getLabel() }}">
+                                    @foreach($cats as $cat)
+                                        <option value="{{ $cat->value }}" @selected($activeCat === $cat->value)>
+                                            {{ $cat->getLabel() }}
+                                        </option>
+                                    @endforeach
+                                </optgroup>
                             @endforeach
                         </select>
                     </label>

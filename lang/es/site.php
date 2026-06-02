@@ -9,6 +9,7 @@ return [
         'open_source' => 'Más de 20 plugins Filament, 15 paquetes Laravel, 7 starter kits. Contribuciones open source en números — estrellas, descargas y seguidores.',
         'sponsors' => 'Patrocina el trabajo — financia nuevos releases, documentación en portugués y soporte para la comunidad Laravel y Filament brasileña.',
         'stack' => 'El stack detrás de este sitio — Laravel, Filament, Livewire, Tailwind y la infraestructura que lo mantiene online.',
+        'links' => 'Links seleccionados — sitios, canales de YouTube, recursos de aprendizaje y listas que vale la pena seguir.',
     ],
 
     'stack' => [
@@ -38,6 +39,7 @@ return [
         'about' => 'Acerca',
         'projects' => 'Proyectos',
         'articles' => 'Artículos',
+        'links' => 'Links',
         'open_source' => 'Open Source',
         'stack' => 'Tecnologías',
         'sponsors' => 'Sponsors',
@@ -122,6 +124,9 @@ return [
         'title' => 'Proyectos.',
         'sub' => 'Plugins Filament, paquetes Laravel y starter kits open source mantenidos activamente. Todo MIT, con releases para v3, v4 y v5 cuando aplique.',
         'category_all' => 'Todos',
+        'family_php_laravel' => 'PHP & Laravel',
+        'family_js_css' => 'JavaScript & CSS',
+        'family_apps_tools' => 'Apps & Herramientas',
         'category_filament' => 'Filament Plugins',
         'category_laravel' => 'Laravel Packages',
         'category_starter' => 'Starter Kits',
@@ -189,6 +194,17 @@ return [
         'feed_link' => 'Feed RSS',
         'empty' => 'Aún no hay artículos.',
         'back_to_list' => '← Volver a artículos',
+    ],
+
+    'links' => [
+        'title' => 'Links.',
+        'sub' => 'Sitios, canales de YouTube, recursos de aprendizaje y listas que vale la pena seguir — seleccionados, fuera del catálogo de código.',
+        'eyebrow' => 'links',
+        'section_website' => 'Sitios',
+        'section_youtube_channel' => 'YouTube',
+        'section_learning_resource' => 'Aprendizaje',
+        'section_awesome_list' => 'Listas',
+        'back_to_list' => '← Volver a links',
     ],
 
     'about' => [

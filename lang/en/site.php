@@ -9,6 +9,7 @@ return [
         'open_source' => '20+ Filament plugins, 15 Laravel packages, 7 starter kits. Open source contributions by the numbers — stars, downloads and followers.',
         'sponsors' => 'Sponsor the work — fund new releases, Portuguese documentation and support for the Brazilian Laravel and Filament community.',
         'stack' => 'The stack behind this site — Laravel, Filament, Livewire, Tailwind and the infrastructure keeping it online.',
+        'links' => 'Curated links — sites, YouTube channels, learning resources and awesome lists worth following.',
     ],
 
     'stack' => [
@@ -38,6 +39,7 @@ return [
         'about' => 'About',
         'projects' => 'Projects',
         'articles' => 'Articles',
+        'links' => 'Links',
         'open_source' => 'Open Source',
         'stack' => 'Tech',
         'sponsors' => 'Sponsors',
@@ -122,6 +124,9 @@ return [
         'title' => 'Projects.',
         'sub' => 'Filament plugins, Laravel packages and open source starter kits actively maintained. All MIT, with releases for v3, v4 and v5 where applicable.',
         'category_all' => 'All',
+        'family_php_laravel' => 'PHP & Laravel',
+        'family_js_css' => 'JavaScript & CSS',
+        'family_apps_tools' => 'Apps & Tools',
         'category_filament' => 'Filament Plugins',
         'category_laravel' => 'Laravel Packages',
         'category_starter' => 'Starter Kits',
@@ -189,6 +194,17 @@ return [
         'feed_link' => 'RSS feed',
         'empty' => 'No articles yet.',
         'back_to_list' => '← Back to articles',
+    ],
+
+    'links' => [
+        'title' => 'Links.',
+        'sub' => 'Sites, YouTube channels, learning resources and lists worth following — curated, outside the code catalogue.',
+        'eyebrow' => 'links',
+        'section_website' => 'Sites',
+        'section_youtube_channel' => 'YouTube',
+        'section_learning_resource' => 'Learning',
+        'section_awesome_list' => 'Awesome lists',
+        'back_to_list' => '← Back to links',
     ],
 
     'about' => [

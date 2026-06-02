@@ -19,14 +19,19 @@ class ProjectController
         $search = trim($request->string('search')->toString());
         $language = $request->string('language')->toString();
 
-        // Articles live on their own /articles landing — keep them out of the
-        // code-project catalogue (they have stars=0 and would just be noise).
+        // The /projects catalogue is code only — packages, plugins, starter
+        // kits, tools. Articles live on /articles and external reference links
+        // (sites, YouTube channels, learning resources, awesome lists) on the
+        // /links hub; both carry stars=0 and would only be noise here.
         $query = Project::query()
             ->published()
-            ->where('category', '!=', ProjectCategory::Article->value);
+            ->whereIn('category', array_map(
+                fn (ProjectCategory $c): string => $c->value,
+                ProjectCategory::catalogueCases(),
+            ));
 
         $category = ProjectCategory::tryFrom($cat);
-        if ($category && $category !== ProjectCategory::Article) {
+        if ($category && ! $category->isExternalLink() && $category !== ProjectCategory::Article) {
             $query->byCategory($category);
         }
 
@@ -100,17 +105,14 @@ class ProjectController
 
         return view('site.projects.index', [
             'projects' => $projects,
-            'activeCat' => ($category && $category !== ProjectCategory::Article) ? $category->value : 'all',
+            'activeCat' => ($category && ! $category->isExternalLink() && $category !== ProjectCategory::Article) ? $category->value : 'all',
             'activeSort' => $sort,
             'activeRole' => $activeRole,
             'activeSource' => $activeSource,
             'activeSearch' => $search,
             'activeLanguage' => $activeLanguage,
             'activeTopic' => $activeTopic,
-            'categories' => array_filter(
-                ProjectCategory::cases(),
-                fn (ProjectCategory $c): bool => $c !== ProjectCategory::Article,
-            ),
+            'categories' => ProjectCategory::catalogueCases(),
             'languages' => $languages,
             'popularTopics' => array_slice($stats['topics'], 0, 15),
             'counts' => $counts,

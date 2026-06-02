@@ -58,6 +58,80 @@ enum ProjectCategory: string implements HasColor, HasLabel
         };
     }
 
+    /**
+     * External reference links — sites, YouTube channels, learning resources
+     * and awesome lists. These carry no stars/downloads and live on the /links
+     * hub, NOT in the code catalogue at /projects.
+     *
+     * @return list<self>
+     */
+    public static function externalLinkCases(): array
+    {
+        return [
+            self::Website,
+            self::YoutubeChannel,
+            self::LearningResource,
+            self::AwesomeList,
+        ];
+    }
+
+    /**
+     * The code catalogue (/projects) — every category that is neither an
+     * external reference link nor an article.
+     *
+     * @return list<self>
+     */
+    public static function catalogueCases(): array
+    {
+        return array_values(array_filter(
+            self::cases(),
+            fn (self $c): bool => $c !== self::Article && ! $c->isExternalLink(),
+        ));
+    }
+
+    public function isExternalLink(): bool
+    {
+        return in_array($this, self::externalLinkCases(), true);
+    }
+
+    /**
+     * The /links hub section anchor (and per-section paginator page name) for
+     * an external-link category — used to scroll back to the right section
+     * when returning from a detail page. Null for non-external categories.
+     */
+    public function linksSection(): ?string
+    {
+        return match ($this) {
+            self::Website => 'sites',
+            self::YoutubeChannel => 'watch',
+            self::LearningResource => 'learn',
+            self::AwesomeList => 'lists',
+            default => null,
+        };
+    }
+
+    /**
+     * Coarse grouping for the /projects category filter. External links and
+     * articles have no catalogue family.
+     */
+    public function family(): ?ProjectFamily
+    {
+        return match ($this) {
+            self::FilamentPlugin, self::LaravelPackage, self::LivewirePackage,
+            self::CakePhpPackage, self::LaravelZeroCli, self::PhpPackage,
+            self::IdePlugin => ProjectFamily::PhpLaravel,
+
+            self::JavascriptPackage, self::CssFramework, self::Framework,
+            self::MobileLibrary => ProjectFamily::JsCss,
+
+            self::StarterKit, self::Saas, self::Tool, self::Application,
+            self::Docker, self::Database => ProjectFamily::AppsTools,
+
+            self::Website, self::YoutubeChannel, self::LearningResource,
+            self::AwesomeList, self::Article => null,
+        };
+    }
+
     public function getColor(): string
     {
         return match ($this) {

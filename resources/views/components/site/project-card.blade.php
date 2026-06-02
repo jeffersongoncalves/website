@@ -10,8 +10,9 @@
         \App\Enums\ProjectCategory::YoutubeChannel,
         \App\Enums\ProjectCategory::Article,
     ], true);
-    // Articles live under /articles/{slug}; everything else under /projects/{slug}.
-    $showRoute = $project->category === \App\Enums\ProjectCategory::Article ? 'articles.show' : 'projects.show';
+    // Canonical section route: articles → /articles, external links → /links,
+    // code → /projects (centralised on the model).
+    $showRoute = $project->canonicalRouteName();
 @endphp
 
 <article class="card project-card">
@@ -81,7 +82,18 @@
                             $extLabel = parse_url($project->docs_url, PHP_URL_HOST) ?: $project->docs_url;
                         }
                     @endphp
-                    <span class="mono-meta-sm"><span aria-hidden="true">↗</span> {{ $extLabel }}</span>
+                    <span class="mono-meta-sm inline-flex items-center gap-1.5">
+                        @if($project->category === \App\Enums\ProjectCategory::Website && ($faviconHost = parse_url((string) $project->docs_url, PHP_URL_HOST)))
+                            {{-- Favicon thumb via Google's S2 service (CSP img-src allows https:).
+                                 Decorative — the host text beside it carries the meaning. --}}
+                            <img src="https://www.google.com/s2/favicons?domain={{ $faviconHost }}&sz=64"
+                                 alt="" width="14" height="14" loading="lazy"
+                                 class="rounded-[2px] shrink-0">
+                        @else
+                            <span aria-hidden="true">↗</span>
+                        @endif
+                        {{ $extLabel }}
+                    </span>
                 @endif
             @elseif(! $project->is_paid)
                 <span aria-label="{{ $project->stars }} @lang('site.projects.label_stars')"><span aria-hidden="true">★</span> {{ $project->stars }}</span>

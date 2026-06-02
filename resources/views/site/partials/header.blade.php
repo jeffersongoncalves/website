@@ -18,6 +18,7 @@
             <a href="{{ route('about') }}" @class(['nav-link', 'is-active' => $active('about')]) @if($active('about')) aria-current="page" @endif>@lang('site.nav.about')</a>
             <a href="{{ route('projects.index') }}" @class(['nav-link', 'is-active' => $active('projects.*')]) @if($active('projects.*')) aria-current="page" @endif>@lang('site.nav.projects')</a>
             <a href="{{ route('articles.index') }}" @class(['nav-link', 'is-active' => $active('articles.*')]) @if($active('articles.*')) aria-current="page" @endif>@lang('site.nav.articles')</a>
+            <a href="{{ route('links.index') }}" @class(['nav-link', 'is-active' => $active('links.*')]) @if($active('links.*')) aria-current="page" @endif>@lang('site.nav.links')</a>
             <a href="{{ route('open-source') }}" @class(['nav-link', 'is-active' => $active('open-source')]) @if($active('open-source')) aria-current="page" @endif>@lang('site.nav.open_source')</a>
             <a href="{{ route('stack') }}" @class(['nav-link', 'is-active' => $active('stack')]) @if($active('stack')) aria-current="page" @endif>@lang('site.nav.stack')</a>
             <a href="{{ route('sponsors') }}" @class(['nav-link', 'is-active' => $active('sponsors')]) @if($active('sponsors')) aria-current="page" @endif>@lang('site.nav.sponsors')</a>
@@ -196,6 +197,7 @@
                     <a href="{{ route('about') }}" @class(['mobile-nav-link', 'is-active' => $active('about')]) @if($active('about')) aria-current="page" @endif>@lang('site.nav.about')</a>
                     <a href="{{ route('projects.index') }}" @class(['mobile-nav-link', 'is-active' => $active('projects.*')]) @if($active('projects.*')) aria-current="page" @endif>@lang('site.nav.projects')</a>
                     <a href="{{ route('articles.index') }}" @class(['mobile-nav-link', 'is-active' => $active('articles.*')]) @if($active('articles.*')) aria-current="page" @endif>@lang('site.nav.articles')</a>
+                    <a href="{{ route('links.index') }}" @class(['mobile-nav-link', 'is-active' => $active('links.*')]) @if($active('links.*')) aria-current="page" @endif>@lang('site.nav.links')</a>
                     <a href="{{ route('open-source') }}" @class(['mobile-nav-link', 'is-active' => $active('open-source')]) @if($active('open-source')) aria-current="page" @endif>@lang('site.nav.open_source')</a>
                     <a href="{{ route('stack') }}" @class(['mobile-nav-link', 'is-active' => $active('stack')]) @if($active('stack')) aria-current="page" @endif>@lang('site.nav.stack')</a>
                     <a href="{{ route('sponsors') }}" @class(['mobile-nav-link', 'is-active' => $active('sponsors')]) @if($active('sponsors')) aria-current="page" @endif>@lang('site.nav.sponsors')</a>

@@ -29,11 +29,11 @@
 
     <div class="divider"></div>
 
-    <section class="section">
+    <section class="section" id="catalogue" style="scroll-margin-top: 6rem;">
         <div class="wrap">
             <x-site.eyebrow num="02" :label="__('site.projects.eyebrow_catalogue')"/>
 
-            <form method="GET" action="{{ route('projects.index') }}" class="projects-filters">
+            <form method="GET" action="{{ route('projects.index').'#catalogue' }}" class="projects-filters">
                 @if($activeTopic !== '')
                     <input type="hidden" name="topic" value="{{ $activeTopic }}">
                 @endif
@@ -122,17 +122,17 @@
             @endphp
             <div class="flex flex-wrap items-center gap-2 mt-6 mono-meta-sm">
                 <span class="text-ink-400">@lang('site.projects.filter_role'):</span>
-                <a href="{{ route('projects.index', $roleBase) }}" class="badge {{ $activeRole === 'all' ? 'badge-accent' : '' }}">@lang('site.projects.role_all')</a>
+                <a href="{{ route('projects.index', $roleBase).'#catalogue' }}" class="badge {{ $activeRole === 'all' ? 'badge-accent' : '' }}">@lang('site.projects.role_all')</a>
                 @foreach($roleOpts as $val => $label)
-                    <a href="{{ route('projects.index', array_merge($roleBase, ['role' => $val])) }}"
+                    <a href="{{ route('projects.index', array_merge($roleBase, ['role' => $val])).'#catalogue' }}"
                        class="badge {{ $activeRole === $val ? 'badge-accent' : '' }}">{{ $label }}</a>
                 @endforeach
             </div>
             <div class="flex flex-wrap items-center gap-2 mt-3 mb-2 mono-meta-sm">
                 <span class="text-ink-400">@lang('site.projects.filter_source'):</span>
-                <a href="{{ route('projects.index', $sourceBase) }}" class="badge {{ $activeSource === 'all' ? 'badge-accent' : '' }}">@lang('site.projects.source_all')</a>
+                <a href="{{ route('projects.index', $sourceBase).'#catalogue' }}" class="badge {{ $activeSource === 'all' ? 'badge-accent' : '' }}">@lang('site.projects.source_all')</a>
                 @foreach($sourceOpts as $val => $label)
-                    <a href="{{ route('projects.index', array_merge($sourceBase, ['source' => $val])) }}"
+                    <a href="{{ route('projects.index', array_merge($sourceBase, ['source' => $val])).'#catalogue' }}"
                        class="badge {{ $activeSource === $val ? 'badge-accent' : '' }}">{{ $label }}</a>
                 @endforeach
             </div>
@@ -141,7 +141,7 @@
                 <div class="flex flex-wrap items-center gap-2 mt-6 mb-6 mono-meta-sm">
                     <span class="text-ink-400">@lang('site.projects.popular_topics'):</span>
                     @foreach($popularTopics as $t)
-                        <a href="{{ route('projects.index', ['topic' => $t['topic']]) }}"
+                        <a href="{{ route('projects.index', ['topic' => $t['topic']]).'#catalogue' }}"
                            class="badge {{ $activeTopic === $t['topic'] ? 'badge-accent' : '' }}">#{{ $t['topic'] }}</a>
                     @endforeach
                 </div>
@@ -151,7 +151,7 @@
                 <div class="mt-6 mb-8 mono-meta-sm">
                     <span class="text-ink-400">@lang('site.projects.filtering_by_topic'):</span>
                     <span class="badge badge-accent ml-2">#{{ $activeTopic }}</span>
-                    <a href="{{ route('projects.index', request()->except(['topic', 'page'])) }}" class="ml-2 text-ink-400 hover:text-ink-200">✕ @lang('site.projects.clear_filter')</a>
+                    <a href="{{ route('projects.index', request()->except(['topic', 'page'])).'#catalogue' }}" class="ml-2 text-ink-400 hover:text-ink-200">✕ @lang('site.projects.clear_filter')</a>
                 </div>
             @endif
 

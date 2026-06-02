@@ -90,7 +90,9 @@ class ProjectController
             default => $query->orderByDesc('stars'),
         };
 
-        $projects = $query->paginate(10)->withQueryString();
+        $projects = $query->paginate(10)->withQueryString()
+            // Anchor pagination to the catalogue so paging doesn't jump to top.
+            ->fragment('catalogue');
 
         $counts = [
             'total' => $stats['repos'],

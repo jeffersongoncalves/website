@@ -14,7 +14,9 @@ class ArticlesController
             ->published()
             ->byCategory(ProjectCategory::Article)
             ->orderByDesc('published_at')
-            ->paginate(12);
+            ->paginate(12)
+            // Anchor pagination to the list so paging doesn't jump to the top.
+            ->fragment('articles');
 
         return view('site.articles.index', ['articles' => $articles]);
     }

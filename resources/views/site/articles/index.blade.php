@@ -15,7 +15,7 @@
 
     <div class="divider"></div>
 
-    <section class="section">
+    <section class="section" id="articles" style="scroll-margin-top: 6rem;">
         <div class="wrap">
             @if($articles->isEmpty())
                 <div class="text-center py-16 mono text-sm text-ink-500">@lang('site.articles.empty')</div>

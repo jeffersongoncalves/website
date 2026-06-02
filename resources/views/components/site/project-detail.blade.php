@@ -2,6 +2,7 @@
     'project',
     'readmeHtml' => null,
     'versions' => [],
+    'versionGroups' => [],
     'activeVersion' => null,
     'ref' => null,
 ])
@@ -182,16 +183,17 @@
                     @endif
 
                     {{-- Version selector --}}
-                    @if(!empty($versions))
+                    @if(!empty($versionGroups))
                         <div class="version-selector">
                             <span class="mono-meta">@lang('site.projects.version_label')</span>
-                            @foreach($versions as $v)
+                            @foreach($versionGroups as $group)
                                 {{-- wire:click switches the README in place; the href keeps it a
-                                     real, shareable ?v= URL (and a no-JS fallback). --}}
-                                <a href="{{ route($showRoute, ['slug' => $project->slug, 'v' => $v]) }}#top"
-                                   wire:click.prevent="setVersion(@js($v))"
-                                   class="chip {{ $activeVersion === $v ? 'chip-active' : '' }}">
-                                    {{ $v }}
+                                     real, shareable ?v= URL (and a no-JS fallback). Versions that
+                                     share a branch render as one chip (e.g. "v4/v5"). --}}
+                                <a href="{{ route($showRoute, ['slug' => $project->slug, 'v' => $group['param']]) }}#top"
+                                   wire:click.prevent="setVersion(@js($group['param']))"
+                                   class="chip {{ in_array($activeVersion, $group['versions'], true) ? 'chip-active' : '' }}">
+                                    {{ $group['label'] }}
                                 </a>
                             @endforeach
                             @if($ref)

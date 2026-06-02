@@ -3,6 +3,7 @@
         :project="$project"
         :readmeHtml="$readmeHtml"
         :versions="$versions"
+        :versionGroups="$versionGroups"
         :activeVersion="$activeVersion"
         :ref="$ref"
     />

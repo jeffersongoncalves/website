@@ -96,15 +96,34 @@ class ProjectShowPage extends Component
 
         $activeVersion = null;
         $ref = null;
+        $versionGroups = [];
 
         if ($versions !== []) {
-            $activeVersion = in_array($this->v, $versions, true) ? $this->v : (string) end($versions);
-            $autoBranch = GithubReadme::branchForFilamentVersion($activeVersion, $versions);
             $overrides = is_array($project->branch_overrides) ? $project->branch_overrides : [];
-            $override = ($autoBranch !== null && isset($overrides[$autoBranch]))
-                ? trim((string) $overrides[$autoBranch])
-                : '';
-            $ref = $override !== '' ? $override : $autoBranch;
+            $activeVersion = in_array($this->v, $versions, true) ? $this->v : (string) end($versions);
+            $ref = $this->resolveBranchForVersion($activeVersion, $versions, $overrides);
+
+            // Group consecutive versions that resolve to the same real branch so
+            // a plugin whose v4 and v5 both live on `master` shows one "v4/v5"
+            // chip rather than two chips pointing at the identical README. The
+            // chip's ?v= uses the highest version of the group (the default).
+            foreach ($versions as $version) {
+                $branch = $this->resolveBranchForVersion($version, $versions, $overrides);
+                $last = count($versionGroups) - 1;
+
+                if ($last >= 0 && $versionGroups[$last]['branch'] === $branch) {
+                    $versionGroups[$last]['versions'][] = $version;
+                } else {
+                    $versionGroups[] = ['versions' => [$version], 'branch' => $branch];
+                }
+            }
+
+            $versionGroups = array_map(static function (array $group): array {
+                $group['label'] = implode('/', $group['versions']);
+                $group['param'] = (string) end($group['versions']);
+
+                return $group;
+            }, $versionGroups);
         } elseif (! empty($project->readme_branch)) {
             $ref = $project->readme_branch;
         }
@@ -130,7 +149,28 @@ class ProjectShowPage extends Component
             $readmeHtml = GithubReadme::wrapTables($readmeHtml);
         }
 
-        return view('livewire.site.project-show', compact('project', 'readmeHtml', 'versions', 'activeVersion', 'ref'))
+        return view('livewire.site.project-show', compact('project', 'readmeHtml', 'versions', 'versionGroups', 'activeVersion', 'ref'))
             ->layout('components.site.layouts.app', ['seoData' => $project]);
+    }
+
+    /**
+     * Resolve the real GitHub branch a tracked Filament version renders from:
+     * the positional auto-branch (1.x, 2.x, …) unless a branch_overrides entry
+     * remaps it. Returns null when the version is not tracked.
+     *
+     * @param  list<string>  $versions  ordered ascending (e.g. ['v3','v4','v5'])
+     * @param  array<string,string>  $overrides  auto-branch => real-branch
+     */
+    private function resolveBranchForVersion(string $version, array $versions, array $overrides): ?string
+    {
+        $autoBranch = GithubReadme::branchForFilamentVersion($version, $versions);
+
+        if ($autoBranch === null) {
+            return null;
+        }
+
+        $override = isset($overrides[$autoBranch]) ? trim((string) $overrides[$autoBranch]) : '';
+
+        return $override !== '' ? $override : $autoBranch;
     }
 }

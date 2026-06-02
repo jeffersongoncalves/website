@@ -34,6 +34,7 @@ class GenerateSitemap extends Command
             ->add(Url::create(route('projects.index')))
             ->add(Url::create(route('articles.index')))
             ->add(Url::create(route('open-source')))
+            ->add(Url::create(route('stack')))
             ->add(Url::create(route('sponsors')));
 
         $sitemap->writeToFile(public_path('sitemap-pages.xml'));

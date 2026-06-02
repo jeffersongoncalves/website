@@ -29,6 +29,16 @@ it('renders about page', function () {
     $this->get('/about')->assertOk();
 });
 
+it('renders the stack page with masked major versions', function () {
+    $this->get('/stack')
+        ->assertOk()
+        ->assertSee('Filament')
+        ->assertSee('Laravel')
+        ->assertSee('5.x')   // masked major line, never the exact pinned version
+        ->assertSee('13.x')
+        ->assertSee(__('site.nav.stack'));
+});
+
 it('marks the current page in the nav with aria-current and is-active', function () {
     $this->get('/about')
         ->assertOk()

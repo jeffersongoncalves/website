@@ -8,6 +8,13 @@ return [
         'projects' => 'Filament plugins, Laravel packages and open source starter kits actively maintained — all MIT-licensed, with CI, tests and regular releases.',
         'open_source' => '20+ Filament plugins, 15 Laravel packages, 7 starter kits. Open source contributions by the numbers — stars, downloads and followers.',
         'sponsors' => 'Sponsor the work — fund new releases, Portuguese documentation and support for the Brazilian Laravel and Filament community.',
+        'stack' => 'The stack behind this site — Laravel, Filament, Livewire, Tailwind and the infrastructure keeping it online.',
+    ],
+
+    'stack' => [
+        'title' => 'Technologies',
+        'sub' => 'The tools that build and run this site, from the backend to deploy.',
+        'version_note' => 'Versions shown by major line only (e.g. 13.x) — the exact production version is not exposed.',
     ],
 
     'errors' => [
@@ -32,6 +39,7 @@ return [
         'projects' => 'Projects',
         'articles' => 'Articles',
         'open_source' => 'Open Source',
+        'stack' => 'Tech',
         'sponsors' => 'Sponsors',
         'demos' => 'Demos',
     ],

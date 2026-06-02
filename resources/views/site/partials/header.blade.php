@@ -19,6 +19,7 @@
             <a href="{{ route('projects.index') }}" @class(['nav-link', 'is-active' => $active('projects.*')]) @if($active('projects.*')) aria-current="page" @endif>@lang('site.nav.projects')</a>
             <a href="{{ route('articles.index') }}" @class(['nav-link', 'is-active' => $active('articles.*')]) @if($active('articles.*')) aria-current="page" @endif>@lang('site.nav.articles')</a>
             <a href="{{ route('open-source') }}" @class(['nav-link', 'is-active' => $active('open-source')]) @if($active('open-source')) aria-current="page" @endif>@lang('site.nav.open_source')</a>
+            <a href="{{ route('stack') }}" @class(['nav-link', 'is-active' => $active('stack')]) @if($active('stack')) aria-current="page" @endif>@lang('site.nav.stack')</a>
             <a href="{{ route('sponsors') }}" @class(['nav-link', 'is-active' => $active('sponsors')]) @if($active('sponsors')) aria-current="page" @endif>@lang('site.nav.sponsors')</a>
             {{-- Demos: live demo subdomains, one per starter kit. Dropdown
                  reuses `lang-dropdown-menu` styling (same anchored panel
@@ -196,6 +197,7 @@
                     <a href="{{ route('projects.index') }}" @class(['mobile-nav-link', 'is-active' => $active('projects.*')]) @if($active('projects.*')) aria-current="page" @endif>@lang('site.nav.projects')</a>
                     <a href="{{ route('articles.index') }}" @class(['mobile-nav-link', 'is-active' => $active('articles.*')]) @if($active('articles.*')) aria-current="page" @endif>@lang('site.nav.articles')</a>
                     <a href="{{ route('open-source') }}" @class(['mobile-nav-link', 'is-active' => $active('open-source')]) @if($active('open-source')) aria-current="page" @endif>@lang('site.nav.open_source')</a>
+                    <a href="{{ route('stack') }}" @class(['mobile-nav-link', 'is-active' => $active('stack')]) @if($active('stack')) aria-current="page" @endif>@lang('site.nav.stack')</a>
                     <a href="{{ route('sponsors') }}" @class(['mobile-nav-link', 'is-active' => $active('sponsors')]) @if($active('sponsors')) aria-current="page" @endif>@lang('site.nav.sponsors')</a>
                     {{-- Demos rendered inline (not a nested disclosure) — mobile
                          already collapses the nav, so a second level of

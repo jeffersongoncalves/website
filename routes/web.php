@@ -11,6 +11,7 @@ use App\Http\Controllers\Site\ProjectController;
 use App\Http\Controllers\Site\ProjectViewController;
 use App\Http\Controllers\Site\ServiceWorkerController;
 use App\Http\Controllers\Site\SponsorsController;
+use App\Http\Controllers\Site\StackController;
 use App\Http\Controllers\Site\SwitchLocaleController;
 use App\Http\Middleware\CachePublicPage;
 use App\Http\Middleware\SetLocale;
@@ -43,6 +44,8 @@ Route::middleware(['set.locale', CachePublicPage::class])->group(function () {
     Route::get('/articles/{slug}', ProjectViewController::class)->name('articles.show');
 
     Route::get('/open-source', OpenSourceController::class)->name('open-source');
+
+    Route::get('/stack', StackController::class)->name('stack');
 
     Route::get('/sponsors', SponsorsController::class)->name('sponsors');
 

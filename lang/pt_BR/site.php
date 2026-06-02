@@ -8,6 +8,13 @@ return [
         'projects' => 'Plugins Filament, pacotes Laravel e starter kits open source mantidos ativamente — todos licença MIT, com CI, testes e releases regulares.',
         'open_source' => '20+ plugins Filament, 15 pacotes Laravel, 7 starter kits. Contribuições open source em números — estrelas, downloads e seguidores.',
         'sponsors' => 'Patrocine o trabalho — financie novos releases, documentação em português e suporte para a comunidade Laravel e Filament brasileira.',
+        'stack' => 'A stack por trás deste site — Laravel, Filament, Livewire, Tailwind e a infraestrutura que mantém tudo no ar.',
+    ],
+
+    'stack' => [
+        'title' => 'Tecnologias',
+        'sub' => 'As ferramentas que constroem e sustentam este site, do backend ao deploy.',
+        'version_note' => 'Versões indicadas apenas pela linha principal (ex.: 13.x) — sem expor a versão exata em produção.',
     ],
 
     'errors' => [
@@ -32,6 +39,7 @@ return [
         'projects' => 'Projetos',
         'articles' => 'Artigos',
         'open_source' => 'Open Source',
+        'stack' => 'Tecnologias',
         'sponsors' => 'Sponsors',
         'demos' => 'Demos',
     ],

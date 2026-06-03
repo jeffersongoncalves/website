@@ -7,6 +7,7 @@ use App\Models\ReadmeCache;
 use App\Models\SiteStat;
 use App\Support\GithubReadme;
 use App\Support\SiteStats;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
@@ -45,6 +46,32 @@ it('persists site stats to the database and reads them back without recomputing'
     Http::fake(fn () => throw new RuntimeException('site stats read should not hit the network'));
     expect(SiteStats::all()['repos'])->toBe(2);
     expect(SiteStats::all()['catalogue'])->toBe(3);
+});
+
+it('caches the assembled stats so repeat reads do not re-query', function () {
+    makeProject(1, ProjectCategory::FilamentPlugin);
+    SiteStats::persist(); // writes the row and (via the saved hook) clears the cache
+
+    DB::enableQueryLog();
+    $first = SiteStats::all();
+    $second = SiteStats::all();
+    $hits = collect(DB::getQueryLog())
+        ->filter(fn ($q) => str_contains($q['query'], 'site_stats'))
+        ->count();
+    DB::disableQueryLog();
+
+    expect($first)->toBe($second)
+        ->and($hits)->toBe(1); // first read warmed the cache, second served from it
+});
+
+it('invalidates the cached stats when the singleton is written', function () {
+    SiteStats::persist();
+    expect(SiteStats::all()['filament'])->toBe(0); // warms the cache at 0
+
+    makeProject(1, ProjectCategory::FilamentPlugin);
+    SiteStats::persist(); // saved hook forgets the cache
+
+    expect(SiteStats::all()['filament'])->toBe(1);
 });
 
 it('computes the per-language breakdown busiest first', function () {

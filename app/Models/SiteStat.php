@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * @property int $id
@@ -51,6 +52,20 @@ use Illuminate\Support\Carbon;
  */
 class SiteStat extends Model
 {
+    /**
+     * Cache key for the assembled stats array (see SiteStats::all()). The row is
+     * a singleton written only via Eloquent (SiteStats::persist /
+     * refreshProjectDerived), so a saved/deleted hook is enough to keep the
+     * cache honest — no writer has to remember to flush.
+     */
+    public const CACHE_KEY = 'site_stats';
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => Cache::forget(self::CACHE_KEY));
+        static::deleted(fn () => Cache::forget(self::CACHE_KEY));
+    }
+
     protected $fillable = [
         'repos',
         'catalogue',

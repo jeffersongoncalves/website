@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -10,6 +11,12 @@ uses(RefreshDatabase::class)->in('Feature');
 
 pest()->beforeEach(function () {
     Queue::fake();
+
+    // Start each test with a cold cache — the array store survives
+    // RefreshDatabase's rollback, so a value cached in one test (e.g. the
+    // SiteStat singleton behind SiteStats::all()) would otherwise leak into the
+    // next and read as stale.
+    Cache::flush();
 
     // Full-page response cache off by default so tests assert freshly-rendered
     // output; the dedicated CachePublicPageTest re-enables it explicitly.

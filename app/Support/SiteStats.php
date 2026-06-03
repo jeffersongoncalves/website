@@ -7,6 +7,7 @@ use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Models\Project;
 use App\Models\SiteStat;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
@@ -20,6 +21,11 @@ class SiteStats
      * hits an external API. If the row is missing (e.g. before the first sync,
      * or while GitHub is unavailable) a zeroed set is returned so the site
      * still renders; views hide GitHub-dependent pieces when the data is empty.
+     *
+     * The assembled array is cached forever and invalidated by SiteStat's
+     * saved/deleted hook, so the several widgets + Livewire components that read
+     * it (some more than once per render) share a single query per write cycle
+     * instead of one query per call.
      *
      * @return array{
      *   repos:int, catalogue:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
@@ -35,13 +41,11 @@ class SiteStats
      */
     public static function all(): array
     {
-        $stat = SiteStat::query()->first();
+        return Cache::rememberForever(SiteStat::CACHE_KEY, function (): array {
+            $stat = SiteStat::query()->first();
 
-        if (! $stat) {
-            return self::empty();
-        }
-
-        return self::toArray($stat);
+            return $stat ? self::toArray($stat) : self::empty();
+        });
     }
 
     /**
@@ -198,13 +202,8 @@ class SiteStats
      */
     public static function contributions(): array
     {
-        $stat = SiteStat::query()->first();
-
-        if (! $stat) {
-            return ['cells' => [], 'total' => 0];
-        }
-
-        return $stat->contributions ?? ['cells' => [], 'total' => 0];
+        // Ride the same cached array as all() rather than firing a second query.
+        return self::all()['contributions'];
     }
 
     /**

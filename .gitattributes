@@ -6,6 +6,25 @@
 *.md diff=markdown
 *.php diff=php
 
+# Binary artefacts — `binary` = `-text -diff`, so git never line-normalises
+# (eol=lf) nor attempts a text diff on them. Covers the precompressed build
+# output (vite-plugin-compression2) and the committed font/image assets.
+*.gz binary
+*.br binary
+*.zst binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.avif binary
+
 /.github/workflows/update-changelog.yml export-ignore
 /.github/CONTRIBUTING.md export-ignore
 /.github/FUNDING.yml export-ignore

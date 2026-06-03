@@ -61,6 +61,7 @@ return [
             'npm_not_published' => 'package.json existe pero el paquete no está publicado en npm.',
             'packagist_not_owned' => 'composer.json existe pero el paquete no está publicado bajo este repositorio en Packagist.',
             'no_directory_readme' => 'El subdirectorio indicado no tiene README — la renderización usará el README raíz.',
+            'no_published_date' => 'No se encontró fecha de publicación en el artículo — defínela manualmente para que la fecha sea correcta.',
         ],
     ],
 

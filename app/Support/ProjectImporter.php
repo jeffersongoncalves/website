@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Enums\ProjectLanguage;
 use App\Exceptions\GithubRateLimitException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -142,6 +143,12 @@ class ProjectImporter
             : self::nameFromHost($host);
         $description = self::nullableString($meta['og:description'] ?? $meta['description'] ?? null);
 
+        // Use the article's own publish date (og `article:published_time`) so the
+        // schema.org datePublished reflects when the post actually went live,
+        // not when it was imported here. Stored as an ISO string — the model's
+        // datetime cast and the Filament DateTimePicker both parse it.
+        $publishedAt = self::parseMetaDate($meta['article:published_time'] ?? null);
+
         $fields = [
             'github_url' => null,
             'slug' => self::articleSlugFromUrl($url),
@@ -158,6 +165,7 @@ class ProjectImporter
             'packagist_url' => null,
             'npm_url' => null,
             'social_image' => self::nullableString($meta['og:image'] ?? null),
+            'published_at' => $publishedAt,
             'stack' => [],
             'versions' => [],
         ];
@@ -166,6 +174,12 @@ class ProjectImporter
 
         if ($description === null) {
             $warnings[] = 'no_description';
+        }
+
+        if ($publishedAt === null) {
+            // Editor should set the real date by hand — the importer leaves it
+            // blank and the observer falls back to stamping "now" on publish.
+            $warnings[] = 'no_published_date';
         }
 
         return ['fields' => $fields, 'warnings' => $warnings];
@@ -612,7 +626,7 @@ class ProjectImporter
                 continue;
             }
             $key = strtolower($property);
-            if (in_array($key, ['title', 'description', 'og:title', 'og:description', 'og:image'], true)) {
+            if (in_array($key, ['title', 'description', 'og:title', 'og:description', 'og:image', 'article:published_time', 'article:modified_time'], true)) {
                 $meta[$key] = $content;
             }
         }
@@ -621,6 +635,30 @@ class ProjectImporter
         libxml_use_internal_errors($previous);
 
         return $meta;
+    }
+
+    /**
+     * Parse an OpenGraph article date (`article:published_time`, ISO 8601) into a
+     * normalised ISO string, or null when absent / unparseable / implausible (a
+     * future date or one before the web existed is treated as garbage).
+     */
+    private static function parseMetaDate(mixed $value): ?string
+    {
+        if (! is_string($value) || trim($value) === '') {
+            return null;
+        }
+
+        try {
+            $date = Carbon::parse(trim($value));
+        } catch (Throwable) {
+            return null;
+        }
+
+        if ($date->isFuture() || $date->year < 1995) {
+            return null;
+        }
+
+        return $date->toIso8601String();
     }
 
     private static function nameFromHost(string $host): string

@@ -61,6 +61,7 @@ return [
             'npm_not_published' => 'package.json present but the package is not published on npm.',
             'packagist_not_owned' => 'composer.json present but the package is not published under this repo on Packagist.',
             'no_directory_readme' => 'The declared subdirectory has no README — readme rendering will fall back to the repo root.',
+            'no_published_date' => 'No publish date found on the article — set it manually so the date is accurate.',
         ],
     ],
 

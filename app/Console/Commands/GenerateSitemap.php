@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\ProjectCategory;
 use App\Models\Project;
 use Illuminate\Console\Command;
 use Spatie\Sitemap\Sitemap;
@@ -27,15 +28,32 @@ class GenerateSitemap extends Command
 
     private function writePages(): void
     {
-        $sitemap = Sitemap::create()
-            ->add(Url::create(route('home')))
-            ->add(Url::create(route('about')))
-            ->add(Url::create(route('projects.index')))
-            ->add(Url::create(route('articles.index')))
-            ->add(Url::create(route('links.index')))
-            ->add(Url::create(route('open-source')))
-            ->add(Url::create(route('stack')))
-            ->add(Url::create(route('sponsors')));
+        $now = now();
+
+        // Each static page carries a changefreq + priority so crawlers can
+        // budget their re-crawls: the catalogue indexes change often and rank
+        // highest; the evergreen pages (about/stack/sponsors) change rarely.
+        $pages = [
+            ['home', Url::CHANGE_FREQUENCY_DAILY, 1.0],
+            ['projects.index', Url::CHANGE_FREQUENCY_DAILY, 0.9],
+            ['articles.index', Url::CHANGE_FREQUENCY_DAILY, 0.9],
+            ['links.index', Url::CHANGE_FREQUENCY_WEEKLY, 0.8],
+            ['open-source', Url::CHANGE_FREQUENCY_WEEKLY, 0.8],
+            ['about', Url::CHANGE_FREQUENCY_MONTHLY, 0.6],
+            ['stack', Url::CHANGE_FREQUENCY_MONTHLY, 0.6],
+            ['sponsors', Url::CHANGE_FREQUENCY_MONTHLY, 0.5],
+        ];
+
+        $sitemap = Sitemap::create();
+
+        foreach ($pages as [$route, $frequency, $priority]) {
+            $sitemap->add(
+                Url::create(route($route))
+                    ->setLastModificationDate($now)
+                    ->setChangeFrequency($frequency)
+                    ->setPriority($priority)
+            );
+        }
 
         $sitemap->writeToFile(public_path('sitemap-pages.xml'));
     }
@@ -45,13 +63,25 @@ class GenerateSitemap extends Command
         $sitemap = Sitemap::create();
 
         Project::query()->published()->orderBy('slug')->get(['slug', 'category', 'updated_at'])->each(
-            fn (Project $project) => $sitemap->add(
+            function (Project $project) use ($sitemap): void {
                 // Emit each project's canonical section URL (articles → /articles,
                 // external links → /links, code → /projects) so the sitemap never
-                // lists a link that just 301s elsewhere.
-                Url::create(route($project->canonicalRouteName(), ['slug' => $project->slug]))
-                    ->setLastModificationDate($project->updated_at ?? now())
-            )
+                // lists a link that just 301s elsewhere. Priority/changefreq are
+                // tiered by kind: code projects (own packages) rank above curated
+                // articles and the third-party external-link catalogue.
+                [$priority, $frequency] = match (true) {
+                    $project->category === ProjectCategory::Article => [0.6, Url::CHANGE_FREQUENCY_MONTHLY],
+                    $project->category->isExternalLink() => [0.5, Url::CHANGE_FREQUENCY_MONTHLY],
+                    default => [0.7, Url::CHANGE_FREQUENCY_WEEKLY],
+                };
+
+                $sitemap->add(
+                    Url::create(route($project->canonicalRouteName(), ['slug' => $project->slug]))
+                        ->setLastModificationDate($project->updated_at ?? now())
+                        ->setChangeFrequency($frequency)
+                        ->setPriority($priority)
+                );
+            }
         );
 
         $sitemap->writeToFile(public_path('sitemap-projects.xml'));

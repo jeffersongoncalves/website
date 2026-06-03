@@ -18,37 +18,31 @@ function sitemapProject(string $name, ProjectCategory $category, string $slug): 
     ]);
 }
 
-it('writes pages with a changefreq and priority on every entry', function () {
-    $this->artisan('sitemap:generate')->assertSuccessful();
-
-    $pages = (string) file_get_contents(public_path('sitemap-pages.xml'));
-
-    expect($pages)
-        ->toContain('<loc>'.route('home').'</loc>')
-        ->toContain('<priority>1.0</priority>')        // home is top priority
-        ->toContain('<changefreq>daily</changefreq>')  // catalogue indexes
-        ->toContain('<changefreq>monthly</changefreq>') // evergreen pages
-        ->toContain('<lastmod>');
-});
-
-it('tiers project priority by kind: code above articles above external links', function () {
+it('writes a single urlset sitemap (not an index) with changefreq + priority on every entry', function () {
     sitemapProject('My Package', ProjectCategory::LaravelPackage, 'pkg');
     sitemapProject('My Article', ProjectCategory::Article, 'article-my-article');
     sitemapProject('A Site', ProjectCategory::Website, 'site-a-site');
 
     $this->artisan('sitemap:generate')->assertSuccessful();
 
-    $projects = (string) file_get_contents(public_path('sitemap-projects.xml'));
+    $xml = (string) file_get_contents(public_path('sitemap.xml'));
 
-    expect($projects)
-        // canonical section per kind
+    expect($xml)
+        // a single inline urlset, not a sitemapindex pointing at sub-files
+        ->toContain('<urlset')
+        ->not->toContain('<sitemapindex')
+        ->not->toContain('sitemap-pages.xml')
+        // pages
+        ->toContain('<loc>'.route('home').'</loc>')
+        ->toContain('<priority>1.0</priority>')
+        ->toContain('<changefreq>daily</changefreq>')
+        ->toContain('<changefreq>monthly</changefreq>')
+        ->toContain('<lastmod>')
+        // projects under their canonical sections, tiered by kind
         ->toContain('/projects/pkg')
         ->toContain('/articles/article-my-article')
         ->toContain('/links/site-a-site')
-        // tiered priorities
         ->toContain('<priority>0.7</priority>') // code project
         ->toContain('<priority>0.6</priority>') // article
-        ->toContain('<priority>0.5</priority>') // external link
-        ->toContain('<changefreq>weekly</changefreq>')
-        ->toContain('<changefreq>monthly</changefreq>');
+        ->toContain('<priority>0.5</priority>'); // external link
 });

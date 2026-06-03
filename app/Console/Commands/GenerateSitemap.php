@@ -6,27 +6,39 @@ use App\Enums\ProjectCategory;
 use App\Models\Project;
 use Illuminate\Console\Command;
 use Spatie\Sitemap\Sitemap;
-use Spatie\Sitemap\SitemapIndex;
 use Spatie\Sitemap\Tags\Url;
 
 class GenerateSitemap extends Command
 {
     protected $signature = 'sitemap:generate';
 
-    protected $description = 'Write public/sitemap.xml (index) and public/sitemap-{pages,projects}.xml';
+    protected $description = 'Write a single public/sitemap.xml (urlset) listing every page + project';
 
     public function handle(): int
     {
-        $this->writePages();
-        $this->writeProjects();
-        $this->writeIndex();
+        $sitemap = Sitemap::create();
 
-        $this->info('Wrote sitemap.xml, sitemap-pages.xml, sitemap-projects.xml');
+        $this->addPages($sitemap);
+        $this->addProjects($sitemap);
+
+        $sitemap->writeToFile(public_path('sitemap.xml'));
+
+        // Drop the legacy split files from when sitemap.xml was an index, so an
+        // upgraded deploy stops serving orphaned, no-longer-referenced sitemaps.
+        foreach (['sitemap-pages.xml', 'sitemap-projects.xml'] as $legacy) {
+            $path = public_path($legacy);
+
+            if (is_file($path)) {
+                unlink($path);
+            }
+        }
+
+        $this->info('Wrote sitemap.xml');
 
         return self::SUCCESS;
     }
 
-    private function writePages(): void
+    private function addPages(Sitemap $sitemap): void
     {
         $now = now();
 
@@ -44,8 +56,6 @@ class GenerateSitemap extends Command
             ['sponsors', Url::CHANGE_FREQUENCY_MONTHLY, 0.5],
         ];
 
-        $sitemap = Sitemap::create();
-
         foreach ($pages as [$route, $frequency, $priority]) {
             $sitemap->add(
                 Url::create(route($route))
@@ -54,14 +64,10 @@ class GenerateSitemap extends Command
                     ->setPriority($priority)
             );
         }
-
-        $sitemap->writeToFile(public_path('sitemap-pages.xml'));
     }
 
-    private function writeProjects(): void
+    private function addProjects(Sitemap $sitemap): void
     {
-        $sitemap = Sitemap::create();
-
         Project::query()->published()->orderBy('slug')->get(['slug', 'category', 'updated_at'])->each(
             function (Project $project) use ($sitemap): void {
                 // Emit each project's canonical section URL (articles → /articles,
@@ -83,17 +89,5 @@ class GenerateSitemap extends Command
                 );
             }
         );
-
-        $sitemap->writeToFile(public_path('sitemap-projects.xml'));
-    }
-
-    private function writeIndex(): void
-    {
-        $base = rtrim(config('app.url'), '/');
-
-        SitemapIndex::create()
-            ->add($base.'/sitemap-pages.xml')
-            ->add($base.'/sitemap-projects.xml')
-            ->writeToFile(public_path('sitemap.xml'));
     }
 }

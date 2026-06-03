@@ -40,4 +40,46 @@ it('emits SoftwareSourceCode + BreadcrumbList JSON-LD and a per-repo OG image on
     $response->assertDontSee('opengraph.githubassets.com', false);
     // README image CDNs are preconnected on pages that render a README.
     $response->assertSee('rel="preconnect" href="https://raw.githubusercontent.com"', false);
+
+    // mbostock/d3 is third-party — the JSON-LD must NOT claim Jefferson authored it.
+    $response->assertDontSee('"author":{', false);
+});
+
+it('claims authorship only for repos under the owner account', function () {
+    Storage::fake('github');
+    Http::fake(['*' => Http::response('<h1>Readme</h1>', 200)]);
+
+    $owned = Project::query()->create([
+        'name' => 'filament-gtag',
+        'category' => ProjectCategory::FilamentPlugin,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/jeffersongoncalves/filament-gtag',
+        'published_at' => now(),
+    ]);
+
+    $this->get('/projects/'.$owned->slug)
+        ->assertOk()
+        ->assertSee('"author":{', false)
+        ->assertSee('"name":"Jefferson Gonçalves"', false);
+});
+
+it('uses the project name (not its description) as the breadcrumb leaf', function () {
+    Storage::fake('github');
+    Http::fake(['*' => Http::response('<h1>Readme</h1>', 200)]);
+
+    $project = Project::query()->create([
+        'name' => 'D3',
+        'title' => ['en' => 'A data-visualisation library'],
+        'category' => ProjectCategory::JavascriptPackage,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/mbostock/d3',
+        'published_at' => now(),
+    ]);
+
+    $this->get('/projects/'.$project->slug)
+        ->assertOk()
+        ->assertSee('"@type":"BreadcrumbList"', false)
+        // leaf crumb is the name, never the long description
+        ->assertSee('"name":"D3"', false)
+        ->assertDontSee('"name":"A data-visualisation library"', false);
 });

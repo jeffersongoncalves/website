@@ -365,8 +365,11 @@ class Project extends Model
 
         return new SEOData(
             title: $this->name,
+            // Only attribute authorship for repos under the owner's account —
+            // the catalogue is mostly third-party, so a blanket author would be
+            // false (mirrors the JSON-LD author rule in project-detail).
             description: $description,
-            author: 'Jefferson Gonçalves',
+            author: $this->isCreatedByOwner() ? 'Jefferson Gonçalves' : null,
             image: $image,
             published_time: $this->published_at,
             modified_time: $this->updated_at,

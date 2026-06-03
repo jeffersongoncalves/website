@@ -36,7 +36,9 @@
 
     $breadcrumbs = [
         $parentCrumb,
-        ['name' => $title, 'url' => route($showRoute, ['slug' => $project->slug])],
+        // Leaf crumb is the project NAME, not its (often sentence-long)
+        // description — a breadcrumb label should read "Openclaw", not the tagline.
+        ['name' => $project->name, 'url' => route($showRoute, ['slug' => $project->slug])],
     ];
 
     $initial = strtoupper(mb_substr($project->name, 0, 1));
@@ -81,11 +83,15 @@
         'programmingLanguage' => $ldType === 'SoftwareSourceCode' ? $project->language?->value : null,
         'datePublished' => $isArticleLd ? $project->published_at?->toIso8601String() : null,
         'dateModified' => $isArticleLd ? $project->updated_at?->toIso8601String() : null,
-        'author' => [
+        // Only claim authorship for repos that actually live under the owner's
+        // GitHub account. The catalogue is mostly third-party (starred repos,
+        // imported articles) — asserting `author: Jefferson` on those is false
+        // structured data. array_filter drops the null for everything else.
+        'author' => $project->isCreatedByOwner() ? [
             '@type' => 'Person',
             'name' => 'Jefferson Gonçalves',
             'url' => route('home'),
-        ],
+        ] : null,
     ], fn ($v) => $v !== null && $v !== '');
 
     $crumbItems = [];

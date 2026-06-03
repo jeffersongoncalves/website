@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
+import { compression } from 'vite-plugin-compression2';
 
 // Several favicon source files are byte-identical (e.g. android-icon-72x72 ==
 // apple-icon-72x72, android-icon-144x144 == ms-icon-144x144). Rollup collapses
@@ -37,6 +38,16 @@ export default defineConfig({
             refresh: true,
         }),
         tailwindcss(),
+        // Emit a build-time .gz next to every text asset so nginx `gzip_static`
+        // serves a max-ratio pre-compressed file instead of re-gzipping at level
+        // 5 per request. Brotli is intentionally omitted: Cloudflare already
+        // serves brotli to clients at the edge, and the alpine nginx image ships
+        // no brotli module — generating .br would be dead weight at the origin.
+        compression({
+            algorithms: ['gzip'],
+            threshold: 1024,
+            deleteOriginalAssets: false,
+        }),
     ],
     build: {
         rollupOptions: {

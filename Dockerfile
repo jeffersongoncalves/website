@@ -113,6 +113,8 @@ RUN set -eux; \
     php artisan --version; \
     php artisan list --raw | grep -q "^horizon " || { echo "FAIL: horizon commands not registered"; exit 1; }; \
     test -f config/horizon.php || { echo "FAIL: config/horizon.php missing"; exit 1; }; \
+    nginx -t || { echo "FAIL: nginx config invalid (e.g. gzip_static module missing)"; exit 1; }; \
+    ls public/build/assets/*.css.gz >/dev/null 2>&1 || { echo "FAIL: no precompressed .gz assets — run pnpm build"; exit 1; }; \
     echo "=== All smoke tests passed ==="
 
 EXPOSE 80

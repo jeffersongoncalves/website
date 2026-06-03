@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Site\ArticlesFeedController;
+use App\Http\Controllers\Site\LlmsTxtController;
 use App\Http\Controllers\Site\OfflineController;
 use App\Http\Controllers\Site\OgImageController;
 use App\Http\Controllers\Site\ServiceWorkerController;
@@ -29,6 +30,10 @@ Route::get('/offline', OfflineController::class)->name('pwa.offline');
 // Cached social-card proxy. Outside the locale/page-cache group: it's a binary
 // response and the image is locale-independent.
 Route::get('/og/{slug}.png', OgImageController::class)->name('og.show');
+
+// llms.txt — plain-text site map for LLM crawlers (llmstxt.org). Lives at the
+// site root with no locale prefix, like /sw.js; it's its own cached text body.
+Route::get('/llms.txt', LlmsTxtController::class)->name('llms');
 
 Route::middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class])->group(function () {
     Route::get('/', HomePage::class)->name('home');

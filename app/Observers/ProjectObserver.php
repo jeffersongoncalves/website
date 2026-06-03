@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Enums\ProjectStatus;
+use App\Http\Controllers\Site\LlmsTxtController;
 use App\Http\Middleware\CachePublicPage;
 use App\Jobs\GenerateSitemapJob;
 use App\Jobs\RefreshProjectStatsJob;
@@ -61,6 +62,7 @@ class ProjectObserver
         try {
             Cache::delete('projects_count');
             Cache::delete('featured_projects');
+            Cache::delete(LlmsTxtController::CACHE_KEY);
         } catch (InvalidArgumentException) {
         }
 

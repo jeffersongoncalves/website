@@ -128,25 +128,13 @@ class ProjectImporter
      */
     private static function buildArticleResult(string $url, string $host): array
     {
-        try {
-            $response = Http::timeout(8)
-                ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
-                    'Accept' => 'text/html,application/xhtml+xml',
-                    'Accept-Language' => 'en-US,en;q=0.9',
-                ])
-                ->get($url);
-        } catch (Throwable $e) {
-            self::logFetchFailure('article', $url, $e);
+        $html = self::fetchPageHtml($url, 'article');
 
+        if ($html === null) {
             return ['error' => 'fetch_failed'];
         }
 
-        if (! $response->successful()) {
-            return ['error' => 'fetch_failed'];
-        }
-
-        $meta = self::parseMeta($response->body());
+        $meta = self::parseMeta($html);
 
         $rawTitle = $meta['og:title'] ?? $meta['title'] ?? null;
         $title = is_string($rawTitle) && trim($rawTitle) !== ''
@@ -315,27 +303,15 @@ class ProjectImporter
      */
     private static function buildYoutubeResult(string $url, string $pathSegment): array
     {
-        try {
-            $response = Http::timeout(8)
-                ->withHeaders([
-                    // YouTube replies with a placeholder shell to bare bots —
-                    // a real browser UA gets the og: tag-rich HTML we need.
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
-                    'Accept' => 'text/html,application/xhtml+xml',
-                    'Accept-Language' => 'en-US,en;q=0.9',
-                ])
-                ->get($url);
-        } catch (Throwable $e) {
-            self::logFetchFailure('youtube', $url, $e);
+        // YouTube replies with a placeholder shell to bare bots — fetchPageHtml's
+        // real-browser UA gets the og: tag-rich HTML we need.
+        $html = self::fetchPageHtml($url, 'youtube');
 
+        if ($html === null) {
             return ['error' => 'fetch_failed'];
         }
 
-        if (! $response->successful()) {
-            return ['error' => 'fetch_failed'];
-        }
-
-        $meta = self::parseMeta($response->body());
+        $meta = self::parseMeta($html);
 
         $rawTitle = $meta['og:title'] ?? $meta['title'] ?? null;
         $name = self::cleanYoutubeTitle(is_string($rawTitle) ? $rawTitle : null, $pathSegment);
@@ -520,24 +496,13 @@ class ProjectImporter
      */
     private static function buildUrlResult(string $url, string $host): array
     {
-        try {
-            $response = Http::timeout(8)
-                ->withHeaders([
-                    'User-Agent' => 'jeffersongoncalves-site',
-                    'Accept' => 'text/html,application/xhtml+xml',
-                ])
-                ->get($url);
-        } catch (Throwable $e) {
-            self::logFetchFailure('website', $url, $e);
+        $html = self::fetchPageHtml($url, 'website');
 
+        if ($html === null) {
             return ['error' => 'fetch_failed'];
         }
 
-        if (! $response->successful()) {
-            return ['error' => 'fetch_failed'];
-        }
-
-        $meta = self::parseMeta($response->body());
+        $meta = self::parseMeta($html);
 
         $name = self::nameFromHost($host);
         $description = $meta['og:description'] ?? $meta['description'] ?? null;
@@ -574,6 +539,46 @@ class ProjectImporter
         }
 
         return ['fields' => $fields, 'warnings' => $warnings];
+    }
+
+    /**
+     * Fetch an HTML page for OpenGraph scraping. Tries a real-browser UA first
+     * (what most sites expect), then falls back to a social link-preview crawler
+     * UA for hosts that 403 datacenter browser requests but still serve og: meta
+     * to known preview bots (e.g. Medium). Returns the body, or null on a network
+     * error or when every attempt comes back non-2xx.
+     */
+    private static function fetchPageHtml(string $url, string $context): ?string
+    {
+        $userAgents = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+            'Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)',
+        ];
+
+        foreach ($userAgents as $userAgent) {
+            try {
+                $response = Http::timeout(8)
+                    ->withHeaders([
+                        'User-Agent' => $userAgent,
+                        'Accept' => 'text/html,application/xhtml+xml',
+                        'Accept-Language' => 'en-US,en;q=0.9',
+                    ])
+                    ->get($url);
+            } catch (Throwable $e) {
+                // A network error (timeout/DNS/TLS) won't be fixed by a
+                // different UA — bail instead of retrying.
+                self::logFetchFailure($context, $url, $e);
+
+                return null;
+            }
+
+            if ($response->successful()) {
+                return $response->body();
+            }
+        }
+
+        // Every UA came back non-2xx (e.g. a hard 403/404).
+        return null;
     }
 
     /**

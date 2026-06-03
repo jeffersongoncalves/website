@@ -732,7 +732,7 @@ class ProjectImporter
 
         [$owner, $repoName] = explode('/', $repoSlug, 2);
 
-        $category = self::resolveCategory($composer, $repo, $hasDockerCompose || $hasStandaloneDockerfile);
+        $category = ProjectClassifier::category($composer, $repo, $hasDockerCompose || $hasStandaloneDockerfile);
 
         // Only treat the project as an npm package if it's actually published
         // *and* the registry's repository field points back at this github
@@ -812,13 +812,13 @@ class ProjectImporter
             'language' => ProjectLanguage::tryFrom((string) ($repo['language'] ?? ''))?->value,
             'packagist_url' => $packagistOwned ? 'https://packagist.org/packages/'.$packagistName : null,
             'npm_url' => $npmPublished ? 'https://www.npmjs.com/package/'.$npmName : null,
-            'stack' => self::resolveStack($composer, $package),
+            'stack' => ProjectClassifier::stack($composer, $package),
             'topics' => ProjectTopics::normalize(
                 is_array($repo['topics'] ?? null) ? $repo['topics'] : [],
                 is_array($composer['keywords'] ?? null) ? $composer['keywords'] : [],
                 is_array($package['keywords'] ?? null) ? $package['keywords'] : [],
             ),
-            'versions' => self::resolveVersions($composer, $branches, $category),
+            'versions' => ProjectClassifier::versions($composer, $branches, $category),
         ];
 
         $warnings = [];
@@ -1122,128 +1122,6 @@ class ProjectImporter
     }
 
     /**
-     * Priority order matters — a Filament plugin that also requires Laravel
-     * should still resolve as a filament_plugin, not laravel_package. Docker
-     * sits below all PHP-stack classifications because a repo with both a
-     * composer.json AND a docker-compose.yml is still primarily the PHP
-     * package; the Docker fallback is for self-hosted apps that ship as
-     * compose stacks (e.g. plausible/analytics).
-     *
-     * @param  array<string, mixed>|null  $composer
-     * @param  array<string, mixed>  $repo
-     */
-    private static function resolveCategory(?array $composer, array $repo, bool $hasDockerCompose = false): string
-    {
-        $topics = is_array($repo['topics'] ?? null) ? $repo['topics'] : [];
-        $require = is_array($composer['require'] ?? null) ? $composer['require'] : [];
-        $type = $composer['type'] ?? null;
-        $vendor = explode('/', is_string($composer['name'] ?? null) ? (string) $composer['name'] : '/')[0];
-
-        if ($type === 'filament-plugin') {
-            return 'filament_plugin';
-        }
-
-        if (in_array('filament-plugin', $topics, true)) {
-            return 'filament_plugin';
-        }
-
-        if (in_array('filament', $topics, true) && self::hasAnyKey($require, 'filament/')) {
-            return 'filament_plugin';
-        }
-
-        if (isset($require['laravel-zero/framework'])) {
-            return 'laravel_zero_cli';
-        }
-
-        if ($vendor === 'cakephp' || in_array('cakephp', $topics, true)) {
-            return 'cakephp_package';
-        }
-
-        if (in_array('livewire', $topics, true) && isset($require['livewire/livewire'])) {
-            return 'livewire_package';
-        }
-
-        if (in_array('starter-kit', $topics, true)) {
-            return 'starter_kit';
-        }
-
-        // A bare `laravel` topic is not enough — multi-framework JS/TS
-        // projects (e.g. shadcn-ui/ui) tag `laravel` because they *support*
-        // Laravel, not because they're a PHP package. Require a composer
-        // manifest (the `laravel/framework` require already implies one).
-        if (isset($require['laravel/framework'])
-            || (in_array('laravel', $topics, true) && $composer !== null)) {
-            return 'laravel_package';
-        }
-
-        if (in_array('framework', $topics, true)) {
-            return 'framework';
-        }
-
-        // Database engines win over Docker even when they ship a compose
-        // file — a DB tagged `postgresql` + `docker` is primarily a
-        // database. Checked before the docker branch for that reason.
-        $databaseTopics = array_intersect(
-            ['database', 'databases', 'dbms', 'rdbms', 'sql', 'nosql', 'newsql',
-                'postgres', 'postgresql', 'mysql', 'mariadb', 'sqlite', 'redis',
-                'mongodb', 'cassandra', 'clickhouse', 'cockroachdb', 'duckdb',
-                'timescaledb', 'elasticsearch', 'opensearch', 'key-value-store'],
-            $topics,
-        );
-        if ($databaseTopics !== []) {
-            return 'database';
-        }
-
-        // Broader docker-topic match — self-hosted projects often tag
-        // themselves with `selfhosted` / `self-hosted` / `containers`
-        // rather than the bare `docker` topic.
-        $dockerTopics = array_intersect(
-            ['docker', 'dockerfile', 'docker-image', 'containers', 'selfhosted', 'self-hosted', 'self-hosting'],
-            $topics,
-        );
-        if ($hasDockerCompose || $dockerTopics !== []) {
-            return 'docker';
-        }
-
-        $repoName = is_string($repo['name'] ?? null) ? strtolower((string) $repo['name']) : '';
-
-        // Awesome lists — the de-facto convention is an `awesome-` repo name
-        // or an `awesome` / `awesome-list` topic.
-        if (str_starts_with($repoName, 'awesome-')
-            || array_intersect(['awesome', 'awesome-list', 'awesome-lists'], $topics) !== []) {
-            return 'awesome_list';
-        }
-
-        // CSS frameworks — topic-driven so a PHP/JS lib that merely ships a
-        // stylesheet isn't misfiled here.
-        if (array_intersect(['css-framework', 'css-frameworks'], $topics) !== []) {
-            return 'css_framework';
-        }
-
-        // Mobile libraries / SDKs — platform topics are the reliable signal.
-        if (array_intersect(
-            ['android', 'ios', 'kotlin', 'swift', 'swiftui', 'jetpack-compose',
-                'flutter', 'react-native', 'android-library', 'ios-library'],
-            $topics,
-        ) !== []) {
-            return 'mobile_library';
-        }
-
-        // Learning resources — roadmaps, courses, books, cheatsheets.
-        if (array_intersect(
-            ['tutorial', 'tutorials', 'education', 'educational', 'learning',
-                'course', 'courses', 'roadmap', 'roadmaps', 'book', 'books',
-                'curriculum', 'cheatsheet', 'cheatsheets', 'interview',
-                'interview-questions', 'study'],
-            $topics,
-        ) !== []) {
-            return 'learning_resource';
-        }
-
-        return 'tool';
-    }
-
-    /**
      * HEAD a raw.githubusercontent.com path to verify a file exists on a
      * given branch without downloading it. Used by the Docker detector
      * to check for docker-compose / compose files without parsing JSON.
@@ -1261,82 +1139,6 @@ class ProjectImporter
         }
 
         return $response->successful();
-    }
-
-    /**
-     * @param  array<string, mixed>|null  $composer
-     * @param  array<string, mixed>|null  $package
-     * @return list<string>
-     */
-    private static function resolveStack(?array $composer, ?array $package): array
-    {
-        $stack = [];
-        $require = is_array($composer['require'] ?? null) ? $composer['require'] : [];
-
-        if (isset($require['laravel/framework'])) {
-            $stack[] = 'Laravel';
-        }
-        if (self::hasAnyKey($require, 'filament/')) {
-            $stack[] = 'Filament';
-        }
-        if (isset($require['livewire/livewire'])) {
-            $stack[] = 'Livewire';
-        }
-
-        $deps = array_merge(
-            is_array($package['dependencies'] ?? null) ? $package['dependencies'] : [],
-            is_array($package['devDependencies'] ?? null) ? $package['devDependencies'] : [],
-        );
-
-        if (isset($deps['tailwindcss'])) {
-            $stack[] = 'Tailwind';
-        }
-        if (isset($deps['alpinejs'])) {
-            $stack[] = 'Alpine.js';
-        }
-        if (isset($deps['vue'])) {
-            $stack[] = 'Vue';
-        }
-        if (isset($deps['react'])) {
-            $stack[] = 'React';
-        }
-
-        return array_values(array_unique($stack));
-    }
-
-    /**
-     * Resolve supported Filament versions from `composer.require['filament/filament']`
-     * and verify each major has a matching `{major}.x` branch (or that
-     * `{major}` matches the default branch). Non-Filament-plugin projects
-     * return an empty list — versions there are editor-managed.
-     *
-     * @param  array<string, mixed>|null  $composer
-     * @param  list<string>  $branches
-     * @return list<string>
-     */
-    private static function resolveVersions(?array $composer, array $branches, string $category): array
-    {
-        if ($category !== 'filament_plugin') {
-            return [];
-        }
-
-        $constraint = $composer['require']['filament/filament'] ?? null;
-
-        if (! is_string($constraint)) {
-            return [];
-        }
-
-        $versions = [];
-
-        if (preg_match_all('/(\d+)/', $constraint, $m)) {
-            foreach ($m[1] as $major) {
-                if ((int) $major >= 3 && (int) $major <= 9) {
-                    $versions[] = 'v'.$major;
-                }
-            }
-        }
-
-        return array_values(array_unique($versions));
     }
 
     /**
@@ -1469,20 +1271,6 @@ class ProjectImporter
         }
 
         return self::packagistOwnershipForName(strtolower($m[1]), $githubUrl);
-    }
-
-    /**
-     * @param  array<string, mixed>  $arr
-     */
-    private static function hasAnyKey(array $arr, string $prefix): bool
-    {
-        foreach (array_keys($arr) as $key) {
-            if (str_starts_with((string) $key, $prefix)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private static function nullableString(mixed $value): ?string

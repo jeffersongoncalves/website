@@ -49,3 +49,46 @@ it('does not promote a bare laravel topic to laravel_package', function (): void
     expect(ProjectClassifier::specificFromTopics(['react', 'nextjs', 'laravel', 'tailwindcss'], 'ui'))
         ->toBeNull();
 });
+
+it('classifies a filament plugin from the composer type', function (): void {
+    expect(ProjectClassifier::category(['type' => 'filament-plugin', 'name' => 'acme/thing'], ['name' => 'thing']))
+        ->toBe('filament_plugin');
+});
+
+it('classifies a laravel package from the composer require', function (): void {
+    expect(ProjectClassifier::category(['require' => ['laravel/framework' => '^11.0']], ['name' => 'pkg']))
+        ->toBe('laravel_package');
+});
+
+it('classifies a docker project from the compose flag, even without docker topics', function (): void {
+    expect(ProjectClassifier::category(null, ['name' => 'selfhosted-app'], hasDockerCompose: true))
+        ->toBe('docker');
+});
+
+it('lets database topics win over a docker compose file', function (): void {
+    expect(ProjectClassifier::category(null, ['name' => 'pg', 'topics' => ['postgresql']], hasDockerCompose: true))
+        ->toBe('database');
+});
+
+it('falls back to tool when no signal matches', function (): void {
+    expect(ProjectClassifier::category(null, ['name' => 'random-cli']))->toBe('tool');
+});
+
+it('detects the tech stack from composer and npm dependencies', function (): void {
+    $stack = ProjectClassifier::stack(
+        ['require' => ['laravel/framework' => '*', 'filament/filament' => '*', 'livewire/livewire' => '*']],
+        ['dependencies' => ['tailwindcss' => '*'], 'devDependencies' => ['alpinejs' => '*']],
+    );
+
+    expect($stack)->toBe(['Laravel', 'Filament', 'Livewire', 'Tailwind', 'Alpine.js']);
+});
+
+it('parses supported filament versions for a plugin and ignores out-of-range majors', function (): void {
+    expect(ProjectClassifier::versions(['require' => ['filament/filament' => '^3.0|^4.0|^5.0']], [], 'filament_plugin'))
+        ->toBe(['v3', 'v4', 'v5']);
+});
+
+it('returns no versions for a non-filament-plugin category', function (): void {
+    expect(ProjectClassifier::versions(['require' => ['filament/filament' => '^3.0']], [], 'laravel_package'))
+        ->toBe([]);
+});

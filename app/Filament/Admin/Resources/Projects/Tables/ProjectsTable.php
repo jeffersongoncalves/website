@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Projects\Tables;
 
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
+use App\Models\Project;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -13,9 +14,11 @@ use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class ProjectsTable
@@ -81,6 +84,12 @@ class ProjectsTable
                 SelectFilter::make('status')
                     ->label(__('admin.fields.status'))
                     ->options(ProjectStatus::class),
+                Filter::make('authored')
+                    ->label(__('admin.fields.authored'))
+                    ->query(function (Builder $query): Builder {
+                        /** @var Builder<Project> $query */
+                        return $query->authored();
+                    }),
                 TernaryFilter::make('featured')
                     ->label(__('admin.fields.featured')),
                 TernaryFilter::make('is_daily_driver')

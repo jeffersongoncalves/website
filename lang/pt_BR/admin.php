@@ -195,6 +195,7 @@ return [
         'docker_url_hint' => 'Ex: https://hub.docker.com/r/owner/repo — usado para contar pulls. GHCR não tem contador público.',
         'docs_url' => 'URL da documentação',
         'demo_url' => 'URL do demo',
+        'authored' => 'Criado por mim',
         'is_maintainer' => 'Apenas mantenedor',
         'is_daily_driver' => 'Uso diário',
         'is_paid' => 'Pacote pago',

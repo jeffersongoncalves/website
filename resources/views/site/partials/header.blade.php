@@ -15,47 +15,13 @@
         </a>
 
         <nav class="hidden md:flex items-center gap-8 text-[0.9375rem]" aria-label="@lang('site.common.nav_primary')">
-            <a href="{{ route('about') }}" @class(['nav-link', 'is-active' => $active('about')]) @if($active('about')) aria-current="page" @endif>@lang('site.nav.about')</a>
-            <a href="{{ route('projects.index') }}" @class(['nav-link', 'is-active' => $active('projects.*')]) @if($active('projects.*')) aria-current="page" @endif>@lang('site.nav.projects')</a>
-            <a href="{{ route('articles.index') }}" @class(['nav-link', 'is-active' => $active('articles.*')]) @if($active('articles.*')) aria-current="page" @endif>@lang('site.nav.articles')</a>
-            <a href="{{ route('links.index') }}" @class(['nav-link', 'is-active' => $active('links.*')]) @if($active('links.*')) aria-current="page" @endif>@lang('site.nav.links')</a>
-            <a href="{{ route('open-source') }}" @class(['nav-link', 'is-active' => $active('open-source')]) @if($active('open-source')) aria-current="page" @endif>@lang('site.nav.open_source')</a>
-            <a href="{{ route('stack') }}" @class(['nav-link', 'is-active' => $active('stack')]) @if($active('stack')) aria-current="page" @endif>@lang('site.nav.stack')</a>
-            <a href="{{ route('sponsors') }}" @class(['nav-link', 'is-active' => $active('sponsors')]) @if($active('sponsors')) aria-current="page" @endif>@lang('site.nav.sponsors')</a>
-            {{-- Demos: live demo subdomains, one per starter kit. Dropdown
-                 reuses `lang-dropdown-menu` styling (same anchored panel
-                 pattern as the locale switcher) so no new CSS is required. --}}
-            <div class="lang-dropdown" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
-                <button type="button"
-                        class="nav-link inline-flex items-center gap-1"
-                        @click="open = !open"
-                        :aria-expanded="open.toString()"
-                        aria-haspopup="true">
-                    <span>@lang('site.nav.demos')</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" :class="{ 'rotate-180': open }" style="transition:transform 200ms var(--ease-out);"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
-                <ul class="lang-dropdown-menu"
-                    role="menu"
-                    x-show="open"
-                    x-transition:enter="transition ease-out duration-150"
-                    x-transition:enter-start="opacity-0 -translate-y-1"
-                    x-transition:enter-end="opacity-100 translate-y-0"
-                    x-transition:leave="transition ease-in duration-100"
-                    x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0"
-                    x-cloak>
-                    @foreach(config('site.demos', []) as $demo)
-                        <li role="none">
-                            <a href="{{ $demo['url'] }}"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="lang-dropdown-item">
-                                <span>{{ $demo['label'] }}</span>
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
+            <x-site.nav-link :href="route('about')" :active="$active('about')">@lang('site.nav.about')</x-site.nav-link>
+            <x-site.nav-link :href="route('projects.index')" :active="$active('projects.*')">@lang('site.nav.projects')</x-site.nav-link>
+            <x-site.nav-link :href="route('articles.index')" :active="$active('articles.*')">@lang('site.nav.articles')</x-site.nav-link>
+            <x-site.nav-link :href="route('links.index')" :active="$active('links.*')">@lang('site.nav.links')</x-site.nav-link>
+            <x-site.nav-link :href="route('open-source')" :active="$active('open-source')">@lang('site.nav.open_source')</x-site.nav-link>
+            <x-site.nav-link :href="route('stack')" :active="$active('stack')">@lang('site.nav.stack')</x-site.nav-link>
+            <x-site.nav-link :href="route('sponsors')" :active="$active('sponsors')">@lang('site.nav.sponsors')</x-site.nav-link>
         </nav>
 
         <div class="flex items-center gap-2">
@@ -194,23 +160,13 @@
                      x-transition:leave-start="opacity-100"
                      x-transition:leave-end="opacity-0"
                      x-cloak>
-                    <a href="{{ route('about') }}" @class(['mobile-nav-link', 'is-active' => $active('about')]) @if($active('about')) aria-current="page" @endif>@lang('site.nav.about')</a>
-                    <a href="{{ route('projects.index') }}" @class(['mobile-nav-link', 'is-active' => $active('projects.*')]) @if($active('projects.*')) aria-current="page" @endif>@lang('site.nav.projects')</a>
-                    <a href="{{ route('articles.index') }}" @class(['mobile-nav-link', 'is-active' => $active('articles.*')]) @if($active('articles.*')) aria-current="page" @endif>@lang('site.nav.articles')</a>
-                    <a href="{{ route('links.index') }}" @class(['mobile-nav-link', 'is-active' => $active('links.*')]) @if($active('links.*')) aria-current="page" @endif>@lang('site.nav.links')</a>
-                    <a href="{{ route('open-source') }}" @class(['mobile-nav-link', 'is-active' => $active('open-source')]) @if($active('open-source')) aria-current="page" @endif>@lang('site.nav.open_source')</a>
-                    <a href="{{ route('stack') }}" @class(['mobile-nav-link', 'is-active' => $active('stack')]) @if($active('stack')) aria-current="page" @endif>@lang('site.nav.stack')</a>
-                    <a href="{{ route('sponsors') }}" @class(['mobile-nav-link', 'is-active' => $active('sponsors')]) @if($active('sponsors')) aria-current="page" @endif>@lang('site.nav.sponsors')</a>
-                    {{-- Demos rendered inline (not a nested disclosure) — mobile
-                         already collapses the nav, so a second level of
-                         expand/collapse adds taps for no real gain. --}}
-                    <div class="mobile-nav-link" aria-hidden="true">@lang('site.nav.demos')</div>
-                    @foreach(config('site.demos', []) as $demo)
-                        <a href="{{ $demo['url'] }}"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="mobile-nav-link pl-6">{{ $demo['label'] }}</a>
-                    @endforeach
+                    <x-site.nav-link mobile :href="route('about')" :active="$active('about')">@lang('site.nav.about')</x-site.nav-link>
+                    <x-site.nav-link mobile :href="route('projects.index')" :active="$active('projects.*')">@lang('site.nav.projects')</x-site.nav-link>
+                    <x-site.nav-link mobile :href="route('articles.index')" :active="$active('articles.*')">@lang('site.nav.articles')</x-site.nav-link>
+                    <x-site.nav-link mobile :href="route('links.index')" :active="$active('links.*')">@lang('site.nav.links')</x-site.nav-link>
+                    <x-site.nav-link mobile :href="route('open-source')" :active="$active('open-source')">@lang('site.nav.open_source')</x-site.nav-link>
+                    <x-site.nav-link mobile :href="route('stack')" :active="$active('stack')">@lang('site.nav.stack')</x-site.nav-link>
+                    <x-site.nav-link mobile :href="route('sponsors')" :active="$active('sponsors')">@lang('site.nav.sponsors')</x-site.nav-link>
                 </nav>
             </div>
         </div>

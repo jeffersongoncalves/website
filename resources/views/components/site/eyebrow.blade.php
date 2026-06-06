@@ -1,3 +1,4 @@
+@blaze(fold: true)
 @props(['num' => null, 'label' => ''])
 
 <div class="sec-num">

@@ -1,3 +1,4 @@
+@blaze
 @props(['data'])
 {{-- JSON_HEX_TAG escapes < and > so embedded content can't break out of the
      <script> with a literal </script>. --}}

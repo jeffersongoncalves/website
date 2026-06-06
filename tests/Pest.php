@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Project;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -16,12 +17,12 @@ uses(RefreshDatabase::class)->in('Feature');
  *
  * @param  array<string, mixed>  $attributes
  */
-function createProject(array $attributes): \App\Models\Project
+function createProject(array $attributes): Project
 {
     $starredAt = $attributes['starred_at'] ?? null;
     unset($attributes['starred_at']);
 
-    $project = \App\Models\Project::query()->create($attributes);
+    $project = Project::query()->create($attributes);
 
     if ($starredAt !== null) {
         $project->forceFill(['starred_at' => $starredAt])->save();

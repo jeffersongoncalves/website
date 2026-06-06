@@ -76,7 +76,7 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->defaultThemeMode(ThemeMode::System)
             ->darkMode(true)
-            ->maxContentWidth(Width::ScreenTwoExtraLarge)
+            ->maxContentWidth(Width::Full)
             ->sidebarCollapsibleOnDesktop()
             ->renderHook(
                 PanelsRenderHook::SIDEBAR_FOOTER,

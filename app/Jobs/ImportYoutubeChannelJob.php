@@ -9,7 +9,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * Seed a single YouTube channel as a published Project — the YouTube
@@ -20,6 +22,8 @@ use Illuminate\Support\Str;
 class ImportYoutubeChannelJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $timeout = 30;
 
     public function __construct(
         public string $handle,
@@ -67,5 +71,14 @@ class ImportYoutubeChannelJob implements ShouldQueue
 
         // Raw insert bypasses ProjectObserver — the batch dispatches a single
         // delayed RefreshProjectStatsJob to recompute derived stats once.
+    }
+
+    public function failed(?Throwable $e): void
+    {
+        Log::error('ImportYoutubeChannelJob failed', [
+            'handle' => $this->handle,
+            'name' => $this->name,
+            'error' => $e?->getMessage(),
+        ]);
     }
 }

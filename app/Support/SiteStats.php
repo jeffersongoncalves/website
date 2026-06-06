@@ -115,56 +115,105 @@ class SiteStats
      */
     public static function refreshProjectDerived(): void
     {
-        $base = Project::query()->published();
-
-        $data = [
-            // "Repos" is the headline count of repositories the user actually
-            // owns on GitHub. The full curated catalogue (which mixes in
-            // thousands of third-party projects) is tracked separately as
-            // `catalogue` so the public-repos number stays honest.
-            'repos' => self::ownedReposCount(),
-            'catalogue' => (int) (clone $base)->count(),
-            'filament' => (int) (clone $base)->byCategory(ProjectCategory::FilamentPlugin)->count(),
-            'laravel' => (int) (clone $base)->byCategory(ProjectCategory::LaravelPackage)->count(),
-            'livewire' => (int) (clone $base)->byCategory(ProjectCategory::LivewirePackage)->count(),
-            'cakephp' => (int) (clone $base)->byCategory(ProjectCategory::CakePhpPackage)->count(),
-            'laravel_zero' => (int) (clone $base)->byCategory(ProjectCategory::LaravelZeroCli)->count(),
-            'ide_plugin' => (int) (clone $base)->byCategory(ProjectCategory::IdePlugin)->count(),
-            'framework' => (int) (clone $base)->byCategory(ProjectCategory::Framework)->count(),
-            'starter' => (int) (clone $base)->byCategory(ProjectCategory::StarterKit)->count(),
-            'saas' => (int) (clone $base)->byCategory(ProjectCategory::Saas)->count(),
-            'tool' => (int) (clone $base)->byCategory(ProjectCategory::Tool)->count(),
-            'docker' => (int) (clone $base)->byCategory(ProjectCategory::Docker)->count(),
-            'database' => (int) (clone $base)->byCategory(ProjectCategory::Database)->count(),
-            'website' => (int) (clone $base)->byCategory(ProjectCategory::Website)->count(),
-            'youtube_channel' => (int) (clone $base)->byCategory(ProjectCategory::YoutubeChannel)->count(),
-            'php_package' => (int) (clone $base)->byCategory(ProjectCategory::PhpPackage)->count(),
-            'javascript_package' => (int) (clone $base)->byCategory(ProjectCategory::JavascriptPackage)->count(),
-            'css_framework' => (int) (clone $base)->byCategory(ProjectCategory::CssFramework)->count(),
-            'application' => (int) (clone $base)->byCategory(ProjectCategory::Application)->count(),
-            'learning_resource' => (int) (clone $base)->byCategory(ProjectCategory::LearningResource)->count(),
-            'awesome_list' => (int) (clone $base)->byCategory(ProjectCategory::AwesomeList)->count(),
-            'mobile_library' => (int) (clone $base)->byCategory(ProjectCategory::MobileLibrary)->count(),
-            'maintained' => (int) (clone $base)->maintained()->count(),
-            'daily_drivers' => (int) (clone $base)->where('is_daily_driver', true)->count(),
-            'stars' => (int) (clone $base)->sum('stars'),
-            'downloads' => (int) (clone $base)->sum('downloads'),
-            'downloads_packagist' => (int) (clone $base)->where('package_type', PackageType::Composer->value)->sum('downloads'),
-            'downloads_npm' => (int) (clone $base)->where('package_type', PackageType::Npm->value)->sum('downloads'),
-            'downloads_jetbrains' => (int) (clone $base)->where('package_type', PackageType::JetBrains->value)->sum('downloads'),
-            'downloads_docker' => (int) (clone $base)->where('package_type', PackageType::Docker->value)->sum('downloads'),
-            'languages' => self::languageBreakdown(),
-            'topics' => self::topicBreakdown(),
-        ];
-
         $stat = SiteStat::query()->firstOrNew([]);
-        $stat->fill($data);
+        $stat->fill(self::localCounts());
 
         if (! $stat->exists) {
             $stat->synced_at = now();
         }
 
         $stat->save();
+    }
+
+    /**
+     * The locally-derived stats (everything that does NOT need a GitHub API
+     * call): catalogue/category counts, badge counts, star/download sums, and
+     * the language/topic breakdowns. Shared by refreshProjectDerived() (observer
+     * path) and compute() (scheduled sync).
+     *
+     * Category counts and per-package-type download sums are each collapsed into
+     * a single GROUP BY query instead of one COUNT/SUM per bucket — a bulk
+     * import of N projects used to fire ~30 aggregates per RefreshProjectStatsJob.
+     *
+     * @return array{
+     *   repos:int, catalogue:int, filament:int, laravel:int, livewire:int, cakephp:int, laravel_zero:int,
+     *   ide_plugin:int, framework:int, starter:int, saas:int, tool:int, docker:int, database:int, website:int, youtube_channel:int,
+     *   php_package:int, javascript_package:int, css_framework:int, application:int, learning_resource:int, awesome_list:int, mobile_library:int,
+     *   maintained:int, daily_drivers:int,
+     *   stars:int, downloads:int, downloads_packagist:int, downloads_npm:int, downloads_jetbrains:int, downloads_docker:int,
+     *   languages:list<array{language:string,total:int}>,
+     *   topics:list<array{topic:string,total:int}>
+     * }
+     */
+    private static function localCounts(): array
+    {
+        $base = Project::query()->published();
+
+        // Raw DB query mirroring the published() scope, so category/package_type
+        // come back as their raw enum-value strings (not the Eloquent enum cast).
+        $published = fn () => DB::table('projects')
+            ->where('status', ProjectStatus::Published->value)
+            ->where(function ($q): void {
+                $q->whereNull('published_at')->orWhere('published_at', '<=', now());
+            });
+
+        $byCategory = $published()
+            ->selectRaw('category, count(*) as aggregate')
+            ->groupBy('category')
+            ->pluck('aggregate', 'category');
+
+        $cat = fn (ProjectCategory $c): int => (int) ($byCategory[$c->value] ?? 0);
+
+        $downloadsByType = $published()
+            ->selectRaw('package_type, sum(downloads) as aggregate')
+            ->groupBy('package_type')
+            ->pluck('aggregate', 'package_type');
+
+        $dl = fn (PackageType $t): int => (int) ($downloadsByType[$t->value] ?? 0);
+
+        $totals = $published()
+            ->selectRaw('count(*) as catalogue, coalesce(sum(stars), 0) as stars, coalesce(sum(downloads), 0) as downloads')
+            ->first();
+
+        return [
+            // "Repos" is the headline count of repositories the user actually
+            // owns on GitHub. The full curated catalogue (which mixes in
+            // thousands of third-party projects) is tracked separately as
+            // `catalogue` so the public-repos number stays honest.
+            'repos' => self::ownedReposCount(),
+            'catalogue' => (int) ($totals->catalogue ?? 0),
+            'filament' => $cat(ProjectCategory::FilamentPlugin),
+            'laravel' => $cat(ProjectCategory::LaravelPackage),
+            'livewire' => $cat(ProjectCategory::LivewirePackage),
+            'cakephp' => $cat(ProjectCategory::CakePhpPackage),
+            'laravel_zero' => $cat(ProjectCategory::LaravelZeroCli),
+            'ide_plugin' => $cat(ProjectCategory::IdePlugin),
+            'framework' => $cat(ProjectCategory::Framework),
+            'starter' => $cat(ProjectCategory::StarterKit),
+            'saas' => $cat(ProjectCategory::Saas),
+            'tool' => $cat(ProjectCategory::Tool),
+            'docker' => $cat(ProjectCategory::Docker),
+            'database' => $cat(ProjectCategory::Database),
+            'website' => $cat(ProjectCategory::Website),
+            'youtube_channel' => $cat(ProjectCategory::YoutubeChannel),
+            'php_package' => $cat(ProjectCategory::PhpPackage),
+            'javascript_package' => $cat(ProjectCategory::JavascriptPackage),
+            'css_framework' => $cat(ProjectCategory::CssFramework),
+            'application' => $cat(ProjectCategory::Application),
+            'learning_resource' => $cat(ProjectCategory::LearningResource),
+            'awesome_list' => $cat(ProjectCategory::AwesomeList),
+            'mobile_library' => $cat(ProjectCategory::MobileLibrary),
+            'maintained' => (int) (clone $base)->maintained()->count(),
+            'daily_drivers' => (int) (clone $base)->where('is_daily_driver', true)->count(),
+            'stars' => (int) ($totals->stars ?? 0),
+            'downloads' => (int) ($totals->downloads ?? 0),
+            'downloads_packagist' => $dl(PackageType::Composer),
+            'downloads_npm' => $dl(PackageType::Npm),
+            'downloads_jetbrains' => $dl(PackageType::JetBrains),
+            'downloads_docker' => $dl(PackageType::Docker),
+            'languages' => self::languageBreakdown(),
+            'topics' => self::topicBreakdown(),
+        ];
     }
 
     /**
@@ -315,55 +364,14 @@ class SiteStats
      */
     private static function compute(): array
     {
-        $base = Project::query()->published();
-
-        $stars = (int) (clone $base)->sum('stars');
-        $downloads = (int) (clone $base)->sum('downloads');
-        $downloadsPackagist = (int) (clone $base)->where('package_type', PackageType::Composer->value)->sum('downloads');
-        $downloadsNpm = (int) (clone $base)->where('package_type', PackageType::Npm->value)->sum('downloads');
-        $downloadsJetbrains = (int) (clone $base)->where('package_type', PackageType::JetBrains->value)->sum('downloads');
-        $downloadsDocker = (int) (clone $base)->where('package_type', PackageType::Docker->value)->sum('downloads');
-
         $github = self::fetchGithubUser(self::GITHUB_LOGIN);
 
-        return [
-            'repos' => self::ownedReposCount(),
-            'catalogue' => (int) (clone $base)->count(),
-            'filament' => (int) (clone $base)->byCategory(ProjectCategory::FilamentPlugin)->count(),
-            'laravel' => (int) (clone $base)->byCategory(ProjectCategory::LaravelPackage)->count(),
-            'livewire' => (int) (clone $base)->byCategory(ProjectCategory::LivewirePackage)->count(),
-            'cakephp' => (int) (clone $base)->byCategory(ProjectCategory::CakePhpPackage)->count(),
-            'laravel_zero' => (int) (clone $base)->byCategory(ProjectCategory::LaravelZeroCli)->count(),
-            'ide_plugin' => (int) (clone $base)->byCategory(ProjectCategory::IdePlugin)->count(),
-            'framework' => (int) (clone $base)->byCategory(ProjectCategory::Framework)->count(),
-            'starter' => (int) (clone $base)->byCategory(ProjectCategory::StarterKit)->count(),
-            'saas' => (int) (clone $base)->byCategory(ProjectCategory::Saas)->count(),
-            'tool' => (int) (clone $base)->byCategory(ProjectCategory::Tool)->count(),
-            'docker' => (int) (clone $base)->byCategory(ProjectCategory::Docker)->count(),
-            'database' => (int) (clone $base)->byCategory(ProjectCategory::Database)->count(),
-            'website' => (int) (clone $base)->byCategory(ProjectCategory::Website)->count(),
-            'youtube_channel' => (int) (clone $base)->byCategory(ProjectCategory::YoutubeChannel)->count(),
-            'php_package' => (int) (clone $base)->byCategory(ProjectCategory::PhpPackage)->count(),
-            'javascript_package' => (int) (clone $base)->byCategory(ProjectCategory::JavascriptPackage)->count(),
-            'css_framework' => (int) (clone $base)->byCategory(ProjectCategory::CssFramework)->count(),
-            'application' => (int) (clone $base)->byCategory(ProjectCategory::Application)->count(),
-            'learning_resource' => (int) (clone $base)->byCategory(ProjectCategory::LearningResource)->count(),
-            'awesome_list' => (int) (clone $base)->byCategory(ProjectCategory::AwesomeList)->count(),
-            'mobile_library' => (int) (clone $base)->byCategory(ProjectCategory::MobileLibrary)->count(),
-            'maintained' => (int) (clone $base)->maintained()->count(),
-            'daily_drivers' => (int) (clone $base)->where('is_daily_driver', true)->count(),
-            'stars' => $stars,
-            'downloads' => $downloads,
-            'downloads_packagist' => $downloadsPackagist,
-            'downloads_npm' => $downloadsNpm,
-            'downloads_jetbrains' => $downloadsJetbrains,
-            'downloads_docker' => $downloadsDocker,
+        // Locally-derived stats + the three GitHub-sourced fields.
+        return array_merge(self::localCounts(), [
             'followers' => $github['followers'] ?? 0,
             'public_sponsors' => self::fetchSponsorCount(self::GITHUB_LOGIN),
             'contributions' => GithubContributions::fetch(self::GITHUB_LOGIN),
-            'languages' => self::languageBreakdown(),
-            'topics' => self::topicBreakdown(),
-        ];
+        ]);
     }
 
     /**

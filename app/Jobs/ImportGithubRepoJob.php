@@ -16,6 +16,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * Import a single public GitHub repo as a published Project — the unit of work
@@ -123,5 +125,13 @@ class ImportGithubRepoJob implements ShouldQueue
     private function canonicalSlug(): string
     {
         return GithubReadme::repoFromUrl($this->githubUrl) ?? $this->githubUrl;
+    }
+
+    public function failed(?Throwable $e): void
+    {
+        Log::error('ImportGithubRepoJob failed', [
+            'github_url' => $this->githubUrl,
+            'error' => $e?->getMessage(),
+        ]);
     }
 }

@@ -9,7 +9,7 @@ use Livewire\Livewire;
 
 function makeProjectAt(string $slug, DateTimeInterface $createdAt, bool $starred = false): Project
 {
-    $project = Project::query()->create([
+    $project = createProject([
         'slug' => $slug,
         'name' => $slug,
         'category' => ProjectCategory::Tool,

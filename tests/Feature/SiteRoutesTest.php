@@ -118,7 +118,7 @@ it('filters projects by origin (own vs starred) and badges starred ones', functi
         'status' => ProjectStatus::Published,
         'published_at' => now(),
     ]);
-    Project::query()->create([
+    createProject([
         'slug' => 'starred-thing',
         'name' => 'starred-thing',
         'category' => ProjectCategory::Tool,

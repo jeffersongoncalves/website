@@ -110,13 +110,16 @@ class ImportStarredRepoJob implements ShouldQueue
         }
 
         $attributes['github_url'] = $canonical;
-        $attributes['starred_at'] = $starredAt;
         $attributes['status'] = 'published';
         $attributes['is_maintainer'] = false;
         $attributes['is_daily_driver'] = false;
 
         try {
-            Project::create($attributes);
+            // starred_at is guarded (set only by this importer) — forceFill it
+            // alongside the mass-assignable attributes.
+            $project = (new Project)->fill($attributes);
+            $project->forceFill(['starred_at' => $starredAt]);
+            $project->save();
         } catch (UniqueConstraintViolationException) {
             // Raced another import for the same repo/slug — already persisted.
         }
@@ -127,5 +130,13 @@ class ImportStarredRepoJob implements ShouldQueue
         $repo = GithubReadme::repoFromUrl($this->htmlUrl);
 
         return $repo !== null ? 'https://github.com/'.$repo : $this->htmlUrl;
+    }
+
+    public function failed(?\Throwable $e): void
+    {
+        Log::error('ImportStarredRepoJob failed', [
+            'html_url' => $this->htmlUrl,
+            'error' => $e?->getMessage(),
+        ]);
     }
 }

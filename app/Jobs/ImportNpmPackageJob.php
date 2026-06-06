@@ -15,6 +15,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * Import a single npm package as a published Project — the npm counterpart to
@@ -107,5 +109,13 @@ class ImportNpmPackageJob implements ShouldQueue
         } catch (UniqueConstraintViolationException) {
             // Row already exists under a different lookup key.
         }
+    }
+
+    public function failed(?Throwable $e): void
+    {
+        Log::error('ImportNpmPackageJob failed', [
+            'package' => $this->package,
+            'error' => $e?->getMessage(),
+        ]);
     }
 }

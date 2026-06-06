@@ -54,7 +54,7 @@ beforeEach(function (): void {
 
 it('dispatches an import only for stars newer than the cursor and stops at the cursor', function (): void {
     // Cursor = newest existing starred_at.
-    Project::query()->create([
+    createProject([
         'slug' => 'old-repo',
         'name' => 'Old Repo',
         'category' => ProjectCategory::Tool,
@@ -89,7 +89,7 @@ it('sends the star+json Accept header so timestamps come back', function (): voi
 });
 
 it('is idempotent: a second run with the cursor advanced dispatches nothing', function (): void {
-    Project::query()->create([
+    createProject([
         'slug' => 'newest',
         'name' => 'Newest',
         'category' => ProjectCategory::Tool,
@@ -111,7 +111,7 @@ it('is idempotent: a second run with the cursor advanced dispatches nothing', fu
 });
 
 it('--full ignores the cursor and re-scans everything', function (): void {
-    Project::query()->create([
+    createProject([
         'slug' => 'newest',
         'name' => 'Newest',
         'category' => ProjectCategory::Tool,
@@ -205,7 +205,7 @@ it('does not skip a new star inside the app timezone offset window', function ()
     // cursor by the app offset (e.g. +3h for America/Sao_Paulo), so a star a
     // couple of hours after the last-synced one would compare as already-known
     // and be dropped. UTC end-to-end keeps the 1h gap visible.
-    Project::query()->create([
+    createProject([
         'slug' => 'last-synced',
         'name' => 'Last Synced',
         'category' => ProjectCategory::Tool,

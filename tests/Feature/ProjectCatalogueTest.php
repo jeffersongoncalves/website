@@ -10,7 +10,7 @@ use Livewire\Livewire;
 
 function publishedProject(string $name, array $attrs = []): Project
 {
-    return Project::query()->create(array_merge([
+    return createProject(array_merge([
         'slug' => Str::slug($name),
         'name' => $name,
         'category' => ProjectCategory::Tool,

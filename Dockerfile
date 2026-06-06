@@ -119,4 +119,8 @@ RUN set -eux; \
 
 EXPOSE 80
 
+# Probe the nginx /health endpoint (busybox wget is always present on alpine).
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+    CMD wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1
+
 ENTRYPOINT ["/entrypoint.sh"]

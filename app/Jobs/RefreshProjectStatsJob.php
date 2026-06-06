@@ -10,6 +10,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * Recompute the SiteStat singleton's locally-derived columns (counts/badges)
@@ -61,5 +63,12 @@ class RefreshProjectStatsJob implements ShouldBeUniqueUntilProcessing, ShouldQue
     public function handle(): void
     {
         SiteStats::refreshProjectDerived();
+    }
+
+    public function failed(?Throwable $e): void
+    {
+        Log::error('RefreshProjectStatsJob failed', [
+            'error' => $e?->getMessage(),
+        ]);
     }
 }

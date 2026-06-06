@@ -142,7 +142,8 @@ class Project extends Model
         'is_paid',
         'published_at',
         'last_synced_at',
-        'starred_at',
+        // starred_at is intentionally NOT mass-assignable — it is internal,
+        // stamped only by ImportStarredRepoJob via forceFill().
     ];
 
     public array $translatable = [

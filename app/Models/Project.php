@@ -43,6 +43,7 @@ use Spatie\Translatable\HasTranslations;
  * @property int $user_contributions
  * @property string $license
  * @property string|null $github_url
+ * @property string|null $github_owner
  * @property string|null $packagist_url
  * @property string|null $npm_url
  * @property string|null $docker_url
@@ -309,11 +310,10 @@ class Project extends Model
             return $query->whereRaw('1 = 0');
         }
 
-        // Match `https://github.com/<username>/...` case-insensitively. The
-        // trailing slash in the pattern stops a prefix collision (e.g. `jeff`
-        // matching `jeffrey/...`).
-        return $query->whereNotNull('github_url')
-            ->whereRaw('lower(github_url) like ?', ['https://github.com/'.strtolower($username).'/%']);
+        // Exact-match the denormalised, indexed owner login (kept lowercased by
+        // the ProjectObserver). Replaces a `lower(github_url) like` scan that
+        // could never use an index.
+        return $query->where('github_owner', strtolower($username));
     }
 
     /** Third-party repos imported from the GitHub stars feed (starred_at set). */

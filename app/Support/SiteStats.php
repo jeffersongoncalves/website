@@ -501,7 +501,7 @@ class SiteStats
     private static function ownedReposCount(): int
     {
         return (int) Project::query()->published()
-            ->whereRaw('lower(github_url) like ?', ['%github.com/'.self::GITHUB_LOGIN.'/%'])
+            ->where('github_owner', strtolower(self::GITHUB_LOGIN))
             ->count();
     }
 

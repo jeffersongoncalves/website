@@ -56,11 +56,58 @@ class OgImageController
             return 'https://opengraph.githubassets.com/1/'.rtrim($m[1], '/');
         }
 
-        if (! empty($project->social_image)) {
+        // social_image is scraped from arbitrary external sites at import time,
+        // so it is untrusted. Only proxy it when it resolves to a public host —
+        // otherwise /og/{slug}.png becomes an SSRF window into internal services.
+        if (! empty($project->social_image) && $this->isPublicHttpUrl((string) $project->social_image)) {
             return (string) $project->social_image;
         }
 
         return null;
+    }
+
+    /**
+     * Whether the URL is a plain http(s) URL whose host resolves only to public
+     * IPs. Hostnames that fail to resolve, or that point at private/reserved/
+     * loopback/link-local ranges, are rejected (deny-by-default).
+     */
+    private function isPublicHttpUrl(string $url): bool
+    {
+        $parts = parse_url($url);
+
+        if ($parts === false || ! isset($parts['scheme'], $parts['host'])) {
+            return false;
+        }
+
+        if (! in_array(strtolower($parts['scheme']), ['http', 'https'], true)) {
+            return false;
+        }
+
+        $host = $parts['host'];
+
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            $ips = [$host];
+        } else {
+            $ips = gethostbynamel($host) ?: [];
+
+            foreach (@dns_get_record($host, DNS_AAAA) ?: [] as $record) {
+                if (isset($record['ipv6'])) {
+                    $ips[] = $record['ipv6'];
+                }
+            }
+        }
+
+        if ($ips === []) {
+            return false;
+        }
+
+        foreach ($ips as $ip) {
+            if (! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

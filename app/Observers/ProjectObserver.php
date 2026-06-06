@@ -9,6 +9,7 @@ use App\Jobs\GenerateSitemapJob;
 use App\Jobs\RefreshProjectStatsJob;
 use App\Jobs\SyncProjectMetricsJob;
 use App\Models\Project;
+use App\Support\GithubReadme;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;
 
@@ -20,13 +21,23 @@ class ProjectObserver
         if ($project->status === ProjectStatus::Published && empty($project->published_at)) {
             $project->published_at = now();
         }
+
+        // Keep the denormalised, indexed owner login in sync with github_url so
+        // the authored/owned facets stay an exact-match index lookup.
+        if ($project->isDirty('github_url')) {
+            $slug = GithubReadme::repoFromUrl($project->github_url);
+
+            $project->github_owner = $slug !== null
+                ? strtolower(explode('/', $slug, 2)[0])
+                : null;
+        }
     }
 
     public function created(Project $project): void
     {
         SyncProjectMetricsJob::dispatch($project);
 
-        $this->flush();
+        $this->flush(featuredAffected: (bool) $project->featured);
     }
 
     public function updated(Project $project): void
@@ -39,29 +50,36 @@ class ProjectObserver
             SyncProjectMetricsJob::dispatch($project);
         }
 
-        $this->flush();
+        // The landing featured list only changes when the row is (or just
+        // stopped being) featured — editing an ordinary project leaves it
+        // untouched, so don't bust that cache for nothing.
+        $this->flush(featuredAffected: (bool) $project->featured || $project->wasChanged('featured'));
     }
 
     public function deleted(Project $project): void
     {
-        $this->flush();
+        $this->flush(featuredAffected: (bool) $project->featured);
     }
 
     public function restored(Project $project): void
     {
-        $this->flush();
+        $this->flush(featuredAffected: (bool) $project->featured);
     }
 
     public function forceDeleted(Project $project): void
     {
-        $this->flush();
+        $this->flush(featuredAffected: (bool) $project->featured);
     }
 
-    private function flush(): void
+    private function flush(bool $featuredAffected = true): void
     {
         try {
             Cache::delete('projects_count');
-            Cache::delete('featured_projects');
+
+            if ($featuredAffected) {
+                Cache::delete('featured_projects');
+            }
+
             Cache::delete(LlmsTxtController::CACHE_KEY);
         } catch (InvalidArgumentException) {
         }

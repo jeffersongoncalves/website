@@ -17,6 +17,24 @@ class SwitchLocaleController
 
         Cookie::queue(SetLocale::COOKIE_NAME, $locale, 60 * 24 * 365);
 
-        return redirect($request->headers->get('referer', '/'));
+        return redirect($this->safeReferer($request));
+    }
+
+    /**
+     * The Referer is attacker-controllable, so only honour it when it points
+     * back at our own host. Anything cross-origin (or unparseable) falls back
+     * to the home page — this closes the open-redirect window.
+     */
+    private function safeReferer(Request $request): string
+    {
+        $referer = $request->headers->get('referer');
+
+        if ($referer === null || $referer === '') {
+            return '/';
+        }
+
+        $host = parse_url($referer, PHP_URL_HOST);
+
+        return $host === $request->getHost() ? $referer : '/';
     }
 }

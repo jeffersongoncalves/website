@@ -70,3 +70,41 @@ it('redirects to the banner when GitHub rate-limits (429)', function () {
 it('404-falls-back for an unknown slug', function () {
     $this->get('/og/does-not-exist.png')->assertRedirect();
 });
+
+it('proxies a social_image hosted on a public address', function () {
+    $project = Project::query()->create([
+        'slug' => 'public-card',
+        'name' => 'public-card',
+        'category' => ProjectCategory::Saas,
+        'status' => ProjectStatus::Published,
+        // IP literal so the public-host check needs no DNS in the test.
+        'social_image' => 'https://93.184.216.34/card.png',
+        'published_at' => now(),
+    ]);
+
+    Http::fake(['93.184.216.34/*' => Http::response('CARDBYTES', 200, ['Content-Type' => 'image/png'])]);
+
+    $this->get('/og/'.$project->slug.'.png')
+        ->assertOk()
+        ->assertSee('CARDBYTES', false);
+});
+
+it('refuses to proxy a social_image pointing at an internal address (SSRF)', function (string $url) {
+    $project = Project::query()->create([
+        'slug' => 'ssrf-'.md5($url),
+        'name' => 'ssrf',
+        'category' => ProjectCategory::Saas,
+        'status' => ProjectStatus::Published,
+        'social_image' => $url,
+        'published_at' => now(),
+    ]);
+
+    // No stray HTTP request is allowed to leave — the guard must short-circuit
+    // to the generic banner before any fetch happens.
+    $this->get('/og/'.$project->slug.'.png')->assertRedirect();
+})->with([
+    'loopback' => 'http://127.0.0.1/x.png',
+    'link-local metadata' => 'http://169.254.169.254/latest/meta-data/',
+    'private range' => 'http://10.0.0.5/x.png',
+    'non-http scheme' => 'file:///etc/passwd',
+]);

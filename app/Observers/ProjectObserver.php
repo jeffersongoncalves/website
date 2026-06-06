@@ -2,12 +2,15 @@
 
 namespace App\Observers;
 
+use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Http\Controllers\Site\LlmsTxtController;
 use App\Http\Middleware\CachePublicPage;
 use App\Jobs\GenerateSitemapJob;
 use App\Jobs\RefreshProjectStatsJob;
 use App\Jobs\SyncProjectMetricsJob;
+use App\Livewire\Site\LinksPage;
+use App\Livewire\Site\LinksSection;
 use App\Models\Project;
 use App\Support\GithubReadme;
 use Illuminate\Support\Facades\Cache;
@@ -81,6 +84,14 @@ class ProjectObserver
             }
 
             Cache::delete(LlmsTxtController::CACHE_KEY);
+
+            // /links hub: which sections are non-empty + each section's topic
+            // chips. Both derive purely from published external-link rows.
+            Cache::delete(LinksPage::SECTIONS_CACHE_KEY);
+
+            foreach (ProjectCategory::externalLinkCases() as $cat) {
+                Cache::delete(LinksSection::topicsCacheKey($cat));
+            }
         } catch (InvalidArgumentException) {
         }
 

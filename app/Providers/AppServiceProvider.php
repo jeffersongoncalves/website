@@ -89,6 +89,16 @@ class AppServiceProvider extends ServiceProvider
                 $data->image = Vite::asset('resources/images/github-og-'.LocaleSupport::short().'.png');
             }
 
+            // Emit og:locale for the active language (OpenGraph wants the
+            // language_TERRITORY form). Without this laravel-seo skips the tag.
+            if (empty($data->locale)) {
+                $data->locale = match (LocaleSupport::short()) {
+                    'en' => 'en_US',
+                    'es' => 'es_ES',
+                    default => 'pt_BR',
+                };
+            }
+
             return $data;
         });
     }

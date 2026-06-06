@@ -8,6 +8,7 @@
         'name' => 'Jefferson Gonçalves',
         'url' => route('home'),
         'jobTitle' => __('site.home.hero_l1'),
+        'inLanguage' => str_replace('_', '-', app()->getLocale()),
         'sameAs' => [
             'https://github.com/jeffersongoncalves',
             'https://www.linkedin.com/in/jeffersonsimaogoncalves/',
@@ -129,7 +130,7 @@
 
             {{-- Heatmap depends on the GitHub API — hidden until contribution data is available. --}}
             @if (! empty($contributions['cells']))
-            <div class="mt-12" x-data='heatmap({ cells: @json($contributions["cells"]) })'>
+            <div class="mt-12">
                 <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
                     <div class="mono-meta-sm text-ink-400">
                         @lang('site.home.heatmap_title')
@@ -146,10 +147,13 @@
                     </div>
                 </div>
                 <div class="overflow-x-auto no-scrollbar">
+                    {{-- Server-rendered (no Alpine x-for): the level → colour map
+                         lives in CSS via data-level, identical to the old bgFor().
+                         Lands in the page cache as static HTML. --}}
                     <div class="grid grid-rows-7 grid-flow-col gap-[3px] w-max">
-                        <template x-for="(c, i) in cells" :key="i">
-                            <span class="hm-cell" :style="`background: ${bgFor(c)}`"></span>
-                        </template>
+                        @foreach($contributions['cells'] as $c)
+                            <span class="hm-cell"@if($c > 0) data-level="{{ $c }}"@endif></span>
+                        @endforeach
                     </div>
                 </div>
             </div>

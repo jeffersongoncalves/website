@@ -7,6 +7,7 @@ use App\Enums\ProjectStatus;
 use App\Models\Project;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\PostgresConnection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -133,36 +134,48 @@ class LinksSection extends Component
      * The most-used topics among this section's published projects (top 12).
      * Aggregated in PHP so it stays portable across DB engines.
      *
+     * Cached per category — the source rows only change on a project save, and
+     * `ProjectObserver` flushes `links_topics:*`. Without the cache this full
+     * chunked scan ran on every render of every section on the (non-page-cached)
+     * /links hub.
+     *
      * @return list<string>
      */
     private function sectionTopics(): array
     {
-        $counts = [];
+        return Cache::rememberForever(self::topicsCacheKey($this->category), function (): array {
+            $counts = [];
 
-        DB::table('projects')
-            ->where('status', ProjectStatus::Published->value)
-            ->where('category', $this->category->value)
-            ->whereNotNull('topics')
-            ->select('topics')
-            ->orderBy('id')
-            ->chunk(500, function ($rows) use (&$counts): void {
-                foreach ($rows as $row) {
-                    $topics = json_decode((string) $row->topics, true);
+            DB::table('projects')
+                ->where('status', ProjectStatus::Published->value)
+                ->where('category', $this->category->value)
+                ->whereNotNull('topics')
+                ->select('topics')
+                ->orderBy('id')
+                ->chunk(500, function ($rows) use (&$counts): void {
+                    foreach ($rows as $row) {
+                        $topics = json_decode((string) $row->topics, true);
 
-                    if (! is_array($topics)) {
-                        continue;
-                    }
+                        if (! is_array($topics)) {
+                            continue;
+                        }
 
-                    foreach ($topics as $topic) {
-                        if (is_string($topic) && $topic !== '') {
-                            $counts[$topic] = ($counts[$topic] ?? 0) + 1;
+                        foreach ($topics as $topic) {
+                            if (is_string($topic) && $topic !== '') {
+                                $counts[$topic] = ($counts[$topic] ?? 0) + 1;
+                            }
                         }
                     }
-                }
-            });
+                });
 
-        arsort($counts);
+            arsort($counts);
 
-        return array_slice(array_keys($counts), 0, 12);
+            return array_slice(array_keys($counts), 0, 12);
+        });
+    }
+
+    public static function topicsCacheKey(ProjectCategory $category): string
+    {
+        return 'links_topics:'.$category->value;
     }
 }

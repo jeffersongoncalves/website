@@ -24,19 +24,6 @@ Alpine.data('terminalTyping', ({ target = '', delay = 600, speed = 60 } = {}) =>
     },
 }));
 
-Alpine.data('heatmap', ({ cells = [] } = {}) => ({
-    cells,
-    bgFor(v) {
-        if (v === 0) return 'var(--surface-elevated-alt)';
-        const isDark = document.documentElement.classList.contains('dark');
-        // Light scheme: deeper amber tints for contrast over paper
-        const r = isDark ? 245 : 217;
-        const g = isDark ? 158 : 119;
-        const b = isDark ? 11  : 6;
-        return `rgba(${r}, ${g}, ${b}, ${v * 0.25})`;
-    },
-}));
-
 Alpine.data('countUp', (initial = []) => ({
     stats: initial.map(s => ({ ...s, shown: '0' })),
     started: false,

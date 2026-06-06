@@ -37,6 +37,26 @@ it('shows external links grouped on the /links hub', function () {
         ->assertSee(__('site.links.section_youtube_channel'));
 });
 
+it('invalidates the cached /links sections + topics when a project is published', function () {
+    // Warm the section + topic caches while the channel does not exist yet.
+    $this->get('/links')
+        ->assertOk()
+        ->assertDontSee('fresh-channel');
+
+    // Publishing a channel flushes both caches via ProjectObserver. If the
+    // SECTIONS_CACHE were stale the section wouldn't render at all, and a stale
+    // topics cache would drop the chip — so seeing both proves invalidation.
+    externalLink('fresh-channel', ProjectCategory::YoutubeChannel, [
+        'docs_url' => 'https://www.youtube.com/@fresh-channel',
+        'topics' => ['streaming'],
+    ]);
+
+    $this->get('/links')
+        ->assertOk()
+        ->assertSee('fresh-channel')
+        ->assertSee('streaming');
+});
+
 it('keeps external links out of the code catalogue at /projects', function () {
     Project::query()->create([
         'slug' => 'a-real-tool',

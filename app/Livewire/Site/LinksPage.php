@@ -5,6 +5,7 @@ namespace App\Livewire\Site;
 use App\Enums\ProjectCategory;
 use App\Models\Project;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
 /**
@@ -16,15 +17,26 @@ use Livewire\Component;
  */
 class LinksPage extends Component
 {
+    public const SECTIONS_CACHE_KEY = 'links_sections';
+
     public function render(): View
     {
-        $sections = [];
+        // Which external-link categories have at least one published row. Only
+        // changes on a project save (ProjectObserver flushes this key), so cache
+        // it instead of running one exists() per category on every render.
+        $values = Cache::rememberForever(self::SECTIONS_CACHE_KEY, function (): array {
+            $sections = [];
 
-        foreach (ProjectCategory::externalLinkCases() as $cat) {
-            if (Project::query()->published()->byCategory($cat)->exists()) {
-                $sections[] = $cat;
+            foreach (ProjectCategory::externalLinkCases() as $cat) {
+                if (Project::query()->published()->byCategory($cat)->exists()) {
+                    $sections[] = $cat->value;
+                }
             }
-        }
+
+            return $sections;
+        });
+
+        $sections = array_map(fn (string $v): ProjectCategory => ProjectCategory::from($v), $values);
 
         return view('livewire.site.links-page', ['sections' => $sections])
             ->layout('components.site.layouts.app', [

@@ -76,6 +76,7 @@
     $mainLd = array_filter([
         '@context' => 'https://schema.org',
         '@type' => $ldType,
+        'inLanguage' => str_replace('_', '-', app()->getLocale()),
         'name' => $project->name,
         'headline' => $isArticleLd ? $project->name : null,
         'description' => $title,
@@ -107,6 +108,7 @@
     $breadcrumbLd = [
         '@context' => 'https://schema.org',
         '@type' => 'BreadcrumbList',
+        'inLanguage' => str_replace('_', '-', app()->getLocale()),
         'itemListElement' => $crumbItems,
     ];
 @endphp

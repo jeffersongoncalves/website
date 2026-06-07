@@ -68,8 +68,14 @@ jobs:
           build-args: |
             APP_VERSION=${{ steps.appver.outputs.value }}
             IMAGE_SOURCE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # Registry-backed build cache (a dedicated :buildcache image in GHCR).
+          # Unlike type=gha — which the Actions Cache API isolates per git ref, so
+          # each release-*.*.* tag built with a cold cache and recompiled every PHP
+          # extension (~1m45s) — the registry cache has no ref scoping and no 7-day
+          # eviction. Every release reads AND writes it, so php-base + composer-deps
+          # stay warm across releases and the build is self-sustaining.
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
 
       - name: Verify :latest digest matches tag digest
         # Smoke-test: se :latest foi publicado nessa run, confirma que aponta

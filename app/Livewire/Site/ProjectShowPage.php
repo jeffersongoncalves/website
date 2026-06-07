@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\ProjectSlugAlias;
 use App\Support\GithubReadme;
 use App\Support\HtmlSanitizer;
+use App\Support\NpmReadme;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Livewire\Attributes\Url;
@@ -131,9 +132,14 @@ class ProjectShowPage extends Component
             $ref = $project->readme_branch;
         }
 
-        $readmeHtml = $project->github_url
-            ? GithubReadme::fetchHtml($project->github_url, $ref)
-            : null;
+        // README comes from GitHub when the project has a repo; npm-only
+        // packages (no github_url) fall back to the README shipped inline in
+        // the npm registry document.
+        $readmeHtml = match (true) {
+            (bool) $project->github_url => GithubReadme::fetchHtml($project->github_url, $ref),
+            (bool) $project->npm_url => NpmReadme::fetchHtml($project->npm_url),
+            default => null,
+        };
 
         if ($readmeHtml !== null) {
             // README HTML comes from an arbitrary (possibly third-party) repo —

@@ -1,9 +1,11 @@
 <?php
 
+use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Models\Project;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
@@ -16,6 +18,21 @@ function pluginProject(array $attrs = []): Project
         'category' => ProjectCategory::FilamentPlugin,
         'status' => ProjectStatus::Published,
         'github_url' => 'https://github.com/acme/filament-thing',
+        'published_at' => now(),
+    ], $attrs));
+}
+
+function npmOnlyProject(array $attrs = []): Project
+{
+    return Project::query()->create(array_merge([
+        'name' => 'tailwindcss-animate',
+        'slug' => 'tailwindcss-animate',
+        'category' => ProjectCategory::JavascriptPackage,
+        'package_type' => PackageType::Npm,
+        'status' => ProjectStatus::Published,
+        'github_url' => null,
+        'npm_url' => 'https://www.npmjs.com/package/tailwindcss-animate',
+        'stars' => 0,
         'published_at' => now(),
     ], $attrs));
 }
@@ -51,4 +68,29 @@ it('renders a project page under its canonical section without redirecting', fun
     $this->get('/projects/filament-thing')
         ->assertOk()
         ->assertSee('Filament Thing');
+});
+
+it('renders the npm registry README for an npm-only package with no repo', function () {
+    Http::fake([
+        'registry.npmjs.org/*' => Http::response(['readme' => '# Animate utilities']),
+    ]);
+
+    npmOnlyProject();
+
+    $this->get('/projects/tailwindcss-animate')
+        ->assertOk()
+        ->assertSee('Animate utilities');
+});
+
+it('shows the npm link and hides stars for an npm-only package with no repo', function () {
+    Http::fake([
+        'registry.npmjs.org/*' => Http::response(['readme' => '# Animate utilities']),
+    ]);
+
+    npmOnlyProject();
+
+    $this->get('/projects/tailwindcss-animate')
+        ->assertOk()
+        ->assertSee('https://www.npmjs.com/package/tailwindcss-animate')
+        ->assertDontSee(__('site.projects.label_stars'));
 });

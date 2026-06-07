@@ -284,6 +284,9 @@
                             @if($project->packagist_url)
                                 <a href="{{ $project->packagist_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Packagist <span aria-hidden="true">↗</span></a>
                             @endif
+                            @if($project->npm_url)
+                                <a href="{{ $project->npm_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">npm <span aria-hidden="true">↗</span></a>
+                            @endif
                             @if($project->docker_url)
                                 <a href="{{ $project->docker_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Docker <span aria-hidden="true">↗</span></a>
                             @endif
@@ -339,10 +342,14 @@
                         @if($showStatsGrid || $showVersionsStat || $showContribStat)
                             <div class="project-detail-grid">
                                 @if($showStatsGrid)
-                                    <div class="project-detail-stat">
-                                        <small>@lang('site.projects.label_stars')</small>
-                                        <strong><span aria-hidden="true">★</span> {{ $project->stars }}</strong>
-                                    </div>
+                                    {{-- Stars are GitHub stargazers — only meaningful when the
+                                         project has a repo. npm-only packages carry no stars. --}}
+                                    @if($project->github_url)
+                                        <div class="project-detail-stat">
+                                            <small>@lang('site.projects.label_stars')</small>
+                                            <strong><span aria-hidden="true">★</span> {{ $project->stars }}</strong>
+                                        </div>
+                                    @endif
                                     @if($project->downloads_label)
                                         <div class="project-detail-stat">
                                             <small>@lang('site.projects.label_downloads')</small>

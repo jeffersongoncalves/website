@@ -17,38 +17,54 @@ beforeEach(function () {
     ]);
 });
 
-function repoProject(string $name, string $repo): Project
+/**
+ * @param  array<string, mixed>  $attrs
+ */
+function repoProject(string $name, string $repoSlug, array $attrs = []): Project
 {
-    return Project::query()->create([
+    return Project::query()->create(array_merge([
         'slug' => $name,
         'name' => $name,
         'category' => ProjectCategory::Tool,
         'status' => ProjectStatus::Published,
-        'github_url' => "https://github.com/acme/{$repo}",
+        'github_url' => "https://github.com/{$repoSlug}",
+        'stars' => 0,
+        'downloads' => 0,
         'published_at' => now(),
-    ]);
+    ], $attrs));
 }
 
 it('reports missing repos without deleting on a dry run', function () {
-    repoProject('gone-pkg', 'gone');
-    repoProject('alive-pkg', 'alive');
+    repoProject('gone-pkg', 'acme/gone');
+    repoProject('alive-pkg', 'acme/alive');
 
-    $this->artisan('projects:prune-missing-repos')
-        ->assertSuccessful();
+    $this->artisan('projects:prune-missing-repos')->assertSuccessful();
 
     expect(Project::query()->where('slug', 'gone-pkg')->exists())->toBeTrue()
         ->and(Project::query()->where('slug', 'alive-pkg')->exists())->toBeTrue();
 });
 
-it('deletes only the 404 repo when --delete is given', function () {
-    repoProject('gone-pkg', 'gone');
-    repoProject('alive-pkg', 'alive');
+it('deletes the zero-metric 404 repo but keeps the one that still resolves', function () {
+    repoProject('gone-pkg', 'acme/gone');
+    repoProject('alive-pkg', 'acme/alive');
 
-    $this->artisan('projects:prune-missing-repos --delete --no-interaction')
-        ->assertSuccessful();
+    $this->artisan('projects:prune-missing-repos --delete --no-interaction')->assertSuccessful();
 
     expect(Project::query()->where('slug', 'gone-pkg')->exists())->toBeFalse()
         ->and(Project::query()->where('slug', 'alive-pkg')->exists())->toBeTrue();
+});
+
+it('deletes a 404 repo even when it still carries packagist + npm links', function () {
+    // The production dead repos (beyondcode/*) keep stale registry links — the
+    // 404 is what matters, not the links.
+    repoProject('gone-pkg', 'acme/gone', [
+        'packagist_url' => 'https://packagist.org/packages/acme/gone',
+        'npm_url' => 'https://www.npmjs.com/package/gone',
+    ]);
+
+    $this->artisan('projects:prune-missing-repos --delete --no-interaction')->assertSuccessful();
+
+    expect(Project::query()->where('slug', 'gone-pkg')->exists())->toBeFalse();
 });
 
 it('never deletes a paid/private project that 404s (e.g. flux-pro)', function () {
@@ -56,64 +72,23 @@ it('never deletes a paid/private project that 404s (e.g. flux-pro)', function ()
     $factory->preventStrayRequests();
     $factory->fake(['api.github.com/repos/livewire/flux-pro' => Http::response('', 404)]);
 
-    Project::query()->create([
-        'slug' => 'flux-pro',
-        'name' => 'Flux Pro',
-        'category' => ProjectCategory::Tool,
-        'status' => ProjectStatus::Published,
-        'github_url' => 'https://github.com/livewire/flux-pro',
-        'is_paid' => true,
-        'published_at' => now(),
-    ]);
+    repoProject('flux-pro', 'livewire/flux-pro', ['is_paid' => true]);
 
-    $this->artisan('projects:prune-missing-repos --delete --no-interaction')
-        ->assertSuccessful();
+    $this->artisan('projects:prune-missing-repos --delete --no-interaction')->assertSuccessful();
 
     expect(Project::query()->where('slug', 'flux-pro')->exists())->toBeTrue();
 });
 
-it('keeps a 404 repo that is still fully published (both packagist + npm set)', function () {
+it('never scans a repo that still has metrics (stars > 0), even if it 404s', function () {
     Http::swap($factory = new Factory);
     $factory->preventStrayRequests();
-    $factory->fake(['api.github.com/repos/acme/renamed' => Http::response('', 404)]);
+    $factory->fake(['api.github.com/repos/acme/popular' => Http::response('', 404)]);
 
-    Project::query()->create([
-        'slug' => 'renamed-pkg',
-        'name' => 'Renamed Pkg',
-        'category' => ProjectCategory::Tool,
-        'status' => ProjectStatus::Published,
-        'github_url' => 'https://github.com/acme/renamed',
-        'packagist_url' => 'https://packagist.org/packages/acme/renamed',
-        'npm_url' => 'https://www.npmjs.com/package/renamed',
-        'published_at' => now(),
-    ]);
+    repoProject('popular-pkg', 'acme/popular', ['stars' => 1200]);
 
-    $this->artisan('projects:prune-missing-repos --delete --no-interaction')
-        ->assertSuccessful();
+    $this->artisan('projects:prune-missing-repos --delete --no-interaction')->assertSuccessful();
 
-    expect(Project::query()->where('slug', 'renamed-pkg')->exists())->toBeTrue();
-});
-
-it('removes a 404 repo that still has only one registry link', function () {
-    Http::swap($factory = new Factory);
-    $factory->preventStrayRequests();
-    $factory->fake(['api.github.com/repos/acme/halfgone' => Http::response('', 404)]);
-
-    Project::query()->create([
-        'slug' => 'halfgone-pkg',
-        'name' => 'Halfgone Pkg',
-        'category' => ProjectCategory::Tool,
-        'status' => ProjectStatus::Published,
-        'github_url' => 'https://github.com/acme/halfgone',
-        'packagist_url' => 'https://packagist.org/packages/acme/halfgone',
-        // npm_url null → only one link → still a prune candidate
-        'published_at' => now(),
-    ]);
-
-    $this->artisan('projects:prune-missing-repos --delete --no-interaction')
-        ->assertSuccessful();
-
-    expect(Project::query()->where('slug', 'halfgone-pkg')->exists())->toBeFalse();
+    expect(Project::query()->where('slug', 'popular-pkg')->exists())->toBeTrue();
 });
 
 it('ignores website/youtube/article categories even with a 404 github_url', function () {
@@ -121,17 +96,9 @@ it('ignores website/youtube/article categories even with a 404 github_url', func
     $factory->preventStrayRequests();
     $factory->fake(['api.github.com/repos/acme/post' => Http::response('', 404)]);
 
-    Project::query()->create([
-        'slug' => 'an-article',
-        'name' => 'An Article',
-        'category' => ProjectCategory::Article,
-        'status' => ProjectStatus::Published,
-        'github_url' => 'https://github.com/acme/post',
-        'published_at' => now(),
-    ]);
+    repoProject('an-article', 'acme/post', ['category' => ProjectCategory::Article]);
 
-    $this->artisan('projects:prune-missing-repos --delete --no-interaction')
-        ->assertSuccessful();
+    $this->artisan('projects:prune-missing-repos --delete --no-interaction')->assertSuccessful();
 
     expect(Project::query()->where('slug', 'an-article')->exists())->toBeTrue();
 });
@@ -141,10 +108,9 @@ it('never deletes a repo it could not verify (5xx = unknown)', function () {
     $factory->preventStrayRequests();
     $factory->fake(['api.github.com/repos/acme/flaky' => Http::response('', 503)]);
 
-    repoProject('flaky-pkg', 'flaky');
+    repoProject('flaky-pkg', 'acme/flaky');
 
-    $this->artisan('projects:prune-missing-repos --delete --no-interaction')
-        ->assertSuccessful();
+    $this->artisan('projects:prune-missing-repos --delete --no-interaction')->assertSuccessful();
 
     expect(Project::query()->where('slug', 'flaky-pkg')->exists())->toBeTrue();
 });

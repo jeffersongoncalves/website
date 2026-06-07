@@ -10,14 +10,16 @@ use App\Support\GithubReadme;
 use Illuminate\Console\Command;
 
 /**
- * Remove projects whose GitHub repo no longer exists. Targets the orphan
- * profile these always share — a github_url but no `repo`, no Packagist/npm
- * link, and not a paid/private package (livewire/flux-pro legitimately 404s) —
- * then confirms each is a real 404 before removing.
+ * Remove projects whose GitHub repo no longer exists. The signal a dead repo
+ * shares (verified against the production export) is NO METRICS — stars = 0 and
+ * downloads = 0; a still-alive repo keeps its star/download counts through the
+ * scheduled sync. The SQL filter narrows to those (skipping paid/private
+ * packages like livewire/flux-pro and the non-repo content categories), then
+ * each candidate is confirmed as a real 404 before removal.
  *
- *   - the profile filter runs in SQL, so paid/published packages are never
- *     even checked;
- *   - only a definitive 404 is removed — a transient/5xx/rate-limit is skipped;
+ *   - only zero-metric, GitHub-backed, non-paid projects are even checked;
+ *   - only a definitive 404 is removed — a transient/5xx/rate-limit is skipped,
+ *     and a zero-metric repo that still resolves (200) is kept;
  *   - Project has no SoftDeletes, so removal is permanent: dry-run by default,
  *     --delete to remove (prompts when interactive, -n consents for cron).
  */
@@ -34,12 +36,10 @@ class PruneMissingRepos extends Command
         $query = Project::query()
             ->whereNotNull('github_url')
             ->where('github_url', '!=', '')
-            ->where('is_paid', false)   // paid packages are private → expected 404
-            // a dead repo is missing at least one registry link; only a row
-            // with BOTH packagist AND npm set is treated as still-published.
-            ->where(fn ($q) => $q->whereNull('packagist_url')->orWhereNull('npm_url'))
-            ->whereNull('repo')          // a real import always backfills `repo`
-            // these categories legitimately have a null repo (not GitHub repos)
+            ->where('is_paid', false) // paid packages are private → expected 404
+            ->where('stars', 0)       // a dead repo has no metrics; an alive one
+            ->where('downloads', 0)   // keeps its star/download counts on sync
+            // these categories aren't GitHub repos
             ->whereNotIn('category', [
                 ProjectCategory::Website->value,
                 ProjectCategory::YoutubeChannel->value,

@@ -31,6 +31,14 @@ it('strips Alpine x-* attributes (the eval/XSS vector under unsafe-eval CSP)', f
         ->toContain('hi');
 });
 
+it('keeps img width/height so README image galleries flow per row', function () {
+    $clean = HtmlSanitizer::clean('<div><img src="https://x.test/1.png" width="20%" height="100"></div>');
+
+    expect($clean)
+        ->toContain('width="20%"')
+        ->toContain('height="100"');
+});
+
 it('keeps safe formatting, links and images', function () {
     $clean = HtmlSanitizer::clean(
         '<h2>Title</h2><p><a href="https://example.test">link</a></p>'

@@ -36,7 +36,13 @@ class HtmlSanitizer
             // Heading permalinks, code-language hints and our table wrappers
             // lean on class names for styling — keep them.
             ->allowAttribute('class', '*')
-            ->allowAttribute('id', '*');
+            ->allowAttribute('id', '*')
+            // Preserve author image sizing on screenshots. READMEs lay out image
+            // galleries with `<img width="20%">` to flow several per row; without
+            // these attributes every image falls back to max-width:100% and
+            // stacks one per line. Scoped to img (value is a dimension, no CSS).
+            ->allowAttribute('width', ['img'])
+            ->allowAttribute('height', ['img']);
 
         return new SymfonyHtmlSanitizer($config);
     }

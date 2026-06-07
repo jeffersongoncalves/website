@@ -63,6 +63,11 @@ jobs:
         with:
           context: .
           push: true
+          # Sem attestation SLSA: evita gerar/pushar um image index extra a cada
+          # release (acelera o push) e mantem um manifesto single, que deixa o
+          # smoke-test de digest (.Manifest.Digest) inequivoco.
+          provenance: false
+          sbom: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |

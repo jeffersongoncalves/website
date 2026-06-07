@@ -51,6 +51,27 @@ it('deletes only the 404 repo when --delete is given', function () {
         ->and(Project::query()->where('slug', 'alive-pkg')->exists())->toBeTrue();
 });
 
+it('never deletes a paid/private project that 404s (e.g. flux-pro)', function () {
+    Http::swap($factory = new Factory);
+    $factory->preventStrayRequests();
+    $factory->fake(['api.github.com/repos/livewire/flux-pro' => Http::response('', 404)]);
+
+    Project::query()->create([
+        'slug' => 'flux-pro',
+        'name' => 'Flux Pro',
+        'category' => ProjectCategory::Tool,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/livewire/flux-pro',
+        'is_paid' => true,
+        'published_at' => now(),
+    ]);
+
+    $this->artisan('projects:prune-missing-repos --delete --no-interaction')
+        ->assertSuccessful();
+
+    expect(Project::query()->where('slug', 'flux-pro')->exists())->toBeTrue();
+});
+
 it('never deletes a repo it could not verify (5xx = unknown)', function () {
     Http::swap($factory = new Factory);
     $factory->preventStrayRequests();

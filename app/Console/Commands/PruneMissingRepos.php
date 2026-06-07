@@ -42,10 +42,12 @@ class PruneMissingRepos extends Command
         $gone = [];
         /** @var list<array{0:int,1:string,2:string,3:string}> $unknown */
         $unknown = [];
+        /** @var list<array{0:int,1:string,2:string,3:string}> $paidGone */
+        $paidGone = [];
         $checked = 0;
         $rateLimited = false;
 
-        $query->orderBy('id')->chunkById(100, function ($projects) use (&$gone, &$unknown, &$checked, &$rateLimited): bool {
+        $query->orderBy('id')->chunkById(100, function ($projects) use (&$gone, &$unknown, &$paidGone, &$checked, &$rateLimited): bool {
             foreach ($projects as $project) {
                 $repoSlug = GithubReadme::repoFromUrl($project->github_url);
 
@@ -65,7 +67,13 @@ class PruneMissingRepos extends Command
                 $row = [$project->id, $project->name, $project->slug, (string) $project->github_url];
 
                 if ($status === GithubClient::REPO_GONE) {
-                    $gone[] = $row;
+                    // Paid packages (e.g. livewire/flux-pro) are private, so a
+                    // 404 on the public API is expected — never prune those.
+                    if ($project->is_paid) {
+                        $paidGone[] = $row;
+                    } else {
+                        $gone[] = $row;
+                    }
                 } elseif ($status === GithubClient::REPO_UNKNOWN) {
                     $unknown[] = $row;
                 }
@@ -81,6 +89,12 @@ class PruneMissingRepos extends Command
             $this->newLine();
             $this->comment(sprintf('%d could not be verified (transient/5xx/rate limit) — left untouched:', count($unknown)));
             $this->table(['ID', 'Name', 'Slug', 'GitHub URL'], $unknown);
+        }
+
+        if ($paidGone !== []) {
+            $this->newLine();
+            $this->comment(sprintf('%d paid/private project(s) returned 404 (expected — kept):', count($paidGone)));
+            $this->table(['ID', 'Name', 'Slug', 'GitHub URL'], $paidGone);
         }
 
         $this->newLine();

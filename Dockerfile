@@ -7,8 +7,15 @@ FROM php:8.4-fpm-alpine AS php-base
 
 # install-php-extensions e a ferramenta upstream do PHP Docker: instala extensoes
 # com deps de sistema corretas, em paralelo, sem gerenciar .build-deps manual.
+#
+# Pin a uma versao imutavel (NAO `latest`): o asset de `latest` muda toda vez
+# que o mlocati publica uma release, mudando o digest desta camada ADD e
+# invalidando o cache do `php-base` a cada build — o que forcava recompilar
+# todas as extensoes (~1m45s) e reinstalar o composer em toda release. Com a
+# URL versionada o cache do BuildKit (gha) acerta e essas camadas sao reusadas.
 ADD --chmod=0755 \
-    https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions \
+    --checksum=sha256:ca45e43f4299997f3cc78459eb7cc29c125281db8779f99209dc3fe3298fd117 \
+    https://github.com/mlocati/docker-php-extension-installer/releases/download/2.11.1/install-php-extensions \
     /usr/local/bin/
 
 RUN install-php-extensions \

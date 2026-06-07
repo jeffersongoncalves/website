@@ -915,6 +915,18 @@
   }
   .markdown-body img { max-width: 100%; height: auto; border-radius: var(--r-sm); margin: var(--s-3) 0; }
 
+  /* Image galleries — READMEs lay out screenshot grids as a bare <div> of
+     <img width="20%">, expecting several per row. Tailwind preflight makes
+     <img> display:block, which stacks them one per line. Any image carrying an
+     explicit width attribute flows inline-block instead, so width-sized
+     galleries wrap into rows; full-width images (width 100% / none) are
+     unaffected since they fill the row anyway. */
+  .markdown-body img[width] {
+    display: inline-block;
+    vertical-align: top;
+    margin: var(--s-2);
+  }
+
   /* Badge row — when a paragraph holds images (shields.io badges, CI status
      badges, etc), whether anchor-wrapped (`> a > img`) or bare (`> img`, e.g.
      a `<p align="center">` of <img> badges), keep them on one inline row

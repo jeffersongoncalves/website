@@ -35,6 +35,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="color-scheme" content="{{ $isDarkInitial ? 'dark' : 'light' }}">
+    {{-- Preload the body font (above-the-fold text → LCP) and warm the
+         connection to the favicon CDN used by external-link cards. --}}
+    <link rel="preload" href="{{ Vite::asset('resources/fonts/dmsans_400.ttf') }}" as="font" type="font/ttf" crossorigin>
+    <link rel="preconnect" href="https://www.google.com" crossorigin>
+    <link rel="dns-prefetch" href="https://www.google.com">
     <x-favicon/>
     {!! seo($resolvedSeo) !!}
     @livewireStyles

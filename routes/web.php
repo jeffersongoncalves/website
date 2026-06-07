@@ -29,7 +29,8 @@ Route::get('/offline', OfflineController::class)->name('pwa.offline');
 
 // Cached social-card proxy. Outside the locale/page-cache group: it's a binary
 // response and the image is locale-independent.
-Route::get('/og/{slug}.png', OgImageController::class)->name('og.show');
+Route::get('/og/{slug}.png', OgImageController::class)->name('og.show')
+    ->middleware('throttle:60,1');
 
 // llms.txt — plain-text site map for LLM crawlers (llmstxt.org). Lives at the
 // site root with no locale prefix, like /sw.js; it's its own cached text body.
@@ -46,7 +47,8 @@ Route::middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class]
 
     Route::get('/articles', ArticlesPage::class)->name('articles.index')
         ->withoutMiddleware(CachePublicPage::class);
-    Route::get('/articles/feed', ArticlesFeedController::class)->name('articles.feed');
+    Route::get('/articles/feed', ArticlesFeedController::class)->name('articles.feed')
+        ->middleware('throttle:60,1');
     // Articles are Project rows but live under /articles/{slug} so the Articles
     // nav highlights instead of Projects. ProjectShowPage 301s any project to
     // its canonical section. Registered after /articles/feed so the static

@@ -6,6 +6,7 @@ use App\Enums\ProjectCategory;
 use App\Models\Project;
 use App\Models\ProjectSlugAlias;
 use App\Support\GithubReadme;
+use App\Support\HtmlSanitizer;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Livewire\Attributes\Url;
@@ -133,6 +134,11 @@ class ProjectShowPage extends Component
             : null;
 
         if ($readmeHtml !== null) {
+            // README HTML comes from an arbitrary (possibly third-party) repo —
+            // strip scripts/handlers before our own link/image rewriting adds
+            // the safe target/rel/loading attributes on top.
+            $readmeHtml = HtmlSanitizer::clean($readmeHtml);
+
             if ($versions !== []) {
                 $readmeHtml = GithubReadme::rewriteSelfRepoLinks(
                     $readmeHtml,

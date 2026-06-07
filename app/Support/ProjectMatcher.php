@@ -79,8 +79,15 @@ class ProjectMatcher
             return null;
         }
 
+        // Narrow to rows whose URL contains this owner/repo (case-insensitive)
+        // instead of loading the whole github catalogue into memory — this runs
+        // on every import job's pre-check, so an awesome-list import of thousands
+        // of repos would otherwise re-scan the table once per job. The strcasecmp
+        // callback below is still the authoritative match (handles URL casing /
+        // `/tree/branch` variants the LIKE can't distinguish).
         return Project::query()
             ->whereNotNull('github_url')
+            ->whereRaw('LOWER(github_url) LIKE ?', ['%'.strtolower($slug).'%'])
             ->get()
             ->first(fn (Project $p) => strcasecmp(
                 (string) GithubReadme::repoFromUrl($p->github_url),

@@ -41,7 +41,7 @@
             <div class="mt-6 mb-8 mono-meta-sm">
                 <span class="text-ink-400">@lang('site.projects.filtering_by_topic'):</span>
                 <span class="badge badge-accent ml-2">#{{ $activeTopic }}</span>
-                <button type="button" wire:click="clearTopic" class="ml-2 text-ink-400 hover:text-ink-200" style="background:transparent;border:0;cursor:pointer;">✕ @lang('site.projects.clear_filter')</button>
+                <button type="button" wire:click="clearTopic" class="ml-2 bg-transparent border-0 cursor-pointer rounded text-ink-400 hover:text-ink-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"><span aria-hidden="true">✕</span> @lang('site.projects.clear_filter')</button>
             </div>
         @endif
 

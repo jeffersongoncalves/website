@@ -111,7 +111,10 @@
                     </span>
                 @endif
             @elseif(! $project->is_paid)
-                <span aria-label="{{ $project->stars }} @lang('site.projects.label_stars')"><span aria-hidden="true">★</span> {{ $project->stars }}</span>
+                {{-- Stars are GitHub stargazers — only meaningful with a repo. npm-only packages carry none. --}}
+                @if($project->github_url)
+                    <span aria-label="{{ $project->stars }} @lang('site.projects.label_stars')"><span aria-hidden="true">★</span> {{ $project->stars }}</span>
+                @endif
                 @if($project->downloads_label)
                     <span aria-label="{{ $project->downloads_label }} @lang('site.projects.label_downloads')"><span aria-hidden="true">↓</span> {{ $project->downloads_label }}</span>
                 @endif

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\ProjectCategory;
 use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use App\Support\GithubClient;
@@ -36,7 +37,13 @@ class PruneMissingRepos extends Command
             ->where('is_paid', false)   // paid packages are private → expected 404
             ->whereNull('packagist_url') // still on Packagist → alive, repo renamed
             ->whereNull('npm_url')       // still on npm → alive, repo renamed
-            ->whereNull('repo');         // a real import always backfills `repo`
+            ->whereNull('repo')          // a real import always backfills `repo`
+            // these categories legitimately have a null repo (not GitHub repos)
+            ->whereNotIn('category', [
+                ProjectCategory::Website->value,
+                ProjectCategory::YoutubeChannel->value,
+                ProjectCategory::Article->value,
+            ]);
 
         if ($slug = $this->option('slug')) {
             $query->where('slug', $slug);

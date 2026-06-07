@@ -93,6 +93,26 @@ it('keeps a 404 repo that is still published on packagist/npm (renamed, not gone
     expect(Project::query()->where('slug', 'renamed-pkg')->exists())->toBeTrue();
 });
 
+it('ignores website/youtube/article categories even with a 404 github_url', function () {
+    Http::swap($factory = new Factory);
+    $factory->preventStrayRequests();
+    $factory->fake(['api.github.com/repos/acme/post' => Http::response('', 404)]);
+
+    Project::query()->create([
+        'slug' => 'an-article',
+        'name' => 'An Article',
+        'category' => ProjectCategory::Article,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/acme/post',
+        'published_at' => now(),
+    ]);
+
+    $this->artisan('projects:prune-missing-repos --delete --no-interaction')
+        ->assertSuccessful();
+
+    expect(Project::query()->where('slug', 'an-article')->exists())->toBeTrue();
+});
+
 it('never deletes a repo it could not verify (5xx = unknown)', function () {
     Http::swap($factory = new Factory);
     $factory->preventStrayRequests();

@@ -777,6 +777,22 @@
     color: var(--text-strong);
   }
 
+  /* Fenced-code syntax highlighting — tempest/highlight CssTheme token classes,
+     coloured from the theme-aware palette so they flip with light/dark. */
+  .markdown-body pre.notranslate { color: var(--text-regular); }
+  .markdown-body .hl-keyword,
+  .markdown-body .hl-operator   { color: var(--accent-text); }
+  .markdown-body .hl-type,
+  .markdown-body .hl-attribute,
+  .markdown-body .hl-property   { color: var(--info); }
+  .markdown-body .hl-value      { color: var(--success); }
+  .markdown-body .hl-number,
+  .markdown-body .hl-literal    { color: var(--warning); }
+  .markdown-body .hl-variable,
+  .markdown-body .hl-generic,
+  .markdown-body .hl-injection  { color: var(--text-regular); }
+  .markdown-body .hl-comment    { color: var(--text-faint); font-style: italic; }
+
   /* Color text helpers (kept for backwards compat; prefer semantic --text-*) */
   .text-ink-100 { color: var(--text-strong); }
   .text-ink-200 { color: var(--text-regular); }

@@ -228,7 +228,7 @@
                                 : null;
                         @endphp
                         @if($articleBody)
-                            <article class="markdown-body">{!! \App\Support\HtmlSanitizer::clean(\Illuminate\Support\Str::markdown($articleBody)) !!}</article>
+                            <article class="markdown-body">{!! \App\Support\HtmlSanitizer::clean(\App\Support\Markdown::render($articleBody)) !!}</article>
                         @endif
                         <div class="card flex flex-col gap-5 {{ $articleBody ? 'mt-8' : '' }}">
                             @unless($articleBody)

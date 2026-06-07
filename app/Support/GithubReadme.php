@@ -6,11 +6,6 @@ use App\Models\ReadmeCache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use League\CommonMark\Environment\Environment;
-use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
-use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
-use League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension;
-use League\CommonMark\MarkdownConverter;
 
 class GithubReadme
 {
@@ -434,19 +429,7 @@ class GithubReadme
 
     private static function renderMarkdown(string $markdown): string
     {
-        $environment = new Environment([
-            'html_input' => 'allow',
-            'allow_unsafe_links' => false,
-            'heading_permalink' => [
-                'symbol' => '#',
-                'html_class' => 'md-anchor',
-            ],
-        ]);
-
-        $environment->addExtension(new CommonMarkCoreExtension);
-        $environment->addExtension(new GithubFlavoredMarkdownExtension);
-        $environment->addExtension(new HeadingPermalinkExtension);
-
-        return (new MarkdownConverter($environment))->convert($markdown)->getContent();
+        // README output is sanitised later in ProjectShowPage before display.
+        return Markdown::render($markdown, headingPermalinks: true);
     }
 }

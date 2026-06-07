@@ -33,7 +33,8 @@
         "spatie/laravel-sitemap": "^7.0",
         "spatie/laravel-sluggable": "^4.0",
         "spatie/laravel-translatable": "^6.14",
-        "symfony/html-sanitizer": "^8.1"
+        "symfony/html-sanitizer": "^8.1",
+        "tempest/highlight": "^2.25"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^4.0",

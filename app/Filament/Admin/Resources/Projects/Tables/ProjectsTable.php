@@ -96,6 +96,8 @@ class ProjectsTable
                     ->label(__('admin.fields.is_daily_driver')),
                 TernaryFilter::make('is_maintainer')
                     ->label(__('admin.fields.is_maintainer')),
+                TernaryFilter::make('is_paid')
+                    ->label(__('admin.fields.is_paid')),
             ])
             ->recordActions([
                 ViewAction::make(),

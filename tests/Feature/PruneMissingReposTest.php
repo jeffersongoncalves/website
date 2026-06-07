@@ -72,6 +72,27 @@ it('never deletes a paid/private project that 404s (e.g. flux-pro)', function ()
     expect(Project::query()->where('slug', 'flux-pro')->exists())->toBeTrue();
 });
 
+it('keeps a 404 repo that is still published on packagist/npm (renamed, not gone)', function () {
+    Http::swap($factory = new Factory);
+    $factory->preventStrayRequests();
+    $factory->fake(['api.github.com/repos/acme/renamed' => Http::response('', 404)]);
+
+    Project::query()->create([
+        'slug' => 'renamed-pkg',
+        'name' => 'Renamed Pkg',
+        'category' => ProjectCategory::Tool,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/acme/renamed',
+        'packagist_url' => 'https://packagist.org/packages/acme/renamed',
+        'published_at' => now(),
+    ]);
+
+    $this->artisan('projects:prune-missing-repos --delete --no-interaction')
+        ->assertSuccessful();
+
+    expect(Project::query()->where('slug', 'renamed-pkg')->exists())->toBeTrue();
+});
+
 it('never deletes a repo it could not verify (5xx = unknown)', function () {
     Http::swap($factory = new Factory);
     $factory->preventStrayRequests();

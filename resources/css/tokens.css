@@ -108,7 +108,11 @@
   --text-strong:            var(--paper-900);
   --text-regular:           var(--paper-800);
   --text-muted:             var(--paper-600);
-  --text-dim:               var(--paper-500);
+  /* Not paper-500 (#8B8377): on the paper-50 surface that is only ~3.7:1,
+     below WCAG AA (4.5:1) for the meta text using .text-ink-500. This darker
+     warm grey clears AA (~5:1) while staying lighter than --text-muted so the
+     dim < muted hierarchy holds. */
+  --text-dim:               #756E63;
   --text-faint:             var(--paper-400);
   --text-on-accent:         #fff;
 

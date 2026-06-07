@@ -98,9 +98,10 @@
                     @endphp
                     <span class="mono-meta-sm inline-flex items-center gap-1.5">
                         @if($project->category === \App\Enums\ProjectCategory::Website && ($faviconHost = parse_url((string) $project->docs_url, PHP_URL_HOST)))
-                            {{-- Favicon thumb via Google's S2 service (CSP img-src allows https:).
+                            {{-- Favicon thumb via our same-origin proxy (cached; keeps the
+                                 browser off Google's S2 service).
                                  Decorative — the host text beside it carries the meaning. --}}
-                            <img src="https://www.google.com/s2/favicons?domain={{ $faviconHost }}&sz=64"
+                            <img src="{{ route('favicon.proxy', ['domain' => $faviconHost]) }}"
                                  alt="" width="14" height="14" loading="lazy"
                                  class="rounded-[2px] shrink-0">
                         @else

@@ -6,6 +6,7 @@ use App\Models\Project;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Vite;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -149,11 +150,15 @@ class OgImageController
             }
 
             $response = $request->get($source);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            Log::warning('OgImageController fetch threw', ['source' => $source, 'error' => $e->getMessage()]);
+
             return null;
         }
 
         if (! $response->successful()) {
+            Log::warning('OgImageController fetch failed', ['source' => $source, 'status' => $response->status()]);
+
             return null;
         }
 

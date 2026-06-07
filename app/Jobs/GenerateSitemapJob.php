@@ -9,6 +9,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class GenerateSitemapJob implements ShouldQueue
 {
@@ -29,5 +31,12 @@ class GenerateSitemapJob implements ShouldQueue
     public function handle(): void
     {
         Artisan::call('sitemap:generate');
+    }
+
+    public function failed(?Throwable $e): void
+    {
+        Log::error('GenerateSitemapJob failed', [
+            'error' => $e?->getMessage(),
+        ]);
     }
 }

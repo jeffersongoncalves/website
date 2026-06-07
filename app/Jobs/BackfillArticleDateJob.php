@@ -11,6 +11,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * Re-read a published article's real publish date from its source page and
@@ -69,5 +71,13 @@ class BackfillArticleDateJob implements ShouldQueue
         // editorial change — no need to wake the observer (cache flush / sitemap
         // / stats) for a date tweak; the batch's own RefreshProjectStatsJob runs.
         $project->forceFill(['published_at' => $real])->saveQuietly();
+    }
+
+    public function failed(?Throwable $e): void
+    {
+        Log::error('BackfillArticleDateJob failed', [
+            'project_id' => $this->projectId,
+            'error' => $e?->getMessage(),
+        ]);
     }
 }

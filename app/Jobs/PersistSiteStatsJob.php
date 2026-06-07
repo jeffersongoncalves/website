@@ -9,6 +9,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class PersistSiteStatsJob implements ShouldQueue
 {
@@ -34,5 +36,12 @@ class PersistSiteStatsJob implements ShouldQueue
     public function handle(): void
     {
         SiteStats::persist();
+    }
+
+    public function failed(?Throwable $e): void
+    {
+        Log::error('PersistSiteStatsJob failed', [
+            'error' => $e?->getMessage(),
+        ]);
     }
 }

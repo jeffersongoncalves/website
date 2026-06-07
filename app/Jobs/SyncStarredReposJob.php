@@ -102,6 +102,14 @@ class SyncStarredReposJob implements ShouldQueue
         ]);
     }
 
+    public function failed(?\Throwable $e): void
+    {
+        Log::error('SyncStarredReposJob failed', [
+            'full' => $this->full,
+            'error' => $e?->getMessage(),
+        ]);
+    }
+
     /**
      * @throws GithubRateLimitException
      */

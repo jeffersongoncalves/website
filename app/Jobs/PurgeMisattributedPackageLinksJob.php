@@ -13,6 +13,7 @@ use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * Re-verify one project's stored packagist_url AND npm_url against its
@@ -116,6 +117,14 @@ class PurgeMisattributedPackageLinksJob implements ShouldQueue
             'project' => $project->slug,
             'github' => $githubUrl,
             'purged' => array_keys($updates),
+        ]);
+    }
+
+    public function failed(?Throwable $e): void
+    {
+        Log::error('PurgeMisattributedPackageLinksJob failed', [
+            'project_id' => $this->projectId,
+            'error' => $e?->getMessage(),
         ]);
     }
 }

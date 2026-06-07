@@ -95,6 +95,13 @@ class MigrateBlogSitesToArticlesJob implements ShouldQueue
         return $converted;
     }
 
+    public function failed(?\Throwable $e): void
+    {
+        logger()->error('MigrateBlogSitesToArticlesJob failed', [
+            'error' => $e?->getMessage(),
+        ]);
+    }
+
     /**
      * A blog/article marker segment followed by a post slug, or a dated archive
      * path. Bare roots and listing pages stay as websites.

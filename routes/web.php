@@ -21,26 +21,31 @@ use App\Livewire\Site\SponsorsPage;
 use App\Livewire\Site\StackPage;
 use Illuminate\Support\Facades\Route;
 
-// PWA infrastructure. `/sw.js` must live at the site root (not behind the
-// locale middleware) so the service worker scope is `/` and there's no
-// locale-prefixed redirect competing with the registration. `/offline` is
-// pre-cached by the SW and served as the fallback for navigation failures.
-Route::get('/sw.js', ServiceWorkerController::class)->name('pwa.sw');
-Route::get('/offline', OfflineController::class)->name('pwa.offline');
+// Root-level routes (no locale prefix). Still wrapped in SecurityHeaders so
+// these endpoints — especially /og and /favicon-proxy, which relay externally
+// sourced bytes — get X-Content-Type-Options: nosniff and the rest.
+Route::middleware([SecurityHeaders::class])->group(function () {
+    // PWA infrastructure. `/sw.js` must live at the site root (not behind the
+    // locale middleware) so the service worker scope is `/` and there's no
+    // locale-prefixed redirect competing with the registration. `/offline` is
+    // pre-cached by the SW and served as the fallback for navigation failures.
+    Route::get('/sw.js', ServiceWorkerController::class)->name('pwa.sw');
+    Route::get('/offline', OfflineController::class)->name('pwa.offline');
 
-// Cached social-card proxy. Outside the locale/page-cache group: it's a binary
-// response and the image is locale-independent.
-Route::get('/og/{slug}.png', OgImageController::class)->name('og.show')
-    ->middleware('throttle:60,1');
+    // Cached social-card proxy. Outside the locale/page-cache group: it's a
+    // binary response and the image is locale-independent.
+    Route::get('/og/{slug}.png', OgImageController::class)->name('og.show')
+        ->middleware('throttle:60,1');
 
-// Same-origin favicon proxy for external-link cards (keeps the browser off
-// Google's S2 service). Locale-independent binary response, like /og.
-Route::get('/favicon-proxy', FaviconController::class)->name('favicon.proxy')
-    ->middleware('throttle:120,1');
+    // Same-origin favicon proxy for external-link cards (keeps the browser off
+    // Google's S2 service). Locale-independent binary response, like /og.
+    Route::get('/favicon-proxy', FaviconController::class)->name('favicon.proxy')
+        ->middleware('throttle:120,1');
 
-// llms.txt — plain-text site map for LLM crawlers (llmstxt.org). Lives at the
-// site root with no locale prefix, like /sw.js; it's its own cached text body.
-Route::get('/llms.txt', LlmsTxtController::class)->name('llms');
+    // llms.txt — plain-text site map for LLM crawlers (llmstxt.org). Lives at
+    // the site root with no locale prefix; it's its own cached text body.
+    Route::get('/llms.txt', LlmsTxtController::class)->name('llms');
+});
 
 Route::middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class])->group(function () {
     Route::get('/', HomePage::class)->name('home');

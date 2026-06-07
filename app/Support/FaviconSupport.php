@@ -132,6 +132,6 @@ abstract class FaviconSupport
 
     private static function getFavicon(): Response
     {
-        return response(Vite::content(config('filakit.favicon')), 200, ['Content-Type' => 'image/x-icon']);
+        return response(Vite::content(config('filakit.favicon.favicon')), 200, ['Content-Type' => 'image/x-icon']);
     }
 }

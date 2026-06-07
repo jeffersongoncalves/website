@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
+use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use App\Models\SiteStat;
 use Illuminate\Support\Facades\Cache;
@@ -366,6 +367,14 @@ class SiteStats
     {
         $github = self::fetchGithubUser(self::GITHUB_LOGIN);
 
+        // A configured token that still yields no user payload means the call
+        // failed (rate limit / outage), not "0 followers". Bail so persist()
+        // never overwrites the cached followers/sponsors/heatmap with zeros —
+        // the job releases and retries once the window clears.
+        if ($github === [] && config('services.github.token')) {
+            throw new GithubRateLimitException(300);
+        }
+
         // Locally-derived stats + the three GitHub-sourced fields.
         return array_merge(self::localCounts(), [
             'followers' => $github['followers'] ?? 0,
@@ -387,6 +396,7 @@ class SiteStats
 
         DB::table('projects')
             ->where('status', ProjectStatus::Published->value)
+            ->where(fn ($q) => $q->whereNull('published_at')->orWhere('published_at', '<=', now()))
             ->whereNotNull('topics')
             ->select('topics')
             ->orderBy('id')
@@ -429,6 +439,7 @@ class SiteStats
         // not the ProjectLanguage enum cast.
         return DB::table('projects')
             ->where('status', ProjectStatus::Published->value)
+            ->where(fn ($q) => $q->whereNull('published_at')->orWhere('published_at', '<=', now()))
             ->whereNotNull('language')
             ->where('language', '!=', '')
             ->selectRaw('language, count(*) as total')
@@ -508,9 +519,10 @@ class SiteStats
      */
     private static function ownedReposCount(): int
     {
-        return (int) Project::query()->published()
-            ->where('github_owner', strtolower(self::GITHUB_LOGIN))
-            ->count();
+        // Single source of truth for "authored" — scopeAuthored() reads
+        // config('services.github.username'), so this no longer diverges from
+        // the catalogue's authored facet when GITHUB_USERNAME is overridden.
+        return (int) Project::query()->published()->authored()->count();
     }
 
     private static function scaleK(int $n): float|int

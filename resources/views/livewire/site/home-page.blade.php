@@ -85,7 +85,7 @@
 
     <section class="section divider" id="how">
         <div class="wrap">
-            <x-site.eyebrow num="02" label="stack"/>
+            <x-site.eyebrow num="02" :label="__('site.home.eyebrow_stack')"/>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 <div class="lg:col-span-5">
@@ -108,7 +108,7 @@
 
     <section class="section divider" id="open-source" x-data='countUp({{ $statsJson }})'>
         <div class="wrap">
-            <x-site.eyebrow num="03" label="open source"/>
+            <x-site.eyebrow num="03" :label="__('site.home.eyebrow_os')"/>
 
             <div class="flex items-end justify-between flex-wrap gap-4 mb-10">
                 <h2 class="h-section">@lang('site.home.os_title')</h2>

@@ -45,7 +45,7 @@ class MigrateBlogSitesToArticlesJob implements ShouldQueue
      */
     public function middleware(): array
     {
-        return [(new WithoutOverlapping('projects:migrate-blog-sites'))->dontRelease()];
+        return [(new WithoutOverlapping('projects:migrate-blog-sites'))->dontRelease()->expireAfter(600)];
     }
 
     /**

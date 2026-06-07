@@ -24,6 +24,33 @@ class ProjectImporter
      *
      * @throws GithubRateLimitException when GitHub is rate-limiting the API
      */
+    /**
+     * Cache an importer result for an hour, but ONLY when it succeeded
+     * (contains 'fields'). Error results (transient fetch/registry failures)
+     * are returned but never cached, so a momentary outage doesn't freeze the
+     * import as a dead result for the whole TTL.
+     *
+     * @param  callable():array<string, mixed>  $build
+     * @return array<string, mixed>
+     */
+    private static function cacheSuccessful(string $key, callable $build): array
+    {
+        /** @var array<string, mixed>|null $cached */
+        $cached = Cache::get($key);
+
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        $result = $build();
+
+        if (isset($result['fields'])) {
+            Cache::put($key, $result, now()->addHour());
+        }
+
+        return $result;
+    }
+
     public static function fromGithub(string $url): array
     {
         $repoSlug = GithubReadme::repoFromUrl($url);
@@ -32,9 +59,8 @@ class ProjectImporter
             return ['error' => 'invalid_url'];
         }
 
-        return Cache::remember(
+        return self::cacheSuccessful(
             "project_importer:github:{$repoSlug}",
-            now()->addHour(),
             fn () => self::buildResult($repoSlug, $url)
         );
     }
@@ -61,9 +87,8 @@ class ProjectImporter
             return ['error' => 'invalid_url'];
         }
 
-        return Cache::remember(
+        return self::cacheSuccessful(
             'project_importer:url:'.sha1($url),
-            now()->addHour(),
             fn () => self::buildUrlResult($url, $host)
         );
     }
@@ -87,9 +112,8 @@ class ProjectImporter
 
         $pathSegment = $m[1];
 
-        return Cache::remember(
+        return self::cacheSuccessful(
             'project_importer:youtube:'.sha1($url),
-            now()->addHour(),
             fn () => self::buildYoutubeResult($url, $pathSegment)
         );
     }
@@ -117,9 +141,8 @@ class ProjectImporter
             return ['error' => 'invalid_url'];
         }
 
-        return Cache::remember(
+        return self::cacheSuccessful(
             'project_importer:article:'.sha1($url),
-            now()->addHour(),
             fn () => self::buildArticleResult($url, $host)
         );
     }
@@ -228,9 +251,8 @@ class ProjectImporter
             return ['error' => 'invalid_url'];
         }
 
-        return Cache::remember(
+        return self::cacheSuccessful(
             "project_importer:npm:{$package}",
-            now()->addHour(),
             fn () => self::buildNpmResult($package)
         );
     }
@@ -562,8 +584,61 @@ class ProjectImporter
      * to known preview bots (e.g. Medium). Returns the body, or null on a network
      * error or when every attempt comes back non-2xx.
      */
+    /**
+     * Whether $url is a plain http(s) URL whose host resolves only to public
+     * IPs (deny-by-default). Mirrors OgImageController's SSRF guard. Bypassed
+     * under tests, which use non-resolving fake hosts (blog.test, etc) with
+     * Http::fake — real DNS lookups there would reject every fixture.
+     */
+    private static function isPublicHttpUrl(string $url): bool
+    {
+        if (app()->runningUnitTests()) {
+            return true;
+        }
+
+        $parts = parse_url($url);
+
+        if ($parts === false || ! isset($parts['scheme'], $parts['host'])) {
+            return false;
+        }
+
+        if (! in_array(strtolower($parts['scheme']), ['http', 'https'], true)) {
+            return false;
+        }
+
+        $host = $parts['host'];
+        $ips = filter_var($host, FILTER_VALIDATE_IP) ? [$host] : (gethostbynamel($host) ?: []);
+
+        foreach (@dns_get_record($host, DNS_AAAA) ?: [] as $record) {
+            if (isset($record['ipv6'])) {
+                $ips[] = $record['ipv6'];
+            }
+        }
+
+        if ($ips === []) {
+            return false;
+        }
+
+        foreach ($ips as $ip) {
+            if (! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private static function fetchPageHtml(string $url, string $context): ?string
     {
+        // The link-importer fetches caller-supplied URLs server-side, so guard
+        // against SSRF: reject hosts that resolve to private/reserved ranges and
+        // re-validate every redirect hop (a public host could 302 to metadata).
+        if (! self::isPublicHttpUrl($url)) {
+            logger()->warning('ProjectImporter: refused non-public fetch URL', ['context' => $context, 'url' => $url]);
+
+            return null;
+        }
+
         $userAgents = [
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
             'Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)',
@@ -572,6 +647,14 @@ class ProjectImporter
         foreach ($userAgents as $userAgent) {
             try {
                 $response = Http::timeout(8)
+                    ->withOptions(['allow_redirects' => [
+                        'max' => 5,
+                        'on_redirect' => function ($request, $response, $uri): void {
+                            if (! self::isPublicHttpUrl((string) $uri)) {
+                                throw new \RuntimeException('import fetch redirect to non-public host blocked: '.$uri);
+                            }
+                        },
+                    ]])
                     ->withHeaders([
                         'User-Agent' => $userAgent,
                         'Accept' => 'text/html,application/xhtml+xml',

@@ -40,7 +40,7 @@ class ProjectObserver
     {
         SyncProjectMetricsJob::dispatch($project);
 
-        $this->flush(featuredAffected: (bool) $project->featured);
+        $this->flush($project, featuredAffected: (bool) $project->featured);
     }
 
     public function updated(Project $project): void
@@ -56,28 +56,33 @@ class ProjectObserver
         // The landing featured list only changes when the row is (or just
         // stopped being) featured — editing an ordinary project leaves it
         // untouched, so don't bust that cache for nothing.
-        $this->flush(featuredAffected: (bool) $project->featured || $project->wasChanged('featured'));
+        $this->flush($project, featuredAffected: (bool) $project->featured || $project->wasChanged('featured'));
     }
 
     public function deleted(Project $project): void
     {
-        $this->flush(featuredAffected: (bool) $project->featured);
+        $this->flush($project, featuredAffected: (bool) $project->featured);
     }
 
     public function restored(Project $project): void
     {
-        $this->flush(featuredAffected: (bool) $project->featured);
+        $this->flush($project, featuredAffected: (bool) $project->featured);
     }
 
     public function forceDeleted(Project $project): void
     {
-        $this->flush(featuredAffected: (bool) $project->featured);
+        $this->flush($project, featuredAffected: (bool) $project->featured);
     }
 
-    private function flush(bool $featuredAffected = true): void
+    private function flush(Project $project, bool $featuredAffected = true): void
     {
         try {
             Cache::delete('projects_count');
+
+            // The /og/{slug}.png social card is cached for a day under this key
+            // independently of the page cache — bust it too so an image-source
+            // edit / unpublish isn't served stale.
+            Cache::forget('og-image:'.$project->slug);
 
             if ($featuredAffected) {
                 Cache::delete('featured_projects');
@@ -107,6 +112,8 @@ class ProjectObserver
         // per row on the worker path.
         RefreshProjectStatsJob::dispatch()->delay(now()->addSeconds(10));
 
-        GenerateSitemapJob::dispatch();
+        // Delayed + unique-until-processing so a bulk import collapses to one
+        // trailing rebuild instead of one per saved row.
+        GenerateSitemapJob::dispatch()->delay(now()->addSeconds(15));
     }
 }

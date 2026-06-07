@@ -103,7 +103,8 @@ class LinksSection extends Component
 
         $search = trim($this->search);
         if ($search !== '') {
-            $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $search).'%';
+            // Escape the backslash first (LIKE escape char) before %/_.
+            $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $search).'%';
             // Postgres LIKE is case-sensitive — use ILIKE there.
             $operator = $query->getConnection() instanceof PostgresConnection ? 'ilike' : 'like';
             $query->where(function ($q) use ($like, $operator): void {

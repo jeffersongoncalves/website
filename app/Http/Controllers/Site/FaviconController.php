@@ -33,12 +33,20 @@ class FaviconController
             return $this->fallback();
         }
 
-        /** @var array{body: string, type: string}|null $icon */
-        $icon = Cache::remember('favicon:'.$domain, now()->addDays(30), function () use ($domain): ?array {
-            return $this->fetch($domain);
-        });
+        $key = 'favicon:'.$domain;
+
+        // Cache::remember treats a null value as a miss, so a failing domain
+        // would re-hit google.com on every request. Store a `false` sentinel
+        // for failures (short negative TTL) so they aren't re-fetched.
+        $icon = Cache::get($key);
 
         if ($icon === null) {
+            $fetched = $this->fetch($domain);
+            Cache::put($key, $fetched ?? false, $fetched !== null ? now()->addDays(30) : now()->addHours(6));
+            $icon = $fetched ?? false;
+        }
+
+        if (! is_array($icon)) {
             return $this->fallback();
         }
 

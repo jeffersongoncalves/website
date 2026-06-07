@@ -63,3 +63,9 @@ pest()->beforeEach(function () {
         'plugins.jetbrains.com/*' => Http::response(['downloads' => 0]),
     ]);
 })->in('Feature');
+
+// Unit tests stub their own HTTP. Block stray requests so a test that forgets
+// to fake an endpoint fails loudly instead of silently receiving an empty 200.
+pest()->beforeEach(function () {
+    Http::preventStrayRequests();
+})->in('Unit');

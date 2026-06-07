@@ -6,6 +6,7 @@ use App\Jobs\PersistSiteStatsJob;
 use App\Jobs\SyncProjectMetricsJob;
 use App\Models\Project;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Bus;
 
 class SyncProjectMetrics extends Command
 {
@@ -23,13 +24,24 @@ class SyncProjectMetrics extends Command
 
         $projects = $query->get();
 
-        foreach ($projects as $project) {
-            SyncProjectMetricsJob::dispatch($project);
+        if ($projects->isEmpty()) {
+            PersistSiteStatsJob::dispatch();
+            $this->info('No projects to sync; dispatched site stats job.');
+
+            return self::SUCCESS;
         }
 
-        PersistSiteStatsJob::dispatch();
+        // Batch the per-project syncs and only recompute the site-stats
+        // aggregate AFTER they all finish — otherwise PersistSiteStatsJob runs
+        // early (while rate-limited project jobs are still queued) and sums
+        // stale stars/downloads.
+        Bus::batch($projects->map(fn (Project $project): SyncProjectMetricsJob => new SyncProjectMetricsJob($project))->all())
+            ->name('sync-project-metrics')
+            ->onQueue('github')
+            ->then(fn () => PersistSiteStatsJob::dispatch())
+            ->dispatch();
 
-        $this->info("Dispatched {$projects->count()} project sync jobs + site stats job on the `github` queue.");
+        $this->info("Dispatched {$projects->count()} project sync jobs; site stats job runs after the batch completes.");
 
         return self::SUCCESS;
     }

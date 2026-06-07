@@ -90,7 +90,9 @@ class ProjectShowPage extends Component
 
     public function render(): View
     {
-        $project = Project::query()->findOrFail($this->projectId);
+        // Keep the published() scope on every re-render (wire:click version
+        // switch) so a row unpublished/rescheduled mid-session stops rendering.
+        $project = Project::query()->published()->findOrFail($this->projectId);
 
         $isFilamentPlugin = $project->category === ProjectCategory::FilamentPlugin;
         $versions = $isFilamentPlugin && is_array($project->versions) ? $project->versions : [];

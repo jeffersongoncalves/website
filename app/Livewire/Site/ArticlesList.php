@@ -26,6 +26,11 @@ class ArticlesList extends Component
         $articles = Project::query()
             ->published()
             ->byCategory(ProjectCategory::Article)
+            // Portable NULLS LAST: published() keeps null published_at visible,
+            // but Postgres sorts NULLs first on DESC, floating undated articles
+            // to the top of a "newest first" list. `published_at IS NULL` (0/1)
+            // pushes them to the bottom on Postgres/MySQL/SQLite alike.
+            ->orderByRaw('published_at is null')
             ->orderByDesc('published_at')
             ->paginate(12);
 

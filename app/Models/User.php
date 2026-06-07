@@ -95,7 +95,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             return false;
         }
 
-        return true;
+        // Status checked on every request (not only at login) so a deactivated
+        // user is dropped from an existing session / remember-me too.
+        return $this->status === true;
     }
 
     public function canImpersonate(): bool

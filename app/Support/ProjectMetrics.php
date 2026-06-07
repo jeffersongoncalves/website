@@ -200,7 +200,6 @@ class ProjectMetrics
 
         $current = is_array($project->branch_overrides) ? $project->branch_overrides : [];
         $versions = array_values($project->versions);
-        $lastIndex = count($versions) - 1;
 
         $next = [];
         foreach ($versions as $i => $version) {

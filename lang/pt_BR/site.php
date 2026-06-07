@@ -92,6 +92,8 @@ return [
         'sponsors_extra' => 'Transparência total: relatórios trimestrais públicos sobre como cada real é alocado.',
         'heatmap_title' => 'Contribuições · últimos 12 meses',
         'view_all' => 'Ver todos os projetos →',
+        'eyebrow_stack' => 'stack',
+        'eyebrow_os' => 'open source',
     ],
 
     'os' => [
@@ -230,6 +232,8 @@ return [
         'principles_title' => 'Como eu trabalho.',
         'cta_title' => 'Veja o que estou construindo.',
         'cta_body' => 'Plugins Filament, pacotes Laravel e starter kits — tudo open source. Issues e PRs são bem-vindos.',
+        'eyebrow_timeline' => 'linha do tempo',
+        'eyebrow_principles' => 'princípios',
     ],
 
     'sponsors' => [

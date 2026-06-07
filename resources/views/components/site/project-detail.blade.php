@@ -79,6 +79,9 @@
         'inLanguage' => str_replace('_', '-', app()->getLocale()),
         'name' => $project->name,
         'headline' => $isArticleLd ? $project->name : null,
+        // Google lists `image` as strongly recommended for Article rich results;
+        // the og:image asset already exists at /og/{slug}.png.
+        'image' => $isArticleLd ? route('og.show', ['slug' => $project->slug]) : null,
         'description' => $title,
         'url' => ($isArticleLd || $ldType === 'WebSite') ? ($project->docs_url ?: $showUrl) : $showUrl,
         'codeRepository' => $ldType === 'SoftwareSourceCode' ? $project->github_url : null,

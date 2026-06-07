@@ -132,7 +132,9 @@ class ProjectsList extends Component
         }
 
         if ($search !== '') {
-            $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $search).'%';
+            // Escape the backslash first (it's the LIKE escape char) so a user
+            // backslash can't turn the following %/_ into a literal/escape.
+            $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $search).'%';
             // Postgres LIKE is case-sensitive — use ILIKE there so a search for
             // "filament" matches "Filament". MySQL/SQLite LIKE already folds case.
             $operator = $query->getConnection() instanceof PostgresConnection ? 'ilike' : 'like';

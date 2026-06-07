@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\SetLocale;
 use App\Support\LocaleSupport;
 use Filament\Actions;
 use Filament\Forms;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\ValidationException;
+use Livewire\Livewire;
 use RalphJSmit\Laravel\SEO\Facades\SEOManager;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 
@@ -67,6 +69,13 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Model::automaticallyEagerLoadRelationships();
+
+        // SetLocale is a route-group middleware, so Livewire /update requests
+        // (live search/sort/topic/pagination on /projects, /links, /articles)
+        // would otherwise run without it and re-render under the default locale,
+        // flipping en/es visitors to pt_BR mid-interaction. Persist it so it
+        // re-runs on every component update.
+        Livewire::addPersistentMiddleware(SetLocale::class);
 
         Paginator::defaultView('pagination.site');
         Paginator::defaultSimpleView('pagination.site-simple');

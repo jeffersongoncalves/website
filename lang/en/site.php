@@ -92,6 +92,8 @@ return [
         'sponsors_extra' => 'Full transparency: public quarterly reports on how each dollar is allocated.',
         'heatmap_title' => 'Contributions · last 12 months',
         'view_all' => 'View all projects →',
+        'eyebrow_stack' => 'stack',
+        'eyebrow_os' => 'open source',
     ],
 
     'os' => [
@@ -230,6 +232,8 @@ return [
         'principles_title' => 'How I work.',
         'cta_title' => 'See what I am building.',
         'cta_body' => 'Filament plugins, Laravel packages and starter kits — all open source. Issues and PRs welcome.',
+        'eyebrow_timeline' => 'timeline',
+        'eyebrow_principles' => 'principles',
     ],
 
     'sponsors' => [

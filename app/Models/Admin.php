@@ -88,7 +88,10 @@ class Admin extends Model implements AuthenticatableContract, AuthorizableContra
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        // Per-request gate (Filament re-runs this on every request, incl.
+        // remember-me re-auth) — deactivating an admin locks them out of an
+        // already-open session, not just at the login form.
+        return $this->status === true;
     }
 
     public function canImpersonate(): bool

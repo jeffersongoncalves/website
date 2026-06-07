@@ -131,10 +131,13 @@ class AdminPanelProvider extends PanelProvider
                     ->setSort(10)
                     ->shouldRegisterNavigation(false)
                     ->shouldShowEmailForm()
+                    // Endonyms (each language in its own name) — intentionally
+                    // not translated, so the selector reads the same regardless
+                    // of the admin's current interface locale.
                     ->shouldShowLocaleForm(options: [
-                        'pt_BR' => __('🇧🇷 Português'),
-                        'en' => __('🇺🇸 Inglês'),
-                        'es' => __('🇪🇸 Espanhol'),
+                        'pt_BR' => '🇧🇷 Português',
+                        'en' => '🇺🇸 English',
+                        'es' => '🇪🇸 Español',
                     ])
                     ->shouldShowSanctumTokens()
                     ->shouldShowMultiFactorAuthentication()

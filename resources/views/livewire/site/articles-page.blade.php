@@ -1,4 +1,7 @@
 <div>
+    @push('head')
+        <link rel="alternate" type="application/rss+xml" title="{{ __('site.articles.title') }}" href="{{ route('articles.feed') }}">
+    @endpush
     <section class="section section-first">
         <div class="wrap">
             <x-site.eyebrow num="01" :label="__('site.articles.eyebrow')"/>

@@ -57,7 +57,9 @@ class RefreshProjectStatsJob implements ShouldBeUniqueUntilProcessing, ShouldQue
      */
     public function middleware(): array
     {
-        return [(new WithoutOverlapping('site-stats:refresh-derived'))->dontRelease()];
+        // expireAfter so a hard-killed worker (timeout/OOM/SIGKILL) doesn't hold
+        // the no-TTL lock forever and silently drop every future refresh.
+        return [(new WithoutOverlapping('site-stats:refresh-derived'))->dontRelease()->expireAfter(180)];
     }
 
     public function handle(): void

@@ -23,7 +23,12 @@ class ProjectImportsWidget extends StatsOverviewWidget
         $lastWeekStart = $weekStart->copy()->subWeek();
 
         $newThisWeek = Project::query()->where('created_at', '>=', $weekStart)->count();
-        $newLastWeek = Project::query()->whereBetween('created_at', [$lastWeekStart, $weekStart])->count();
+        // Exclusive upper bound — whereBetween is inclusive, so a row created at
+        // exactly $weekStart would be counted in both this week and last week.
+        $newLastWeek = Project::query()
+            ->where('created_at', '>=', $lastWeekStart)
+            ->where('created_at', '<', $weekStart)
+            ->count();
         $delta = $newThisWeek - $newLastWeek;
         $deltaLabel = ($delta >= 0 ? '+' : '').number_format($delta, 0, ',', '.');
 

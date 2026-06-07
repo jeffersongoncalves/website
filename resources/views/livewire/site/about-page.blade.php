@@ -45,7 +45,7 @@
 
     <section class="section">
         <div class="wrap">
-            <x-site.eyebrow num="02" label="timeline"/>
+            <x-site.eyebrow num="02" :label="__('site.about.eyebrow_timeline')"/>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 <div class="lg:col-span-4">
@@ -96,7 +96,7 @@
 
     <section class="section">
         <div class="wrap">
-            <x-site.eyebrow num="03" label="princípios"/>
+            <x-site.eyebrow num="03" :label="__('site.about.eyebrow_principles')"/>
             <h2 class="h-section mb-12">@lang('site.about.principles_title')</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 @foreach($principles as $i => $p)

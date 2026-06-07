@@ -48,6 +48,7 @@ class OgImageController
 
         return response($cached['body'], 200)
             ->header('Content-Type', $cached['type'])
+            ->header('X-Content-Type-Options', 'nosniff')
             ->header('Cache-Control', 'public, max-age=86400');
     }
 
@@ -143,13 +144,28 @@ class OgImageController
     private function fetch(string $source, ?array $resolve = null): ?array
     {
         try {
-            $request = Http::timeout(8);
+            $options = [
+                // Follow redirects but re-validate every hop: the CURLOPT_RESOLVE
+                // pin only covers the first host, so without this a public host
+                // could 302 to 169.254.169.254/localhost and defeat the IP guard.
+                'allow_redirects' => [
+                    'max' => 3,
+                    'strict' => true,
+                    'referer' => false,
+                    'protocols' => ['http', 'https'],
+                    'on_redirect' => function ($request, $response, $uri): void {
+                        if ($this->publicResolveEntries((string) $uri) === null) {
+                            throw new \RuntimeException('OG fetch redirect to non-public host blocked: '.$uri);
+                        }
+                    },
+                ],
+            ];
 
             if ($resolve !== null) {
-                $request = $request->withOptions(['curl' => [CURLOPT_RESOLVE => $resolve]]);
+                $options['curl'] = [CURLOPT_RESOLVE => $resolve];
             }
 
-            $response = $request->get($source);
+            $response = Http::timeout(8)->withOptions($options)->get($source);
         } catch (Throwable $e) {
             Log::warning('OgImageController fetch threw', ['source' => $source, 'error' => $e->getMessage()]);
 
@@ -162,9 +178,20 @@ class OgImageController
             return null;
         }
 
+        // This endpoint serves images only. Untrusted upstreams (social_image)
+        // could return text/html+script; serving that verbatim from our own
+        // origin would be stored XSS, so reject anything that isn't an image.
+        $type = strtolower(trim((string) $response->header('Content-Type')));
+
+        if (! str_starts_with($type, 'image/')) {
+            Log::warning('OgImageController rejected non-image upstream', ['source' => $source, 'type' => $type]);
+
+            return null;
+        }
+
         return [
             'body' => $response->body(),
-            'type' => (string) ($response->header('Content-Type') ?: 'image/png'),
+            'type' => $type,
         ];
     }
 

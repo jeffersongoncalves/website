@@ -54,6 +54,15 @@ it('deletes the zero-metric 404 repo but keeps the one that still resolves', fun
         ->and(Project::query()->where('slug', 'alive-pkg')->exists())->toBeTrue();
 });
 
+it('deletes without a prompt when --force is given', function () {
+    repoProject('gone-pkg', 'acme/gone');
+
+    // No --no-interaction here: --force must bypass the confirmation itself.
+    $this->artisan('projects:prune-missing-repos --delete --force')->assertSuccessful();
+
+    expect(Project::query()->where('slug', 'gone-pkg')->exists())->toBeFalse();
+});
+
 it('deletes a 404 repo even when it still carries packagist + npm links', function () {
     // The production dead repos (beyondcode/*) keep stale registry links — the
     // 404 is what matters, not the links.

@@ -27,6 +27,7 @@ class PruneMissingRepos extends Command
 {
     protected $signature = 'projects:prune-missing-repos
         {--delete : Remove the matched projects (default: dry-run report)}
+        {--force : Skip the delete confirmation prompt (for non-interactive runners)}
         {--slug= : Only check this single project slug}';
 
     protected $description = 'Remove orphan projects whose GitHub repo no longer exists';
@@ -110,7 +111,10 @@ class PruneMissingRepos extends Command
             return self::SUCCESS;
         }
 
-        if ($this->input->isInteractive()
+        // Prompt only when interactive and not forced. --force lets headless
+        // runners (kronn/cron, where there's no TTY to type "yes") proceed.
+        if (! $this->option('force')
+            && $this->input->isInteractive()
             && ! $this->confirm(sprintf('Permanently delete these %d project(s)?', count($gone)), false)) {
             $this->info('Aborted — nothing removed.');
 

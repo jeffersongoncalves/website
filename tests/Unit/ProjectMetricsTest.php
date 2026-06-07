@@ -7,6 +7,7 @@ use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use App\Support\ProjectMetrics;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
@@ -92,6 +93,24 @@ it('skips branch repair when the snapshot has no branches', function () {
 
     // Empty branch list = no data this run; existing overrides are left intact.
     expect($project->fresh()->branch_overrides)->toBe(['1.x' => 'custom']);
+});
+
+it('still persists stars when the contributors endpoint times out', function () {
+    // Giant repos (NixOS/nixpkgs) make the contributors call exhaust the retry
+    // budget and throw ConnectionException. That must not discard the stars the
+    // GraphQL call already produced — the contributors timeout is swallowed.
+    config(['services.github.username' => 'owner']);
+    Http::fake([
+        'api.github.com/repos/*/contributors*' => fn () => throw new ConnectionException('cURL error 28: Operation timed out'),
+        'api.github.com/graphql' => Http::response(graphqlRepo(stars: 25015)),
+    ]);
+
+    $project = metricsProject(['stars' => 0]);
+    $changed = ProjectMetrics::sync($project);
+
+    expect($changed)->toBeTrue()
+        ->and($project->fresh()->stars)->toBe(25015)
+        ->and($project->fresh()->user_contributions)->toBe(0);
 });
 
 it('reads user contributions from a single contributors page', function () {

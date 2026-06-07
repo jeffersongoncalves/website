@@ -7,6 +7,7 @@ use App\Enums\ProjectCategory;
 use App\Enums\ProjectLanguage;
 use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
@@ -273,12 +274,23 @@ class ProjectMetrics
         // anyone with a meaningful contribution. The old 5-page walk burned up
         // to 4 extra calls/project on popular repos hunting a user who, if
         // absent from page 1, contributed too little to matter (result: 0).
-        $response = self::http()
-            ->withHeaders($headers)
-            ->get("https://api.github.com/repos/{$repo}/contributors", [
-                'per_page' => 100,
-                'anon' => 'false',
-            ]);
+        try {
+            $response = self::http()
+                ->withHeaders($headers)
+                ->get("https://api.github.com/repos/{$repo}/contributors", [
+                    'per_page' => 100,
+                    'anon' => 'false',
+                ]);
+        } catch (ConnectionException $e) {
+            // Giant repos (e.g. NixOS/nixpkgs) make the contributors endpoint so
+            // slow it exhausts the retry budget and times out. This is the last,
+            // least-important enrichment in sync() — swallow the timeout and
+            // return null (the documented "couldn't verify" path) so it never
+            // discards the stars/language/topics already gathered this run.
+            Log::warning('GitHub contributors API timed out', ['repo' => $repo, 'error' => $e->getMessage()]);
+
+            return null;
+        }
 
         self::throwIfRateLimited($response);
 

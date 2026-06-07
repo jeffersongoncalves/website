@@ -90,6 +90,9 @@ class ProjectObserver
 
             Cache::delete(LlmsTxtController::CACHE_KEY);
 
+            // Catalogue-only topic chips on /projects (SiteStats::catalogueTopics).
+            Cache::delete('site_stats:catalogue_topics');
+
             // /links hub: which sections are non-empty + each section's topic
             // chips. Both derive purely from published external-link rows.
             Cache::delete(LinksPage::SECTIONS_CACHE_KEY);

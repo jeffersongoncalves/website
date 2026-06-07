@@ -94,9 +94,29 @@ class ImportStarredRepoJob implements ShouldQueue
         $fields = $result['fields'] ?? null;
 
         if (! is_array($fields)) {
-            Log::warning('ImportStarredRepoJob: importer failed', [
+            $error = $result['error'] ?? 'unknown';
+
+            // Transient failure (network/timeout/unknown): RELEASE to retry
+            // within retryUntil instead of dropping the star. The sync cursor is
+            // MAX(starred_at); if we silently returned, a newer star importing
+            // successfully would advance the cursor past this one and it would
+            // never be re-enumerated — permanently lost. Permanent failures
+            // (repo deleted/renamed → repo_not_found, or invalid_url) can't be
+            // retried, so those still drop.
+            if ($error === 'fetch_failed' || $error === 'unknown') {
+                Log::warning('ImportStarredRepoJob: transient importer failure, retrying', [
+                    'url' => $canonical,
+                    'error' => $error,
+                ]);
+
+                $this->release($this->backoff);
+
+                return;
+            }
+
+            Log::warning('ImportStarredRepoJob: importer failed permanently', [
                 'url' => $canonical,
-                'error' => $result['error'] ?? 'unknown',
+                'error' => $error,
             ]);
 
             return;

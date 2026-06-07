@@ -161,7 +161,9 @@ class ProjectsList extends Component
             'activeTopic' => $activeTopic,
             'categories' => ProjectCategory::catalogueCases(),
             'languages' => $languages,
-            'popularTopics' => array_slice($stats['topics'], 0, 15),
+            // Catalogue-only topics so a chip never points at a topic carried
+            // solely by articles/external-links (which this list excludes).
+            'popularTopics' => array_slice(SiteStats::catalogueTopics(), 0, 15),
         ]);
     }
 }

@@ -21,6 +21,16 @@ it('drops javascript: links', function () {
         ->not->toContain('javascript:');
 });
 
+it('strips Alpine x-* attributes (the eval/XSS vector under unsafe-eval CSP)', function () {
+    $clean = HtmlSanitizer::clean('<div x-data="{a:1}" x-init="fetch(\'/x\')" @click="evil()">hi</div>');
+
+    expect($clean)
+        ->not->toContain('x-data')
+        ->not->toContain('x-init')
+        ->not->toContain('@click')
+        ->toContain('hi');
+});
+
 it('keeps safe formatting, links and images', function () {
     $clean = HtmlSanitizer::clean(
         '<h2>Title</h2><p><a href="https://example.test">link</a></p>'

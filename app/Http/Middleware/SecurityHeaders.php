@@ -17,6 +17,15 @@ use Symfony\Component\HttpFoundation\Response;
  * (edge-injected beacon.min.js). The value is in the structural
  * directives — frame-ancestors (clickjacking), object-src none, base-uri and
  * form-action lock-down, and upgrade-insecure-requests.
+ *
+ * XSS NOTE: because 'unsafe-inline'/'unsafe-eval' stay (a nonce would break the
+ * package-injected GTM/gtag inline scripts, and Alpine needs eval regardless),
+ * the CSP is NOT the XSS backstop for the untrusted HTML this site renders
+ * (third-party GitHub READMEs + imported article bodies via {!! !!}).
+ * App\Support\HtmlSanitizer is the SOLE control there — it strips <script>,
+ * event-handler attributes and Alpine x-* attributes. Do not weaken the
+ * sanitizer or add a new {!! !!} sink for untrusted content without a
+ * compensating control.
  */
 class SecurityHeaders
 {

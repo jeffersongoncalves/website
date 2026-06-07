@@ -392,11 +392,39 @@ class SiteStats
      */
     private static function topicBreakdown(): array
     {
+        return self::aggregateTopics(null);
+    }
+
+    /**
+     * Catalogue-only topic counts (excludes articles + external-link rows that
+     * the /projects list filters out). Drives the projects-page topic chips so a
+     * chip never points at a topic with zero catalogue results. Cached forever
+     * and busted by ProjectObserver on any project change.
+     *
+     * @return list<array{topic:string,total:int}>
+     */
+    public static function catalogueTopics(): array
+    {
+        return Cache::rememberForever('site_stats:catalogue_topics', fn (): array => self::aggregateTopics(
+            array_map(fn (ProjectCategory $c): string => $c->value, ProjectCategory::catalogueCases()),
+        ));
+    }
+
+    /**
+     * Published-project topic counts, busiest first (top 30). Aggregated in PHP
+     * so it stays portable across DB engines (no JSON-array SQL functions).
+     *
+     * @param  list<string>|null  $categories  null = all published rows; otherwise restrict to these category values
+     * @return list<array{topic:string,total:int}>
+     */
+    private static function aggregateTopics(?array $categories): array
+    {
         $counts = [];
 
         DB::table('projects')
             ->where('status', ProjectStatus::Published->value)
             ->where(fn ($q) => $q->whereNull('published_at')->orWhere('published_at', '<=', now()))
+            ->when($categories !== null, fn ($q) => $q->whereIn('category', $categories))
             ->whereNotNull('topics')
             ->select('topics')
             ->orderBy('id')

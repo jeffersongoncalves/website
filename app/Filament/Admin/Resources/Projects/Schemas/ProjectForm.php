@@ -81,6 +81,14 @@ class ProjectForm
                             ->columnSpanFull()
                             ->columns(2)
                             ->schema([
+                                Toggle::make('has_branches')
+                                    ->label(__('admin.fields.has_branches'))
+                                    ->helperText(__('admin.helpers.has_branches'))
+                                    ->live()
+                                    ->columnSpanFull()
+                                    // A paid plugin is private — no public branches to track.
+                                    ->visible(fn (Get $get) => enum_equals($get('category'), ProjectCategory::FilamentPlugin)
+                                        && ! $get('is_paid')),
                                 CheckboxList::make('versions')
                                     ->label(__('admin.fields.versions'))
                                     ->options([
@@ -100,7 +108,9 @@ class ProjectForm
                                         }
                                         $set('branch_overrides', $next);
                                     })
-                                    ->visible(fn (Get $get) => enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
+                                    ->visible(fn (Get $get) => enum_equals($get('category'), ProjectCategory::FilamentPlugin)
+                                        && ! $get('is_paid')
+                                        && $get('has_branches')),
                                 TagsInput::make('versions')
                                     ->label(__('admin.fields.versions'))
                                     ->placeholder(__('admin.placeholders.versions_free'))
@@ -135,7 +145,9 @@ class ProjectForm
                                         }
                                         $component->state($map);
                                     })
-                                    ->visible(fn (Get $get) => enum_equals($get('category'), ProjectCategory::FilamentPlugin)),
+                                    ->visible(fn (Get $get) => enum_equals($get('category'), ProjectCategory::FilamentPlugin)
+                                        && ! $get('is_paid')
+                                        && $get('has_branches')),
                                 TextInput::make('readme_branch')
                                     ->label(__('admin.fields.readme_branch'))
                                     ->maxLength(255)
@@ -166,7 +178,9 @@ class ProjectForm
                                     ->helperText(__('admin.helpers.is_daily_driver')),
                                 Toggle::make('is_paid')
                                     ->label(__('admin.fields.is_paid'))
-                                    ->helperText(__('admin.helpers.is_paid')),
+                                    ->helperText(__('admin.helpers.is_paid'))
+                                    // Drives the visibility of the plugin branch-tracking fields.
+                                    ->live(),
                             ]),
                         Section::make(__('admin.sections.links'))
                             ->columnSpanFull()

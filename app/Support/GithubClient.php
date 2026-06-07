@@ -17,6 +17,42 @@ use Throwable;
  */
 class GithubClient
 {
+    /** Repo resolves on GitHub. */
+    public const REPO_EXISTS = 'exists';
+
+    /** GitHub answered 404 — repo deleted, renamed, or now private. */
+    public const REPO_GONE = 'gone';
+
+    /** Couldn't determine (network error, 5xx, or a non-rate-limit refusal) —
+     *  callers must NOT treat this as gone. */
+    public const REPO_UNKNOWN = 'unknown';
+
+    /**
+     * Tri-state existence probe for a repo, distinguishing a definitive 404
+     * (safe to prune) from a transient/unknown failure (never prune on doubt).
+     * A rate-limit response throws GithubRateLimitException to the caller.
+     *
+     * @throws GithubRateLimitException
+     */
+    public static function repoStatus(string $repoSlug): string
+    {
+        $response = self::githubGet("https://api.github.com/repos/{$repoSlug}");
+
+        if ($response === null) {
+            return self::REPO_UNKNOWN; // network/timeout/DNS — logged in githubGet
+        }
+
+        if ($response->status() === 404) {
+            return self::REPO_GONE;
+        }
+
+        if ($response->successful()) {
+            return self::REPO_EXISTS;
+        }
+
+        return self::REPO_UNKNOWN; // 5xx / 451 / other — don't assume gone
+    }
+
     /**
      * @return array<string, mixed>|null
      */

@@ -80,7 +80,8 @@ class ProjectsTable
             ->filters([
                 SelectFilter::make('category')
                     ->label(__('admin.fields.category'))
-                    ->options(ProjectCategory::class),
+                    ->options(ProjectCategory::class)
+                    ->multiple(),
                 SelectFilter::make('status')
                     ->label(__('admin.fields.status'))
                     ->options(ProjectStatus::class),

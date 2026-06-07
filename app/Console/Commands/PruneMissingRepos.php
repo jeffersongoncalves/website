@@ -35,8 +35,9 @@ class PruneMissingRepos extends Command
             ->whereNotNull('github_url')
             ->where('github_url', '!=', '')
             ->where('is_paid', false)   // paid packages are private → expected 404
-            ->whereNull('packagist_url') // still on Packagist → alive, repo renamed
-            ->whereNull('npm_url')       // still on npm → alive, repo renamed
+            // a dead repo is missing at least one registry link; only a row
+            // with BOTH packagist AND npm set is treated as still-published.
+            ->where(fn ($q) => $q->whereNull('packagist_url')->orWhereNull('npm_url'))
             ->whereNull('repo')          // a real import always backfills `repo`
             // these categories legitimately have a null repo (not GitHub repos)
             ->whereNotIn('category', [

@@ -72,7 +72,7 @@ it('never deletes a paid/private project that 404s (e.g. flux-pro)', function ()
     expect(Project::query()->where('slug', 'flux-pro')->exists())->toBeTrue();
 });
 
-it('keeps a 404 repo that is still published on packagist/npm (renamed, not gone)', function () {
+it('keeps a 404 repo that is still fully published (both packagist + npm set)', function () {
     Http::swap($factory = new Factory);
     $factory->preventStrayRequests();
     $factory->fake(['api.github.com/repos/acme/renamed' => Http::response('', 404)]);
@@ -84,6 +84,7 @@ it('keeps a 404 repo that is still published on packagist/npm (renamed, not gone
         'status' => ProjectStatus::Published,
         'github_url' => 'https://github.com/acme/renamed',
         'packagist_url' => 'https://packagist.org/packages/acme/renamed',
+        'npm_url' => 'https://www.npmjs.com/package/renamed',
         'published_at' => now(),
     ]);
 
@@ -91,6 +92,28 @@ it('keeps a 404 repo that is still published on packagist/npm (renamed, not gone
         ->assertSuccessful();
 
     expect(Project::query()->where('slug', 'renamed-pkg')->exists())->toBeTrue();
+});
+
+it('removes a 404 repo that still has only one registry link', function () {
+    Http::swap($factory = new Factory);
+    $factory->preventStrayRequests();
+    $factory->fake(['api.github.com/repos/acme/halfgone' => Http::response('', 404)]);
+
+    Project::query()->create([
+        'slug' => 'halfgone-pkg',
+        'name' => 'Halfgone Pkg',
+        'category' => ProjectCategory::Tool,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/acme/halfgone',
+        'packagist_url' => 'https://packagist.org/packages/acme/halfgone',
+        // npm_url null → only one link → still a prune candidate
+        'published_at' => now(),
+    ]);
+
+    $this->artisan('projects:prune-missing-repos --delete --no-interaction')
+        ->assertSuccessful();
+
+    expect(Project::query()->where('slug', 'halfgone-pkg')->exists())->toBeFalse();
 });
 
 it('ignores website/youtube/article categories even with a 404 github_url', function () {

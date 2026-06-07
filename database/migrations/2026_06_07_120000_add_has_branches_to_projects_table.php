@@ -21,12 +21,23 @@ return new class extends Migration
             $table->boolean('has_branches')->default(false)->after('readme_branch');
         });
 
+        // Decide "non-empty versions" in PHP rather than SQL: `versions` is a
+        // json column and a `versions != '[]'` comparison has no operator on
+        // Postgres (json <> text). Walking the rows keeps the backfill portable
+        // across Postgres (prod) and SQLite (tests).
         DB::table('projects')
             ->where('category', 'filament_plugin')
             ->where('is_paid', false)
             ->whereNotNull('versions')
-            ->where('versions', '!=', '[]')
-            ->update(['has_branches' => true]);
+            ->select('id', 'versions')
+            ->get()
+            ->each(function (object $row): void {
+                $versions = json_decode((string) $row->versions, true);
+
+                if (is_array($versions) && $versions !== []) {
+                    DB::table('projects')->where('id', $row->id)->update(['has_branches' => true]);
+                }
+            });
     }
 
     public function down(): void

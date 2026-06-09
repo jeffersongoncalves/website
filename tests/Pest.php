@@ -11,24 +11,13 @@ uses(TestCase::class)->in('Feature', 'Unit');
 uses(RefreshDatabase::class)->in('Feature');
 
 /**
- * Create a Project fixture, honouring starred_at even though it is guarded
- * (not mass-assignable) on the model — production stamps it via forceFill in
- * ImportStarredRepoJob, so tests do the same.
+ * Create a Project fixture.
  *
  * @param  array<string, mixed>  $attributes
  */
 function createProject(array $attributes): Project
 {
-    $starredAt = $attributes['starred_at'] ?? null;
-    unset($attributes['starred_at']);
-
-    $project = Project::query()->create($attributes);
-
-    if ($starredAt !== null) {
-        $project->forceFill(['starred_at' => $starredAt])->save();
-    }
-
-    return $project;
+    return Project::query()->create($attributes);
 }
 
 pest()->beforeEach(function () {

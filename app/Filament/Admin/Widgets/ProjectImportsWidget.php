@@ -32,12 +32,6 @@ class ProjectImportsWidget extends StatsOverviewWidget
         $delta = $newThisWeek - $newLastWeek;
         $deltaLabel = ($delta >= 0 ? '+' : '').number_format($delta, 0, ',', '.');
 
-        $starredTotal = Project::query()->whereNotNull('starred_at')->count();
-        $starredThisWeek = Project::query()
-            ->whereNotNull('starred_at')
-            ->where('created_at', '>=', $weekStart)
-            ->count();
-
         $total = Project::query()->count();
 
         return [
@@ -47,11 +41,6 @@ class ProjectImportsWidget extends StatsOverviewWidget
                 ->color($delta >= 0 ? 'success' : 'danger')
                 ->chart(self::perDayCounts(14)),
 
-            Stat::make(__('admin.widgets.project_imports.starred_total'), number_format($starredTotal, 0, ',', '.'))
-                ->description(__('admin.widgets.project_imports.starred_week', ['count' => number_format($starredThisWeek, 0, ',', '.')]))
-                ->descriptionIcon('heroicon-m-star')
-                ->color('warning'),
-
             Stat::make(__('admin.widgets.project_imports.total'), number_format($total, 0, ',', '.'))
                 ->description(__('admin.widgets.project_imports.total_desc'))
                 ->color('primary'),
@@ -60,7 +49,7 @@ class ProjectImportsWidget extends StatsOverviewWidget
 
     protected function getColumns(): int
     {
-        return 3;
+        return 2;
     }
 
     /**

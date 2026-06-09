@@ -144,8 +144,6 @@ class Project extends Model
         'is_paid',
         'published_at',
         'last_synced_at',
-        // starred_at is intentionally NOT mass-assignable — it is internal,
-        // stamped only by ImportStarredRepoJob via forceFill().
     ];
 
     public array $translatable = [
@@ -174,7 +172,6 @@ class Project extends Model
             'status' => ProjectStatus::class,
             'published_at' => 'datetime',
             'last_synced_at' => 'datetime',
-            'starred_at' => 'datetime',
         ];
     }
 
@@ -302,8 +299,8 @@ class Project extends Model
     /**
      * Projects the owner actually authored — the repo lives under his GitHub
      * account (same rule as isCreatedByOwner / the "creator" badge). NOT merely
-     * `is_maintainer = false`, which also matched every starred third-party repo
-     * and wrongly listed them as authored.
+     * `is_maintainer = false`, which also matched third-party repos and wrongly
+     * listed them as authored.
      */
     public function scopeAuthored(Builder $query): Builder
     {
@@ -320,22 +317,10 @@ class Project extends Model
         return $query->where('github_owner', strtolower($username));
     }
 
-    /** Third-party repos imported from the GitHub stars feed (starred_at set). */
-    public function scopeStarred(Builder $query): Builder
-    {
-        return $query->whereNotNull('starred_at');
-    }
-
-    /** Curated/own projects — everything that did NOT come from a star import. */
-    public function scopeOwn(Builder $query): Builder
-    {
-        return $query->whereNull('starred_at');
-    }
-
     /**
      * Whether this repo lives under the site owner's GitHub account — i.e. a
-     * package Jefferson created himself, as opposed to one he only maintains or
-     * starred. Drives the "creator" badge.
+     * package Jefferson created himself, as opposed to one he only maintains.
+     * Drives the "creator" badge.
      */
     public function isCreatedByOwner(): bool
     {

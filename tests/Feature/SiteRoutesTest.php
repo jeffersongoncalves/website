@@ -110,35 +110,6 @@ it('filters projects by daily driver role', function () {
         ->assertDontSee('b-plugin');
 });
 
-it('filters projects by origin (own vs starred) and badges starred ones', function () {
-    Project::query()->create([
-        'slug' => 'my-own-pkg',
-        'name' => 'my-own-pkg',
-        'category' => ProjectCategory::FilamentPlugin,
-        'status' => ProjectStatus::Published,
-        'published_at' => now(),
-    ]);
-    createProject([
-        'slug' => 'starred-thing',
-        'name' => 'starred-thing',
-        'category' => ProjectCategory::Tool,
-        'status' => ProjectStatus::Published,
-        'starred_at' => now(),
-        'published_at' => now(),
-    ]);
-
-    $this->get('/projects?source=starred')
-        ->assertOk()
-        ->assertSee('starred-thing')
-        ->assertDontSee('my-own-pkg')
-        ->assertSee(__('site.projects.badge_starred'));
-
-    $this->get('/projects?source=own')
-        ->assertOk()
-        ->assertSee('my-own-pkg')
-        ->assertDontSee('starred-thing');
-});
-
 it('badges the owner-created packages as creator, third-party as not', function () {
     config(['services.github.username' => 'jeffersongoncalves']);
 

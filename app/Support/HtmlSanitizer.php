@@ -7,7 +7,7 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
 /**
  * Sanitises rendered HTML that originated from untrusted sources — GitHub
- * READMEs of starred third-party repos and the markdown body of imported
+ * READMEs of third-party repos and the markdown body of imported
  * articles. Both render with raw-HTML enabled (CommonMark `html_input: allow`
  * / Str::markdown), so a crafted source could ship `<script>` or an inline
  * event handler (`<img onerror=...>`); the site's CSP keeps `'unsafe-inline'`

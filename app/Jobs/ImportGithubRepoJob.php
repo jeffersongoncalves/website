@@ -28,9 +28,6 @@ use Throwable;
  * RateLimited middleware so GitHub's limit is respected. Idempotent — a repo
  * already cadastrado is upserted (missing fields only), never duplicated — so a
  * re-dispatch of the whole batch is cheap.
- *
- * The star-feed importer (ImportStarredRepoJob) stays separate: it stamps
- * starred_at and dedups differently. This job is for curated/catalogue repos.
  */
 class ImportGithubRepoJob implements ShouldQueue
 {

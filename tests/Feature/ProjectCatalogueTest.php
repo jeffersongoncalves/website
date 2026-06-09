@@ -117,7 +117,7 @@ it('filters by topic', function () {
         ->assertDontSee('vue-thing');
 });
 
-it('role=authored lists only repos under the owner account, not starred third-party repos', function () {
+it('role=authored lists only repos under the owner account, not third-party repos', function () {
     config(['services.github.username' => 'jeffersongoncalves']);
 
     publishedProject('my-own-pkg', [
@@ -125,13 +125,12 @@ it('role=authored lists only repos under the owner account, not starred third-pa
         'github_url' => 'https://github.com/jeffersongoncalves/my-own-pkg',
         'is_maintainer' => false,
     ]);
-    // A starred third-party repo: is_maintainer=false too, so the old
+    // A third-party repo: is_maintainer=false too, so the old
     // `where('is_maintainer', false)` scope wrongly listed it as authored.
     publishedProject('someone-else-repo', [
         'slug' => 'someone-else-repo',
         'github_url' => 'https://github.com/someoneelse/cool-thing',
         'is_maintainer' => false,
-        'starred_at' => now(),
     ]);
 
     $this->get('/projects?role=authored')

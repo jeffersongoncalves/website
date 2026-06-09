@@ -89,7 +89,7 @@
         'datePublished' => $isArticleLd ? $project->published_at?->toIso8601String() : null,
         'dateModified' => $isArticleLd ? $project->updated_at?->toIso8601String() : null,
         // Only claim authorship for repos that actually live under the owner's
-        // GitHub account. The catalogue is mostly third-party (starred repos,
+        // GitHub account. The catalogue is mostly third-party (other repos,
         // imported articles) — asserting `author: Jefferson` on those is false
         // structured data. array_filter drops the null for everything else.
         'author' => $project->isCreatedByOwner() ? [

@@ -267,8 +267,8 @@ class SiteStats
 
         return [
             ['label_key' => 'os.repos',     'target' => $s['repos']],
-            ['label_key' => 'os.followers', 'target' => self::scaleK($s['followers']), 'suffix' => self::suffixK($s['followers']), 'decimals' => 1],
-            ['label_key' => 'os.downloads', 'target' => self::scaleM($s['downloads']), 'suffix' => self::suffixM($s['downloads']), 'decimals' => 1],
+            self::abbrevK('os.followers', $s['followers']),
+            self::abbrevM('os.downloads', $s['downloads']),
             ['label_key' => 'os.plugins',   'target' => $s['filament'], 'suffix' => '+'],
         ];
     }
@@ -283,14 +283,14 @@ class SiteStats
         return [
             ['label_key' => 'os.repos',                'target' => $s['repos']],
             ['label_key' => 'os.catalogue',            'target' => $s['catalogue']],
-            ['label_key' => 'os.followers',            'target' => self::scaleK($s['followers']), 'suffix' => self::suffixK($s['followers']), 'decimals' => 1],
-            ['label_key' => 'os.downloads_packagist',  'target' => self::scaleM($s['downloads_packagist']), 'suffix' => self::suffixM($s['downloads_packagist']), 'decimals' => 1],
-            ['label_key' => 'os.downloads_npm',        'target' => self::scaleM($s['downloads_npm']), 'suffix' => self::suffixM($s['downloads_npm']), 'decimals' => 1],
-            ['label_key' => 'os.downloads_jetbrains',  'target' => self::scaleM($s['downloads_jetbrains']), 'suffix' => self::suffixM($s['downloads_jetbrains']), 'decimals' => 1],
+            self::abbrevK('os.followers', $s['followers']),
+            self::abbrevM('os.downloads_packagist', $s['downloads_packagist']),
+            self::abbrevM('os.downloads_npm', $s['downloads_npm']),
+            self::abbrevM('os.downloads_jetbrains', $s['downloads_jetbrains']),
             ['label_key' => 'os.plugins_filament',     'target' => $s['filament']],
             ['label_key' => 'os.packages_laravel',     'target' => $s['laravel']],
             ['label_key' => 'os.starter_kits',         'target' => $s['starter']],
-            ['label_key' => 'os.stars',                'target' => self::scaleK($s['stars']), 'suffix' => self::suffixK($s['stars']), 'decimals' => 1],
+            self::abbrevK('os.stars', $s['stars']),
             ['label_key' => 'os.public_sponsors',      'target' => $s['public_sponsors']],
         ];
     }
@@ -585,5 +585,43 @@ class SiteStats
         }
 
         return '';
+    }
+
+    /**
+     * countUp card for a k-scaled value. `decimals` is set only when the value
+     * was actually abbreviated (suffix present) — otherwise a raw count like 163
+     * would render as "163.0".
+     *
+     * @return array{label_key:string,target:float|int,suffix?:string,decimals?:int}
+     */
+    private static function abbrevK(string $key, int $n): array
+    {
+        $suffix = self::suffixK($n);
+        $card = ['label_key' => $key, 'target' => self::scaleK($n)];
+
+        if ($suffix !== '') {
+            $card['suffix'] = $suffix;
+            $card['decimals'] = 1;
+        }
+
+        return $card;
+    }
+
+    /**
+     * countUp card for an M/k-scaled value. Same decimals rule as abbrevK.
+     *
+     * @return array{label_key:string,target:float|int,suffix?:string,decimals?:int}
+     */
+    private static function abbrevM(string $key, int $n): array
+    {
+        $suffix = self::suffixM($n);
+        $card = ['label_key' => $key, 'target' => self::scaleM($n)];
+
+        if ($suffix !== '') {
+            $card['suffix'] = $suffix;
+            $card['decimals'] = 1;
+        }
+
+        return $card;
     }
 }

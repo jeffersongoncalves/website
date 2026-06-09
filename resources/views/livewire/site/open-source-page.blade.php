@@ -38,7 +38,7 @@
     @if (! empty($contributions['cells']))
     <div class="divider"></div>
 
-    <section class="section" x-data='heatmap({ cells: @json($contributions["cells"]) })'>
+    <section class="section">
         <div class="wrap">
             <x-site.eyebrow num="03" label="contribuições"/>
             <div class="flex items-end justify-between flex-wrap gap-4 mb-6">
@@ -60,12 +60,15 @@
                  from assistive tech; the grid as a whole carries one descriptive
                  label with the yearly total instead. --}}
             <div class="overflow-x-auto no-scrollbar">
+                {{-- Server-rendered (no Alpine x-for): the level → colour map
+                     lives in CSS via data-level. Identical to the home heatmap;
+                     lands in the page cache as static HTML. --}}
                 <div class="grid grid-rows-7 grid-flow-col gap-[3px] w-max"
                      role="img"
                      aria-label="{{ number_format($contributions['total'], 0, ',', '.') }} @lang('site.os.contributions_2')">
-                    <template x-for="(c, i) in cells" :key="i">
-                        <span class="hm-cell" :style="`background: ${bgFor(c)}`" aria-hidden="true"></span>
-                    </template>
+                    @foreach($contributions['cells'] as $c)
+                        <span class="hm-cell"@if($c > 0) data-level="{{ $c }}"@endif aria-hidden="true"></span>
+                    @endforeach
                 </div>
             </div>
         </div>

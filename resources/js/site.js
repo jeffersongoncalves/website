@@ -61,25 +61,6 @@ Alpine.data('countUp', (initial = []) => ({
     },
 }));
 
-// GitHub contribution heatmap. `cells` is the flat per-day count array from
-// SiteStats; each cell's colour encodes its count. bgFor() mirrors the amber
-// stops the `.hm-cell[data-level]` legend uses in site.css — level 0 falls back
-// to the empty-cell surface, 1–4 are quartiles of the busiest day so the scale
-// adapts to whatever the max contribution count happens to be.
-Alpine.data('heatmap', ({ cells = [] } = {}) => ({
-    cells,
-    max: Math.max(1, ...cells),
-    bgFor(count) {
-        if (!count || count <= 0) return 'var(--surface-elevated-alt)';
-        const level = Math.min(4, Math.max(1, Math.ceil((count / this.max) * 4)));
-        const rgb = document.documentElement.classList.contains('dark')
-            ? '245, 158, 11'
-            : '217, 119, 6';
-        const opacity = [0, 0.25, 0.5, 0.75, 1][level];
-        return `rgba(${rgb}, ${opacity})`;
-    },
-}));
-
 Alpine.data('markdownCopy', () => ({
     enhance() {
         const root = this.$el;

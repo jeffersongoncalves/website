@@ -354,7 +354,7 @@
     background: var(--surface-elevated-alt);
     transition: background-color var(--dur-fast) var(--ease-out);
   }
-  /* Legend swatches — mirror the same per-scheme amber stops the JS bgFor() uses */
+  /* Per-scheme amber stops — the heatmap cells use these same data-level classes (server-rendered) */
   .hm-cell[data-level="1"] { background: rgba(217, 119, 6, 0.25); }
   .hm-cell[data-level="2"] { background: rgba(217, 119, 6, 0.50); }
   .hm-cell[data-level="3"] { background: rgba(217, 119, 6, 0.75); }

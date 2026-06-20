@@ -11,11 +11,13 @@ use App\Support\GithubReadme;
 use App\Support\LocaleSupport;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use RalphJSmit\Laravel\SEO\Models\SEO;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 use Spatie\Sluggable\HasSlug;
@@ -28,38 +30,42 @@ use Spatie\Translatable\HasTranslations;
  * @property string $name
  * @property string|null $repo
  * @property ProjectCategory $category
- * @property PackageType|null $package_type
- * @property ProjectLanguage|null $language
  * @property array<array-key, mixed>|null $title
  * @property array<array-key, mixed>|null $content
  * @property array<array-key, mixed>|null $versions
- * @property array<array-key, mixed>|null $branch_overrides
- * @property string|null $readme_branch
- * @property bool $has_branches
  * @property array<array-key, mixed>|null $stack
- * @property array<array-key, mixed>|null $topics
  * @property int $stars
  * @property int $downloads
  * @property string|null $downloads_label
- * @property int $user_contributions
  * @property string $license
  * @property string|null $github_url
- * @property string|null $github_owner
  * @property string|null $packagist_url
- * @property string|null $npm_url
- * @property string|null $docker_url
  * @property string|null $docs_url
  * @property string|null $demo_url
  * @property ProjectStatus $status
  * @property bool $featured
- * @property bool $is_maintainer
- * @property bool $is_daily_driver
- * @property bool $is_paid
  * @property Carbon|null $published_at
  * @property Carbon|null $last_synced_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property string|null $readme_branch
+ * @property array<array-key, mixed>|null $branch_overrides
+ * @property bool $is_maintainer
+ * @property int $user_contributions
+ * @property bool $is_daily_driver
+ * @property string|null $npm_url
+ * @property bool $is_paid
+ * @property PackageType|null $package_type
+ * @property string|null $docker_url
+ * @property ProjectLanguage|null $language
+ * @property array<array-key, mixed>|null $topics
+ * @property string|null $social_image
+ * @property string|null $github_owner
+ * @property bool $has_branches
  * @property-read array $translatable_columns_from
+ * @property-read SEO $seo
+ * @property-read Collection<int, ProjectSlugAlias> $slugAliases
+ * @property-read int|null $slug_aliases_count
  * @property-read mixed $translations
  *
  * @method static Builder<static>|Project authored()
@@ -71,33 +77,46 @@ use Spatie\Translatable\HasTranslations;
  * @method static Builder<static>|Project newQuery()
  * @method static Builder<static>|Project published()
  * @method static Builder<static>|Project query()
+ * @method static Builder<static>|Project whereBranchOverrides($value)
  * @method static Builder<static>|Project whereCategory($value)
  * @method static Builder<static>|Project whereContent($value)
- * @method static Builder<static>|Project whereCoverImage($value)
  * @method static Builder<static>|Project whereCreatedAt($value)
  * @method static Builder<static>|Project whereDemoUrl($value)
+ * @method static Builder<static>|Project whereDockerUrl($value)
  * @method static Builder<static>|Project whereDocsUrl($value)
  * @method static Builder<static>|Project whereDownloads($value)
  * @method static Builder<static>|Project whereDownloadsLabel($value)
  * @method static Builder<static>|Project whereFeatured($value)
+ * @method static Builder<static>|Project whereGithubOwner($value)
  * @method static Builder<static>|Project whereGithubUrl($value)
+ * @method static Builder<static>|Project whereHasBranches($value)
  * @method static Builder<static>|Project whereId($value)
+ * @method static Builder<static>|Project whereIsDailyDriver($value)
+ * @method static Builder<static>|Project whereIsMaintainer($value)
+ * @method static Builder<static>|Project whereIsPaid($value)
  * @method static Builder<static>|Project whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
  * @method static Builder<static>|Project whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
+ * @method static Builder<static>|Project whereLanguage($value)
  * @method static Builder<static>|Project whereLastSyncedAt($value)
  * @method static Builder<static>|Project whereLicense($value)
  * @method static Builder<static>|Project whereLocale(string $column, string $locale)
  * @method static Builder<static>|Project whereLocales(string $column, array $locales)
  * @method static Builder<static>|Project whereName($value)
+ * @method static Builder<static>|Project whereNpmUrl($value)
+ * @method static Builder<static>|Project wherePackageType($value)
  * @method static Builder<static>|Project wherePackagistUrl($value)
  * @method static Builder<static>|Project wherePublishedAt($value)
+ * @method static Builder<static>|Project whereReadmeBranch($value)
  * @method static Builder<static>|Project whereRepo($value)
  * @method static Builder<static>|Project whereSlug($value)
+ * @method static Builder<static>|Project whereSocialImage($value)
  * @method static Builder<static>|Project whereStack($value)
  * @method static Builder<static>|Project whereStars($value)
  * @method static Builder<static>|Project whereStatus($value)
  * @method static Builder<static>|Project whereTitle($value)
+ * @method static Builder<static>|Project whereTopics($value)
  * @method static Builder<static>|Project whereUpdatedAt($value)
+ * @method static Builder<static>|Project whereUserContributions($value)
  * @method static Builder<static>|Project whereVersions($value)
  *
  * @mixin \Eloquent

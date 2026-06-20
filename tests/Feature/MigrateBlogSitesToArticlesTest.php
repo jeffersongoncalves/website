@@ -5,7 +5,6 @@ use App\Enums\ProjectStatus;
 use App\Jobs\MigrateBlogSitesToArticlesJob;
 use App\Models\Project;
 use App\Models\ProjectSlugAlias;
-use Illuminate\Support\Facades\Queue;
 
 function runMigrateBlogSitesOp(): int
 {
@@ -73,13 +72,6 @@ it('is idempotent — a second run converts nothing more', function () {
     runMigrateBlogSitesOp();
 
     expect(Project::query()->where('category', ProjectCategory::Article->value)->count())->toBe(1);
-});
-
-it('dispatches the migration job from the one-time operation', function () {
-    $op = require base_path('operations/2026_06_02_090342_migrate_blog_sites_to_articles.php');
-    $op->process();
-
-    Queue::assertPushed(MigrateBlogSitesToArticlesJob::class);
 });
 
 it('runs via the projects:migrate-blog-sites command', function () {

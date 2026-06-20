@@ -9,21 +9,32 @@ use Illuminate\Support\Facades\Cache;
 /**
  * @property int $id
  * @property int $repos
- * @property int $catalogue
- * @property array<int, array{language: string, total: int}>|null $languages
- * @property array<int, array{topic: string, total: int}>|null $topics
  * @property int $filament
  * @property int $laravel
+ * @property int $starter
+ * @property int $tool
+ * @property int $stars
+ * @property int $downloads
+ * @property int $followers
+ * @property int $public_sponsors
+ * @property array<array-key, mixed>|null $contributions
+ * @property Carbon|null $synced_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property int $maintained
+ * @property int $daily_drivers
+ * @property int $downloads_packagist
+ * @property int $downloads_npm
+ * @property int $downloads_jetbrains
  * @property int $livewire
  * @property int $cakephp
  * @property int $laravel_zero
  * @property int $ide_plugin
  * @property int $framework
- * @property int $starter
  * @property int $saas
- * @property int $tool
  * @property int $docker
  * @property int $database
+ * @property int $downloads_docker
  * @property int $website
  * @property int $youtube_channel
  * @property int $php_package
@@ -33,20 +44,53 @@ use Illuminate\Support\Facades\Cache;
  * @property int $learning_resource
  * @property int $awesome_list
  * @property int $mobile_library
- * @property int $maintained
- * @property int $daily_drivers
- * @property int $stars
- * @property int $downloads
- * @property int $downloads_packagist
- * @property int $downloads_npm
- * @property int $downloads_jetbrains
- * @property int $downloads_docker
- * @property int $followers
- * @property int $public_sponsors
- * @property array{cells: list<int>, total: int}|null $contributions
- * @property Carbon|null $synced_at
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property int $catalogue
+ * @property array<array-key, mixed>|null $languages
+ * @property array<array-key, mixed>|null $topics
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereApplication($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereAwesomeList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereCakephp($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereCatalogue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereContributions($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereCssFramework($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereDailyDrivers($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereDatabase($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereDocker($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereDownloads($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereDownloadsDocker($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereDownloadsJetbrains($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereDownloadsNpm($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereDownloadsPackagist($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereFilament($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereFollowers($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereFramework($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereIdePlugin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereJavascriptPackage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereLanguages($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereLaravel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereLaravelZero($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereLearningResource($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereLivewire($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereMaintained($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereMobileLibrary($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat wherePhpPackage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat wherePublicSponsors($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereRepos($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereSaas($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereStars($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereStarter($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereSyncedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereTool($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereTopics($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereWebsite($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat whereYoutubeChannel($value)
  *
  * @mixin \Eloquent
  */

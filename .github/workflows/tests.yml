@@ -23,8 +23,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          # 8.4 to match the Dockerfile + phpstan.yml: the locked symfony v8 /
-          # tempest/highlight deps require PHP >= 8.4 and won't install on 8.3.
+          # 8.4: the locked symfony v8 / tempest/highlight deps require
+          # PHP >= 8.4 and won't install on 8.3.
           php-version: '8.4'
           extensions: pcntl, redis, sqlite3, pdo_sqlite
           coverage: none

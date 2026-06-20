@@ -17,6 +17,20 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadmeCache newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadmeCache newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadmeCache query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadmeCache whereCheckedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadmeCache whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadmeCache whereDefaultBranch($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadmeCache whereEtag($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadmeCache whereFetchedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadmeCache whereHtmlPath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadmeCache whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadmeCache whereRef($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadmeCache whereRepo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadmeCache whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ReadmeCache extends Model

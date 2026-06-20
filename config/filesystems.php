@@ -48,7 +48,7 @@ return [
         ],
 
         // Specialized cache for fetched GitHub artefacts (rendered README HTML).
-        // Backed by a persistent volume in production — see docker-compose.
+        // Back this with a persistent volume in production.
         'github' => [
             'driver' => 'local',
             'root' => storage_path('app/github'),

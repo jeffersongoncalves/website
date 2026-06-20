@@ -13,12 +13,11 @@ abstract class AppVersion
      *   3. `git describe --tags --abbrev=0` (dev only, .git available)
      *   4. fallback `0.0.0`
      *
-     * When the env path resolves (production Docker injects APP_VERSION via
-     * build-arg → Dockerfile ENV) the lookup is O(1) and we deliberately
-     * skip the cache. Earlier versions cached the value indefinitely in
-     * Redis, which meant a fresh deploy still served the previous version
-     * for up to an hour after rollout. Only the slow paths (VERSION file
-     * I/O + `git describe` shell-out) are still cached.
+     * When the env path resolves (production sets APP_VERSION at deploy time)
+     * the lookup is O(1) and we deliberately skip the cache. Earlier versions
+     * cached the value indefinitely in Redis, which meant a fresh deploy still
+     * served the previous version for up to an hour after rollout. Only the
+     * slow paths (VERSION file I/O + `git describe` shell-out) are still cached.
      */
     public static function current(): string
     {

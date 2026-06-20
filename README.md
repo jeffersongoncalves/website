@@ -18,7 +18,6 @@ backed by Filament admin panels.
 - Three Filament panels — Admin (`/admin`), App (`/app`), Guest (`/`) — each independently toggleable via `config/filakit.php`
 - Two auth guards (`admin`, `web`) with separate user models
 - Horizon dashboard at `/horizon`, authorized via the `admin` guard
-- Dockerized production image with nginx + php-fpm + Horizon + scheduler
 
 ## Local development
 
@@ -46,25 +45,11 @@ composer pint      # code style
 ./vendor/bin/pest  # tests
 ```
 
-## Docker
+## Production
 
-Multi-stage build — `php-base`, `composer-deps`, `runtime` — serving nginx + php-fpm +
-Horizon + scheduler through supervisord. Production assets (`public/build`) are committed
-to the repo and copied into the image.
-
-```bash
-docker build -t jeffersongoncalves.dev.br .
-```
-
-### CI build & release
-
-- A push to `main` that changes `composer.lock` triggers `auto-release-filament.yml`,
-  which pushes a `release-X.Y.Z` tag.
-- The `release-*.*.*` tag triggers `docker-build.yml`, which builds and pushes the image
-  to GHCR (`ghcr.io/jeffersongoncalves/jeffersongoncalves.dev.br`) tagged with the release,
-  the commit SHA, and `latest`, then creates the GitHub Release.
-
-Production requires a reachable Redis instance and `QUEUE_CONNECTION=redis`.
+Production assets (`public/build`) are committed to the repo — run `pnpm run build` and
+commit after any change under `resources/`. Production uses PostgreSQL via env and requires
+a reachable Redis instance with `QUEUE_CONNECTION=redis` (Horizon).
 
 ## License
 

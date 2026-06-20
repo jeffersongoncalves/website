@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c8820bc9242d912f34f4780c4ae51f0d",
+    "content-hash": "5c4e7dccda195cc5d09c853413cb5072",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2824,76 +2824,6 @@
                 }
             ],
             "time": "2026-06-20T19:51:15+00:00"
-        },
-        {
-            "name": "jeffersongoncalves/laravel-github-readme",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jeffersongoncalves/laravel-github-readme.git",
-                "reference": "2f3d8423bdc70640d72084a079dc86b744d44cf0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-readme/zipball/2f3d8423bdc70640d72084a079dc86b744d44cf0",
-                "reference": "2f3d8423bdc70640d72084a079dc86b744d44cf0",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/database": "^11.0|^12.0|^13.0",
-                "illuminate/support": "^11.0|^12.0|^13.0",
-                "league/commonmark": "^2.4",
-                "php": "^8.2",
-                "spatie/laravel-package-tools": "^1.14"
-            },
-            "require-dev": {
-                "larastan/larastan": "^3.0",
-                "orchestra/testbench": "^9.0|^10.0|^11.0",
-                "pestphp/pest": "^3.7.4|^4.0",
-                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "JeffersonGoncalves\\GitHubReadme\\GitHubReadmeServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "JeffersonGoncalves\\GitHubReadme\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jefferson Gonçalves",
-                    "email": "gerson.simao.92@gmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A Laravel package that fetches, renders and disk-caches GitHub repository READMEs. It uses conditional ETag requests with a short freshness window, reuses cached HTML on 304 responses, falls back to stale content on errors, and rewrites relative assets/links to absolute GitHub URLs. Rendered HTML is untrusted — sanitize it before display.",
-            "homepage": "https://github.com/jeffersongoncalves/laravel-github-readme",
-            "keywords": [
-                "jeffersongoncalves",
-                "laravel",
-                "laravel-github-readme"
-            ],
-            "support": {
-                "issues": "https://github.com/jeffersongoncalves/laravel-github-readme/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-github-readme/tree/v1.0.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/jeffersongoncalves",
-                    "type": "github"
-                }
-            ],
-            "time": "2026-06-20T19:52:00+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-gtag",

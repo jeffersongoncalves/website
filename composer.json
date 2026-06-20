@@ -27,7 +27,6 @@
         "jeffersongoncalves/filament-sensible-defaults": "^1.0",
         "jeffersongoncalves/laravel-github-client": "^1.0",
         "jeffersongoncalves/laravel-github-contributions": "^1.0",
-        "jeffersongoncalves/laravel-github-readme": "^1.0",
         "jeffersongoncalves/laravel-html-sanitizer": "^1.0",
         "jeffersongoncalves/laravel-markdown": "^1.0",
         "jeffersongoncalves/laravel-page-cache": "^1.0",
@@ -43,9 +42,7 @@
         "ralphjsmit/laravel-seo": "^1.8",
         "spatie/laravel-sitemap": "^7.0",
         "spatie/laravel-sluggable": "^4.0",
-        "spatie/laravel-translatable": "^6.14",
-        "symfony/html-sanitizer": "^8.1",
-        "tempest/highlight": "^2.25"
+        "spatie/laravel-translatable": "^6.14"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^4.0",

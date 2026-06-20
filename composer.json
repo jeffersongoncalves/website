@@ -103,15 +103,15 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
+            "pnpm dlx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"pnpm run dev\" --names='server,queue,vite'"
         ],
         "schedule": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd\" \"php artisan schedule:work\" --names=schedule"
+            "pnpm dlx concurrently -c \"#93c5fd\" \"php artisan schedule:work\" --names=schedule"
         ],
         "queue": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd\" \"php artisan queue:listen --tries=1\" --names=queue"
+            "pnpm dlx concurrently -c \"#93c5fd\" \"php artisan queue:listen --tries=1\" --names=queue"
         ]
     },
     "extra": {

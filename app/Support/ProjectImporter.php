@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 use JeffersonGoncalves\GitHubClient\GitHubClient;
+use JeffersonGoncalves\SsrfGuard\SsrfGuard;
 use Throwable;
 
 class ProjectImporter
@@ -576,36 +577,7 @@ class ProjectImporter
             return true;
         }
 
-        $parts = parse_url($url);
-
-        if ($parts === false || ! isset($parts['scheme'], $parts['host'])) {
-            return false;
-        }
-
-        if (! in_array(strtolower($parts['scheme']), ['http', 'https'], true)) {
-            return false;
-        }
-
-        $host = $parts['host'];
-        $ips = filter_var($host, FILTER_VALIDATE_IP) ? [$host] : (gethostbynamel($host) ?: []);
-
-        foreach (@dns_get_record($host, DNS_AAAA) ?: [] as $record) {
-            if (isset($record['ipv6'])) {
-                $ips[] = $record['ipv6'];
-            }
-        }
-
-        if ($ips === []) {
-            return false;
-        }
-
-        foreach ($ips as $ip) {
-            if (! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                return false;
-            }
-        }
-
-        return true;
+        return app(SsrfGuard::class)->isPublicUrl($url);
     }
 
     private static function fetchPageHtml(string $url, string $context): ?string

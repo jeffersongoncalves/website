@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Vite;
+use JeffersonGoncalves\SsrfGuard\SsrfGuard;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -56,7 +57,7 @@ class OgImageController
 
     /**
      * The image source plus, for untrusted hosts, the curl resolve map that
-     * pins the connection to the IP we validated — see publicResolveEntries().
+     * pins the connection to the IP we validated — see SsrfGuard::resolveEntries().
      *
      * @return array{url: string, resolve: list<string>|null}|null
      */
@@ -71,7 +72,7 @@ class OgImageController
         // so it is untrusted. Only proxy it when it resolves to a public host —
         // otherwise /og/{slug}.png becomes an SSRF window into internal services.
         if (! empty($project->social_image)) {
-            $resolve = $this->publicResolveEntries((string) $project->social_image);
+            $resolve = app(SsrfGuard::class)->resolveEntries((string) $project->social_image);
 
             if ($resolve !== null) {
                 return ['url' => (string) $project->social_image, 'resolve' => $resolve];
@@ -79,64 +80,6 @@ class OgImageController
         }
 
         return null;
-    }
-
-    /**
-     * For a plain http(s) URL whose host resolves only to public IPs, return a
-     * curl CURLOPT_RESOLVE entry (`host:port:ip`) pinning the host to the
-     * validated IP. Returns null for non-http(s) URLs, unresolvable hosts, or
-     * any host pointing at a private/reserved/loopback/link-local range
-     * (deny-by-default).
-     *
-     * Pinning closes the DNS-rebinding (TOCTOU) window: without it the host is
-     * resolved once here and again at fetch time, letting an attacker-controlled
-     * domain flip to an internal IP between the two lookups.
-     *
-     * @return list<string>|null
-     */
-    private function publicResolveEntries(string $url): ?array
-    {
-        $parts = parse_url($url);
-
-        if ($parts === false || ! isset($parts['scheme'], $parts['host'])) {
-            return null;
-        }
-
-        $scheme = strtolower($parts['scheme']);
-
-        if (! in_array($scheme, ['http', 'https'], true)) {
-            return null;
-        }
-
-        $host = $parts['host'];
-        $port = $parts['port'] ?? ($scheme === 'https' ? 443 : 80);
-
-        if (filter_var($host, FILTER_VALIDATE_IP)) {
-            $ips = [$host];
-        } else {
-            $ips = gethostbynamel($host) ?: [];
-
-            foreach (@dns_get_record($host, DNS_AAAA) ?: [] as $record) {
-                if (isset($record['ipv6'])) {
-                    $ips[] = $record['ipv6'];
-                }
-            }
-        }
-
-        if ($ips === []) {
-            return null;
-        }
-
-        foreach ($ips as $ip) {
-            if (! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                return null;
-            }
-        }
-
-        // Pin to the first validated IP. curl needs the bare host (no brackets).
-        $bareHost = trim($host, '[]');
-
-        return ["{$bareHost}:{$port}:{$ips[0]}"];
     }
 
     /**
@@ -156,7 +99,7 @@ class OgImageController
                     'referer' => false,
                     'protocols' => ['http', 'https'],
                     'on_redirect' => function ($request, $response, $uri): void {
-                        if ($this->publicResolveEntries((string) $uri) === null) {
+                        if (app(SsrfGuard::class)->resolveEntries((string) $uri) === null) {
                             throw new \RuntimeException('OG fetch redirect to non-public host blocked: '.$uri);
                         }
                     },

@@ -219,8 +219,7 @@ class ProjectForm
     {
         return [
             TextInput::make("title.$locale")
-                ->label(__('admin.fields.title'))
-                ->maxLength(255),
+                ->label(__('admin.fields.title')),
         ];
     }
 }

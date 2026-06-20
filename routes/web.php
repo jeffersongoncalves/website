@@ -9,8 +9,6 @@ use App\Http\Controllers\Site\OfflineController;
 use App\Http\Controllers\Site\OgImageController;
 use App\Http\Controllers\Site\ServiceWorkerController;
 use App\Http\Controllers\Site\SwitchLocaleController;
-use App\Http\Middleware\CachePublicPage;
-use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocale;
 use App\Livewire\Site\AboutPage;
 use App\Livewire\Site\ArticlesPage;
@@ -22,6 +20,8 @@ use App\Livewire\Site\ProjectsPage;
 use App\Livewire\Site\SponsorsPage;
 use App\Livewire\Site\StackPage;
 use Illuminate\Support\Facades\Route;
+use JeffersonGoncalves\PageCache\Middleware\CachePublicPage;
+use JeffersonGoncalves\SecurityHeaders\Middleware\SecurityHeaders;
 
 // Root-level routes (no locale prefix). Still wrapped in SecurityHeaders so
 // these endpoints — especially /og and /favicon-proxy, which relay externally

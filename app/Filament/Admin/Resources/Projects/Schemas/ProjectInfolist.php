@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Projects\Schemas;
 
-use App\Filament\Schemas\Components\AdditionalInformation;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use JeffersonGoncalves\Filament\AdditionalInformation\AdditionalInformation;
 
 class ProjectInfolist
 {

@@ -7,7 +7,6 @@ namespace App\Observers;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Http\Controllers\Site\LlmsTxtController;
-use App\Http\Middleware\CachePublicPage;
 use App\Jobs\GenerateSitemapJob;
 use App\Jobs\RefreshProjectStatsJob;
 use App\Jobs\SyncProjectMetricsJob;
@@ -16,6 +15,7 @@ use App\Livewire\Site\LinksSection;
 use App\Models\Project;
 use App\Support\GithubReadme;
 use Illuminate\Support\Facades\Cache;
+use JeffersonGoncalves\PageCache\Middleware\CachePublicPage;
 use Psr\SimpleCache\InvalidArgumentException;
 
 class ProjectObserver

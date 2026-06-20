@@ -177,6 +177,8 @@ class ProjectImporter
         // datetime cast and the Filament DateTimePicker both parse it.
         $publishedAt = self::parseMetaDate($meta['article:published_time'] ?? null);
 
+        $warnings = [];
+
         $fields = [
             'github_url' => null,
             'slug' => self::articleSlugFromUrl($url),
@@ -185,9 +187,7 @@ class ProjectImporter
             'license' => null,
             'readme_branch' => null,
             'docs_url' => $url,
-            'title.en' => $description ?? $title,
-            'title.pt' => $description ?? $title,
-            'title.es' => $description ?? $title,
+            ...self::titlesFromDescription($description, $title, $warnings),
             'category' => 'article',
             'package_type' => 'none',
             'packagist_url' => null,
@@ -197,12 +197,6 @@ class ProjectImporter
             'stack' => [],
             'versions' => [],
         ];
-
-        $warnings = [];
-
-        if ($description === null) {
-            $warnings[] = 'no_description';
-        }
 
         if ($publishedAt === null) {
             // Editor should set the real date by hand — the importer leaves it
@@ -302,6 +296,8 @@ class ProjectImporter
             $docsUrl = null;
         }
 
+        $warnings = [];
+
         $fields = [
             'github_url' => $githubUrl,
             // Strip the `@scope/` punctuation before slugging — Str::slug would
@@ -312,11 +308,7 @@ class ProjectImporter
             'license' => $license,
             'readme_branch' => null,
             'docs_url' => $docsUrl,
-            // Fall back to the package name when the registry ships no
-            // description so the title never imports blank.
-            'title.en' => $description ?? self::prettifyNpmName($name),
-            'title.pt' => $description ?? self::prettifyNpmName($name),
-            'title.es' => $description ?? self::prettifyNpmName($name),
+            ...self::titlesFromDescription($description, self::prettifyNpmName($name), $warnings),
             'category' => 'javascript_package',
             'package_type' => 'npm',
             'packagist_url' => null,
@@ -325,12 +317,6 @@ class ProjectImporter
             'topics' => ProjectTopics::normalize(is_array($data['keywords'] ?? null) ? $data['keywords'] : []),
             'versions' => [],
         ];
-
-        $warnings = [];
-
-        if ($description === null) {
-            $warnings[] = 'no_description';
-        }
 
         if ($missingDirectoryReadme) {
             $warnings[] = 'no_directory_readme';
@@ -365,6 +351,8 @@ class ProjectImporter
             : (str_contains($pathSegment, '/') ? explode('/', $pathSegment, 2)[1] : $pathSegment);
         $slug = 'youtube-'.Str::slug($handle);
 
+        $warnings = [];
+
         $fields = [
             'github_url' => null,
             'slug' => $slug,
@@ -373,9 +361,7 @@ class ProjectImporter
             'license' => null,
             'readme_branch' => null,
             'docs_url' => $url,
-            'title.en' => $description ?? $name,
-            'title.pt' => $description ?? $name,
-            'title.es' => $description ?? $name,
+            ...self::titlesFromDescription($description, $name, $warnings),
             'category' => 'youtube_channel',
             'package_type' => 'none',
             'packagist_url' => null,
@@ -383,12 +369,6 @@ class ProjectImporter
             'stack' => [],
             'versions' => [],
         ];
-
-        $warnings = [];
-
-        if ($description === null) {
-            $warnings[] = 'no_description';
-        }
 
         return ['fields' => $fields, 'warnings' => $warnings];
     }
@@ -549,6 +529,8 @@ class ProjectImporter
         $description = $meta['og:description'] ?? $meta['description'] ?? null;
         $title = $meta['og:title'] ?? $meta['title'] ?? $name;
 
+        $warnings = [];
+
         $fields = [
             'github_url' => null,
             'slug' => self::siteSlugFromUrl($url),
@@ -557,9 +539,7 @@ class ProjectImporter
             'license' => null,
             'readme_branch' => null,
             'docs_url' => $url,
-            'title.en' => $description ?? $title,
-            'title.pt' => $description ?? $title,
-            'title.es' => $description ?? $title,
+            ...self::titlesFromDescription($description, $title, $warnings),
             // URL imports always represent external sites (blogs, hosted
             // services, personal pages) — there's no manifest to classify
             // against, so default to the Website category instead of the
@@ -572,12 +552,6 @@ class ProjectImporter
             'stack' => [],
             'versions' => [],
         ];
-
-        $warnings = [];
-
-        if ($description === null) {
-            $warnings[] = 'no_description';
-        }
 
         return ['fields' => $fields, 'warnings' => $warnings];
     }
@@ -894,6 +868,12 @@ class ProjectImporter
         }
         $description = self::pickDescription($composer, $package, $repo);
 
+        $warnings = [];
+
+        if ($category === 'application') {
+            $warnings[] = 'category_fallback';
+        }
+
         $fields = [
             'github_url' => $url,
             'slug' => Str::slug($owner.'-'.$repoName),
@@ -902,13 +882,7 @@ class ProjectImporter
             'license' => self::normalizeLicense($repo['license'] ?? null),
             'readme_branch' => $branch,
             'docs_url' => self::nullableString($repo['homepage'] ?? null),
-            // Mirror the same description across all locales — the importer can't
-            // translate, the editor manually edits per-locale later. Same value
-            // beats null fields the editor has to clear. Fall back to the repo
-            // name when there's no description so the title never imports blank.
-            'title.en' => $description ?? self::prettifyName($repoName),
-            'title.pt' => $description ?? self::prettifyName($repoName),
-            'title.es' => $description ?? self::prettifyName($repoName),
+            ...self::titlesFromDescription($description, self::prettifyName($repoName), $warnings),
             'category' => $category,
             'package_type' => $packageType,
             'language' => ProjectLanguage::tryFrom((string) ($repo['language'] ?? ''))?->value,
@@ -922,16 +896,6 @@ class ProjectImporter
             ),
             'versions' => ProjectClassifier::versions($composer, $branches, $category),
         ];
-
-        $warnings = [];
-
-        if ($category === 'application') {
-            $warnings[] = 'category_fallback';
-        }
-
-        if ($description === null) {
-            $warnings[] = 'no_description';
-        }
 
         if ($npmName !== null && ! $npmPublished) {
             $warnings[] = 'npm_not_published';
@@ -1227,6 +1191,31 @@ class ProjectImporter
         }
 
         return self::packagistOwnershipForName(strtolower($m[1]), $githubUrl);
+    }
+
+    /**
+     * Mirror a single description across all three locale title fields — the
+     * importer can't translate, so the editor edits per-locale later; the same
+     * value beats null fields it would have to clear. Falls back to `$fallback`
+     * when there's no description so the title never imports blank, and pushes a
+     * `no_description` warning in that case.
+     *
+     * @param  list<string>  $warnings
+     * @return array{'title.en': string, 'title.pt': string, 'title.es': string}
+     */
+    private static function titlesFromDescription(?string $description, string $fallback, array &$warnings): array
+    {
+        $value = $description ?? $fallback;
+
+        if ($description === null) {
+            $warnings[] = 'no_description';
+        }
+
+        return [
+            'title.en' => $value,
+            'title.pt' => $value,
+            'title.es' => $value,
+        ];
     }
 
     private static function nullableString(mixed $value): ?string

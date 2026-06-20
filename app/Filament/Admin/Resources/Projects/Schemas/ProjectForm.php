@@ -219,7 +219,11 @@ class ProjectForm
     {
         return [
             TextInput::make("title.$locale")
-                ->label(__('admin.fields.title')),
+                ->label(__('admin.fields.title'))
+                // The title is sourced from the upstream description (GitHub repo
+                // description, og:description, npm description); GitHub caps repo
+                // descriptions at 350 chars, so match that ceiling.
+                ->maxLength(350),
         ];
     }
 }

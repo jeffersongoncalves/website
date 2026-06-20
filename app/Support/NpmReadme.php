@@ -7,6 +7,7 @@ namespace App\Support;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use JeffersonGoncalves\Markdown\Markdown;
 use Throwable;
 
 /**

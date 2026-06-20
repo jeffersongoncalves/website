@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use App\Support\GithubReadme;
 use App\Support\ProjectAttributes;
@@ -19,6 +18,7 @@ use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 use Throwable;
 
 /**
@@ -75,7 +75,7 @@ class ImportGithubRepoJob implements ShouldQueue
 
         try {
             $result = ProjectImporter::fromGithub($this->githubUrl);
-        } catch (GithubRateLimitException $e) {
+        } catch (GitHubRateLimitException $e) {
             $this->release($e->retryAfter);
 
             return;

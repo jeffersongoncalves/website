@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Enums\ProjectCategory;
-use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
-use App\Support\GithubClient;
 use App\Support\GithubReadme;
 use Illuminate\Console\Command;
+use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
+use JeffersonGoncalves\GitHubClient\GitHubClient;
 
 /**
  * Remove projects whose GitHub repo no longer exists. The signal a dead repo
@@ -68,8 +68,8 @@ class PruneMissingRepos extends Command
                 }
 
                 try {
-                    $status = GithubClient::repoStatus($repoSlug);
-                } catch (GithubRateLimitException $e) {
+                    $status = GitHubClient::repoStatus($repoSlug);
+                } catch (GitHubRateLimitException $e) {
                     $rateLimited = true;
 
                     return false;
@@ -77,9 +77,9 @@ class PruneMissingRepos extends Command
 
                 $scanned++;
 
-                if ($status === GithubClient::REPO_GONE) {
+                if ($status === GitHubClient::REPO_GONE) {
                     $gone[] = [$project->id, $project->name, $project->slug, (string) $project->github_url];
-                } elseif ($status === GithubClient::REPO_UNKNOWN) {
+                } elseif ($status === GitHubClient::REPO_UNKNOWN) {
                     $skipped++; // transient/5xx — never prune on doubt
                 }
             }

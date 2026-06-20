@@ -8,10 +8,10 @@ use App\Enums\ProjectCategory;
 use App\Models\Project;
 use App\Models\ProjectSlugAlias;
 use App\Support\GithubReadme;
-use App\Support\HtmlSanitizer;
 use App\Support\NpmReadme;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use JeffersonGoncalves\HtmlSanitizer\HtmlSanitizer;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Support;
 
 use App\Enums\ProjectLanguage;
-use App\Exceptions\GithubRateLimitException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
+use JeffersonGoncalves\GitHubClient\GitHubClient;
 use Throwable;
 
 class ProjectImporter
@@ -24,7 +25,7 @@ class ProjectImporter
      *
      * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
      *
-     * @throws GithubRateLimitException when GitHub is rate-limiting the API
+     * @throws GitHubRateLimitException when GitHub is rate-limiting the API
      */
     /**
      * Cache an importer result for an hour, but ONLY when it succeeded
@@ -240,7 +241,7 @@ class ProjectImporter
      *
      * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
      *
-     * @throws GithubRateLimitException when recovering the GitHub repo hits a rate limit
+     * @throws GitHubRateLimitException when recovering the GitHub repo hits a rate limit
      */
     public static function fromNpm(string $url): array
     {
@@ -280,9 +281,9 @@ class ProjectImporter
             $githubUrl = 'https://github.com/'.$repoInfo['slug'];
 
             if ($repoInfo['directory'] !== null) {
-                $branch = GithubClient::fetchDefaultBranchForSlug($repoInfo['slug']) ?? 'main';
+                $branch = GitHubClient::fetchDefaultBranchForSlug($repoInfo['slug']) ?? 'main';
                 $githubUrl .= '/tree/'.$branch.'/'.$repoInfo['directory'];
-                $missingDirectoryReadme = ! GithubClient::subdirectoryHasReadme(
+                $missingDirectoryReadme = ! GitHubClient::subdirectoryHasReadme(
                     $repoInfo['slug'],
                     $repoInfo['directory'],
                 );
@@ -766,15 +767,15 @@ class ProjectImporter
      */
     private static function buildResult(string $repoSlug, string $url): array
     {
-        $repo = GithubClient::fetchRepo($repoSlug);
+        $repo = GitHubClient::fetchRepo($repoSlug);
 
         if ($repo === null) {
             return ['error' => 'repo_not_found'];
         }
 
         $branch = is_string($repo['default_branch'] ?? null) ? $repo['default_branch'] : 'main';
-        $composer = GithubClient::fetchManifest($repoSlug, $branch, 'composer.json');
-        $package = GithubClient::fetchManifest($repoSlug, $branch, 'package.json');
+        $composer = GitHubClient::fetchManifest($repoSlug, $branch, 'composer.json');
+        $package = GitHubClient::fetchManifest($repoSlug, $branch, 'package.json');
         // Docker classification signals — checked on root + the two common
         // self-hosted layouts (plausible/analytics ships `hosting/`, several
         // others ship `installer/`). HEAD against raw.githubusercontent.com
@@ -793,7 +794,7 @@ class ProjectImporter
         ];
         $hasDockerCompose = false;
         foreach ($composePaths as $path) {
-            if (GithubClient::fileExists($repoSlug, $branch, $path)) {
+            if (GitHubClient::fileExists($repoSlug, $branch, $path)) {
                 $hasDockerCompose = true;
                 break;
             }
@@ -803,8 +804,8 @@ class ProjectImporter
         // Laravel app with a dev Dockerfile would be misclassified.
         $hasStandaloneDockerfile = $composer === null
             && $package === null
-            && GithubClient::fileExists($repoSlug, $branch, 'Dockerfile');
-        $branches = GithubClient::fetchBranches($repoSlug);
+            && GitHubClient::fileExists($repoSlug, $branch, 'Dockerfile');
+        $branches = GitHubClient::fetchBranches($repoSlug);
 
         [$owner, $repoName] = explode('/', $repoSlug, 2);
 

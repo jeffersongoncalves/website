@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Admin\Resources\Projects\Concerns;
 
-use App\Exceptions\GithubRateLimitException;
 use App\Support\ProjectImporter;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 
 trait HasImportFromGithubAction
 {
@@ -157,7 +157,7 @@ trait HasImportFromGithubAction
     {
         try {
             $result = $importer();
-        } catch (GithubRateLimitException) {
+        } catch (GitHubRateLimitException) {
             $result = ['error' => 'rate_limited'];
         }
 

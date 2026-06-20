@@ -27,7 +27,7 @@ jobs:
           # PHP >= 8.4 and won't install on 8.3.
           php-version: '8.4'
           extensions: pcntl, redis, sqlite3, pdo_sqlite
-          coverage: none
+          coverage: pcov
 
       - name: Install composer dependencies
         uses: ramsey/composer-install@v4
@@ -48,4 +48,4 @@ jobs:
           # (the .env.example default is pt_BR for the production site).
           APP_LOCALE: en
           APP_FALLBACK_LOCALE: en
-        run: ./vendor/bin/pest
+        run: ./vendor/bin/pest --coverage --min=88

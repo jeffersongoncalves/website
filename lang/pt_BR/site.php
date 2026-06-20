@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'seo' => [
         'default_description' => 'Jefferson Gonçalves — Desenvolvedor PHP Full Stack. 18 anos construindo com Laravel, Filament e a stack TALL. Mantenedor de 20+ plugins Filament e pacotes Laravel.',

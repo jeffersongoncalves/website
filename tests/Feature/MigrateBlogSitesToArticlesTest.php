@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Jobs\MigrateBlogSitesToArticlesJob;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Support\GithubReadme;
 
 it('maps a real branch back to its user-facing version via overrides', function () {

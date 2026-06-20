@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Admin\Resources\Projects\Schemas;
 
 use App\Enums\PackageType;
@@ -215,6 +217,9 @@ class ProjectForm
             ]);
     }
 
+    /**
+     * @return array<int, TextInput>
+     */
     private static function translatableFields(string $locale): array
     {
         return [

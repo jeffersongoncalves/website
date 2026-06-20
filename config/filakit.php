@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'defaultCurrency' => 'brl',
     'defaultDateDisplayFormat' => 'M j, Y',

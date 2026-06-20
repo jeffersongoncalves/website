@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Support\FaviconSupport;
 
 // FaviconSupport::routes() is registered from bootstrap/app.php's withRouting

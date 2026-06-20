@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Support;
 
 use App\Enums\PackageType;
@@ -200,7 +202,7 @@ class ProjectMetrics
         }
 
         $current = is_array($project->branch_overrides) ? $project->branch_overrides : [];
-        $versions = array_values($project->versions);
+        $versions = $project->versions;
 
         $next = [];
         foreach ($versions as $i => $version) {

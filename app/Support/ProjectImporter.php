@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Support;
 
 use App\Enums\ProjectLanguage;
@@ -51,6 +53,9 @@ class ProjectImporter
         return $result;
     }
 
+    /**
+     * @return array{fields?: array<string, mixed>, warnings?: list<string>, error?: string}
+     */
     public static function fromGithub(string $url): array
     {
         $repoSlug = GithubReadme::repoFromUrl($url);

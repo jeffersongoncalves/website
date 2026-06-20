@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Http;
 
 it('proxies and serves a favicon for a valid domain', function () {

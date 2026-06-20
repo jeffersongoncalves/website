@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     'accepted' => 'O campo :attribute deve ser aceito.',

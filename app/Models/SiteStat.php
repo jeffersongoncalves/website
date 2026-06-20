@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +19,7 @@ use Illuminate\Support\Facades\Cache;
  * @property int $downloads
  * @property int $followers
  * @property int $public_sponsors
- * @property array<array-key, mixed>|null $contributions
+ * @property array{cells: list<int>, total: int}|null $contributions
  * @property Carbon|null $synced_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -45,8 +47,8 @@ use Illuminate\Support\Facades\Cache;
  * @property int $awesome_list
  * @property int $mobile_library
  * @property int $catalogue
- * @property array<array-key, mixed>|null $languages
- * @property array<array-key, mixed>|null $topics
+ * @property list<array{language: string, total: int}>|null $languages
+ * @property list<array{topic: string, total: int}>|null $topics
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteStat newQuery()

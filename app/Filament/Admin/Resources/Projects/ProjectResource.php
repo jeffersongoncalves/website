@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Admin\Resources\Projects;
 
 use App\Filament\Admin\Resources\Projects\Pages\CreateProject;
@@ -15,6 +17,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
 class ProjectResource extends Resource
@@ -34,7 +37,7 @@ class ProjectResource extends Resource
         return ['name', 'slug', 'repo'];
     }
 
-    public static function getGlobalSearchResultUrl($record): string
+    public static function getGlobalSearchResultUrl(Model $record): string
     {
         return self::getUrl('view', ['record' => $record]);
     }

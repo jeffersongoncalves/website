@@ -1,0 +1,58 @@
+name: mutation
+
+# Mutation testing guards the *quality* of the assertions on the core logic
+# classes (coverage % only proves a line ran, not that a test would catch a
+# behaviour change). Scoped to the proven 100%-MSI classes and gated at --min=100
+# so a weakened assertion fails CI. Heavy, so it runs only when those files or
+# their tests change (plus manual dispatch), not on every push.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/Support/ProjectClassifier.php'
+      - 'app/Support/ProjectMetrics.php'
+      - 'app/Support/Markdown.php'
+      - 'app/Support/HtmlSanitizer.php'
+      - 'tests/**'
+      - '.github/workflows/mutation.yml'
+  workflow_dispatch:
+
+jobs:
+  mutate:
+    name: mutate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pcntl, redis, sqlite3, pdo_sqlite
+          coverage: pcov
+
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@v4
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Mutation test the core logic classes
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
+          CACHE_STORE: array
+          QUEUE_CONNECTION: sync
+          SESSION_DRIVER: array
+          APP_LOCALE: en
+          APP_FALLBACK_LOCALE: en
+        run: |
+          for class in ProjectClassifier ProjectMetrics Markdown HtmlSanitizer; do
+            echo "::group::Mutating $class"
+            ./vendor/bin/pest --mutate --covered-only --min=100 --path="app/Support/$class.php"
+            echo "::endgroup::"
+          done

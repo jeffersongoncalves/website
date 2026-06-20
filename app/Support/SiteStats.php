@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Support;
 
 use App\Enums\PackageType;
@@ -465,7 +467,7 @@ class SiteStats
     {
         // DB::table (not Eloquent) so `language` comes back as the raw string,
         // not the ProjectLanguage enum cast.
-        return DB::table('projects')
+        $rows = DB::table('projects')
             ->where('status', ProjectStatus::Published->value)
             ->where(fn ($q) => $q->whereNull('published_at')->orWhere('published_at', '<=', now()))
             ->whereNotNull('language')
@@ -474,12 +476,12 @@ class SiteStats
             ->groupBy('language')
             ->orderByDesc('total')
             ->orderBy('language')
-            ->get()
-            ->map(fn ($row): array => [
-                'language' => (string) $row->language,
-                'total' => (int) $row->total,
-            ])
-            ->all();
+            ->get();
+
+        return array_values($rows->map(fn ($row): array => [
+            'language' => (string) $row->language,
+            'total' => (int) $row->total,
+        ])->all());
     }
 
     /**

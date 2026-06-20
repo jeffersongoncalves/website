@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\PackageType;
@@ -9,6 +11,7 @@ use App\Enums\ProjectStatus;
 use App\Observers\ProjectObserver;
 use App\Support\GithubReadme;
 use App\Support\LocaleSupport;
+use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -32,7 +35,7 @@ use Spatie\Translatable\HasTranslations;
  * @property ProjectCategory $category
  * @property array<array-key, mixed>|null $title
  * @property array<array-key, mixed>|null $content
- * @property array<array-key, mixed>|null $versions
+ * @property list<string>|null $versions
  * @property array<array-key, mixed>|null $stack
  * @property int $stars
  * @property int $downloads
@@ -62,7 +65,7 @@ use Spatie\Translatable\HasTranslations;
  * @property string|null $social_image
  * @property string|null $github_owner
  * @property bool $has_branches
- * @property-read array $translatable_columns_from
+ * @property-read array<int, string> $translatable_columns_from
  * @property-read SEO $seo
  * @property-read Collection<int, ProjectSlugAlias> $slugAliases
  * @property-read int|null $slug_aliases_count
@@ -95,12 +98,12 @@ use Spatie\Translatable\HasTranslations;
  * @method static Builder<static>|Project whereIsMaintainer($value)
  * @method static Builder<static>|Project whereIsPaid($value)
  * @method static Builder<static>|Project whereJsonContainsLocale(string $column, string $locale, ?mixed $value, string $operand = '=')
- * @method static Builder<static>|Project whereJsonContainsLocales(string $column, array $locales, ?mixed $value, string $operand = '=')
+ * @method static Builder<static>|Project whereJsonContainsLocales(string $column, array<int, string> $locales, ?mixed $value, string $operand = '=')
  * @method static Builder<static>|Project whereLanguage($value)
  * @method static Builder<static>|Project whereLastSyncedAt($value)
  * @method static Builder<static>|Project whereLicense($value)
  * @method static Builder<static>|Project whereLocale(string $column, string $locale)
- * @method static Builder<static>|Project whereLocales(string $column, array $locales)
+ * @method static Builder<static>|Project whereLocales(string $column, array<int, string> $locales)
  * @method static Builder<static>|Project whereName($value)
  * @method static Builder<static>|Project whereNpmUrl($value)
  * @method static Builder<static>|Project wherePackageType($value)
@@ -124,7 +127,9 @@ use Spatie\Translatable\HasTranslations;
 #[ObservedBy(ProjectObserver::class)]
 class Project extends Model
 {
+    /** @use HasFactory<ProjectFactory> */
     use HasFactory;
+
     use HasSEO;
     use HasSlug;
     use HasTranslations;
@@ -165,6 +170,7 @@ class Project extends Model
         'last_synced_at',
     ];
 
+    /** @var list<string> */
     public array $translatable = [
         'title',
         'content',
@@ -282,6 +288,10 @@ class Project extends Model
         return $this->hasMany(ProjectSlugAlias::class);
     }
 
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', ProjectStatus::Published)
@@ -293,11 +303,19 @@ class Project extends Model
             });
     }
 
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
     public function scopeFeatured(Builder $query): Builder
     {
         return $query->where('featured', true);
     }
 
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
     public function scopeByCategory(Builder $query, ProjectCategory|string $category): Builder
     {
         $value = $category instanceof ProjectCategory ? $category->value : $category;
@@ -305,11 +323,19 @@ class Project extends Model
         return $query->where('category', $value);
     }
 
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
     public function scopeByLanguage(Builder $query, string $language): Builder
     {
         return $query->where('language', $language);
     }
 
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
     public function scopeMaintained(Builder $query): Builder
     {
         return $query->where('is_maintainer', true);
@@ -320,6 +346,9 @@ class Project extends Model
      * account (same rule as isCreatedByOwner / the "creator" badge). NOT merely
      * `is_maintainer = false`, which also matched third-party repos and wrongly
      * listed them as authored.
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
      */
     public function scopeAuthored(Builder $query): Builder
     {

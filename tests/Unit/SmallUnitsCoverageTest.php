@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\PackageType;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
@@ -74,4 +76,9 @@ it('returns false for an empty enum list', function () {
 it('matches a raw scalar value against a list of enums', function () {
     expect(enum_equals('npm', [PackageType::Composer, PackageType::Npm]))->toBeTrue()
         ->and(enum_equals('docker', [PackageType::Composer, PackageType::Npm]))->toBeFalse();
+});
+
+it('treats a null value as no match (never throws under strict types)', function () {
+    expect(enum_equals(null, PackageType::Npm))->toBeFalse()
+        ->and(enum_equals(null, [PackageType::Composer, PackageType::Npm]))->toBeFalse();
 });

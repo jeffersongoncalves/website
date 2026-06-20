@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Support\GithubContributions;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Facades\Http;

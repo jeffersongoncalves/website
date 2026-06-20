@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\ProjectLanguage;
 
 it('maps a known GitHub language name onto a case', function (): void {

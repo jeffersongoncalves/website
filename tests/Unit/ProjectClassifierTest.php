@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Support\ProjectClassifier;
 
 it('promotes awesome repos by name even when other topics match', function (): void {

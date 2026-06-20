@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Middleware\SetLocale;
 
 it('switches the locale cookie and returns to a same-host referer', function () {

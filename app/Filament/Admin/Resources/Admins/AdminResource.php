@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Admin\Resources\Admins;
 
 use App\Filament\Admin\Resources\Admins\Pages\CreateAdmin;
@@ -15,6 +17,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
 use function __;
@@ -34,7 +37,7 @@ class AdminResource extends Resource
         return ['name', 'email'];
     }
 
-    public static function getGlobalSearchResultUrl($record): string
+    public static function getGlobalSearchResultUrl(Model $record): string
     {
         return self::getUrl('view', ['record' => $record]);
     }

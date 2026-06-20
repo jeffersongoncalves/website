@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Support\GithubReadme;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;

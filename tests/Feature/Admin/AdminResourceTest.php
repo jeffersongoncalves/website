@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Filament\Admin\Resources\Admins\Pages\CreateAdmin;
 use App\Filament\Admin\Resources\Admins\Pages\ListAdmins;
 use App\Models\Admin;

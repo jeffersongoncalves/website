@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 it('renders a themed 404 page', function () {
     $response = $this->get('/this-route-does-not-exist');
 

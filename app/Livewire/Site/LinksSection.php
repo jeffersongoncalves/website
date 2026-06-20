@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire\Site;
 
 use App\Enums\ProjectCategory;
@@ -48,6 +50,8 @@ class LinksSection extends Component
      * Anchor-scoped query-string keys so each section stays independent. This
      * runs (via the SupportQueryString hook) before mount() sets $this->anchor,
      * so resolve the anchor straight from the bound `category` param instead.
+     *
+     * @return array<string, array{as: string, except: string}>
      */
     protected function queryString(): array
     {

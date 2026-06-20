@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\ReadmeCache;
 use App\Support\GithubReadme;
 use Illuminate\Support\Facades\Http;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Support\HtmlSanitizer;
 use App\Support\Markdown;
 

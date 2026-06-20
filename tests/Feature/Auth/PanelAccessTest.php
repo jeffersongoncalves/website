@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Filament\Admin\Pages\Auth\Login;
 use App\Models\Admin;
 use App\Models\User;

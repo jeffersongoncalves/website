@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Admin\Resources\Projects\Tables;
 
 use App\Enums\ProjectCategory;

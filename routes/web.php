@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\Site\ArticlesFeedController;
 use App\Http\Controllers\Site\FaviconController;
 use App\Http\Controllers\Site\LlmsTxtController;

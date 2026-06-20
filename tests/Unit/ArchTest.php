@@ -1,11 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 // Architecture guardrails. Keep these conservative — they run on every push
 // and a false positive blocks the whole suite.
 
 arch('no debug statements leak into app code')
     ->expect(['dd', 'dump', 'ray', 'var_dump', 'print_r', 'var_export', 'die'])
     ->not->toBeUsed();
+
+arch('app code declares strict types')
+    ->expect('App')
+    ->toUseStrictTypes();
 
 arch('enums are real enums')
     ->expect('App\Enums')

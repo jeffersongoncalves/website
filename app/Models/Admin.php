@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Observers\AdminObserver;
+use Database\Factories\AdminFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
@@ -66,7 +69,10 @@ class Admin extends Model implements AuthenticatableContract, AuthorizableContra
     use Authenticatable;
     use Authorizable;
     use CanResetPassword;
+
+    /** @use HasFactory<AdminFactory> */
     use HasFactory;
+
     use MustVerifyEmail;
     use Notifiable;
 

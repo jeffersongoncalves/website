@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
-use App\Models\User;
+use App\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends Factory<User>
+ * @extends Factory<Admin>
  */
 class AdminFactory extends Factory
 {
+    protected $model = Admin::class;
+
     /**
      * The current password being used by the factory.
      */

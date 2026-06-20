@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Support;
 
 use BackedEnum;
@@ -17,7 +19,9 @@ if (! function_exists('App\Support\enum_equals')) {
         }
 
         if (! $value instanceof BackedEnum) {
-            return $enum::tryFrom($value) === $enum;
+            // A null/absent value (e.g. an unset Filament form field) never
+            // matches an enum case — and tryFrom() rejects null under strict types.
+            return $value !== null && $enum::tryFrom($value) === $enum;
         }
 
         return $enum === $value;

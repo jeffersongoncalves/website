@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'seo' => [
         'default_description' => 'Jefferson Gonçalves — Full Stack PHP Developer. 18 years building with Laravel, Filament and the TALL stack. Maintainer of 20+ Filament plugins and Laravel packages.',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Support\ProjectTopics;
 
 it('normalizes, slugifies and lowercases', function (): void {

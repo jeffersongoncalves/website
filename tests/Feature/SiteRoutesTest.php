@@ -37,6 +37,8 @@ it('sends security headers on public pages', function () {
         ->assertHeader('X-Content-Type-Options', 'nosniff')
         ->assertHeader('X-Frame-Options', 'SAMEORIGIN')
         ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+        ->assertHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
+        ->assertHeader('X-Permitted-Cross-Domain-Policies', 'none')
         ->assertHeader('Content-Security-Policy');
 });
 

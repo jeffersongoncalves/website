@@ -38,8 +38,15 @@ class SecurityHeaders
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-        $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), browsing-topics=()');
+        $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()');
         $response->headers->set('Content-Security-Policy', $this->contentSecurityPolicy());
+
+        // Isolate the browsing context (XS-Leaks / Spectre defence-in-depth).
+        // "-allow-popups" keeps analytics/GTM popups from being severed.
+        // No COEP/CORP: those would break the cross-origin-embeddable OG images
+        // and the `img-src https:` third-party images.
+        $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+        $response->headers->set('X-Permitted-Cross-Domain-Policies', 'none');
 
         // HSTS only over real HTTPS and never in local dev (a cached max-age on
         // a *.test domain is a pain to undo).

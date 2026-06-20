@@ -38,7 +38,6 @@
             <span>© {{ date('Y') }} Jefferson Gonçalves · @lang('site.footer.copyright')</span>
             <span>
                 @lang('site.footer.location')
-                <span class="mono-meta-sm ml-3 opacity-70">v{{ \App\Support\AppVersion::current() }}</span>
             </span>
         </div>
     </div>

@@ -1,7 +1,7 @@
 // jeffersongoncalves.dev.br service worker — generated from blade so the
-// VERSION constant follows whatever AppVersion::current() reports, which
-// bumps on every `release-X.Y.Z` tag. A new VERSION forces a new cache
-// name on activate and tears down the old caches.
+// VERSION constant tracks the Vite build manifest hash, changing whenever
+// assets are rebuilt. A new VERSION forces a new cache name on activate and
+// tears down the old caches.
 const VERSION = '{{ $version }}';
 const CACHE_NAME = `jg-pwa-v${VERSION}`;
 const OFFLINE_URL = '/offline';

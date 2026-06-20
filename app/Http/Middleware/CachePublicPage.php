@@ -63,18 +63,13 @@ class CachePublicPage
 
     private function cacheKey(Request $request): string
     {
-        // Fold the deployed app version into the key so a new release
-        // invalidates every cached page automatically — otherwise stale HTML
-        // (e.g. the old version in the footer) survives the deploy until TTL.
-        $build = (string) config('app.version', '');
-
         // The layout renders light/dark pre-paint markup from the theme cookie,
         // so it must be part of the key or the first visitor's theme is served
         // to everyone. Key on the PATH (not full URL): the cached routes ignore
         // the query string, so including it would let ?x=1,2,3… flood the cache.
         $theme = $request->cookie('theme') === 'light' ? 'light' : 'dark';
 
-        return 'page:'.$build.':'.self::version().':'.app()->getLocale().':'.$theme.':'.sha1($request->path());
+        return 'page:'.self::version().':'.app()->getLocale().':'.$theme.':'.sha1($request->path());
     }
 
     private static function version(): int

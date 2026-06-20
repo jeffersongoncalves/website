@@ -3,7 +3,5 @@
     <div class="flex items-center gap-2" style="font-family: var(--font-mono); font-size: 12px; color: var(--color-ink-300);">
         <span class="editorial-pulse"></span>
         <span>{{ config('app.env') === 'production' ? __('admin.status.production') : __('admin.status.local') }}</span>
-        <span style="color: var(--color-ink-500);">·</span>
-        <span style="color: var(--color-ink-500);">v{{ \App\Support\AppVersion::current() }}</span>
     </div>
 </div>

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f155781fde2c07278043c36c0feb7333",
+    "content-hash": "2dd7dbe2cd2732c72f0846321f0e9529",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2896,27 +2896,28 @@
         },
         {
             "name": "jeffersongoncalves/laravel-github-readme",
-            "version": "v1.0.1",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-github-readme.git",
-                "reference": "8c2a6a1be1d5c9ad10ebff9ab749eeb80448a216"
+                "reference": "dad3f40b5ff24d973403388769833e21a9a44678"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-readme/zipball/8c2a6a1be1d5c9ad10ebff9ab749eeb80448a216",
-                "reference": "8c2a6a1be1d5c9ad10ebff9ab749eeb80448a216",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-readme/zipball/dad3f40b5ff24d973403388769833e21a9a44678",
+                "reference": "dad3f40b5ff24d973403388769833e21a9a44678",
                 "shasum": ""
             },
             "require": {
                 "illuminate/database": "^11.0|^12.0|^13.0",
                 "illuminate/support": "^11.0|^12.0|^13.0",
-                "league/commonmark": "^2.4",
+                "league/commonmark": "^2.8.2",
                 "php": "^8.2",
                 "spatie/laravel-package-tools": "^1.14"
             },
             "require-dev": {
                 "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
                 "orchestra/testbench": "^9.0|^10.0|^11.0",
                 "pestphp/pest": "^3.7.4|^4.0",
                 "pestphp/pest-plugin-laravel": "^3.0|^4.0"
@@ -2954,7 +2955,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-github-readme/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-github-readme/tree/v1.0.1"
+                "source": "https://github.com/jeffersongoncalves/laravel-github-readme/tree/v2.0.0"
             },
             "funding": [
                 {
@@ -2962,7 +2963,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-20T21:25:20+00:00"
+            "time": "2026-06-21T20:09:41+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-gtag",
@@ -3256,16 +3257,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-markdown",
-            "version": "v1.0.1",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-markdown.git",
-                "reference": "bbc818029bcf3768900918417bbe3717e580ef3b"
+                "reference": "4a927bb284311807fac1033748bb54b3bcbb3e9c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-markdown/zipball/bbc818029bcf3768900918417bbe3717e580ef3b",
-                "reference": "bbc818029bcf3768900918417bbe3717e580ef3b",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-markdown/zipball/4a927bb284311807fac1033748bb54b3bcbb3e9c",
+                "reference": "4a927bb284311807fac1033748bb54b3bcbb3e9c",
                 "shasum": ""
             },
             "require": {
@@ -3279,8 +3280,8 @@
                 "larastan/larastan": "^3.0",
                 "laravel/pint": "^1.0",
                 "orchestra/testbench": "^9.0|^10.0|^11.0",
-                "pestphp/pest": "^3.7.4|^4.0",
-                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+                "pestphp/pest": "^3.7.4",
+                "pestphp/pest-plugin-laravel": "^3.0"
             },
             "type": "library",
             "extra": {
@@ -3306,7 +3307,7 @@
                     "role": "Developer"
                 }
             ],
-            "description": "A shared CommonMark renderer for Laravel with GitHub Flavored Markdown, optional heading permalinks, and server-side syntax highlighting (class-based tokens) via tempest/highlight. Renders raw HTML for trusted-pipeline rendering — pair with jeffersongoncalves/laravel-html-sanitizer before displaying untrusted content.",
+            "description": "A shared CommonMark renderer for Laravel with GitHub Flavored Markdown, optional heading permalinks, and server-side syntax highlighting (class-based tokens) via tempest/highlight. Safe by default: raw HTML is escaped unless you opt in to html_input=allow for trusted content. Requires PHP 8.4 because the syntax highlighter tempest/highlight requires it from 2.26 onward.",
             "homepage": "https://github.com/jeffersongoncalves/laravel-markdown",
             "keywords": [
                 "Laravel-Markdown",
@@ -3315,7 +3316,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-markdown/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-markdown/tree/v1.0.1"
+                "source": "https://github.com/jeffersongoncalves/laravel-markdown/tree/v2.0.0"
             },
             "funding": [
                 {
@@ -3323,7 +3324,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-20T20:16:30+00:00"
+            "time": "2026-06-21T20:09:37+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-page-cache",
@@ -3464,16 +3465,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-security-headers",
-            "version": "v1.0.0",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-security-headers.git",
-                "reference": "50a202614467f1e71fb53ccdcef22ed0f2b07617"
+                "reference": "7b1d6997cdc799fb87ed3d5842cb28ef7b2deac1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-security-headers/zipball/50a202614467f1e71fb53ccdcef22ed0f2b07617",
-                "reference": "50a202614467f1e71fb53ccdcef22ed0f2b07617",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-security-headers/zipball/7b1d6997cdc799fb87ed3d5842cb28ef7b2deac1",
+                "reference": "7b1d6997cdc799fb87ed3d5842cb28ef7b2deac1",
                 "shasum": ""
             },
             "require": {
@@ -3497,6 +3498,9 @@
                 }
             },
             "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
                 "psr-4": {
                     "JeffersonGoncalves\\SecurityHeaders\\": "src"
                 }
@@ -3521,7 +3525,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-security-headers/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-security-headers/tree/v1.0.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-security-headers/tree/v2.0.0"
             },
             "funding": [
                 {
@@ -3529,7 +3533,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-20T19:50:38+00:00"
+            "time": "2026-06-21T20:09:27+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-ssrf-guard",

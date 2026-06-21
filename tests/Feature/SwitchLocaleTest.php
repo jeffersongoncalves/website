@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Http\Middleware\SetLocale;
-
 it('switches the locale cookie and returns to a same-host referer', function () {
     $this->withHeaders(['referer' => url('/projects')])
         ->get('/locale/en')
         ->assertRedirect(url('/projects'))
-        ->assertCookie(SetLocale::COOKIE_NAME, 'en');
+        ->assertCookie('locale', 'en');
 });
 
 it('ignores a cross-origin referer and falls back home (open-redirect guard)', function () {
@@ -18,9 +16,9 @@ it('ignores a cross-origin referer and falls back home (open-redirect guard)', f
 });
 
 it('falls back home when no referer is present', function () {
-    $this->get('/locale/pt')
+    $this->get('/locale/pt_BR')
         ->assertRedirect('/')
-        ->assertCookie(SetLocale::COOKIE_NAME, 'pt');
+        ->assertCookie('locale', 'pt_BR');
 });
 
 it('rejects an unsupported locale at the route level', function () {

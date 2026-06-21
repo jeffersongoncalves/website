@@ -5,13 +5,13 @@ declare(strict_types=1);
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Models\Project;
-use App\Models\ReadmeCache;
 use App\Models\SiteStat;
 use App\Support\GithubReadme;
 use App\Support\SiteStats;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use JeffersonGoncalves\GitHubReadme\Models\ReadmeCache;
 
 function makeProject(int $i, ProjectCategory $category, ?string $githubUrl = null): Project
 {

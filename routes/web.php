@@ -9,7 +9,6 @@ use App\Http\Controllers\Site\OfflineController;
 use App\Http\Controllers\Site\OgImageController;
 use App\Http\Controllers\Site\ServiceWorkerController;
 use App\Http\Controllers\Site\SwitchLocaleController;
-use App\Http\Middleware\SetLocale;
 use App\Livewire\Site\AboutPage;
 use App\Livewire\Site\ArticlesPage;
 use App\Livewire\Site\HomePage;
@@ -84,6 +83,6 @@ Route::middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class]
     Route::get('/sponsors', SponsorsPage::class)->name('sponsors');
 
     Route::get('/locale/{locale}', SwitchLocaleController::class)
-        ->whereIn('locale', SetLocale::SUPPORTED)
+        ->whereIn('locale', config('locale-cookie.supported'))
         ->name('locale.switch');
 });

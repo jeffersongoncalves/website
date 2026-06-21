@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5c4e7dccda195cc5d09c853413cb5072",
+    "content-hash": "56025e3e7a446a1e0912bc0d50e41585",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2826,6 +2826,76 @@
             "time": "2026-06-20T19:51:15+00:00"
         },
         {
+            "name": "jeffersongoncalves/laravel-github-readme",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-github-readme.git",
+                "reference": "8c2a6a1be1d5c9ad10ebff9ab749eeb80448a216"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-readme/zipball/8c2a6a1be1d5c9ad10ebff9ab749eeb80448a216",
+                "reference": "8c2a6a1be1d5c9ad10ebff9ab749eeb80448a216",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^11.0|^12.0|^13.0",
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "league/commonmark": "^2.4",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\GitHubReadme\\GitHubReadmeServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\GitHubReadme\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel package that fetches, renders and disk-caches GitHub repository READMEs. It uses conditional ETag requests with a short freshness window, reuses cached HTML on 304 responses, falls back to stale content on errors, and rewrites relative assets/links to absolute GitHub URLs. Rendered HTML is untrusted — sanitize it before display.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-github-readme",
+            "keywords": [
+                "jeffersongoncalves",
+                "laravel",
+                "laravel-github-readme"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-github-readme/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-github-readme/tree/v1.0.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-20T21:25:20+00:00"
+        },
+        {
             "name": "jeffersongoncalves/laravel-gtag",
             "version": "v2.0.3",
             "source": {
@@ -3046,6 +3116,74 @@
                 }
             ],
             "time": "2026-06-20T20:56:15+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-locale-cookie",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-locale-cookie.git",
+                "reference": "0025b7b174fd68ef2dadc99857ef171e89995fb4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-locale-cookie/zipball/0025b7b174fd68ef2dadc99857ef171e89995fb4",
+                "reference": "0025b7b174fd68ef2dadc99857ef171e89995fb4",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\LocaleCookie\\LocaleCookieServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\LocaleCookie\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel middleware that resolves the application locale from a cookie, validating the requested value against a configurable list of supported locales and falling back to a sensible default when the cookie is missing or unknown. Cookie name, supported locales, and fallback locale are all driven by config.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-locale-cookie",
+            "keywords": [
+                "jeffersongoncalves",
+                "laravel",
+                "laravel-locale-cookie"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-locale-cookie/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-locale-cookie/tree/v1.0.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-20T21:24:56+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-markdown",

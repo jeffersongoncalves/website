@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Http\Middleware\SetLocale;
 use App\Support\LocaleSupport;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
@@ -16,6 +15,8 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use JeffersonGoncalves\LocaleCookie\Middleware\SetLocale;
+use JeffersonGoncalves\Markdown\Markdown;
 use Livewire\Livewire;
 use RalphJSmit\Laravel\SEO\Facades\SEOManager;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
@@ -61,6 +62,12 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Model::automaticallyEagerLoadRelationships();
+
+        // README HTML is rendered through jeffersongoncalves/laravel-markdown
+        // (GFM + heading permalinks + server-side syntax highlighting) rather
+        // than the package's plain CommonMark default. Wired at runtime so no
+        // closure leaks into a cached config. Sanitised later before display.
+        config(['github-readme.renderer' => static fn (string $markdown): string => Markdown::render($markdown, headingPermalinks: true)]);
 
         // SetLocale is a route-group middleware, so Livewire /update requests
         // (live search/sort/topic/pagination on /projects, /links, /articles)

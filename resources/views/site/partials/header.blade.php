@@ -1,6 +1,7 @@
 @php
-    $locale = \App\Support\LocaleSupport::short();
-    $locales = \App\Http\Middleware\SetLocale::SUPPORTED;
+    $current = app()->getLocale();
+    $locales = config('locale-cookie.supported', []);
+    $label = fn (string $c): string => strtoupper(preg_split('/[_-]/', $c)[0] ?? $c);
     $localeUrl = fn (string $target) => route('locale.switch', ['locale' => $target]);
     $active = fn (string ...$patterns): bool => request()->routeIs(...$patterns);
 @endphp
@@ -112,7 +113,7 @@
                         :aria-expanded="open.toString()"
                         aria-haspopup="listbox"
                         aria-label="@lang('site.common.toggle_lang')">
-                    <span>{{ strtoupper($locale) }}</span>
+                    <span>{{ $label($current) }}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" :class="{ 'rotate-180': open }" style="transition:transform 200ms var(--ease-out);"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <ul class="lang-dropdown-menu"
@@ -126,11 +127,11 @@
                     x-transition:leave-end="opacity-0"
                     x-cloak>
                     @foreach($locales as $code)
-                        <li role="option" aria-selected="{{ $locale === $code ? 'true' : 'false' }}">
+                        <li role="option" aria-selected="{{ $current === $code ? 'true' : 'false' }}">
                             <a href="{{ $localeUrl($code) }}"
-                               class="lang-dropdown-item {{ $locale === $code ? 'is-active' : '' }}">
-                                <span>{{ strtoupper($code) }}</span>
-                                @if($locale === $code)
+                               class="lang-dropdown-item {{ $current === $code ? 'is-active' : '' }}">
+                                <span>{{ $label($code) }}</span>
+                                @if($current === $code)
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 @endif
                             </a>

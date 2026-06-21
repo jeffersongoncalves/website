@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Site;
 
-use App\Http\Middleware\SetLocale;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -13,11 +12,13 @@ class SwitchLocaleController
 {
     public function __invoke(Request $request, string $locale): RedirectResponse
     {
-        if (! in_array($locale, SetLocale::SUPPORTED, true)) {
-            $locale = 'pt';
+        $supported = config('locale-cookie.supported', []);
+
+        if (! in_array($locale, $supported, true)) {
+            $locale = config('locale-cookie.fallback') ?? config('app.fallback_locale');
         }
 
-        Cookie::queue(SetLocale::COOKIE_NAME, $locale, 60 * 24 * 365);
+        Cookie::queue(config('locale-cookie.cookie', 'locale'), $locale, 60 * 24 * 365);
 
         return redirect($this->safeReferer($request));
     }

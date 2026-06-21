@@ -213,7 +213,7 @@ it('persists the site stats singleton row from local + github data', function ()
 
 it('releases PersistSiteStatsJob without writing zeros when GitHub is rate-limiting', function () {
     // With a token configured, an empty user payload means the call failed —
-    // compute() throws GithubRateLimitException so persist() never overwrites
+    // compute() throws GitHubRateLimitException so persist() never overwrites
     // the cached followers/sponsors with zeros.
     config(['services.github.token' => 'test-token']);
 

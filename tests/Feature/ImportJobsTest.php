@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
-use App\Exceptions\GithubRateLimitException;
 use App\Jobs\ImportGithubRepoJob;
 use App\Jobs\ImportNpmPackageJob;
 use App\Jobs\ImportWebsiteJob;
@@ -18,6 +17,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 
 uses(RefreshDatabase::class);
 
@@ -120,7 +120,7 @@ it('throws a rate-limit exception from the importer instead of degrading to inco
     ]);
 
     ProjectImporter::fromGithub('https://github.com/acme/widget');
-})->throws(GithubRateLimitException::class);
+})->throws(GitHubRateLimitException::class);
 
 it('releases the github import job back to the queue when GitHub is rate-limiting, creating nothing', function () {
     Http::swap(new Factory);

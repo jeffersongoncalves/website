@@ -33,7 +33,7 @@ pest()->beforeEach(function () {
 
     // Full-page response cache off by default so tests assert freshly-rendered
     // output; the dedicated CachePublicPageTest re-enables it explicitly.
-    config(['filakit.page_cache_enabled' => false]);
+    config(['page-cache.enabled' => false]);
 
     Http::preventStrayRequests();
     Http::fake([

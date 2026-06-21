@@ -7,12 +7,13 @@ namespace App\Support;
 use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
-use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use App\Models\SiteStat;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
+use JeffersonGoncalves\GitHubContributions\GitHubContributions;
 
 class SiteStats
 {
@@ -374,14 +375,14 @@ class SiteStats
         // never overwrites the cached followers/sponsors/heatmap with zeros —
         // the job releases and retries once the window clears.
         if ($github === [] && config('services.github.token')) {
-            throw new GithubRateLimitException(300);
+            throw new GitHubRateLimitException(300);
         }
 
         // Locally-derived stats + the three GitHub-sourced fields.
         return array_merge(self::localCounts(), [
             'followers' => $github['followers'] ?? 0,
             'public_sponsors' => self::fetchSponsorCount(self::GITHUB_LOGIN),
-            'contributions' => GithubContributions::fetch(self::GITHUB_LOGIN),
+            'contributions' => GitHubContributions::fetch(self::GITHUB_LOGIN),
         ]);
     }
 

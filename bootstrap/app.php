@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Http\Middleware\SetLocale;
-use App\Support\FaviconSupport;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,9 +12,6 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
-        then: function () {
-            FaviconSupport::routes();
-        }
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([

@@ -7,7 +7,6 @@ namespace App\Support;
 use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectLanguage;
-use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
@@ -15,6 +14,7 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 
 class ProjectMetrics
 {
@@ -44,7 +44,7 @@ class ProjectMetrics
      * caught by SyncProjectMetricsJob, which releases back to the queue with a
      * delay until the window resets.
      *
-     * @throws GithubRateLimitException
+     * @throws GitHubRateLimitException
      */
     private static function throwIfRateLimited(Response $response): void
     {
@@ -67,7 +67,7 @@ class ProjectMetrics
             $retryAfter = ((int) $response->header('X-RateLimit-Reset')) - time();
         }
 
-        throw new GithubRateLimitException(max(60, $retryAfter));
+        throw new GitHubRateLimitException(max(60, $retryAfter));
     }
 
     public static function sync(Project $project): bool
@@ -368,7 +368,7 @@ class ProjectMetrics
      * Returns null when unavailable: no token (GraphQL always requires auth), a
      * network/HTTP error, or a null `repository` (not found / GraphQL error). A
      * rate-limit response — HTTP 403/429, or a 200 carrying a `RATE_LIMITED`
-     * error — throws GithubRateLimitException, same as the REST path.
+     * error — throws GitHubRateLimitException, same as the REST path.
      *
      * @return array{stars:int, language:?string, topics:list<string>, default_branch:?string, branches:list<string>}|null
      */
@@ -417,7 +417,7 @@ class ProjectMetrics
                 if (is_array($error) && ($error['type'] ?? null) === 'RATE_LIMITED') {
                     $retryAfter = ((int) $response->header('X-RateLimit-Reset')) - time();
 
-                    throw new GithubRateLimitException(max(60, $retryAfter));
+                    throw new GitHubRateLimitException(max(60, $retryAfter));
                 }
             }
         }

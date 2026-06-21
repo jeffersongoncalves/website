@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use App\Support\ProjectAttributes;
 use App\Support\ProjectImporter;
@@ -18,6 +17,7 @@ use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 use Throwable;
 
 /**
@@ -69,7 +69,7 @@ class ImportNpmPackageJob implements ShouldQueue
 
         try {
             $result = ProjectImporter::fromNpm($npmUrl);
-        } catch (GithubRateLimitException $e) {
+        } catch (GitHubRateLimitException $e) {
             $this->release($e->retryAfter);
 
             return;

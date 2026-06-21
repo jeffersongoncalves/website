@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ab0d0af6d1c7d117ec089a1b28ebd110",
+    "content-hash": "5c4e7dccda195cc5d09c853413cb5072",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2258,6 +2258,77 @@
             "time": "2026-06-11T18:29:41+00:00"
         },
         {
+            "name": "jeffersongoncalves/filament-additional-information",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/filament-additional-information.git",
+                "reference": "11949b62d73cf524936760fc7816fe1b461ddc36"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-additional-information/zipball/11949b62d73cf524936760fc7816fe1b461ddc36",
+                "reference": "11949b62d73cf524936760fc7816fe1b461ddc36",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.21",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\Filament\\AdditionalInformation\\FilamentAdditionalInformationServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\Filament\\AdditionalInformation\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A reusable Filament infolist section that displays created/updated (and any other) timestamp entries via a simple make() factory.",
+            "homepage": "https://github.com/jeffersongoncalves/filament-additional-information",
+            "keywords": [
+                "additional-information",
+                "filament",
+                "filament-plugin",
+                "infolist",
+                "jeffersongoncalves",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/filament-additional-information/issues",
+                "source": "https://github.com/jeffersongoncalves/filament-additional-information/tree/1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-20T20:01:09+00:00"
+        },
+        {
             "name": "jeffersongoncalves/filament-gtag",
             "version": "v3.1.1",
             "source": {
@@ -2540,6 +2611,221 @@
             "time": "2026-03-04T03:17:04+00:00"
         },
         {
+            "name": "jeffersongoncalves/filament-sensible-defaults",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/filament-sensible-defaults.git",
+                "reference": "1340e731edb54973ddc16874c0206680aa21b4cd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-sensible-defaults/zipball/1340e731edb54973ddc16874c0206680aa21b4cd",
+                "reference": "1340e731edb54973ddc16874c0206680aa21b4cd",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.3",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.21",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\Filament\\SensibleDefaults\\FilamentSensibleDefaultsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\Filament\\SensibleDefaults\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Filament plugin that applies a curated set of sensible, opinionated UI defaults across your panels (actions, forms, selects, date-time pickers, tables, pages and display formats) with config-driven, per-block opt-outs.",
+            "homepage": "https://github.com/jeffersongoncalves/filament-sensible-defaults",
+            "keywords": [
+                "filament",
+                "filament-sensible-defaults",
+                "jeffersongoncalves",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/filament-sensible-defaults/issues",
+                "source": "https://github.com/jeffersongoncalves/filament-sensible-defaults/tree/1.0.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-20T20:23:19+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-github-client",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-github-client.git",
+                "reference": "03ba0fd80ccf7aab96bcad4390fcaf98c1d40184"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-client/zipball/03ba0fd80ccf7aab96bcad4390fcaf98c1d40184",
+                "reference": "03ba0fd80ccf7aab96bcad4390fcaf98c1d40184",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.21",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\GitHubClient\\GitHubClientServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\GitHubClient\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "jefferson@codions.com",
+                    "homepage": "https://github.com/jeffersongoncalves"
+                }
+            ],
+            "description": "A lightweight GitHub REST API client for Laravel with tri-state repository status detection and built-in rate-limit handling.",
+            "keywords": [
+                "GitHub-API",
+                "client",
+                "github",
+                "http",
+                "laravel",
+                "rate-limit",
+                "rest"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-github-client/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-github-client/tree/v1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-20T19:51:08+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-github-contributions",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-github-contributions.git",
+                "reference": "82cb58181a33b683533bf0dc000930ee9b435f43"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-contributions/zipball/82cb58181a33b683533bf0dc000930ee9b435f43",
+                "reference": "82cb58181a33b683533bf0dc000930ee9b435f43",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.21",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\GitHubContributions\\GitHubContributionsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\GitHubContributions\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "jefferson@codions.com",
+                    "homepage": "https://github.com/jeffersongoncalves"
+                }
+            ],
+            "description": "Fetch the GitHub contribution calendar for any login as a flat 0-4 heatmap-cell array, ready to render your own contribution heatmap.",
+            "keywords": [
+                "calendar",
+                "contribution-graph",
+                "contributions",
+                "github",
+                "graphql",
+                "heatmap",
+                "laravel",
+                "profile"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-github-contributions/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-github-contributions/tree/v1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-20T19:51:15+00:00"
+        },
+        {
             "name": "jeffersongoncalves/laravel-gtag",
             "version": "v2.0.3",
             "source": {
@@ -2690,6 +2976,421 @@
                 }
             ],
             "time": "2026-05-23T16:59:48+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-html-sanitizer",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-html-sanitizer.git",
+                "reference": "15f8344a97ee62fdb2933fa5ad761c4799c8e29e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-html-sanitizer/zipball/15f8344a97ee62fdb2933fa5ad761c4799c8e29e",
+                "reference": "15f8344a97ee62fdb2933fa5ad761c4799c8e29e",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14",
+                "symfony/html-sanitizer": "^7.0|^8.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\HtmlSanitizer\\HtmlSanitizerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\HtmlSanitizer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This Laravel package provides a simple wrapper around the Symfony HTML Sanitizer to safely clean untrusted HTML. It strips scripts, inline event handlers, and Alpine attributes while keeping the presentational subset (headings, lists, tables, code blocks, images, links) that rendered Markdown and READMEs need. The package is easy to install and configure, seamlessly integrating with your existing Laravel application.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-html-sanitizer",
+            "keywords": [
+                "jeffersongoncalves",
+                "laravel",
+                "laravel-html-sanitizer"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-html-sanitizer/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-html-sanitizer/tree/v1.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-20T20:56:15+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-markdown",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-markdown.git",
+                "reference": "bbc818029bcf3768900918417bbe3717e580ef3b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-markdown/zipball/bbc818029bcf3768900918417bbe3717e580ef3b",
+                "reference": "bbc818029bcf3768900918417bbe3717e580ef3b",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "league/commonmark": "^2.4",
+                "php": "^8.4",
+                "spatie/laravel-package-tools": "^1.14",
+                "tempest/highlight": "^2.25"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\Markdown\\MarkdownServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\Markdown\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A shared CommonMark renderer for Laravel with GitHub Flavored Markdown, optional heading permalinks, and server-side syntax highlighting (class-based tokens) via tempest/highlight. Renders raw HTML for trusted-pipeline rendering — pair with jeffersongoncalves/laravel-html-sanitizer before displaying untrusted content.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-markdown",
+            "keywords": [
+                "Laravel-Markdown",
+                "jeffersongoncalves",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-markdown/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-markdown/tree/v1.0.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-20T20:16:30+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-page-cache",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-page-cache.git",
+                "reference": "472d72398c3bdc1e91e99b2d277950fcd502c3b2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-page-cache/zipball/472d72398c3bdc1e91e99b2d277950fcd502c3b2",
+                "reference": "472d72398c3bdc1e91e99b2d277950fcd502c3b2",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\PageCache\\PageCacheServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\PageCache\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This Laravel package provides a full-page response cache middleware for stateless public GET pages. It caches 200 responses keyed by a version token, locale, and theme cookie, skips authenticated requests, exposes an X-Page-Cache HIT/MISS header, and offers a static flush() helper to invalidate every cached page at once.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-page-cache",
+            "keywords": [
+                "jeffersongoncalves",
+                "laravel",
+                "laravel-page-cache"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-page-cache/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-page-cache/tree/v1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-20T19:51:47+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-pwa-favicon",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-pwa-favicon.git",
+                "reference": "e06f6ade5b3dbea57423617b443515451c51b3c2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-pwa-favicon/zipball/e06f6ade5b3dbea57423617b443515451c51b3c2",
+                "reference": "e06f6ade5b3dbea57423617b443515451c51b3c2",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/routing": "^11.0|^12.0|^13.0",
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\PwaFavicon\\PwaFaviconServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\PwaFavicon\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This Laravel package serves a spec-shaped PWA `manifest.json` (with Android density icons, a 512px master icon, and a maskable variant), a `browserconfig.xml` for Windows tiles, a `favicon.ico` route, and Apple touch icon head links. It turns any Laravel application into an installable Progressive Web App with sensible, publishable defaults.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-pwa-favicon",
+            "keywords": [
+                "jeffersongoncalves",
+                "laravel",
+                "laravel-pwa-favicon"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-pwa-favicon/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-pwa-favicon/tree/v1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-20T19:51:54+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-security-headers",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-security-headers.git",
+                "reference": "50a202614467f1e71fb53ccdcef22ed0f2b07617"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-security-headers/zipball/50a202614467f1e71fb53ccdcef22ed0f2b07617",
+                "reference": "50a202614467f1e71fb53ccdcef22ed0f2b07617",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\SecurityHeaders\\SecurityHeadersServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\SecurityHeaders\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This Laravel package stamps a configurable set of baseline security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy, Content-Security-Policy, Cross-Origin-Opener-Policy, X-Permitted-Cross-Domain-Policies and HSTS) onto your HTTP responses via a single middleware. Every header value and the full CSP directive map are driven by config, so you can tune or disable each one without touching code.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-security-headers",
+            "keywords": [
+                "jeffersongoncalves",
+                "laravel",
+                "laravel-security-headers"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-security-headers/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-security-headers/tree/v1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-20T19:50:38+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-ssrf-guard",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-ssrf-guard.git",
+                "reference": "038417b23126fa28c461b6ab0a13d373580d0775"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-ssrf-guard/zipball/038417b23126fa28c461b6ab0a13d373580d0775",
+                "reference": "038417b23126fa28c461b6ab0a13d373580d0775",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\SsrfGuard\\SsrfGuardServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\SsrfGuard\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel package that protects outbound HTTP requests from SSRF (Server-Side Request Forgery): it validates that a URL's host resolves only to public IPs (denying private, reserved, loopback and link-local ranges by default), pins the connection to the validated IP to close the DNS-rebinding TOCTOU window, and performs safe GET requests that re-validate every redirect hop.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-ssrf-guard",
+            "keywords": [
+                "jeffersongoncalves",
+                "laravel",
+                "laravel-ssrf-guard"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-ssrf-guard/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-ssrf-guard/tree/v1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-20T19:51:21+00:00"
         },
         {
             "name": "jenssegers/agent",
@@ -14316,7 +15017,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.3"
+        "php": "^8.4"
     },
     "platform-dev": {},
     "platform-overrides": {

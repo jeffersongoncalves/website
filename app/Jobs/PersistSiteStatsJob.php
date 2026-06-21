@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Exceptions\GithubRateLimitException;
 use App\Support\SiteStats;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,6 +13,7 @@ use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 use Throwable;
 
 class PersistSiteStatsJob implements ShouldQueue
@@ -54,7 +54,7 @@ class PersistSiteStatsJob implements ShouldQueue
     {
         try {
             SiteStats::persist();
-        } catch (GithubRateLimitException $e) {
+        } catch (GitHubRateLimitException $e) {
             // GitHub call failed mid-compute — release instead of writing zeros
             // over the cached followers/sponsors/contribution values.
             $this->release($e->retryAfter);

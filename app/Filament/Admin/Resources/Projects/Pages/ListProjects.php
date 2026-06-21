@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Admin\Resources\Projects\Pages;
 
 use App\Enums\ProjectStatus;
-use App\Exceptions\GithubRateLimitException;
 use App\Filament\Admin\Resources\Projects\ProjectResource;
 use App\Models\Project;
 use App\Support\ProjectAttributes;
@@ -18,6 +17,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 
 class ListProjects extends ListRecords
 {
@@ -80,7 +80,7 @@ class ListProjects extends ListRecords
                         'article' => ProjectImporter::fromArticle($data['url']),
                         default => ProjectImporter::fromUrl($data['url']),
                     };
-                } catch (GithubRateLimitException) {
+                } catch (GitHubRateLimitException) {
                     $result = ['error' => 'rate_limited'];
                 }
 

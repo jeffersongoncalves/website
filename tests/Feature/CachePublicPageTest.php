@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
-use App\Http\Middleware\CachePublicPage;
 use App\Models\Project;
 use Illuminate\Support\Facades\Cache;
+use JeffersonGoncalves\PageCache\Middleware\CachePublicPage;
 
 beforeEach(function (): void {
-    config(['filakit.page_cache_enabled' => true]);
+    config(['page-cache.enabled' => true]);
     Cache::flush();
 });
 
@@ -40,7 +40,7 @@ it('busts the cache when a project changes', function (): void {
 });
 
 it('does not cache when disabled', function (): void {
-    config(['filakit.page_cache_enabled' => false]);
+    config(['page-cache.enabled' => false]);
 
     $res = $this->get('/about');
     $res->assertOk();

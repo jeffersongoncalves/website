@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use App\Support\ProjectMetrics;
 use Illuminate\Bus\Batchable;
@@ -16,6 +15,7 @@ use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 use Throwable;
 
 class SyncProjectMetricsJob implements ShouldQueue
@@ -60,7 +60,7 @@ class SyncProjectMetricsJob implements ShouldQueue
     {
         try {
             ProjectMetrics::sync($this->project);
-        } catch (GithubRateLimitException $e) {
+        } catch (GitHubRateLimitException $e) {
             // Limit won't clear until the window resets — release with a delay
             // until then instead of retrying immediately and 403-ing again.
             // Keeps the log clean (no 200+ identical warnings per burst).

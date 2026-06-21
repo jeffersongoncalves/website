@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
-use App\Exceptions\GithubRateLimitException;
 use App\Models\Project;
 use App\Support\ProjectMetrics;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,6 +12,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
+use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 
 uses(RefreshDatabase::class);
 
@@ -129,7 +129,7 @@ it('reads user contributions from a single contributors page', function () {
     Http::assertNotSent(fn ($request) => str_contains($request->url(), 'page=2'));
 });
 
-it('throws GithubRateLimitException on a GraphQL 403 rate limit', function () {
+it('throws GitHubRateLimitException on a GraphQL 403 rate limit', function () {
     Http::fake([
         'api.github.com/graphql' => Http::response('', 403, [
             'X-RateLimit-Remaining' => '0',
@@ -138,7 +138,7 @@ it('throws GithubRateLimitException on a GraphQL 403 rate limit', function () {
     ]);
 
     expect(fn () => ProjectMetrics::sync(metricsProject()))
-        ->toThrow(GithubRateLimitException::class);
+        ->toThrow(GitHubRateLimitException::class);
 });
 
 it('throws when GraphQL returns a RATE_LIMITED error on a 200', function () {
@@ -151,7 +151,7 @@ it('throws when GraphQL returns a RATE_LIMITED error on a 200', function () {
     ]);
 
     expect(fn () => ProjectMetrics::sync(metricsProject()))
-        ->toThrow(GithubRateLimitException::class);
+        ->toThrow(GitHubRateLimitException::class);
 });
 
 it('completes without throwing on a non-rate-limit GraphQL failure', function () {

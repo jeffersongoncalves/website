@@ -8,6 +8,7 @@ use App\Models\ReadmeCache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use JeffersonGoncalves\Markdown\Markdown;
 
 class GithubReadme
 {

@@ -18,6 +18,12 @@ use Throwable;
 class ProjectImporter
 {
     /**
+     * Matches an npmjs.com/package URL, capturing the package id (`name` or
+     * `@scope/name`). Shared by every npm-URL parser so the pattern lives once.
+     */
+    public const NPM_PACKAGE_PATTERN = '~npmjs\.com/package/(@[^/?#]+/[^/?#]+|[^/?#]+)~i';
+
+    /**
      * Fetch a GitHub repo + composer.json + package.json + branches and
      * return a flat array of form fields plus warnings the caller should
      * surface to the editor. Result is cached for an hour per repo so
@@ -416,7 +422,7 @@ class ProjectImporter
      */
     private static function npmNameFromUrl(string $url): ?string
     {
-        if (! preg_match('~npmjs\.com/package/(@[^/?#]+/[^/?#]+|[^/?#]+)~i', trim($url), $m)) {
+        if (! preg_match(self::NPM_PACKAGE_PATTERN, trim($url), $m)) {
             return null;
         }
 
@@ -685,7 +691,12 @@ class ProjectImporter
 
         try {
             $date = Carbon::parse(trim($value));
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            Log::warning('ProjectImporter parseMetaDate failed', [
+                'value' => $value,
+                'error' => $e->getMessage(),
+            ]);
+
             return null;
         }
 
@@ -1027,7 +1038,7 @@ class ProjectImporter
      */
     public static function npmUrlOwnershipStatus(string $npmUrl, string $githubUrl): string
     {
-        if (! preg_match('~npmjs\.com/package/(@[^/?#]+/[^/?#]+|[^/?#]+)~i', $npmUrl, $m)) {
+        if (! preg_match(self::NPM_PACKAGE_PATTERN, $npmUrl, $m)) {
             return self::LINK_UNKNOWN;
         }
 

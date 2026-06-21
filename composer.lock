@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2dd7dbe2cd2732c72f0846321f0e9529",
+    "content-hash": "4eb881e0f73cc00bd1c416d3e799d0a9",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -3325,6 +3325,79 @@
                 }
             ],
             "time": "2026-06-21T20:09:37+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-npm-readme",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-npm-readme.git",
+                "reference": "66a17f5f65aab09e678aeebaafca04770b03b62e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-npm-readme/zipball/66a17f5f65aab09e678aeebaafca04770b03b62e",
+                "reference": "66a17f5f65aab09e678aeebaafca04770b03b62e",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.8",
+                "illuminate/contracts": "^11.0|^12.0|^13.0",
+                "illuminate/http": "^11.0|^12.0|^13.0",
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "league/commonmark": "^2.8.2",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\NpmReadme\\NpmReadmeServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\NpmReadme\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel package that fetches an npm package's README from the registry document, renders the markdown and caches the resulting HTML. The default renderer strips raw HTML; provide your own renderer callable (and sanitize) to keep it. Rendered HTML is untrusted — sanitize it before display.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-npm-readme",
+            "keywords": [
+                "jeffersongoncalves",
+                "laravel",
+                "laravel-npm-readme"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-npm-readme/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-npm-readme/tree/v1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-21T23:22:27+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-page-cache",

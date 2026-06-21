@@ -601,7 +601,7 @@ class ProjectMetrics
         }
 
         // Matches npmjs.com/package/{name} or npmjs.com/package/@scope/name
-        if (! preg_match('~npmjs\.com/package/(@[^/?#]+/[^/?#]+|[^/?#]+)~i', $url, $m)) {
+        if (! preg_match(ProjectImporter::NPM_PACKAGE_PATTERN, $url, $m)) {
             return null;
         }
 

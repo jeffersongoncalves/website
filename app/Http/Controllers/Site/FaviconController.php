@@ -54,6 +54,7 @@ class FaviconController
 
         return response($icon['body'], 200)
             ->header('Content-Type', $icon['type'])
+            ->header('X-Content-Type-Options', 'nosniff')
             ->header('Cache-Control', 'public, max-age=2592000, immutable');
     }
 
@@ -73,9 +74,18 @@ class FaviconController
             return null;
         }
 
+        // Only cache + serve real images. Google S2 always returns image/*,
+        // but validating it (like OgImageController) keeps a non-image response
+        // from ever being served under an image content-type.
+        $type = strtolower(trim((string) $response->header('Content-Type')));
+
+        if (! str_starts_with($type, 'image/')) {
+            return null;
+        }
+
         return [
             'body' => $response->body(),
-            'type' => (string) ($response->header('Content-Type') ?: 'image/png'),
+            'type' => $type,
         ];
     }
 

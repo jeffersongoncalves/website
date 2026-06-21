@@ -72,4 +72,12 @@ class SyncProjectMetricsJob implements ShouldQueue
             ]);
         }
     }
+
+    public function failed(?Throwable $e): void
+    {
+        Log::error('SyncProjectMetricsJob permanently failed', [
+            'project' => $this->project->slug,
+            'error' => $e?->getMessage(),
+        ]);
+    }
 }

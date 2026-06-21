@@ -29,6 +29,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use JeffersonGoncalves\Filament\Gtag\GtagPlugin;
 use JeffersonGoncalves\Filament\Gtm\GtmPlugin;
 use JeffersonGoncalves\Filament\OneTimeOperations\OneTimeOperationsPlugin;
+use JeffersonGoncalves\Filament\Pwa\FilamentPwaPlugin;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 
@@ -119,6 +120,12 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()->label(fn () => __('admin.navigation.settings'))->collapsed(),
             ])
             ->plugins([
+                // Injects manifest link + theme-color + apple-touch-icon links
+                // into the panel <head>. theme-color mirrors the dark-default /
+                // light-cookie logic that components.favicon used to carry, so
+                // switching the source doesn't flip the mobile address-bar tint.
+                FilamentPwaPlugin::make()
+                    ->themeColor(request()->cookie('theme') === 'light' ? '#FFFEF9' : '#0B0A09'),
                 FilamentLogViewer::make()
                     ->navigationGroup(__('admin.navigation.settings')),
                 OneTimeOperationsPlugin::make(),

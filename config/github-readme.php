@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use App\Support\GithubReadme;
 
 return [
     /*
@@ -81,5 +82,5 @@ return [
     | e.g. with jeffersongoncalves/laravel-html-sanitizer.
     |
     */
-    'renderer' => null,
+    'renderer' => [GithubReadme::class, 'renderMarkdown'],
 ];

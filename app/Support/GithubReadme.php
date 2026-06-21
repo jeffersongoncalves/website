@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use JeffersonGoncalves\GitHubReadme\GitHubReadme as Readme;
+use JeffersonGoncalves\Markdown\Markdown;
 
 /**
  * App-side facade over jeffersongoncalves/laravel-github-readme.
@@ -21,6 +22,18 @@ class GithubReadme
     public static function fetchHtml(string $githubUrl, ?string $ref = null): ?string
     {
         return Readme::fetchHtml($githubUrl, $ref);
+    }
+
+    /**
+     * Renderer wired into `config('github-readme.renderer')` as an array
+     * callable (serializable, so `config:cache` works) — renders README
+     * markdown through jeffersongoncalves/laravel-markdown (GFM + heading
+     * permalinks + server-side syntax highlighting) instead of the package's
+     * plain CommonMark default. Output is sanitised later before display.
+     */
+    public static function renderMarkdown(string $markdown): string
+    {
+        return Markdown::render($markdown, headingPermalinks: true);
     }
 
     public static function repoFromUrl(?string $url): ?string

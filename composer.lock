@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "56025e3e7a446a1e0912bc0d50e41585",
+    "content-hash": "f155781fde2c07278043c36c0feb7333",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2611,6 +2611,75 @@
             "time": "2026-03-04T03:17:04+00:00"
         },
         {
+            "name": "jeffersongoncalves/filament-pwa",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/filament-pwa.git",
+                "reference": "a2175fcfbe3ef62cde136ad8e25d902622f21c1d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-pwa/zipball/a2175fcfbe3ef62cde136ad8e25d902622f21c1d",
+                "reference": "a2175fcfbe3ef62cde136ad8e25d902622f21c1d",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "jeffersongoncalves/laravel-pwa-favicon": "^1.0.1",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.14.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+                "pestphp/pest-plugin-livewire": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\Filament\\Pwa\\FilamentPwaServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\Filament\\Pwa\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Filament plugin that injects the full PWA <head> markup (favicons, Apple touch icons, manifest link, msapplication tiles, theme-color and mobile web-app metas) into your panels via laravel-pwa-favicon.",
+            "homepage": "https://github.com/jeffersongoncalves/filament-pwa",
+            "keywords": [
+                "favicon",
+                "filament",
+                "filament-pwa",
+                "jeffersongoncalves",
+                "laravel",
+                "manifest",
+                "pwa"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/filament-pwa/issues",
+                "source": "https://github.com/jeffersongoncalves/filament-pwa/tree/1.0.4"
+            },
+            "time": "2026-06-21T18:16:37+00:00"
+        },
+        {
             "name": "jeffersongoncalves/filament-sensible-defaults",
             "version": "1.0.1",
             "source": {
@@ -3326,16 +3395,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-pwa-favicon",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-pwa-favicon.git",
-                "reference": "e06f6ade5b3dbea57423617b443515451c51b3c2"
+                "reference": "7fdc46310129a46a0609db019b238589955a70e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-pwa-favicon/zipball/e06f6ade5b3dbea57423617b443515451c51b3c2",
-                "reference": "e06f6ade5b3dbea57423617b443515451c51b3c2",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-pwa-favicon/zipball/7fdc46310129a46a0609db019b238589955a70e4",
+                "reference": "7fdc46310129a46a0609db019b238589955a70e4",
                 "shasum": ""
             },
             "require": {
@@ -3383,7 +3452,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-pwa-favicon/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-pwa-favicon/tree/v1.0.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-pwa-favicon/tree/v1.0.1"
             },
             "funding": [
                 {
@@ -3391,7 +3460,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-20T19:51:54+00:00"
+            "time": "2026-06-21T18:09:36+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-security-headers",

@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use JeffersonGoncalves\LocaleCookie\Middleware\SetLocale;
-use JeffersonGoncalves\Markdown\Markdown;
 use Livewire\Livewire;
 use RalphJSmit\Laravel\SEO\Facades\SEOManager;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
@@ -30,9 +29,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if (config('pwa-favicon.enabled')) {
-            FilamentView::registerRenderHook(PanelsRenderHook::HEAD_START, fn (): View => view('components.favicon'));
-        }
+        // The panel PWA <head> (manifest + theme-color + favicons + apple/web-app
+        // metas) is injected by the filament-pwa plugin on the admin panel; the
+        // public site emits the same tags via <x-favicon/>. No favicon render
+        // hook needed here.
         FilamentView::registerRenderHook(PanelsRenderHook::HEAD_START, fn (): View => view('components.js-md5'));
     }
 
@@ -62,12 +62,6 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Model::automaticallyEagerLoadRelationships();
-
-        // README HTML is rendered through jeffersongoncalves/laravel-markdown
-        // (GFM + heading permalinks + server-side syntax highlighting) rather
-        // than the package's plain CommonMark default. Wired at runtime so no
-        // closure leaks into a cached config. Sanitised later before display.
-        config(['github-readme.renderer' => static fn (string $markdown): string => Markdown::render($markdown, headingPermalinks: true)]);
 
         // SetLocale is a route-group middleware, so Livewire /update requests
         // (live search/sort/topic/pagination on /projects, /links, /articles)

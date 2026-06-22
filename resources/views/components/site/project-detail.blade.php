@@ -9,7 +9,7 @@
 ])
 
 @php
-    $locale  = \App\Support\LocaleSupport::short();
+    $locale  = \JeffersonGoncalves\LocaleCookie\LocaleCookie::short();
     $title   = $project->getTranslation('title', $locale, false) ?: $project->name;
 
     // Canonical section route (centralised on the model): articles → /articles,

@@ -2,7 +2,7 @@
 @props(['project'])
 
 @php
-    $locale = \App\Support\LocaleSupport::short();
+    $locale = \JeffersonGoncalves\LocaleCookie\LocaleCookie::short();
     $title = $project->getTranslation('title', $locale, false) ?: $project->getTranslation('title', 'pt', false);
     // External-link projects (no repo → no stars/license): show the host
     // instead of the stars/license meta, same as the show page.

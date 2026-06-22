@@ -1,5 +1,5 @@
 @php
-    $locale = \App\Support\LocaleSupport::short();
+    $locale = \JeffersonGoncalves\LocaleCookie\LocaleCookie::short();
     $statsJson = collect($homeStats)->map(fn ($s) => array_merge($s, ['label' => __('site.' . $s['label_key'])]))->values()->toJson();
 
     $personLd = [

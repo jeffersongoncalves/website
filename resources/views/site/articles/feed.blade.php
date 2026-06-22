@@ -7,7 +7,7 @@
 <language>{{ str_replace('_', '-', app()->getLocale()) }}</language>
 <atom:link href="{{ route('articles.feed') }}" rel="self" type="application/rss+xml"/>
 @foreach($articles as $article)
-@php($locale = \App\Support\LocaleSupport::short())
+@php($locale = \JeffersonGoncalves\LocaleCookie\LocaleCookie::short())
 @php($description = $article->getTranslation('title', $locale, false) ?: $article->name)
 <item>
 <title>{{ $article->name }}</title>

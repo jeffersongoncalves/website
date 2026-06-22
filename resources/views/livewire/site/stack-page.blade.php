@@ -1,4 +1,4 @@
-@php $locale = \App\Support\LocaleSupport::short(); @endphp
+@php $locale = \JeffersonGoncalves\LocaleCookie\LocaleCookie::short(); @endphp
 
 <div>
     <section class="section section-first">

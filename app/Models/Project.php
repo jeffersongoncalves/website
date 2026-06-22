@@ -10,7 +10,6 @@ use App\Enums\ProjectLanguage;
 use App\Enums\ProjectStatus;
 use App\Observers\ProjectObserver;
 use App\Support\GithubReadme;
-use App\Support\LocaleSupport;
 use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -20,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use JeffersonGoncalves\LocaleCookie\LocaleCookie;
 use RalphJSmit\Laravel\SEO\Models\SEO;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
@@ -385,7 +385,7 @@ class Project extends Model
 
     public function getDynamicSEOData(): SEOData
     {
-        $locale = LocaleSupport::short();
+        $locale = LocaleCookie::short();
         $description = $this->getTranslation('title', $locale, false) ?: $this->name;
 
         // Point og:image at our own cached proxy (/og/{slug}.png) rather than

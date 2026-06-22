@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Support\LocaleSupport;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -15,6 +14,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use JeffersonGoncalves\LocaleCookie\LocaleCookie;
 use JeffersonGoncalves\LocaleCookie\Middleware\SetLocale;
 use Livewire\Livewire;
 use RalphJSmit\Laravel\SEO\Facades\SEOManager;
@@ -81,13 +81,13 @@ class AppServiceProvider extends ServiceProvider
     {
         SEOManager::SEODataTransformer(function (SEOData $data): SEOData {
             if (empty($data->image)) {
-                $data->image = Vite::asset('resources/images/github-og-'.LocaleSupport::short().'.png');
+                $data->image = Vite::asset('resources/images/github-og-'.LocaleCookie::short().'.png');
             }
 
             // Emit og:locale for the active language (OpenGraph wants the
             // language_TERRITORY form). Without this laravel-seo skips the tag.
             if (empty($data->locale)) {
-                $data->locale = match (LocaleSupport::short()) {
+                $data->locale = match (LocaleCookie::short()) {
                     'en' => 'en_US',
                     'es' => 'es_ES',
                     default => 'pt_BR',

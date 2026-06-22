@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 use JeffersonGoncalves\GitHubClient\GitHubClient;
 use JeffersonGoncalves\SsrfGuard\SsrfGuard;
+use JeffersonGoncalves\TopicNormalizer\TopicNormalizer;
 use Throwable;
 
 class ProjectImporter
@@ -322,7 +323,7 @@ class ProjectImporter
             'packagist_url' => null,
             'npm_url' => 'https://www.npmjs.com/package/'.$name,
             'stack' => [],
-            'topics' => ProjectTopics::normalize(is_array($data['keywords'] ?? null) ? $data['keywords'] : []),
+            'topics' => TopicNormalizer::normalize(is_array($data['keywords'] ?? null) ? $data['keywords'] : []),
             'versions' => [],
         ];
 
@@ -873,7 +874,7 @@ class ProjectImporter
             'packagist_url' => $packagistOwned ? 'https://packagist.org/packages/'.$packagistName : null,
             'npm_url' => $npmPublished ? 'https://www.npmjs.com/package/'.$npmName : null,
             'stack' => ProjectClassifier::stack($composer, $package),
-            'topics' => ProjectTopics::normalize(
+            'topics' => TopicNormalizer::normalize(
                 is_array($repo['topics'] ?? null) ? $repo['topics'] : [],
                 is_array($composer['keywords'] ?? null) ? $composer['keywords'] : [],
                 is_array($package['keywords'] ?? null) ? $package['keywords'] : [],

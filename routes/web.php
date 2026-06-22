@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Site\ArticlesFeedController;
-use App\Http\Controllers\Site\FaviconController;
 use App\Http\Controllers\Site\LlmsTxtController;
 use App\Http\Controllers\Site\OfflineController;
 use App\Http\Controllers\Site\OgImageController;
@@ -35,10 +34,8 @@ Route::middleware([SecurityHeaders::class])->group(function () {
     Route::get('/og/{slug}.png', OgImageController::class)->name('og.show')
         ->middleware('throttle:60,1');
 
-    // Same-origin favicon proxy for external-link cards (keeps the browser off
-    // Google's S2 service). Locale-independent binary response, like /og.
-    Route::get('/favicon-proxy', FaviconController::class)->name('favicon.proxy')
-        ->middleware('throttle:120,1');
+    // /favicon-proxy (name `favicon-proxy`) is registered by
+    // jeffersongoncalves/laravel-favicon-proxy (config favicon-proxy.*).
 
     // llms.txt — plain-text site map for LLM crawlers (llmstxt.org). Lives at
     // the site root with no locale prefix; it's its own cached text body.

@@ -98,7 +98,7 @@
                             {{-- Favicon thumb via our same-origin proxy (cached; keeps the
                                  browser off Google's S2 service).
                                  Decorative — the host text beside it carries the meaning. --}}
-                            <img src="{{ route('favicon.proxy', ['domain' => $faviconHost]) }}"
+                            <img src="{{ route('favicon-proxy', ['domain' => $faviconHost]) }}"
                                  alt="" width="14" height="14" loading="lazy"
                                  class="rounded-[2px] shrink-0">
                         @else

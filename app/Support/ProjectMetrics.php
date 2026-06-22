@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
+use JeffersonGoncalves\TopicNormalizer\TopicNormalizer;
 
 class ProjectMetrics
 {
@@ -131,7 +132,7 @@ class ProjectMetrics
         if ($project->packagist_url) {
             $rawTopics = array_merge($rawTopics, self::fetchPackagistKeywords($project->packagist_url));
         }
-        $topics = ProjectTopics::normalize($rawTopics);
+        $topics = TopicNormalizer::normalize($rawTopics);
         if ($topics !== [] && $topics !== ($project->topics ?? [])) {
             $project->topics = $topics;
             $changed = true;
@@ -738,7 +739,7 @@ class ProjectMetrics
     /**
      * Pull `keywords` off the Packagist package document so they can feed the
      * project's topics. Merges keywords across versions (deduped/capped later by
-     * ProjectTopics). Empty on any failure.
+     * TopicNormalizer). Empty on any failure.
      *
      * @return list<string>
      */

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6f969e67953ba317d636f3ba411e9b58",
+    "content-hash": "1dfe40706a6bb9c2b94ad3cceac30d8b",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2750,6 +2750,79 @@
             "time": "2026-06-20T20:23:19+00:00"
         },
         {
+            "name": "jeffersongoncalves/laravel-favicon-proxy",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-favicon-proxy.git",
+                "reference": "384a935fa4193f57ce8d352f8989bfaf870bcb68"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-favicon-proxy/zipball/384a935fa4193f57ce8d352f8989bfaf870bcb68",
+                "reference": "384a935fa4193f57ce8d352f8989bfaf870bcb68",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.8",
+                "illuminate/contracts": "^11.0|^12.0|^13.0",
+                "illuminate/http": "^11.0|^12.0|^13.0",
+                "illuminate/routing": "^11.0|^12.0|^13.0",
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\FaviconProxy\\FaviconProxyServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\FaviconProxy\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel package that proxies and server-side caches website favicons (Google S2 by default) behind a same-origin route, so visitors' browsers never hit the third-party favicon service. Validates the upstream content-type, sends nosniff, negative-caches failures and falls back to a transparent pixel.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-favicon-proxy",
+            "keywords": [
+                "jeffersongoncalves",
+                "laravel",
+                "laravel-favicon-proxy"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-favicon-proxy/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-favicon-proxy/tree/v1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-22T00:13:30+00:00"
+        },
+        {
             "name": "jeffersongoncalves/laravel-github-client",
             "version": "v1.0.0",
             "source": {
@@ -3747,6 +3820,76 @@
                 }
             ],
             "time": "2026-06-20T19:51:21+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-topic-normalizer",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-topic-normalizer.git",
+                "reference": "ce80047946141d79002a8313acf9a6f24f270b3a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-topic-normalizer/zipball/ce80047946141d79002a8313acf9a6f24f270b3a",
+                "reference": "ce80047946141d79002a8313acf9a6f24f270b3a",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^11.0|^12.0|^13.0",
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\TopicNormalizer\\TopicNormalizerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\TopicNormalizer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A tiny Laravel helper that merges raw topic/keyword lists (GitHub topics, composer.json + package.json keywords, Packagist keywords, …) into one slugged, deduplicated, length-filtered and capped list.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-topic-normalizer",
+            "keywords": [
+                "jeffersongoncalves",
+                "laravel",
+                "laravel-topic-normalizer"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-topic-normalizer/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-topic-normalizer/tree/v1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-22T00:18:37+00:00"
         },
         {
             "name": "jenssegers/agent",

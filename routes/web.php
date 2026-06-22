@@ -7,7 +7,6 @@ use App\Http\Controllers\Site\FaviconController;
 use App\Http\Controllers\Site\LlmsTxtController;
 use App\Http\Controllers\Site\OfflineController;
 use App\Http\Controllers\Site\OgImageController;
-use App\Http\Controllers\Site\ServiceWorkerController;
 use App\Http\Controllers\Site\SwitchLocaleController;
 use App\Livewire\Site\AboutPage;
 use App\Livewire\Site\ArticlesPage;
@@ -26,11 +25,10 @@ use JeffersonGoncalves\SecurityHeaders\Middleware\SecurityHeaders;
 // these endpoints — especially /og and /favicon-proxy, which relay externally
 // sourced bytes — get X-Content-Type-Options: nosniff and the rest.
 Route::middleware([SecurityHeaders::class])->group(function () {
-    // PWA infrastructure. `/sw.js` must live at the site root (not behind the
-    // locale middleware) so the service worker scope is `/` and there's no
-    // locale-prefixed redirect competing with the registration. `/offline` is
-    // pre-cached by the SW and served as the fallback for navigation failures.
-    Route::get('/sw.js', ServiceWorkerController::class)->name('pwa.sw');
+    // `/offline` is pre-cached by the service worker and served as the fallback
+    // for navigation failures. The `/sw.js` route itself is registered by
+    // jeffersongoncalves/laravel-pwa-service-worker (config pwa-service-worker.*),
+    // with SecurityHeaders attached via that package's `middleware` config.
     Route::get('/offline', OfflineController::class)->name('pwa.offline');
 
     // Cached social-card proxy. Outside the locale/page-cache group: it's a

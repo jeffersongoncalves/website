@@ -35,6 +35,7 @@
         "jeffersongoncalves/laravel-npm-readme": "^1.0",
         "jeffersongoncalves/laravel-page-cache": "^1.0",
         "jeffersongoncalves/laravel-pwa-favicon": "^1.0",
+        "jeffersongoncalves/laravel-pwa-service-worker": "^1.0",
         "jeffersongoncalves/laravel-security-headers": "^2.0",
         "jeffersongoncalves/laravel-ssrf-guard": "^1.0",
         "joaopaulolndev/filament-edit-profile": "^3.0",

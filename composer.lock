@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4eb881e0f73cc00bd1c416d3e799d0a9",
+    "content-hash": "6f969e67953ba317d636f3ba411e9b58",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -3535,6 +3535,78 @@
                 }
             ],
             "time": "2026-06-21T18:09:36+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-pwa-service-worker",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-pwa-service-worker.git",
+                "reference": "5295992abd1b71cb637b493515e82c216c6dc484"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-pwa-service-worker/zipball/5295992abd1b71cb637b493515e82c216c6dc484",
+                "reference": "5295992abd1b71cb637b493515e82c216c6dc484",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^11.0|^12.0|^13.0",
+                "illuminate/http": "^11.0|^12.0|^13.0",
+                "illuminate/routing": "^11.0|^12.0|^13.0",
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.14"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\PwaServiceWorker\\PwaServiceWorkerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\PwaServiceWorker\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel package that serves a PWA service worker at /sw.js from a Blade template whose cache version tracks the Vite build manifest hash. Ships precache + cache-first (hashed assets), network-first (navigations) and stale-while-revalidate (everything else) strategies with an offline fallback, all configurable.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-pwa-service-worker",
+            "keywords": [
+                "jeffersongoncalves",
+                "laravel",
+                "laravel-pwa-service-worker"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-pwa-service-worker/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-pwa-service-worker/tree/v1.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-06-22T00:00:19+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-security-headers",

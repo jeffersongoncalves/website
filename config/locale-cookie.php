@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+use JeffersonGoncalves\SecurityHeaders\Middleware\SecurityHeaders;
 
 return [
 
@@ -40,5 +41,26 @@ return [
     */
 
     'fallback' => 'pt_BR',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Locale Switch Route
+    |--------------------------------------------------------------------------
+    |
+    | The package registers `locale/{locale}` (name `locale.switch`) — persists
+    | the chosen locale in the cookie and redirects to a same-host Referer. The
+    | header switcher links to route('locale.switch', ['locale' => $code]).
+    | `web` keeps the cookie encrypted like SetLocale reads it; SecurityHeaders
+    | mirrors the hardening the manual route used to apply.
+    |
+    */
+
+    'switch' => [
+        'enabled' => true,
+        'path' => 'locale/{locale}',
+        'name' => 'locale.switch',
+        'lifetime' => 60 * 24 * 365,
+        'middleware' => ['web', SecurityHeaders::class],
+    ],
 
 ];

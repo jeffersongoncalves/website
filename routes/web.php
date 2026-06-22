@@ -7,7 +7,6 @@ use App\Http\Controllers\Site\FaviconController;
 use App\Http\Controllers\Site\LlmsTxtController;
 use App\Http\Controllers\Site\OfflineController;
 use App\Http\Controllers\Site\OgImageController;
-use App\Http\Controllers\Site\SwitchLocaleController;
 use App\Livewire\Site\AboutPage;
 use App\Livewire\Site\ArticlesPage;
 use App\Livewire\Site\HomePage;
@@ -79,8 +78,7 @@ Route::middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class]
     Route::get('/stack', StackPage::class)->name('stack');
 
     Route::get('/sponsors', SponsorsPage::class)->name('sponsors');
-
-    Route::get('/locale/{locale}', SwitchLocaleController::class)
-        ->whereIn('locale', config('locale-cookie.supported'))
-        ->name('locale.switch');
 });
+
+// /locale/{locale} (name `locale.switch`) is registered by
+// jeffersongoncalves/laravel-locale-cookie (config locale-cookie.switch).

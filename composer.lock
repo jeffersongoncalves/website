@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1dfe40706a6bb9c2b94ad3cceac30d8b",
+    "content-hash": "fca3426b9ad3f07fd701cf70b8b2a3c0",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2681,16 +2681,16 @@
         },
         {
             "name": "jeffersongoncalves/filament-sensible-defaults",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-sensible-defaults.git",
-                "reference": "1340e731edb54973ddc16874c0206680aa21b4cd"
+                "reference": "5f36900622eb40612f2c521c81ebb18dc5a3ccb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-sensible-defaults/zipball/1340e731edb54973ddc16874c0206680aa21b4cd",
-                "reference": "1340e731edb54973ddc16874c0206680aa21b4cd",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-sensible-defaults/zipball/5f36900622eb40612f2c521c81ebb18dc5a3ccb4",
+                "reference": "5f36900622eb40612f2c521c81ebb18dc5a3ccb4",
                 "shasum": ""
             },
             "require": {
@@ -2739,7 +2739,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-sensible-defaults/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-sensible-defaults/tree/1.0.1"
+                "source": "https://github.com/jeffersongoncalves/filament-sensible-defaults/tree/1.0.2"
             },
             "funding": [
                 {
@@ -2747,7 +2747,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-20T20:23:19+00:00"
+            "time": "2026-06-20T21:25:42+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-favicon-proxy",
@@ -2824,16 +2824,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-github-client",
-            "version": "v1.0.0",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-github-client.git",
-                "reference": "03ba0fd80ccf7aab96bcad4390fcaf98c1d40184"
+                "reference": "2c31252a69ddf9693d68fdd781376b171b9242df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-client/zipball/03ba0fd80ccf7aab96bcad4390fcaf98c1d40184",
-                "reference": "03ba0fd80ccf7aab96bcad4390fcaf98c1d40184",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-client/zipball/2c31252a69ddf9693d68fdd781376b171b9242df",
+                "reference": "2c31252a69ddf9693d68fdd781376b171b9242df",
                 "shasum": ""
             },
             "require": {
@@ -2884,7 +2884,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-github-client/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-github-client/tree/v1.0.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-github-client/tree/v1.1.0"
             },
             "funding": [
                 {
@@ -2892,20 +2892,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-20T19:51:08+00:00"
+            "time": "2026-06-21T20:14:46+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-github-contributions",
-            "version": "v1.0.0",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-github-contributions.git",
-                "reference": "82cb58181a33b683533bf0dc000930ee9b435f43"
+                "reference": "3e521086b4d61adb6ba3b0791e4e0a7ac6156120"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-contributions/zipball/82cb58181a33b683533bf0dc000930ee9b435f43",
-                "reference": "82cb58181a33b683533bf0dc000930ee9b435f43",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-contributions/zipball/3e521086b4d61adb6ba3b0791e4e0a7ac6156120",
+                "reference": "3e521086b4d61adb6ba3b0791e4e0a7ac6156120",
                 "shasum": ""
             },
             "require": {
@@ -2957,7 +2957,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-github-contributions/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-github-contributions/tree/v1.0.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-github-contributions/tree/v1.1.0"
             },
             "funding": [
                 {
@@ -2965,7 +2965,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-20T19:51:15+00:00"
+            "time": "2026-06-21T20:14:47+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-github-readme",
@@ -3192,16 +3192,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-html-sanitizer",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-html-sanitizer.git",
-                "reference": "15f8344a97ee62fdb2933fa5ad761c4799c8e29e"
+                "reference": "03feeadc3a61846d0dcf0278e808912323b0337a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-html-sanitizer/zipball/15f8344a97ee62fdb2933fa5ad761c4799c8e29e",
-                "reference": "15f8344a97ee62fdb2933fa5ad761c4799c8e29e",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-html-sanitizer/zipball/03feeadc3a61846d0dcf0278e808912323b0337a",
+                "reference": "03feeadc3a61846d0dcf0278e808912323b0337a",
                 "shasum": ""
             },
             "require": {
@@ -3244,13 +3244,17 @@
             "description": "This Laravel package provides a simple wrapper around the Symfony HTML Sanitizer to safely clean untrusted HTML. It strips scripts, inline event handlers, and Alpine attributes while keeping the presentational subset (headings, lists, tables, code blocks, images, links) that rendered Markdown and READMEs need. The package is easy to install and configure, seamlessly integrating with your existing Laravel application.",
             "homepage": "https://github.com/jeffersongoncalves/laravel-html-sanitizer",
             "keywords": [
+                "html",
                 "jeffersongoncalves",
                 "laravel",
-                "laravel-html-sanitizer"
+                "laravel-html-sanitizer",
+                "sanitizer",
+                "security",
+                "xss"
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-html-sanitizer/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-html-sanitizer/tree/v1.1.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-html-sanitizer/tree/v1.2.0"
             },
             "funding": [
                 {
@@ -3258,7 +3262,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-20T20:56:15+00:00"
+            "time": "2026-06-21T20:09:33+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-locale-cookie",
@@ -3474,16 +3478,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-page-cache",
-            "version": "v1.0.0",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-page-cache.git",
-                "reference": "472d72398c3bdc1e91e99b2d277950fcd502c3b2"
+                "reference": "a75e1bac376c4907ccd8fdcdda104eb3dffce266"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-page-cache/zipball/472d72398c3bdc1e91e99b2d277950fcd502c3b2",
-                "reference": "472d72398c3bdc1e91e99b2d277950fcd502c3b2",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-page-cache/zipball/a75e1bac376c4907ccd8fdcdda104eb3dffce266",
+                "reference": "a75e1bac376c4907ccd8fdcdda104eb3dffce266",
                 "shasum": ""
             },
             "require": {
@@ -3530,7 +3534,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-page-cache/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-page-cache/tree/v1.0.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-page-cache/tree/v1.1.0"
             },
             "funding": [
                 {
@@ -3538,7 +3542,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-20T19:51:47+00:00"
+            "time": "2026-06-21T20:09:19+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-pwa-favicon",
@@ -3755,16 +3759,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-ssrf-guard",
-            "version": "v1.0.0",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-ssrf-guard.git",
-                "reference": "038417b23126fa28c461b6ab0a13d373580d0775"
+                "reference": "0eb45bf729cea4fc0123c7a11dce5f000f554788"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-ssrf-guard/zipball/038417b23126fa28c461b6ab0a13d373580d0775",
-                "reference": "038417b23126fa28c461b6ab0a13d373580d0775",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-ssrf-guard/zipball/0eb45bf729cea4fc0123c7a11dce5f000f554788",
+                "reference": "0eb45bf729cea4fc0123c7a11dce5f000f554788",
                 "shasum": ""
             },
             "require": {
@@ -3811,7 +3815,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-ssrf-guard/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-ssrf-guard/tree/v1.0.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-ssrf-guard/tree/v1.1.0"
             },
             "funding": [
                 {
@@ -3819,7 +3823,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-20T19:51:21+00:00"
+            "time": "2026-06-21T20:09:23+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-topic-normalizer",

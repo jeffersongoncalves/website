@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fca3426b9ad3f07fd701cf70b8b2a3c0",
+    "content-hash": "e714b02394115f17dad01817f80ec5ec",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2259,16 +2259,16 @@
         },
         {
             "name": "jeffersongoncalves/filament-additional-information",
-            "version": "1.0.0",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-additional-information.git",
-                "reference": "11949b62d73cf524936760fc7816fe1b461ddc36"
+                "reference": "f429d92ea27c51aa33dac01f95bf26bf1befc302"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-additional-information/zipball/11949b62d73cf524936760fc7816fe1b461ddc36",
-                "reference": "11949b62d73cf524936760fc7816fe1b461ddc36",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-additional-information/zipball/f429d92ea27c51aa33dac01f95bf26bf1befc302",
+                "reference": "f429d92ea27c51aa33dac01f95bf26bf1befc302",
                 "shasum": ""
             },
             "require": {
@@ -2279,7 +2279,7 @@
             "require-dev": {
                 "larastan/larastan": "^3.0",
                 "laravel/pint": "^1.21",
-                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "orchestra/testbench": "^10.0|^11.0",
                 "pestphp/pest": "^4.0"
             },
             "type": "library",
@@ -2318,7 +2318,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-additional-information/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-additional-information/tree/1.0.0"
+                "source": "https://github.com/jeffersongoncalves/filament-additional-information/tree/3.0.0"
             },
             "funding": [
                 {
@@ -2326,7 +2326,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-20T20:01:09+00:00"
+            "time": "2026-06-24T00:33:32+00:00"
         },
         {
             "name": "jeffersongoncalves/filament-gtag",
@@ -2612,16 +2612,16 @@
         },
         {
             "name": "jeffersongoncalves/filament-pwa",
-            "version": "1.0.4",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-pwa.git",
-                "reference": "a2175fcfbe3ef62cde136ad8e25d902622f21c1d"
+                "reference": "08e0c6c9ba5d55c8155b260786214b298e16ec41"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-pwa/zipball/a2175fcfbe3ef62cde136ad8e25d902622f21c1d",
-                "reference": "a2175fcfbe3ef62cde136ad8e25d902622f21c1d",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-pwa/zipball/08e0c6c9ba5d55c8155b260786214b298e16ec41",
+                "reference": "08e0c6c9ba5d55c8155b260786214b298e16ec41",
                 "shasum": ""
             },
             "require": {
@@ -2634,9 +2634,7 @@
                 "larastan/larastan": "^3.0",
                 "laravel/pint": "^1.0",
                 "orchestra/testbench": "^10.0|^11.0",
-                "pestphp/pest": "^3.0|^4.0",
-                "pestphp/pest-plugin-laravel": "^3.0|^4.0",
-                "pestphp/pest-plugin-livewire": "^3.0|^4.0"
+                "pestphp/pest": "^4.0"
             },
             "type": "library",
             "extra": {
@@ -2675,34 +2673,34 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-pwa/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-pwa/tree/1.0.4"
+                "source": "https://github.com/jeffersongoncalves/filament-pwa/tree/3.0.0"
             },
-            "time": "2026-06-21T18:16:37+00:00"
+            "time": "2026-06-24T01:22:43+00:00"
         },
         {
             "name": "jeffersongoncalves/filament-sensible-defaults",
-            "version": "1.0.2",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-sensible-defaults.git",
-                "reference": "5f36900622eb40612f2c521c81ebb18dc5a3ccb4"
+                "reference": "36049ec71704433c3cb8d15c82e27dad1b6ffb75"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-sensible-defaults/zipball/5f36900622eb40612f2c521c81ebb18dc5a3ccb4",
-                "reference": "5f36900622eb40612f2c521c81ebb18dc5a3ccb4",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-sensible-defaults/zipball/36049ec71704433c3cb8d15c82e27dad1b6ffb75",
+                "reference": "36049ec71704433c3cb8d15c82e27dad1b6ffb75",
                 "shasum": ""
             },
             "require": {
-                "filament/filament": "^5.3",
+                "filament/filament": "^5.0",
                 "php": "^8.3",
                 "spatie/laravel-package-tools": "^1.14.0"
             },
             "require-dev": {
                 "larastan/larastan": "^3.0",
                 "laravel/pint": "^1.21",
-                "orchestra/testbench": "^9.0|^10.0|^11.0",
-                "pestphp/pest": "^3.7.4|^4.0",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^4.0",
                 "pestphp/pest-plugin-laravel": "^3.0|^4.0"
             },
             "type": "library",
@@ -2739,7 +2737,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-sensible-defaults/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-sensible-defaults/tree/1.0.2"
+                "source": "https://github.com/jeffersongoncalves/filament-sensible-defaults/tree/3.0.0"
             },
             "funding": [
                 {
@@ -2747,7 +2745,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-20T21:25:42+00:00"
+            "time": "2026-06-24T01:02:05+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-favicon-proxy",

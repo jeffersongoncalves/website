@@ -971,7 +971,3 @@ html {
 @media (max-width: 640px) {
     .login-terminal-body { padding: 20px; }
 }
-
-.fi-badge {
-    width: fit-content !important;
-}

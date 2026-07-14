@@ -18,10 +18,10 @@ jobs:
     name: pest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           # 8.4: the locked symfony v8 / tempest/highlight deps require
           # PHP >= 8.4 and won't install on 8.3.
@@ -30,7 +30,7 @@ jobs:
           coverage: pcov
 
       - name: Install composer dependencies
-        uses: ramsey/composer-install@v4
+        uses: ramsey/composer-install@26d8a556604053a9612623447203a691f406fbe6 # v4
 
       - name: Prepare environment
         run: |

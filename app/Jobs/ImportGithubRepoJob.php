@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\Project;
+use App\Services\PostHogService;
 use App\Support\GithubReadme;
 use App\Support\ProjectAttributes;
 use App\Support\ProjectImporter;
@@ -115,10 +116,17 @@ class ImportGithubRepoJob implements ShouldQueue
         $attributes['is_daily_driver'] = false;
 
         try {
-            Project::create($attributes);
+            $project = Project::create($attributes);
         } catch (UniqueConstraintViolationException) {
             // Raced another import for the same repo/slug — already persisted.
+            return;
         }
+
+        app(PostHogService::class)->capture($this->githubUrl, 'project_imported', [
+            'project_id' => $project->id,
+            'category' => $project->category->value,
+            'github_url' => $this->githubUrl,
+        ]);
     }
 
     private function canonicalSlug(): string

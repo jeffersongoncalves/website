@@ -6,6 +6,7 @@ namespace App\Livewire\Site;
 
 use App\Enums\ProjectCategory;
 use App\Models\Project;
+use App\Services\PostHogService;
 use App\Support\SiteStats;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\PostgresConnection;
@@ -51,6 +52,7 @@ class ProjectsList extends Component
     {
         if ($property !== 'page') {
             $this->resetPage();
+            $this->trackFilterChanged($property);
         }
     }
 
@@ -58,18 +60,34 @@ class ProjectsList extends Component
     {
         $this->role = $role;
         $this->resetPage();
+        $this->trackFilterChanged('role');
     }
 
     public function setTopic(string $topic): void
     {
         $this->topic = $topic;
         $this->resetPage();
+        $this->trackFilterChanged('topic');
     }
 
     public function clearTopic(): void
     {
         $this->topic = '';
         $this->resetPage();
+        $this->trackFilterChanged('topic');
+    }
+
+    private function trackFilterChanged(string $facet): void
+    {
+        app(PostHogService::class)->capture(session()->getId(), 'projects_catalogue_filtered', [
+            'facet' => $facet,
+            'search' => $this->search,
+            'cat' => $this->cat,
+            'language' => $this->language,
+            'sort' => $this->sort,
+            'role' => $this->role,
+            'topic' => $this->topic,
+        ]);
     }
 
     public function render(): View

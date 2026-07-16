@@ -7,7 +7,6 @@ namespace App\Livewire\Site;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Models\Project;
-use App\Services\PostHogService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Support\Facades\Cache;
@@ -87,7 +86,6 @@ class LinksSection extends Component
     {
         if (in_array($property, ['search', 'dir', 'topic'], true)) {
             $this->resetPage($this->anchor);
-            $this->trackFilterChanged($property);
         }
     }
 
@@ -95,25 +93,12 @@ class LinksSection extends Component
     {
         $this->topic = $topic;
         $this->resetPage($this->anchor);
-        $this->trackFilterChanged('topic');
     }
 
     public function clearTopic(): void
     {
         $this->topic = '';
         $this->resetPage($this->anchor);
-        $this->trackFilterChanged('topic');
-    }
-
-    private function trackFilterChanged(string $facet): void
-    {
-        app(PostHogService::class)->capture(session()->getId(), 'external_links_filtered', [
-            'facet' => $facet,
-            'section' => $this->anchor,
-            'search' => $this->search,
-            'dir' => $this->dir,
-            'topic' => $this->topic,
-        ]);
     }
 
     public function render(): View

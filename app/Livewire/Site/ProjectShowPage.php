@@ -7,7 +7,6 @@ namespace App\Livewire\Site;
 use App\Enums\ProjectCategory;
 use App\Models\Project;
 use App\Models\ProjectSlugAlias;
-use App\Services\PostHogService;
 use App\Support\GithubReadme;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -55,11 +54,6 @@ class ProjectShowPage extends Component
     public function setVersion(string $version): void
     {
         $this->v = $version;
-
-        app(PostHogService::class)->capture(session()->getId(), 'project_version_selected', [
-            'project_id' => $this->projectId,
-            'version' => $version,
-        ]);
     }
 
     /**

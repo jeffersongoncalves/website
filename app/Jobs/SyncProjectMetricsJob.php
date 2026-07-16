@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\Project;
-use App\Services\PostHogService;
 use App\Support\ProjectMetrics;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
@@ -61,10 +60,6 @@ class SyncProjectMetricsJob implements ShouldQueue
     {
         try {
             ProjectMetrics::sync($this->project);
-
-            app(PostHogService::class)->capture($this->project->slug, 'project_metrics_synced', [
-                'project_id' => $this->project->id,
-            ]);
         } catch (GitHubRateLimitException $e) {
             // Limit won't clear until the window resets — release with a delay
             // until then instead of retrying immediately and 403-ing again.

@@ -137,7 +137,14 @@ class AdminPanelProvider extends PanelProvider
                 FilamentShortUrlPlugin::make()
                     ->navigationGroup(__('admin.navigation.management'))
                     ->navigationIcon('heroicon-o-link')
-                    ->navigationSort(30),
+                    ->navigationSort(30)
+                    // Links here are minted by App\Support\OutboundLink, one per
+                    // outbound destination — nothing to organise by hand and
+                    // nothing to bulk-import, so the organisation surface is off.
+                    ->hidePixels()
+                    ->hideFolders()
+                    ->hideTags()
+                    ->hideImport(),
                 GtmPlugin::make(),
                 GtagPlugin::make(),
                 FilamentEditProfilePlugin::make()

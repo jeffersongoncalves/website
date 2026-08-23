@@ -237,7 +237,7 @@
                             @unless($articleBody)
                                 <p class="body-text">@lang($isArticle ? 'site.projects.article_blurb' : 'site.projects.external_site_blurb')</p>
                             @endunless
-                            <a href="{{ $externalUrl }}" rel="noopener" target="_blank" class="btn btn-primary self-start inline-flex items-center gap-3">
+                            <a href="{{ \App\Support\OutboundLink::to($externalUrl, $project->name) }}" rel="noopener" target="_blank" class="btn btn-primary self-start inline-flex items-center gap-3">
                                 <span>@lang($isArticle ? 'site.projects.article_read' : 'site.projects.external_site_visit')</span>
                                 <span class="mono-meta-sm opacity-70">{{ $externalHost }}</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
@@ -248,13 +248,13 @@
                             <p class="body-text" style="color:var(--text-muted);">
                                 @lang('site.projects.readme_paid')
                                 @if($project->docs_url)
-                                    <a href="{{ $project->docs_url }}" rel="noopener" target="_blank" class="text-amber">{{ $project->docs_url }}</a>
+                                    <a href="{{ \App\Support\OutboundLink::to($project->docs_url, $project->name) }}" rel="noopener" target="_blank" class="text-amber">{{ $project->docs_url }}</a>
                                 @endif
                             </p>
                         @elseif($project->github_url)
                             <p class="body-text" style="color:var(--text-muted);">
                                 @lang('site.projects.readme_unavailable')
-                                <a href="{{ $project->github_url }}" rel="noopener" target="_blank" class="text-amber">{{ $project->github_url }}</a>
+                                <a href="{{ \App\Support\OutboundLink::to($project->github_url, $project->name) }}" rel="noopener" target="_blank" class="text-amber">{{ $project->github_url }}</a>
                             </p>
                         @else
                             <p class="body-text" style="color:var(--text-muted);">
@@ -270,31 +270,31 @@
                     {{-- Card 1: primary actions --}}
                     <div class="card project-actions-card">
                         @if($isExternalSite && $externalUrl)
-                            <a href="{{ $externalUrl }}" rel="noopener" target="_blank" class="btn btn-primary project-action-btn">
+                            <a href="{{ \App\Support\OutboundLink::to($externalUrl, $project->name) }}" rel="noopener" target="_blank" class="btn btn-primary project-action-btn">
                                 @lang('site.projects.external_site_visit')
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                             </a>
                         @else
                             @if($project->github_url)
-                                <a href="{{ $project->github_url }}" rel="noopener" target="_blank" class="btn btn-primary project-action-btn">
+                                <a href="{{ \App\Support\OutboundLink::to($project->github_url, $project->name) }}" rel="noopener" target="_blank" class="btn btn-primary project-action-btn">
                                     GitHub
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                                 </a>
                             @endif
                             @if($project->packagist_url)
-                                <a href="{{ $project->packagist_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Packagist <span aria-hidden="true">↗</span></a>
+                                <a href="{{ \App\Support\OutboundLink::to($project->packagist_url, $project->name) }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Packagist <span aria-hidden="true">↗</span></a>
                             @endif
                             @if($project->npm_url)
-                                <a href="{{ $project->npm_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">npm <span aria-hidden="true">↗</span></a>
+                                <a href="{{ \App\Support\OutboundLink::to($project->npm_url, $project->name) }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">npm <span aria-hidden="true">↗</span></a>
                             @endif
                             @if($project->docker_url)
-                                <a href="{{ $project->docker_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Docker <span aria-hidden="true">↗</span></a>
+                                <a href="{{ \App\Support\OutboundLink::to($project->docker_url, $project->name) }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">Docker <span aria-hidden="true">↗</span></a>
                             @endif
                             @if($project->docs_url)
-                                <a href="{{ $project->docs_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">@lang('site.projects.action_docs') <span aria-hidden="true">↗</span></a>
+                                <a href="{{ \App\Support\OutboundLink::to($project->docs_url, $project->name) }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">@lang('site.projects.action_docs') <span aria-hidden="true">↗</span></a>
                             @endif
                             @if($project->demo_url)
-                                <a href="{{ $project->demo_url }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">@lang('site.projects.action_demo') <span aria-hidden="true">↗</span></a>
+                                <a href="{{ \App\Support\OutboundLink::to($project->demo_url, $project->name) }}" rel="noopener" target="_blank" class="btn btn-secondary project-action-btn">@lang('site.projects.action_demo') <span aria-hidden="true">↗</span></a>
                             @endif
                         @endif
                     </div>

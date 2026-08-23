@@ -122,7 +122,7 @@
                 </div>
                 <div class="lg:col-span-5 flex flex-wrap gap-3 lg:justify-end">
                     <a href="{{ route('projects.index') }}" class="btn btn-primary">@lang('site.common.view_projects')</a>
-                    <a href="{{ config('site.social.github') }}" rel="noopener" target="_blank" class="btn btn-secondary">@lang('site.common.view_github')</a>
+                    <a href="{{ \App\Support\OutboundLink::to(config('site.social.github'), 'GitHub') }}" rel="noopener" target="_blank" class="btn btn-secondary">@lang('site.common.view_github')</a>
                 </div>
             </div>
         </div>

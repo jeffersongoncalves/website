@@ -46,7 +46,7 @@
                     </p>
                 </div>
                 <div class="lg:col-span-5 flex flex-wrap gap-3 lg:justify-end">
-                    <a href="{{ config('site.social.github') }}" rel="noopener" target="_blank" class="btn btn-primary">
+                    <a href="{{ \App\Support\OutboundLink::to(config('site.social.github'), 'GitHub') }}" rel="noopener" target="_blank" class="btn btn-primary">
                         @lang('site.common.view_github')
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                     </a>

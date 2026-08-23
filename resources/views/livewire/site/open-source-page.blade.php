@@ -109,7 +109,7 @@
                 </div>
                 <div class="lg:col-span-5 flex flex-wrap gap-3 lg:justify-end">
                     <a href="{{ route('sponsors') }}" class="btn btn-primary">Ver tiers →</a>
-                    <a href="{{ config('site.social.sponsors') }}" rel="noopener" target="_blank" class="btn btn-secondary">GitHub Sponsors ↗</a>
+                    <a href="{{ \App\Support\OutboundLink::to(config('site.social.sponsors'), 'GitHub Sponsors') }}" rel="noopener" target="_blank" class="btn btn-secondary">GitHub Sponsors ↗</a>
                 </div>
             </div>
         </div>

@@ -22,7 +22,7 @@
                                 <div class="flex items-baseline justify-between gap-3">
                                     <h3 class="h-card break-words min-w-0">
                                         @if(!empty($item['url']))
-                                            <a href="{{ $item['url'] }}" class="hover:text-amber" @unless(!empty($item['internal'])) rel="noopener" target="_blank" @endunless>{{ $item['name'] }}</a>
+                                            <a href="{{ empty($item['internal']) ? \App\Support\OutboundLink::to($item['url'], $item['name']) : $item['url'] }}" class="hover:text-amber" @unless(!empty($item['internal'])) rel="noopener" target="_blank" @endunless>{{ $item['name'] }}</a>
                                         @else
                                             {{ $item['name'] }}
                                         @endif

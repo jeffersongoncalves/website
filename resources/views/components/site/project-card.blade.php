@@ -123,27 +123,27 @@
         </div>
         <div class="flex items-center gap-3 text-ink-400">
             @if($project->github_url)
-                <a href="{{ $project->github_url }}" aria-label="GitHub" rel="noopener" target="_blank">
+                <a href="{{ \App\Support\OutboundLink::to($project->github_url, $project->name) }}" aria-label="GitHub" rel="noopener" target="_blank">
                     <x-site.icon name="github"/>
                 </a>
             @endif
             @if($project->packagist_url)
-                <a href="{{ $project->packagist_url }}" aria-label="Packagist" rel="noopener" target="_blank">
+                <a href="{{ \App\Support\OutboundLink::to($project->packagist_url, $project->name) }}" aria-label="Packagist" rel="noopener" target="_blank">
                     <x-site.icon name="packagist"/>
                 </a>
             @endif
             @if($project->docker_url)
-                <a href="{{ $project->docker_url }}" aria-label="Docker" rel="noopener" target="_blank">
+                <a href="{{ \App\Support\OutboundLink::to($project->docker_url, $project->name) }}" aria-label="Docker" rel="noopener" target="_blank">
                     <x-site.icon name="docker"/>
                 </a>
             @endif
             @if($isExternalSite && $project->docs_url)
                 @if($project->category === \App\Enums\ProjectCategory::YoutubeChannel)
-                    <a href="{{ $project->docs_url }}" aria-label="YouTube" rel="noopener" target="_blank">
+                    <a href="{{ \App\Support\OutboundLink::to($project->docs_url, $project->name) }}" aria-label="YouTube" rel="noopener" target="_blank">
                         <x-site.icon name="youtube"/>
                     </a>
                 @else
-                    <a href="{{ $project->docs_url }}" aria-label="Website" rel="noopener" target="_blank">
+                    <a href="{{ \App\Support\OutboundLink::to($project->docs_url, $project->name) }}" aria-label="Website" rel="noopener" target="_blank">
                         <x-site.icon name="website"/>
                     </a>
                 @endif

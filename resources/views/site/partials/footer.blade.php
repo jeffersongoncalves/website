@@ -26,10 +26,10 @@
             <div>
                 <div class="site-footer-title">@lang('site.footer.social')</div>
                 <ul class="site-footer-list">
-                    <li><a href="{{ config('site.social.github') }}"    rel="noopener" target="_blank">GitHub ↗</a></li>
-                    <li><a href="{{ config('site.social.linkedin') }}"  rel="noopener" target="_blank">LinkedIn ↗</a></li>
-                    <li><a href="{{ config('site.social.packagist') }}" rel="noopener" target="_blank">Packagist ↗</a></li>
-                    <li><a href="{{ config('site.social.x') }}"         rel="noopener" target="_blank">X (Twitter) ↗</a></li>
+                    <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.github'), 'GitHub') }}"    rel="noopener" target="_blank">GitHub ↗</a></li>
+                    <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.linkedin'), 'LinkedIn') }}"  rel="noopener" target="_blank">LinkedIn ↗</a></li>
+                    <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.packagist'), 'Packagist') }}" rel="noopener" target="_blank">Packagist ↗</a></li>
+                    <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.x'), 'X (Twitter)') }}"         rel="noopener" target="_blank">X (Twitter) ↗</a></li>
                 </ul>
             </div>
         </div>

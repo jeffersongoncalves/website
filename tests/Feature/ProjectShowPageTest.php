@@ -6,6 +6,7 @@ use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Models\Project;
+use App\Support\OutboundLink;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -91,8 +92,9 @@ it('shows the npm link and hides stars for an npm-only package with no repo', fu
 
     npmOnlyProject();
 
+    // Off-site, so the button points at the tracked short URL, not npm itself.
     $this->get('/projects/tailwindcss-animate')
         ->assertOk()
-        ->assertSee('https://www.npmjs.com/package/tailwindcss-animate')
+        ->assertSee(OutboundLink::to('https://www.npmjs.com/package/tailwindcss-animate'))
         ->assertDontSee(__('site.projects.label_stars'));
 });

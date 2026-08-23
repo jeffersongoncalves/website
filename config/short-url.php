@@ -37,12 +37,12 @@ return [
         // of an explicit `/{urlKey}` route, so host app routes always take
         // precedence over short URL keys.
         //
-        // NOT env-driven, and never turn this off while `prefix` is empty:
-        // the package registers its routes before the app's, so a root-level
-        // `/{urlKey}` matches first and swallows every single-segment route on
-        // the site — /projects, /about and /links all 404'd in production
-        // (2026-08-23) the moment this resolved falsy.
-        'fallback' => true,
+        // Back on the upstream default (true as of core v3.0.0, which also
+        // moved the route into an app()->booted() callback). Leave it on while
+        // `prefix` is empty: on v2 a falsy value planted `/{urlKey}` at the
+        // root ahead of the app's routes and /projects, /about and /links all
+        // 404'd in production (2026-08-23).
+        'fallback' => env('SHORT_URL_ROUTE_FALLBACK', true),
     ],
 
     /*

@@ -23,12 +23,12 @@ backed by Filament admin panels.
 
 ```bash
 composer install
-pnpm install
+bun install
 cp .env.example .env
 php artisan key:generate
 touch database/database.sqlite
 php artisan migrate
-pnpm run build
+bun run build
 ```
 
 Run the full dev stack (serve + queue + vite):
@@ -47,7 +47,7 @@ composer pint      # code style
 
 ## Production
 
-Production assets (`public/build`) are committed to the repo — run `pnpm run build` and
+Production assets (`public/build`) are committed to the repo — run `bun run build` and
 commit after any change under `resources/`. Production uses PostgreSQL via env and requires
 a reachable Redis instance with `QUEUE_CONNECTION=redis` (Horizon).
 

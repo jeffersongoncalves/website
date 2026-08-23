@@ -34,5 +34,5 @@ CHANGELOG.md export-ignore
 .styleci.yml export-ignore
 README.md export-ignore
 LICENSE.md export-ignore
-pnpm-lock.yaml export-ignore
-pnpm-workspace.yaml export-ignore
+bun.lock export-ignore
+bun.lockb export-ignore

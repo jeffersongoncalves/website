@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Support\OutboundLink;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 use JeffersonGoncalves\LaravelShortUrl\Jobs\TrackShortUrlVisitJob;
@@ -16,6 +17,13 @@ it('mints one short URL per off-site destination and reuses it', function () {
     $second = OutboundLink::to('https://github.com/jeffersongoncalves/filament-short-url', 'somewhere else');
 
     expect($second)->toBe($first)
+        ->and(ShortUrl::query()->count())->toBe(1);
+
+    // Cold cache (a deploy ran cache:clear) must find the existing row, not
+    // mint a second key for the same destination.
+    Cache::flush();
+
+    expect(OutboundLink::to('https://github.com/jeffersongoncalves/filament-short-url'))->toBe($first)
         ->and(ShortUrl::query()->count())->toBe(1);
 
     $row = ShortUrl::query()->firstOrFail();

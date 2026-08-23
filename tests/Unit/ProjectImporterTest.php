@@ -353,7 +353,9 @@ it('omits the directory-readme warning when the subdirectory ships a README', fu
                 'directory' => 'packages/@tailwindcss-vite',
             ],
         ], 200),
-        'api.github.com/repos/tailwindlabs/tailwindcss/readme/packages/@tailwindcss-vite' => Http::response([
+        // %40, not @ — GitHubClient rawurlencodes each path segment, so the
+        // request this stub has to match carries the encoded scope.
+        'api.github.com/repos/tailwindlabs/tailwindcss/readme/packages/%40tailwindcss-vite' => Http::response([
             'name' => 'README.md',
             'path' => 'packages/@tailwindcss-vite/README.md',
         ], 200),

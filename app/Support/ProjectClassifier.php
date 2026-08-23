@@ -288,6 +288,31 @@ class ProjectClassifier
     }
 
     /**
+     * Whether the repo keeps a branch per version (`1.x`, `3.x`, …) rather than
+     * shipping every Filament major from one branch. Drives `has_branches`,
+     * which gates the versions + branch_overrides fields in the admin form.
+     *
+     * Read off the real branch list, not off `versions`: a plugin can declare
+     * `^3.0|^4.0` in one branch and have nothing to switch between.
+     *
+     * @param  list<string>  $branches
+     */
+    public static function hasVersionBranches(array $branches, string $category): bool
+    {
+        if ($category !== 'filament_plugin') {
+            return false;
+        }
+
+        foreach ($branches as $branch) {
+            if (preg_match('/^\d+\.x$/', (string) $branch) === 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param  array<array-key, mixed>  $arr
      */
     private static function hasAnyKey(array $arr, string $prefix): bool

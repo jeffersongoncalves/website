@@ -880,6 +880,7 @@ class ProjectImporter
                 is_array($package['keywords'] ?? null) ? $package['keywords'] : [],
             ),
             'versions' => ProjectClassifier::versions($composer, $branches, $category),
+            'has_branches' => ProjectClassifier::hasVersionBranches($branches, $category),
         ];
 
         if ($npmName !== null && ! $npmPublished) {

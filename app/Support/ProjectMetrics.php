@@ -145,6 +145,20 @@ class ProjectMetrics
             $changed = true;
         }
 
+        // has_branches gates the versions + branch_overrides fields in the admin
+        // form, and nothing on the import path used to set it — only the rollout
+        // backfill did, so every plugin imported since showed the toggle off even
+        // with 3.x/4.x branches sitting on the repo. Derive it from the real
+        // branch list on each sync.
+        //
+        // Promote only, never demote: an editor who ticked it by hand keeps it,
+        // and a run that reads no branches can't silently hide their version data.
+        if (! $project->has_branches
+            && ProjectClassifier::hasVersionBranches($snapshot['branches'] ?? [], $project->category->value)) {
+            $project->has_branches = true;
+            $changed = true;
+        }
+
         $repairedOverrides = self::repairBranchOverrides($project, $defaultBranch, $snapshot['branches'] ?? null);
         if ($repairedOverrides !== null) {
             $project->branch_overrides = $repairedOverrides;

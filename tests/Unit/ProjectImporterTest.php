@@ -106,6 +106,18 @@ it('imports a Filament plugin with composer.json', function (): void {
     expect($fields['npm_url'])->toBeNull();
     expect($fields['stack'])->toBe(['Laravel', 'Filament']);
     expect($fields['versions'])->toBe(['v3', 'v4', 'v5']);
+    // The repo ships 3.x/4.x/5.x branches, so the admin form must open with the
+    // versions + branch_overrides fields already unlocked.
+    expect($fields['has_branches'])->toBeTrue();
+});
+
+it('leaves has_branches off for a plugin that ships every version from one branch', function (): void {
+    importerFakes(fakeGithubRepo(), fakeComposer(), null, ['main']);
+
+    $result = ProjectImporter::fromGithub('https://github.com/jeffersongoncalves/filament-cep-field');
+
+    expect($result['fields']['versions'])->toBe(['v3', 'v4', 'v5'])
+        ->and($result['fields']['has_branches'])->toBeFalse();
 });
 
 it('does not attach packagist_url when composer.json ships a borrowed name (app skeleton)', function (): void {

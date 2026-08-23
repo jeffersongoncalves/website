@@ -84,6 +84,44 @@ it('repairs branch overrides from the branches in the GraphQL snapshot', functio
     expect($project->fresh()->branch_overrides)->toBe(['1.x' => '3.x', '2.x' => 'main']);
 });
 
+it('turns on has_branches when the repo keeps a branch per version', function () {
+    Http::fake([
+        'api.github.com/repos/*/contributors*' => Http::response([]),
+        'api.github.com/graphql' => Http::response(graphqlRepo(branches: ['3.x', '4.x', 'main'])),
+    ]);
+
+    // Imported before the flag was derived anywhere, so it sits off and the
+    // admin form hides the version fields.
+    $project = metricsProject(['versions' => ['v3', 'v4'], 'has_branches' => false]);
+    ProjectMetrics::sync($project);
+
+    expect($project->fresh()->has_branches)->toBeTrue();
+});
+
+it('does not turn on has_branches for a repo with no version branches', function () {
+    Http::fake([
+        'api.github.com/repos/*/contributors*' => Http::response([]),
+        'api.github.com/graphql' => Http::response(graphqlRepo(branches: ['main', 'develop'])),
+    ]);
+
+    $project = metricsProject(['versions' => ['v3'], 'has_branches' => false]);
+    ProjectMetrics::sync($project);
+
+    expect($project->fresh()->has_branches)->toBeFalse();
+});
+
+it('never demotes a hand-ticked has_branches when the sync reads no branches', function () {
+    Http::fake([
+        'api.github.com/repos/*/contributors*' => Http::response([]),
+        'api.github.com/graphql' => Http::response(graphqlRepo(branches: [])),
+    ]);
+
+    $project = metricsProject(['versions' => ['v3'], 'has_branches' => true]);
+    ProjectMetrics::sync($project);
+
+    expect($project->fresh()->has_branches)->toBeTrue();
+});
+
 it('skips branch repair when the snapshot has no branches', function () {
     Http::fake([
         'api.github.com/repos/*/contributors*' => Http::response([]),

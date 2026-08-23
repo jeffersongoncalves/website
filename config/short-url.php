@@ -33,10 +33,16 @@ return [
         'domain' => env('SHORT_URL_ROUTE_DOMAIN'),
         'middleware' => ['web'],
 
-        // When true, the redirect route is registered as the application's
-        // fallback route instead of an explicit `/{urlKey}` route, so host
-        // app routes always take precedence over short URL keys.
-        'fallback' => env('SHORT_URL_ROUTE_FALLBACK', false),
+        // Registers the redirect as the application's fallback route instead
+        // of an explicit `/{urlKey}` route, so host app routes always take
+        // precedence over short URL keys.
+        //
+        // NOT env-driven, and never turn this off while `prefix` is empty:
+        // the package registers its routes before the app's, so a root-level
+        // `/{urlKey}` matches first and swallows every single-segment route on
+        // the site — /projects, /about and /links all 404'd in production
+        // (2026-08-23) the moment this resolved falsy.
+        'fallback' => true,
     ],
 
     /*

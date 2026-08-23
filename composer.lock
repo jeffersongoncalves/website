@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e714b02394115f17dad01817f80ec5ec",
+    "content-hash": "ab50307a3b7595e450258dd6823490fb",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2748,6 +2748,79 @@
             "time": "2026-06-24T01:02:05+00:00"
         },
         {
+            "name": "jeffersongoncalves/filament-short-url",
+            "version": "3.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/filament-short-url.git",
+                "reference": "0eff338eec8579e8ea38b02d53809bbe0e98ea47"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-short-url/zipball/0eff338eec8579e8ea38b02d53809bbe0e98ea47",
+                "reference": "0eff338eec8579e8ea38b02d53809bbe0e98ea47",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.3",
+                "jeffersongoncalves/laravel-short-url": "^2.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-laravel": "^4.0",
+                "pestphp/pest-plugin-livewire": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\Filament\\ShortUrl\\FilamentShortUrlServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\Filament\\ShortUrl\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Filament admin resource for jeffersongoncalves/laravel-short-url — create and manage short URLs from a Filament panel.",
+            "homepage": "https://github.com/jeffersongoncalves/filament-short-url",
+            "keywords": [
+                "URL-Shortener",
+                "filament",
+                "filament-plugin",
+                "laravel",
+                "short-url"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/filament-short-url/issues",
+                "source": "https://github.com/jeffersongoncalves/filament-short-url/tree/3.2.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-23T17:41:17+00:00"
+        },
+        {
             "name": "jeffersongoncalves/laravel-favicon-proxy",
             "version": "v1.0.0",
             "source": {
@@ -3754,6 +3827,82 @@
                 }
             ],
             "time": "2026-06-21T20:09:27+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-short-url",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-short-url.git",
+                "reference": "6ee1b891265c00546d63f6eb0ea01eb91607d1e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-short-url/zipball/6ee1b891265c00546d63f6eb0ea01eb91607d1e4",
+                "reference": "6ee1b891265c00546d63f6eb0ea01eb91607d1e4",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^12.0|^13.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-laravel": "^4.0"
+            },
+            "suggest": {
+                "geoip2/geoip2": "Required to resolve visitor geolocation with the MaxMind GeoIP driver.",
+                "predis/predis": "Required for Redis-buffered visit counters when the phpredis extension isn't available.",
+                "stancl/tenancy": "Required to resolve the current tenant automatically when short-url.tenancy.enabled is on."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\LaravelShortUrl\\LaravelShortUrlServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\LaravelShortUrl\\": "src/",
+                    "JeffersonGoncalves\\LaravelShortUrl\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel package for creating and redirecting short URLs, with caching and an extensible redirect pipeline.",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-short-url",
+            "keywords": [
+                "URL-Shortener",
+                "laravel",
+                "redirect",
+                "short-url"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-short-url/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-short-url/tree/v2.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-19T15:23:34+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-ssrf-guard",

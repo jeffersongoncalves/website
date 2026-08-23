@@ -30,6 +30,7 @@ use JeffersonGoncalves\Filament\Gtag\GtagPlugin;
 use JeffersonGoncalves\Filament\Gtm\GtmPlugin;
 use JeffersonGoncalves\Filament\OneTimeOperations\OneTimeOperationsPlugin;
 use JeffersonGoncalves\Filament\Pwa\FilamentPwaPlugin;
+use JeffersonGoncalves\Filament\ShortUrl\FilamentShortUrlPlugin;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 
@@ -129,6 +130,14 @@ class AdminPanelProvider extends PanelProvider
                 FilamentLogViewer::make()
                     ->navigationGroup(__('admin.navigation.settings')),
                 OneTimeOperationsPlugin::make(),
+                // Short links (jeffersongoncalves/laravel-short-url admin UI).
+                // The redirect route is registered by the core package as the
+                // app *fallback* (SHORT_URL_ROUTE_FALLBACK=true in .env), so every
+                // site route wins over a short key sitting at the root.
+                FilamentShortUrlPlugin::make()
+                    ->navigationGroup(__('admin.navigation.management'))
+                    ->navigationIcon('heroicon-o-link')
+                    ->navigationSort(30),
                 GtmPlugin::make(),
                 GtagPlugin::make(),
                 FilamentEditProfilePlugin::make()

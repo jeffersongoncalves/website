@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 use App\Support\OutboundLink;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 use JeffersonGoncalves\LaravelShortUrl\Jobs\TrackShortUrlVisitJob;
 use JeffersonGoncalves\LaravelShortUrl\Models\ShortUrl;
+use JeffersonGoncalves\LaravelShortUrl\Models\Visit;
 
 uses(RefreshDatabase::class);
 
@@ -51,6 +53,26 @@ it('redirects the minted short URL to its destination and queues the click', fun
         ->assertRedirect($destination);
 
     Queue::assertPushed(TrackShortUrlVisitJob::class);
+});
+
+it('records the Cloudflare country on the visit even though the job runs off-request', function () {
+    $destination = 'https://github.com/jeffersongoncalves/laravel-short-url';
+
+    $this->withHeaders(['CF-IPCountry' => 'BR', 'CF-IPCountry-Name' => 'Brazil'])
+        ->get(OutboundLink::to($destination))
+        ->assertRedirect($destination);
+
+    $job = Queue::pushed(TrackShortUrlVisitJob::class)->firstOrFail();
+
+    // Stand in for the worker: the visitor's request is gone by the time the
+    // job runs, so the geo has to have travelled in the payload.
+    app()->instance('request', Request::create('/', 'GET'));
+    app()->call([$job, 'handle']);
+
+    $visit = Visit::query()->firstOrFail();
+
+    expect($visit->country_code)->toBe('BR')
+        ->and($visit->country)->toBe('Brazil');
 });
 
 it('falls back to the raw destination when the short URL cannot be minted', function () {

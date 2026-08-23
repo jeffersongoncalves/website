@@ -147,7 +147,15 @@ return [
     'tracking' => [
         'driver' => env('SHORT_URL_VISIT_REPOSITORY', 'eloquent'),
 
-        'trust_cdn_headers' => env('SHORT_URL_TRUST_CDN_HEADERS', false),
+        // On: the `headers` GeoIP driver reads Cloudflare's CF-IPCountry off
+        // the request, so visits carry a country with no external lookup.
+        //
+        // Accepted tradeoff: the origin also answers on its own address, so a
+        // caller bypassing Cloudflare can send whatever CF-IPCountry it likes.
+        // The blast radius is the geo column on visit rows — nothing here
+        // authorises, prices or rate-limits on country. Set in config, not env,
+        // so a missing key on one server can't silently blank the geo data.
+        'trust_cdn_headers' => true,
 
         'geoip' => [
             'driver' => env('SHORT_URL_GEOIP_DRIVER', 'headers'),

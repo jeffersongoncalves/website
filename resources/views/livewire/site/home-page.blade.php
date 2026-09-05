@@ -209,6 +209,18 @@
                         </div>
                         <span class="mono text-[0.875rem] text-ink-400">→</span>
                     </a>
+
+                    <a href="{{ \App\Support\OutboundLink::to(config('site.social.buymeacoffee'), 'Buy Me a Coffee') }}" rel="noopener" target="_blank"
+                       class="card flex items-center justify-between mt-4">
+                        <div class="flex items-center gap-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+                            <div>
+                                <div class="font-medium text-[1.0625rem] text-ink-100">@lang('site.sponsors.buymeacoffee')</div>
+                                <div class="mt-1 mono-meta">@lang('site.sponsors.buymeacoffee_sub')</div>
+                            </div>
+                        </div>
+                        <span class="mono text-[0.875rem] text-ink-400">→</span>
+                    </a>
                 </div>
             </div>
         </div>

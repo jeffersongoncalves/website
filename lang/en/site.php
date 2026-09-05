@@ -238,6 +238,8 @@ return [
         'sub' => 'Sponsorship funds new releases, Portuguese documentation and support for the Brazilian Laravel/Filament community. Public quarterly reports.',
         'github_sponsors' => 'GitHub Sponsors',
         'github_sub' => 'recurring · USD/BRL',
+        'buymeacoffee' => 'Buy Me a Coffee',
+        'buymeacoffee_sub' => 'one-off contribution',
     ],
 
     'footer' => [

@@ -238,6 +238,8 @@ return [
         'sub' => 'Sponsorship financia novos releases, documentação em português e suporte para a comunidade brasileira de Laravel/Filament. Relatórios trimestrais públicos.',
         'github_sponsors' => 'GitHub Sponsors',
         'github_sub' => 'recorrente · USD/BRL',
+        'buymeacoffee' => 'Buy Me a Coffee',
+        'buymeacoffee_sub' => 'contribuição avulsa',
     ],
 
     'footer' => [

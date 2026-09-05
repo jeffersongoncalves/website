@@ -10,6 +10,7 @@ return [
         'x' => 'https://x.com/gersonsimao92',
         'email' => 'contato@jeffersongoncalves.dev.br',
         'sponsors' => 'https://github.com/sponsors/jeffersongoncalves',
+        'buymeacoffee' => 'https://buymeacoffee.com/jeffersongoncalves',
     ],
 
     // home_stats and os_stats are now computed dynamically by App\Support\SiteStats.

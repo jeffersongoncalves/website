@@ -139,6 +139,10 @@ class StackPage extends Component
                         'pt' => 'Injeta o <head> PWA completo nos painéis Filament.',
                         'en' => 'Injects the full PWA <head> into Filament panels.',
                         'es' => 'Inyecta el <head> PWA completo en los paneles Filament.'],
+                    ['name' => 'jeffersongoncalves/filament-short-url', 'author' => true, 'packagist' => 'jeffersongoncalves/filament-short-url',
+                        'pt' => 'Encurtador de URLs integrado ao painel Filament.',
+                        'en' => 'URL shortener integrated into the Filament panel.',
+                        'es' => 'Acortador de URLs integrado en el panel Filament.'],
                     ['name' => 'jeffersongoncalves/laravel-pwa-favicon', 'author' => true, 'packagist' => 'jeffersongoncalves/laravel-pwa-favicon',
                         'pt' => 'Manifesto PWA, favicons e o <head> instalável.',
                         'en' => 'PWA manifest, favicons and the installable <head>.',
@@ -197,6 +201,10 @@ class StackPage extends Component
                         'es' => 'Une y normaliza listas de tópicos/keywords.'],
 
                     // Community packages.
+                    ['name' => 'livewire/blaze', 'packagist' => 'livewire/blaze',
+                        'pt' => 'Pré-compila componentes Blade anônimos pra renderização mais rápida.',
+                        'en' => 'Precompiles anonymous Blade components for faster rendering.',
+                        'es' => 'Precompila componentes Blade anónimos para un renderizado más rápido.'],
                     ['name' => 'laravel/horizon', 'packagist' => 'laravel/horizon',
                         'pt' => 'Dashboard e workers das filas Redis.',
                         'en' => 'Dashboard and workers for the Redis queues.',

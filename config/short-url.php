@@ -155,6 +155,13 @@ return [
         // The blast radius is the geo column on visit rows — nothing here
         // authorises, prices or rate-limits on country. Set in config, not env,
         // so a missing key on one server can't silently blank the geo data.
+        //
+        // No city: the `headers` driver only ever reads country — that
+        // header is CloudFront-only, and this app sits behind Cloudflare
+        // (free tier has no city header), so the city breakdown widget stays
+        // empty. The only driver that populates city here is `ip_api`, which
+        // trades the free/instant CF header for a per-visit external HTTP
+        // call — not worth it just for that widget.
         'trust_cdn_headers' => true,
 
         'geoip' => [

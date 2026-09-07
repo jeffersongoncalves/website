@@ -39,6 +39,9 @@ class ProjectsList extends Component
     public string $role = 'all';
 
     #[Url]
+    public string $source = 'all';
+
+    #[Url]
     public string $topic = '';
 
     public function paginationView(): string
@@ -57,6 +60,12 @@ class ProjectsList extends Component
     public function setRole(string $role): void
     {
         $this->role = $role;
+        $this->resetPage();
+    }
+
+    public function setSource(string $source): void
+    {
+        $this->source = $source;
         $this->resetPage();
     }
 
@@ -115,6 +124,15 @@ class ProjectsList extends Component
             $query->where('is_daily_driver', true);
         }
 
+        // Origin facet — separate Jefferson's own/curated catalogue from the
+        // third-party repos imported off the GitHub stars feed.
+        $activeSource = in_array($this->source, ['own', 'starred'], true) ? $this->source : 'all';
+        if ($activeSource === 'own') {
+            $query->own();
+        } elseif ($activeSource === 'starred') {
+            $query->starred();
+        }
+
         if ($search !== '') {
             // Escape the backslash first (it's the LIKE escape char) so a user
             // backslash can't turn the following %/_ into a literal/escape.
@@ -140,6 +158,7 @@ class ProjectsList extends Component
             'projects' => $projects,
             'activeCat' => ($category && ! $category->isExternalLink() && $category !== ProjectCategory::Article) ? $category->value : 'all',
             'activeRole' => $activeRole,
+            'activeSource' => $activeSource,
             'activeLanguage' => $activeLanguage,
             'activeTopic' => $activeTopic,
             'categories' => ProjectCategory::catalogueCases(),

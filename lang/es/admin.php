@@ -135,12 +135,15 @@ return [
             'heading' => 'Proyectos e imports',
             'new_week' => 'Nuevos esta semana',
             'delta' => ':delta vs semana anterior',
+            'starred_total' => 'Importados por star',
+            'starred_week' => ':count esta semana',
             'total' => 'Total de proyectos',
             'total_desc' => 'en el catálogo',
         ],
         'projects_per_day' => [
             'heading' => 'Altas por día (últimos 30 días)',
             'all' => 'Nuevos proyectos',
+            'starred' => 'Por star',
         ],
     ],
 

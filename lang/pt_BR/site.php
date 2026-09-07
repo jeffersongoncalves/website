@@ -184,6 +184,12 @@ return [
         'badge_paid' => 'pago',
         'badge_creator' => 'criador',
         'badge_creator_help' => 'Pacote que eu criei e mantenho',
+        'badge_starred' => 'via star',
+        'badge_starred_help' => 'Repositório de terceiros que dei star no GitHub',
+        'filter_source' => 'Origem',
+        'source_all' => 'Todas',
+        'source_own' => 'Meus projetos',
+        'source_starred' => 'Via star',
     ],
 
     'articles' => [

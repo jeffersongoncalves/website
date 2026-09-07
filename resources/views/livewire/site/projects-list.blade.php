@@ -61,12 +61,23 @@
             'maintainer' => __('site.projects.role_maintainer'),
             'daily_driver' => __('site.projects.role_daily_driver'),
         ];
+        $sourceOpts = [
+            'own' => __('site.projects.source_own'),
+            'starred' => __('site.projects.source_starred'),
+        ];
     @endphp
     <div class="flex flex-wrap items-center gap-2 mt-6 mono-meta-sm">
         <span class="text-ink-400">@lang('site.projects.filter_role'):</span>
         <button type="button" wire:click="setRole('all')" class="badge {{ $activeRole === 'all' ? 'badge-accent' : '' }}">@lang('site.projects.role_all')</button>
         @foreach($roleOpts as $val => $label)
             <button type="button" wire:click="setRole('{{ $val }}')" class="badge {{ $activeRole === $val ? 'badge-accent' : '' }}">{{ $label }}</button>
+        @endforeach
+    </div>
+    <div class="flex flex-wrap items-center gap-2 mt-3 mb-2 mono-meta-sm">
+        <span class="text-ink-400">@lang('site.projects.filter_source'):</span>
+        <button type="button" wire:click="setSource('all')" class="badge {{ $activeSource === 'all' ? 'badge-accent' : '' }}">@lang('site.projects.source_all')</button>
+        @foreach($sourceOpts as $val => $label)
+            <button type="button" wire:click="setSource('{{ $val }}')" class="badge {{ $activeSource === $val ? 'badge-accent' : '' }}">{{ $label }}</button>
         @endforeach
     </div>
 

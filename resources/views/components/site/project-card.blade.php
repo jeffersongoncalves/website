@@ -38,6 +38,9 @@
             @if($project->is_paid)
                 <x-site.badge variant="warning" :title="__('site.projects.badge_paid')">@lang('site.projects.badge_paid')</x-site.badge>
             @endif
+            @if($project->starred_at)
+                <x-site.badge :title="__('site.projects.badge_starred_help')"><span aria-hidden="true">★</span> @lang('site.projects.badge_starred')</x-site.badge>
+            @endif
             <x-site.badge>{{ $project->category->getLabel() }}</x-site.badge>
         </div>
     </div>

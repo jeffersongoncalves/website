@@ -162,7 +162,14 @@ class SyncStarredReposJob implements ShouldQueue
                     return $dispatched;
                 }
 
-                ImportStarredRepoJob::dispatch($htmlUrl, $starredAt);
+                // Staggered by 1s/job (matches the shared 'github-api' 60/min
+                // limiter) instead of dumping the whole page onto the queue at
+                // once. A --full resync can dispatch thousands in one pass —
+                // without this, they all become ready simultaneously and
+                // thunder-herd the RateLimited middleware (grab → over-limit →
+                // release, repeated across the whole backlog every ~60s)
+                // instead of draining smoothly.
+                ImportStarredRepoJob::dispatch($htmlUrl, $starredAt)->delay(now()->addSeconds($dispatched));
                 $dispatched++;
             }
 

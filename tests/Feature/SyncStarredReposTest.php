@@ -134,6 +134,27 @@ it('--full ignores the cursor and re-scans everything', function (): void {
     Bus::assertDispatchedTimes(ImportStarredRepoJob::class, 2);
 });
 
+it('staggers each dispatched import by 1s so a bulk sync does not flood the queue at once', function (): void {
+    Http::fake([
+        '*api.github.com/users/*/starred*' => Http::response(starItems([
+            ['acme/third', '2026-05-27T10:00:00Z'],
+            ['acme/second', '2026-05-26T10:00:00Z'],
+            ['acme/first', '2026-05-25T10:00:00Z'],
+        ])),
+    ]);
+
+    (new SyncStarredReposJob)->handle();
+
+    $delays = Bus::dispatched(ImportStarredRepoJob::class)
+        ->map(fn (ImportStarredRepoJob $job) => $job->delay)
+        ->all();
+
+    // Dispatch order follows the API's desc order (third, second, first) —
+    // each gets a strictly later delay than the one before it.
+    expect($delays)->toHaveCount(3);
+    expect($delays[0])->toBeLessThan($delays[1])->and($delays[1])->toBeLessThan($delays[2]);
+});
+
 it('follows pagination past a full page', function (): void {
     $page1 = array_map(
         fn (int $i): array => [

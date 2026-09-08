@@ -149,6 +149,28 @@ it('dispatches a batch of per-project sync jobs', function () {
         && $batch->jobs->every(fn ($job) => $job instanceof SyncProjectMetricsJob));
 });
 
+it('skips projects synced within the last 20h on a full-catalogue run, but not via --slug', function () {
+    Bus::fake();
+
+    $fresh = consoleCmd_publishedProject(['slug' => 'fresh', 'name' => 'Fresh']);
+    $fresh->forceFill(['last_synced_at' => now()->subHours(2)])->save();
+    $stale = consoleCmd_publishedProject(['slug' => 'stale', 'name' => 'Stale']);
+    $stale->forceFill(['last_synced_at' => now()->subHours(25)])->save();
+    consoleCmd_publishedProject(['slug' => 'never', 'name' => 'Never']);
+
+    $this->artisan('projects:sync-metrics')
+        ->expectsOutputToContain('Dispatched 2 project sync jobs')
+        ->assertSuccessful();
+
+    Bus::assertBatched(fn ($batch) => $batch->jobs->count() === 2
+        && $batch->jobs->pluck('project.slug')->all() === ['stale', 'never']);
+
+    // --slug is an explicit manual resync — always runs, freshness aside.
+    $this->artisan('projects:sync-metrics', ['--slug' => 'fresh'])
+        ->expectsOutputToContain('Dispatched 1 project sync jobs')
+        ->assertSuccessful();
+});
+
 it('limits the sync batch to a single slug via --slug', function () {
     Bus::fake();
 

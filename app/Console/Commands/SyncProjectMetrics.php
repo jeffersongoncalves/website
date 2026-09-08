@@ -22,6 +22,17 @@ class SyncProjectMetrics extends Command
 
         if ($slug = $this->option('slug')) {
             $query->where('slug', $slug);
+        } else {
+            // Full-catalogue runs (the daily schedule) skip anything synced
+            // recently. Without this, every run re-dispatches the whole
+            // catalogue regardless of whether yesterday's batch actually
+            // finished draining through the 'github' queue's rate limit —
+            // an ever-growing backlog where jobs near the tail exhaust their
+            // 2h retryUntil before ever getting a real turn. `--slug` (an
+            // explicit manual resync) always runs regardless of freshness.
+            $query->where(function ($q): void {
+                $q->whereNull('last_synced_at')->orWhere('last_synced_at', '<', now()->subHours(20));
+            });
         }
 
         $projects = $query->get();

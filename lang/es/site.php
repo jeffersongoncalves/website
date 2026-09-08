@@ -12,12 +12,18 @@ return [
         'sponsors' => 'Patrocina el trabajo — financia nuevos releases, documentación en portugués y soporte para la comunidad Laravel y Filament brasileña.',
         'stack' => 'El stack detrás de este sitio — Laravel, Filament, Livewire, Tailwind y la infraestructura que lo mantiene online.',
         'links' => 'Links seleccionados — sitios, canales de YouTube, recursos de aprendizaje y listas que vale la pena seguir.',
+        'mcp_guide' => 'Consulta este portafolio desde un asistente de IA vía MCP (Model Context Protocol) — endpoint, configuración y herramientas disponibles.',
     ],
 
     'stack' => [
         'title' => 'Tecnologías',
         'sub' => 'Las herramientas que construyen y sostienen este sitio, del backend al deploy.',
         'mine' => 'De mi autoría',
+    ],
+
+    'mcp_guide' => [
+        'title' => 'Servidor MCP',
+        'sub' => 'Consulta este portafolio desde un asistente de IA en vez de rasparlo — un servidor MCP público y de solo lectura sobre el catálogo de proyectos.',
     ],
 
     'errors' => [
@@ -46,6 +52,7 @@ return [
         'stack' => 'Tecnologías',
         'sponsors' => 'Sponsors',
         'demos' => 'Demos',
+        'mcp_guide' => 'MCP',
     ],
 
     'common' => [

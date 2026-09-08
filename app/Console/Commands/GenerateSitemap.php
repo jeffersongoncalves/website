@@ -56,6 +56,7 @@ class GenerateSitemap extends Command
             ['about', Url::CHANGE_FREQUENCY_MONTHLY, 0.6],
             ['stack', Url::CHANGE_FREQUENCY_MONTHLY, 0.6],
             ['sponsors', Url::CHANGE_FREQUENCY_MONTHLY, 0.5],
+            ['developers.mcp', Url::CHANGE_FREQUENCY_MONTHLY, 0.4],
         ];
 
         foreach ($pages as [$route, $frequency, $priority]) {

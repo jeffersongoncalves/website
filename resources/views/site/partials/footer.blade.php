@@ -20,6 +20,7 @@
                     <li><a href="{{ route('projects.index') }}">@lang('site.nav.projects')</a></li>
                     <li><a href="{{ route('open-source') }}">@lang('site.nav.open_source')</a></li>
                     <li><a href="{{ route('sponsors') }}">@lang('site.nav.sponsors')</a></li>
+                    <li><a href="{{ route('developers.mcp') }}">@lang('site.nav.mcp_guide')</a></li>
                 </ul>
             </div>
 

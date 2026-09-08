@@ -10,6 +10,7 @@ use App\Livewire\Site\AboutPage;
 use App\Livewire\Site\ArticlesPage;
 use App\Livewire\Site\HomePage;
 use App\Livewire\Site\LinksPage;
+use App\Livewire\Site\McpGuidePage;
 use App\Livewire\Site\OpenSourcePage;
 use App\Livewire\Site\ProjectShowPage;
 use App\Livewire\Site\ProjectsPage;
@@ -75,6 +76,10 @@ Route::middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class]
     Route::get('/stack', StackPage::class)->name('stack');
 
     Route::get('/sponsors', SponsorsPage::class)->name('sponsors');
+
+    // /developers/mcp — kept out of /mcp itself, which is the machine
+    // endpoint (Mcp::web in routes/ai.php already owns GET/POST/DELETE there).
+    Route::get('/developers/mcp', McpGuidePage::class)->name('developers.mcp');
 });
 
 // /locale/{locale} (name `locale.switch`) is registered by

@@ -52,6 +52,7 @@ class LlmsTxtController
             ['open-source', 'Open Source', 'maintained packages and contribution stats'],
             ['stack', 'Stack', 'the technologies powering this site'],
             ['sponsors', 'Sponsors', 'GitHub Sponsors and supporters'],
+            ['developers.mcp', 'MCP Server', 'how to query this portfolio from an AI assistant via MCP'],
         ] as [$route, $label, $note]) {
             $lines[] = '- ['.$label.']('.route($route).'): '.$note;
         }

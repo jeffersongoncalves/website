@@ -166,7 +166,7 @@ return [
 
         'geoip' => [
             'driver' => env('SHORT_URL_GEOIP_DRIVER', 'headers'),
-            'maxmind_database_path' => env('SHORT_URL_MAXMIND_DB_PATH'),
+            'maxmind_database_path' => env('SHORT_URL_MAXMIND_DB_PATH', storage_path('app/geoip/GeoLite2-City.mmdb')),
         ],
 
         'counter_buffering' => env('SHORT_URL_COUNTER_BUFFERING', false),

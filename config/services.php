@@ -42,6 +42,12 @@ return [
         'username' => env('GITHUB_USERNAME', 'jeffersongoncalves'),
     ],
 
+    'maxmind' => [
+        // Free account + license key: https://www.maxmind.com/en/geolite2/signup-form
+        // Used by the geoip:update command (App\Console\Commands\UpdateGeoIpDatabase).
+        'license_key' => env('MAXMIND_LICENSE_KEY'),
+    ],
+
     'plugins_sync' => [
         // Bearer token the jeffersongoncalves/jeffersongoncalves repo's
         // notify-site-plugins-sync workflow sends when plugins.json changes,

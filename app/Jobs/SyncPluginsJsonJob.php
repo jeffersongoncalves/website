@@ -1,0 +1,157 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Jobs;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Throwable;
+
+/**
+ * Re-scans jeffersongoncalves/jeffersongoncalves's plugins.json (the catalog
+ * driving that repo's profile README) and fans out one ImportGithubRepoJob
+ * per entry — dispatched by POST /api/plugins-sync, which the source repo's
+ * notify-site-plugins-sync workflow calls whenever plugins.json changes.
+ *
+ * Does no diffing itself: ImportGithubRepoJob already no-ops on a repo that's
+ * already cadastrado (a cheap DB pre-check, no GitHub call), so dispatching
+ * for every entry on every run is the simplest correct way to "find what's
+ * new" — only the actually-new rows do any real work.
+ *
+ * ShouldBeUniqueUntilProcessing + WithoutOverlapping so a source push that
+ * fires the webhook twice in quick succession collapses to one scan.
+ */
+class SyncPluginsJsonJob implements ShouldBeUniqueUntilProcessing, ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $tries = 3;
+
+    public int $backoff = 30;
+
+    public int $uniqueFor = 120;
+
+    public function __construct()
+    {
+        $this->onQueue('github');
+    }
+
+    public function uniqueId(): string
+    {
+        return 'plugins-json:sync';
+    }
+
+    /**
+     * @return array<int, object>
+     */
+    public function middleware(): array
+    {
+        return [(new WithoutOverlapping('plugins-json:sync'))->dontRelease()->expireAfter(180)];
+    }
+
+    public function handle(): void
+    {
+        $url = (string) config('services.plugins_sync.source_url');
+
+        $response = Http::timeout(15)->get($url);
+
+        if (! $response->successful()) {
+            Log::warning('SyncPluginsJsonJob: failed to fetch plugins.json', [
+                'url' => $url,
+                'status' => $response->status(),
+            ]);
+
+            return;
+        }
+
+        $data = $response->json();
+
+        if (! is_array($data)) {
+            Log::warning('SyncPluginsJsonJob: plugins.json did not decode to an array', ['url' => $url]);
+
+            return;
+        }
+
+        foreach ($this->flatten($data) as [$slug, $category]) {
+            ImportGithubRepoJob::dispatch("https://github.com/{$slug}", $category);
+        }
+    }
+
+    /**
+     * Walk every category in plugins.json (including the nested
+     * startkit.legacy.{v3,v4,...} and filament.{plugins,collaborator} groups)
+     * and yield [owner/repo, fallback category] pairs. `repo` overrides
+     * `package` when a listing's Composer vendor differs from its GitHub
+     * owner (e.g. the CakePHP packages, published under
+     * jeffersonsimaogoncalves but hosted under jeffersongoncalves).
+     *
+     * @param  array<string, mixed>  $data
+     * @return list<array{0: string, 1: string}>
+     */
+    private function flatten(array $data): array
+    {
+        $categoryFallbacks = [
+            'startkit' => 'starter_kit',
+            'filament' => 'filament_plugin',
+            'laravel' => 'laravel_package',
+            'laravelZero' => 'laravel_zero_cli',
+            'cli' => 'tool',
+            'cliPython' => 'tool',
+            'jetbrains' => 'ide_plugin',
+            'vscode' => 'ide_plugin',
+            'browserExtensions' => 'tool',
+            'obsidianPlugins' => 'tool',
+            'claudeCodePlugins' => 'tool',
+            'cakephp' => 'cakephp_package',
+        ];
+
+        $out = [];
+
+        foreach ($data as $topKey => $value) {
+            $fallback = $categoryFallbacks[$topKey] ?? 'tool';
+            $out = [...$out, ...$this->collectEntries($value, $fallback)];
+        }
+
+        return $out;
+    }
+
+    /**
+     * @return list<array{0: string, 1: string}>
+     */
+    private function collectEntries(mixed $node, string $fallback): array
+    {
+        if (! is_array($node)) {
+            return [];
+        }
+
+        // A plugin/package entry: {"title": ..., "package": "vendor/repo"[, "repo": "owner/repo"]}.
+        if (isset($node['package']) && is_string($node['package'])) {
+            $slug = is_string($node['repo'] ?? null) ? $node['repo'] : $node['package'];
+
+            return [[$slug, $fallback]];
+        }
+
+        // A list of entries, or a nested group (legacy.v3/v4, plugins/collaborator, …).
+        $out = [];
+        foreach ($node as $child) {
+            $out = [...$out, ...$this->collectEntries($child, $fallback)];
+        }
+
+        return $out;
+    }
+
+    public function failed(?Throwable $e): void
+    {
+        Log::error('SyncPluginsJsonJob failed', [
+            'error' => $e?->getMessage(),
+        ]);
+    }
+}

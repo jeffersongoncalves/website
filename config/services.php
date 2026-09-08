@@ -42,4 +42,12 @@ return [
         'username' => env('GITHUB_USERNAME', 'jeffersongoncalves'),
     ],
 
+    'plugins_sync' => [
+        // Bearer token the jeffersongoncalves/jeffersongoncalves repo's
+        // notify-site-plugins-sync workflow sends when plugins.json changes,
+        // so POST /api/plugins-sync can re-scan it for newly added repos.
+        'token' => env('PLUGINS_SYNC_TOKEN'),
+        'source_url' => env('PLUGINS_SYNC_SOURCE_URL', 'https://raw.githubusercontent.com/jeffersongoncalves/jeffersongoncalves/master/plugins.json'),
+    ],
+
 ];

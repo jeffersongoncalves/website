@@ -49,6 +49,7 @@ use Spatie\Translatable\HasTranslations;
  * @property bool $featured
  * @property Carbon|null $published_at
  * @property Carbon|null $last_synced_at
+ * @property Carbon|null $starred_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property string|null $readme_branch
@@ -368,13 +369,23 @@ class Project extends Model
         return $query->where('github_owner', strtolower($username));
     }
 
-    /** Third-party repos imported from the GitHub stars feed (starred_at set). */
+    /**
+     * Third-party repos imported from the GitHub stars feed (starred_at set).
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
     public function scopeStarred(Builder $query): Builder
     {
         return $query->whereNotNull('starred_at');
     }
 
-    /** Curated/own projects — everything that did NOT come from a star import. */
+    /**
+     * Curated/own projects — everything that did NOT come from a star import.
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
     public function scopeOwn(Builder $query): Builder
     {
         return $query->whereNull('starred_at');

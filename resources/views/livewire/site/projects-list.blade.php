@@ -102,6 +102,20 @@
     @if($projects->isEmpty())
         <div class="text-center py-16 mono text-sm text-ink-500">@lang('site.common.no_results')</div>
     @else
+        {{-- ItemList JSON-LD so an AI agent can enumerate this page's catalogue
+             without parsing paginated/wire-filtered HTML. Position accounts for
+             the current page offset so it stays accurate past page 1. --}}
+        <x-site.json-ld :data="[
+            '@context' => 'https://schema.org',
+            '@type' => 'ItemList',
+            'itemListElement' => $projects->values()->map(fn ($project, $i) => [
+                '@type' => 'ListItem',
+                'position' => $projects->firstItem() + $i,
+                'name' => $project->name,
+                'url' => $project->publicUrl(),
+            ])->all(),
+        ]"/>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             @foreach($projects as $project)
                 <x-site.project-card :project="$project"/>

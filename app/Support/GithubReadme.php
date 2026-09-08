@@ -13,9 +13,10 @@ use JeffersonGoncalves\Markdown\Markdown;
  * The generic fetch/cache/render + HTML post-processing lives in the package
  * (which renders through jeffersongoncalves/laravel-markdown via the
  * `github-readme.renderer` callable wired in AppServiceProvider). Only the
- * portfolio-specific glue stays here: the Filament version⇄branch mapping and
- * the self-repo `/tree/{branch}` → `projects.show?v=` link rewrite, which both
- * reference this app's routes and version conventions.
+ * portfolio-specific glue stays here: the Filament version⇄branch mapping,
+ * the self-repo `/tree/{branch}` → `projects.show?v=` link rewrite, and
+ * routing outbound README links through OutboundLink — all reference this
+ * app's routes/short-url system, not something the generic package knows about.
  */
 class GithubReadme
 {
@@ -64,6 +65,31 @@ class GithubReadme
     public static function rewriteRelativeAssets(string $markdown, string $repo, ?string $ref = null): string
     {
         return Readme::rewriteRelativeAssets($markdown, $repo, $ref);
+    }
+
+    /**
+     * Route every absolute `<a href="...">` in rendered README HTML through
+     * OutboundLink, so README link clicks get counted the same as every other
+     * outbound link on the site. OutboundLink::to() no-ops on same-host URLs,
+     * so the local `projects.show` links left by rewriteSelfRepoLinks() (and
+     * any other self-host anchor) pass through untouched.
+     *
+     * Must run AFTER markExternalLinks() — that method tags a link as
+     * external by comparing its href host, so it needs the real destination
+     * host still in the href, not the short-url host this rewrite produces.
+     */
+    public static function rewriteOutboundLinks(string $html): string
+    {
+        return preg_replace_callback(
+            '~<a([^>]*?)\shref="(https?://[^"]+)"([^>]*)>~i',
+            function (array $m): string {
+                $url = html_entity_decode($m[2], ENT_QUOTES | ENT_HTML5);
+                $short = OutboundLink::to($url) ?? $url;
+
+                return '<a'.$m[1].' href="'.htmlspecialchars($short, ENT_QUOTES | ENT_HTML5).'"'.$m[3].'>';
+            },
+            $html
+        ) ?? $html;
     }
 
     /**

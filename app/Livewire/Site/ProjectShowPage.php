@@ -20,8 +20,9 @@ use Livewire\Component;
  * /links/{slug}. mount() keeps the old controller's lookup + 301 redirects
  * (retired-slug aliases and wrong-section canonicalisation) — issued straight
  * from the initial request so they stay true 301s. The Filament-plugin version
- * switcher (?v=) is now reactive: clicking a version swaps the README in place
- * via wire:click instead of a full reload. Excluded from CachePublicPage.
+ * switcher (?v=) is a plain full-reload link (no wire:click) so the route stays
+ * eligible for CachePublicPage — a cached page's csrf-token meta tag is stale
+ * for every visitor but the other, so an AJAX wire:click POST would 419.
  */
 class ProjectShowPage extends Component
 {
@@ -49,11 +50,6 @@ class ProjectShowPage extends Component
         }
 
         $this->projectId = $project->id;
-    }
-
-    public function setVersion(string $version): void
-    {
-        $this->v = $version;
     }
 
     /**

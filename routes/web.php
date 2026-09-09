@@ -54,8 +54,7 @@ Route::middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class]
 
     Route::get('/projects', ProjectsPage::class)->name('projects.index')
         ->withoutMiddleware(CachePublicPage::class);
-    Route::get('/projects/{slug}', ProjectShowPage::class)->name('projects.show')
-        ->withoutMiddleware(CachePublicPage::class);
+    Route::get('/projects/{slug}', ProjectShowPage::class)->name('projects.show');
 
     Route::get('/articles', ArticlesPage::class)->name('articles.index')
         ->withoutMiddleware(CachePublicPage::class);
@@ -65,16 +64,14 @@ Route::middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class]
     // nav highlights instead of Projects. ProjectShowPage 301s any project to
     // its canonical section. Registered after /articles/feed so the static
     // segment still wins.
-    Route::get('/articles/{slug}', ProjectShowPage::class)->name('articles.show')
-        ->withoutMiddleware(CachePublicPage::class);
+    Route::get('/articles/{slug}', ProjectShowPage::class)->name('articles.show');
 
     Route::get('/links', LinksPage::class)->name('links.index')
         ->withoutMiddleware(CachePublicPage::class);
     // External-link projects (sites, channels, learning resources, awesome
     // lists) are canonical under /links/{slug}; ProjectShowPage 301s any served
     // under the wrong section. Registered after the static /links route.
-    Route::get('/links/{slug}', ProjectShowPage::class)->name('links.show')
-        ->withoutMiddleware(CachePublicPage::class);
+    Route::get('/links/{slug}', ProjectShowPage::class)->name('links.show');
 
     Route::get('/open-source', OpenSourcePage::class)->name('open-source');
 

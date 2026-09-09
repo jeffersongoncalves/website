@@ -6,6 +6,7 @@ use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Jobs\PersistSiteStatsJob;
 use App\Jobs\PurgeMisattributedPackageLinksJob;
+use App\Jobs\SyncPluginsJsonJob;
 use App\Jobs\SyncProjectMetricsJob;
 use App\Jobs\WarmReadmeCacheJob;
 use App\Models\Admin;
@@ -272,4 +273,16 @@ it('limits the warm run to a single slug via --slug', function () {
         ->assertSuccessful();
 
     Queue::assertPushed(WarmReadmeCacheJob::class, fn (WarmReadmeCacheJob $job) => $job->project->slug === 'keep');
+});
+
+// ---------------------------------------------------------------------------
+// plugins:sync (SyncPluginsJson)
+// ---------------------------------------------------------------------------
+
+it('queues a plugins.json sync', function () {
+    $this->artisan('plugins:sync')
+        ->expectsOutputToContain('Queued plugins.json sync.')
+        ->assertSuccessful();
+
+    Queue::assertPushed(SyncPluginsJsonJob::class);
 });

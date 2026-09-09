@@ -61,9 +61,40 @@ Alpine.data('countUp', (initial = []) => ({
     },
 }));
 
+// Shared across every markdown-body instance on the page (there's normally
+// only one) — a single overlay is created lazily on first use and reused.
+function openImageLightbox(src, alt) {
+    let overlay = document.querySelector('.image-lightbox');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'image-lightbox';
+        overlay.innerHTML = '<img class="image-lightbox__img">';
+        overlay.addEventListener('click', () => overlay.classList.remove('is-open'));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') overlay.classList.remove('is-open');
+        });
+        document.body.appendChild(overlay);
+    }
+    const img = overlay.querySelector('.image-lightbox__img');
+    img.src = src;
+    img.alt = alt || '';
+    overlay.classList.add('is-open');
+}
+
 Alpine.data('markdownCopy', () => ({
     enhance() {
         const root = this.$el;
+
+        // README images not wrapped in a link — badges/shields almost always
+        // link elsewhere (CI status, license, ...) and must keep navigating;
+        // only a bare <img> (a screenshot, diagram, ...) gets the lightbox.
+        root.querySelectorAll('img').forEach((img) => {
+            if (img.closest('a') || img.dataset.lightboxEnhanced) return;
+            img.dataset.lightboxEnhanced = '1';
+            img.classList.add('markdown-image--zoomable');
+            img.addEventListener('click', () => openImageLightbox(img.currentSrc || img.src, img.alt));
+        });
+
         const blocks = root.querySelectorAll('pre > code');
         blocks.forEach((code) => {
             const pre = code.parentElement;

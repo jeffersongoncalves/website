@@ -8,6 +8,7 @@ use App\Jobs\PersistSiteStatsJob;
 use App\Jobs\PurgeMisattributedPackageLinksJob;
 use App\Jobs\SyncPluginsJsonJob;
 use App\Jobs\SyncProjectMetricsJob;
+use App\Jobs\WarmOgImageJob;
 use App\Jobs\WarmReadmeCacheJob;
 use App\Models\Admin;
 use App\Models\Project;
@@ -278,6 +279,34 @@ it('limits the warm run to a single slug via --slug', function () {
 // ---------------------------------------------------------------------------
 // plugins:sync (SyncPluginsJson)
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// projects:warm-og-image-cache (WarmOgImageCache)
+// ---------------------------------------------------------------------------
+
+it('dispatches a warm job only for projects with a github_url or social_image', function () {
+    consoleCmd_publishedProject(['slug' => 'gh', 'github_url' => 'https://github.com/owner/a']);
+    consoleCmd_publishedProject(['slug' => 'social', 'github_url' => null, 'social_image' => 'https://example.com/x.png']);
+    // Excluded: neither source.
+    consoleCmd_publishedProject(['slug' => 'neither', 'github_url' => null]);
+
+    $this->artisan('projects:warm-og-image-cache')
+        ->expectsOutputToContain('Dispatched 2 social card warm jobs.')
+        ->assertSuccessful();
+
+    Queue::assertPushed(WarmOgImageJob::class, 2);
+});
+
+it('limits the og-image warm run to a single slug via --slug', function () {
+    consoleCmd_publishedProject(['slug' => 'keep', 'github_url' => 'https://github.com/owner/a']);
+    consoleCmd_publishedProject(['slug' => 'skip', 'github_url' => 'https://github.com/owner/b']);
+
+    $this->artisan('projects:warm-og-image-cache', ['--slug' => 'keep'])
+        ->expectsOutputToContain('Dispatched 1 social card warm jobs.')
+        ->assertSuccessful();
+
+    Queue::assertPushed(WarmOgImageJob::class, fn (WarmOgImageJob $job) => $job->project->slug === 'keep');
+});
 
 it('queues a plugins.json sync', function () {
     $this->artisan('plugins:sync')

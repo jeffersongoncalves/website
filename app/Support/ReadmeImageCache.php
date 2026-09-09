@@ -61,6 +61,28 @@ class ReadmeImageCache
         return is_string($host) && in_array(strtolower($host), self::ALLOWED_HOSTS, true);
     }
 
+    /**
+     * Every allow-listed image src in rendered README HTML, deduped — used
+     * by WarmReadmeCacheJob to pre-fetch images alongside the README itself
+     * instead of leaving the first real visitor to pay each image's cold
+     * fetch one at a time.
+     *
+     * @return list<string>
+     */
+    public static function extractAllowedImageUrls(string $html): array
+    {
+        if (preg_match_all('~<img\b[^>]*?\ssrc="([^"]+)"~i', $html, $m) === false) {
+            return [];
+        }
+
+        $urls = array_map(
+            static fn (string $src): string => html_entity_decode($src, ENT_QUOTES | ENT_HTML5),
+            $m[1]
+        );
+
+        return array_values(array_unique(array_filter($urls, self::isAllowedHost(...))));
+    }
+
     public static function path(string $url): string
     {
         return 'readme-images/'.sha1($url);

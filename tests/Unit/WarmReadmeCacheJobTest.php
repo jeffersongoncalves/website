@@ -6,6 +6,7 @@ use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Jobs\WarmReadmeCacheJob;
 use App\Models\Project;
+use App\Support\ReadmeImageCache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
@@ -73,6 +74,34 @@ it('warms the plain readme_branch for a project with no tracked versions', funct
     (new WarmReadmeCacheJob($project))->handle();
 
     expect(ReadmeCache::query()->where(['repo' => 'owner/repo', 'ref' => 'develop'])->exists())->toBeTrue();
+});
+
+it('warms every GitHub-hosted image found in the fetched README', function () {
+    Http::fake([
+        'api.github.com/repos/*/readme*' => Http::response(
+            "# README\n\n<img src=\"https://raw.githubusercontent.com/owner/repo/main/banner.png\">",
+            200,
+            ['Content-Type' => 'text/plain']
+        ),
+        'raw.githubusercontent.com/owner/repo/main/banner.png' => Http::response('PNGBYTES', 200, ['Content-Type' => 'image/png']),
+    ]);
+
+    $project = Project::query()->create([
+        'name' => 'Repo',
+        'slug' => 'repo',
+        'category' => ProjectCategory::LaravelPackage,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/owner/repo',
+        'readme_branch' => 'main',
+        'stars' => 0,
+        'downloads' => 0,
+    ]);
+
+    (new WarmReadmeCacheJob($project))->handle();
+
+    Storage::disk('github')->assertExists(
+        ReadmeImageCache::path('https://raw.githubusercontent.com/owner/repo/main/banner.png')
+    );
 });
 
 it('warms the npm README for a package with no github_url', function () {

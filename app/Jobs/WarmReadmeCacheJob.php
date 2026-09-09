@@ -7,6 +7,7 @@ namespace App\Jobs;
 use App\Enums\ProjectCategory;
 use App\Models\Project;
 use App\Support\GithubReadme;
+use App\Support\ReadmeImageCache;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,7 +29,9 @@ use Throwable;
  *
  * A Filament plugin with tracked versions gets every version's ref warmed
  * (not just the default) — a visitor can land on any ?v= via a shared link
- * or the version-switcher chip, and each ref is cached separately.
+ * or the version-switcher chip, and each ref is cached separately. Every
+ * GitHub-hosted image found in the fetched HTML is pre-warmed too, via
+ * ReadmeImageCache — see warmImages().
  */
 class WarmReadmeCacheJob implements ShouldQueue
 {
@@ -66,16 +69,35 @@ class WarmReadmeCacheJob implements ShouldQueue
         try {
             if ($this->project->github_url) {
                 foreach ($this->refsToWarm() as $ref) {
-                    GithubReadme::fetchHtml($this->project->github_url, $ref);
+                    $html = GithubReadme::fetchHtml($this->project->github_url, $ref);
+                    $this->warmImages($html);
                 }
             } elseif ($this->project->npm_url) {
-                NpmReadme::fetchHtml($this->project->npm_url);
+                $this->warmImages(NpmReadme::fetchHtml($this->project->npm_url));
             }
         } catch (Throwable $e) {
             Log::warning('WarmReadmeCacheJob failed', [
                 'project' => $this->project->slug,
                 'error' => $e->getMessage(),
             ]);
+        }
+    }
+
+    /**
+     * Pre-fetch every GitHub-hosted image found in a README so the first
+     * real visitor's browser gets our own cached copy instead of triggering
+     * a cold fetch to GitHub's raw-content CDN per image — see
+     * ReadmeImageCache's docblock (measured a 54s LCP on a hotlinked
+     * banner image in production).
+     */
+    private function warmImages(?string $html): void
+    {
+        if ($html === null) {
+            return;
+        }
+
+        foreach (ReadmeImageCache::extractAllowedImageUrls($html) as $url) {
+            ReadmeImageCache::warm($url);
         }
     }
 

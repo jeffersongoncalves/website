@@ -88,8 +88,12 @@ Alpine.data('markdownCopy', () => ({
         // README images not wrapped in a link — badges/shields almost always
         // link elsewhere (CI status, license, ...) and must keep navigating;
         // only a bare <img> (a screenshot, diagram, ...) gets the lightbox.
+        // SVGs are skipped too: almost always a small icon/diagram with a
+        // transparent background, which looks wrong blown up over the
+        // lightbox's blurred backdrop.
         root.querySelectorAll('img').forEach((img) => {
             if (img.closest('a') || img.dataset.lightboxEnhanced) return;
+            if (/\.svg(\?|#|$)/i.test(img.src)) return;
             img.dataset.lightboxEnhanced = '1';
             img.classList.add('markdown-image--zoomable');
             img.addEventListener('click', () => openImageLightbox(img.currentSrc || img.src, img.alt));

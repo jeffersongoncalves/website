@@ -52,6 +52,28 @@ class GithubReadme
         return Readme::lazyloadImages($html);
     }
 
+    /**
+     * Stamp a blank `alt=""` on any `<img>` still missing the attribute.
+     * Markdown `![]()` syntax always emits one, but READMEs frequently embed
+     * raw `<img>` HTML (badge/banner rows) with none at all — an empty,
+     * decorative alt is the safe default for content we don't control,
+     * matching the site's own logo images.
+     */
+    public static function ensureImageAlt(string $html): string
+    {
+        return preg_replace_callback(
+            '~<img\b([^>]*?)>~i',
+            function (array $m): string {
+                $attrs = $m[1];
+
+                return preg_match('/\balt\s*=/i', $attrs) === 1
+                    ? $m[0]
+                    : '<img'.$attrs.' alt="">';
+            },
+            $html
+        ) ?? $html;
+    }
+
     public static function wrapTables(string $html): string
     {
         return Readme::wrapTables($html);

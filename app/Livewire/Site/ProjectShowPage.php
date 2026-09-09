@@ -159,6 +159,7 @@ class ProjectShowPage extends Component
             $readmeHtml = GithubReadme::markExternalLinks($readmeHtml, $selfHost);
             $readmeHtml = GithubReadme::rewriteOutboundLinks($readmeHtml);
             $readmeHtml = GithubReadme::lazyloadImages($readmeHtml);
+            $readmeHtml = GithubReadme::ensureImageAlt($readmeHtml);
             $readmeHtml = GithubReadme::wrapTables($readmeHtml);
         }
 

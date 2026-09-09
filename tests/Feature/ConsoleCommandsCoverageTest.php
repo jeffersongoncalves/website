@@ -7,6 +7,7 @@ use App\Enums\ProjectStatus;
 use App\Jobs\PersistSiteStatsJob;
 use App\Jobs\PurgeMisattributedPackageLinksJob;
 use App\Jobs\SyncProjectMetricsJob;
+use App\Jobs\WarmReadmeCacheJob;
 use App\Models\Admin;
 use App\Models\Project;
 use Illuminate\Support\Facades\Bus;
@@ -243,4 +244,32 @@ it('dispatches no purge jobs when no project carries package links', function ()
         ->assertSuccessful();
 
     Queue::assertNotPushed(PurgeMisattributedPackageLinksJob::class);
+});
+
+// ---------------------------------------------------------------------------
+// projects:warm-readme-cache (WarmReadmeCache)
+// ---------------------------------------------------------------------------
+
+it('dispatches a warm job only for projects with a github_url or npm_url', function () {
+    consoleCmd_publishedProject(['slug' => 'gh', 'github_url' => 'https://github.com/owner/a']);
+    consoleCmd_publishedProject(['slug' => 'npm', 'github_url' => null, 'npm_url' => 'https://www.npmjs.com/package/b']);
+    // Excluded: neither link.
+    consoleCmd_publishedProject(['slug' => 'neither', 'github_url' => null]);
+
+    $this->artisan('projects:warm-readme-cache')
+        ->expectsOutputToContain('Dispatched 2 README warm jobs.')
+        ->assertSuccessful();
+
+    Queue::assertPushed(WarmReadmeCacheJob::class, 2);
+});
+
+it('limits the warm run to a single slug via --slug', function () {
+    consoleCmd_publishedProject(['slug' => 'keep', 'github_url' => 'https://github.com/owner/a']);
+    consoleCmd_publishedProject(['slug' => 'skip', 'github_url' => 'https://github.com/owner/b']);
+
+    $this->artisan('projects:warm-readme-cache', ['--slug' => 'keep'])
+        ->expectsOutputToContain('Dispatched 1 README warm jobs.')
+        ->assertSuccessful();
+
+    Queue::assertPushed(WarmReadmeCacheJob::class, fn (WarmReadmeCacheJob $job) => $job->project->slug === 'keep');
 });

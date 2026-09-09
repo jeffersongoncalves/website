@@ -8,6 +8,7 @@ use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectLanguage;
 use App\Enums\ProjectStatus;
+use App\Support\GithubReadme;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
@@ -104,7 +105,10 @@ class ProjectForm
                                     ->afterStateUpdated(function ($state, Set $set, Get $get): void {
                                         $current = (array) ($get('branch_overrides') ?? []);
                                         $next = [];
-                                        foreach (array_values((array) $state) as $i => $_) {
+                                        // Keyed by numeric-major order (v3→1.x, v4→2.x, ...), matching
+                                        // GithubReadme::branchForFilamentVersion() — not checkbox toggle
+                                        // order, which isn't guaranteed ascending.
+                                        foreach (GithubReadme::sortedVersions(array_values((array) $state)) as $i => $_) {
                                             $branch = ($i + 1).'.x';
                                             $next[$branch] = $current[$branch] ?? $branch;
                                         }
@@ -141,7 +145,8 @@ class ProjectForm
                                             return;
                                         }
                                         $map = [];
-                                        foreach (array_values($versions) as $i => $_) {
+                                        $sorted = GithubReadme::sortedVersions(array_values(array_map('strval', $versions)));
+                                        foreach ($sorted as $i => $_) {
                                             $branch = ($i + 1).'.x';
                                             $map[$branch] = $branch;
                                         }

@@ -94,7 +94,9 @@ class ProjectShowPage extends Component
         $project = Project::query()->published()->findOrFail($this->projectId);
 
         $isFilamentPlugin = $project->category === ProjectCategory::FilamentPlugin;
-        $versions = $isFilamentPlugin && is_array($project->versions) ? $project->versions : [];
+        $versions = $isFilamentPlugin && is_array($project->versions)
+            ? GithubReadme::sortedVersions($project->versions)
+            : [];
 
         $activeVersion = null;
         $ref = null;

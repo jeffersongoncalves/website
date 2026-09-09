@@ -217,7 +217,7 @@ class ProjectMetrics
         }
 
         $current = is_array($project->branch_overrides) ? $project->branch_overrides : [];
-        $versions = $project->versions;
+        $versions = GithubReadme::sortedVersions($project->versions);
 
         $next = [];
         foreach ($versions as $i => $version) {

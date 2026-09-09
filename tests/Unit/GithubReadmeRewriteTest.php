@@ -20,6 +20,22 @@ it('returns null for branches that are not tracked', function () {
     expect(GithubReadme::branchToVersion('99.x', ['v3', 'v4']))->toBeNull();
 });
 
+it('resolves the auto-branch by numeric major regardless of storage order', function () {
+    // A persisted `versions` array is not guaranteed ascending (import order,
+    // admin edits). branchForFilamentVersion() must still put v4 on 2.x even
+    // when v4 sits last in the array — the position it happens to occupy is
+    // not what determines its branch.
+    $scrambled = ['v3', 'v5', 'v4'];
+
+    expect(GithubReadme::branchForFilamentVersion('v3', $scrambled))->toBe('1.x')
+        ->and(GithubReadme::branchForFilamentVersion('v4', $scrambled))->toBe('2.x')
+        ->and(GithubReadme::branchForFilamentVersion('v5', $scrambled))->toBe('3.x');
+});
+
+it('sorts and dedupes versions by numeric major', function () {
+    expect(GithubReadme::sortedVersions(['v5', 'v3', 'v4', 'v3']))->toBe(['v3', 'v4', 'v5']);
+});
+
 it('rewrites self-repo /tree/{branch} into a local projects.show URL', function () {
     $html = '<p>See <a href="https://github.com/joaopaulolndev/filament-edit-profile/tree/2.x">v4</a> and '
         .'<a href="https://github.com/joaopaulolndev/filament-edit-profile/tree/main">v3</a>.</p>';

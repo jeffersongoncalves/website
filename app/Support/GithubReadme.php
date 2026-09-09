@@ -115,17 +115,37 @@ class GithubReadme
     }
 
     /**
+     * Numerically sort Filament version strings ("v3", "v4", "v5", ...) by
+     * major and dedupe — the canonical order branchForFilamentVersion() and
+     * branchToVersion() index against. A persisted `versions` array isn't
+     * guaranteed to already be in this order (an import or an admin edit can
+     * leave it scrambled), and indexing an out-of-order array silently shifts
+     * every version's auto-branch onto the wrong one.
+     *
+     * @param  list<string>  $versions
+     * @return list<string>
+     */
+    public static function sortedVersions(array $versions): array
+    {
+        $sorted = array_values(array_unique($versions));
+
+        usort($sorted, static fn (string $a, string $b): int => (int) ltrim($a, 'vV') <=> (int) ltrim($b, 'vV'));
+
+        return $sorted;
+    }
+
+    /**
      * Filament plugin branches follow a per-repo sequence: the lowest supported
      * Filament version maps to branch `1.x`, next to `2.x`, etc.
      * Example: plugin supporting [v3,v4,v5] → 1.x, 2.x, 3.x.
      * Plugin supporting [v4,v5]            → 1.x, 2.x.
      * Plugin supporting [v5]               → 1.x.
      *
-     * @param  list<string>  $supportedVersions  ordered ascending (e.g. ['v3','v4','v5'])
+     * @param  list<string>  $supportedVersions  need not be pre-sorted — see sortedVersions()
      */
     public static function branchForFilamentVersion(string $version, array $supportedVersions): ?string
     {
-        $idx = array_search($version, $supportedVersions, true);
+        $idx = array_search($version, self::sortedVersions($supportedVersions), true);
 
         if ($idx === false) {
             return null;
@@ -139,12 +159,12 @@ class GithubReadme
      * after applying branch_overrides), return the user-facing version
      * (e.g. 'v3', 'v4', 'v5') or null when the branch is not tracked.
      *
-     * @param  list<string>  $supportedVersions  ordered ascending (e.g. ['v3','v4','v5'])
+     * @param  list<string>  $supportedVersions  need not be pre-sorted — see sortedVersions()
      * @param  array<string,string>  $branchOverrides  auto-branch → real-branch map
      */
     public static function branchToVersion(string $branch, array $supportedVersions, array $branchOverrides = []): ?string
     {
-        foreach ($supportedVersions as $i => $version) {
+        foreach (self::sortedVersions($supportedVersions) as $i => $version) {
             $autoBranch = ($i + 1).'.x';
             $realBranch = isset($branchOverrides[$autoBranch]) && trim((string) $branchOverrides[$autoBranch]) !== ''
                 ? trim((string) $branchOverrides[$autoBranch])

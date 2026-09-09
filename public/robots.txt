@@ -3,5 +3,6 @@ Allow: /
 Disallow: /admin
 Disallow: /app
 Disallow: /horizon
+Disallow: /livewire
 
 Sitemap: https://jeffersongoncalves.dev.br/sitemap.xml

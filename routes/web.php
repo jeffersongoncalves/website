@@ -6,6 +6,7 @@ use App\Http\Controllers\Site\ArticlesFeedController;
 use App\Http\Controllers\Site\LlmsTxtController;
 use App\Http\Controllers\Site\OfflineController;
 use App\Http\Controllers\Site\OgImageController;
+use App\Http\Controllers\Site\SitemapController;
 use App\Livewire\Site\AboutPage;
 use App\Livewire\Site\ArticlesPage;
 use App\Livewire\Site\HomePage;
@@ -41,6 +42,10 @@ Route::middleware([SecurityHeaders::class])->group(function () {
     // llms.txt — plain-text site map for LLM crawlers (llmstxt.org). Lives at
     // the site root with no locale prefix; it's its own cached text body.
     Route::get('/llms.txt', LlmsTxtController::class)->name('llms');
+
+    // /sitemap.xml — cached + DB-driven (see SitemapController), not a static
+    // file, so it survives atomic deploys that swap the public/ directory.
+    Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 });
 
 Route::middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class])->group(function () {

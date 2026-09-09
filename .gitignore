@@ -2,8 +2,6 @@
 /build
 /node_modules
 /public/hot
-/public/sitemap.xml
-/public/sitemap-*.xml
 /public/storage
 /storage/*.key
 /storage/pail

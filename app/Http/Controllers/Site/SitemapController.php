@@ -2,42 +2,42 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace App\Http\Controllers\Site;
 
 use App\Enums\ProjectCategory;
 use App\Models\Project;
-use Illuminate\Console\Command;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
 
-class GenerateSitemap extends Command
+/**
+ * /sitemap.xml — built on the fly and cached forever (same pattern as
+ * LlmsTxtController), invalidated by ProjectObserver on any project change.
+ * Previously this was a static public/sitemap.xml file written by a daily
+ * cron + queued job (`sitemap:generate`), which 404'd whenever a deploy
+ * swapped in a new release directory before the next cron run — public/ is
+ * per-release, not shared across releases like storage/ or the cache.
+ */
+class SitemapController
 {
-    protected $signature = 'sitemap:generate';
+    public const CACHE_KEY = 'sitemap_xml';
 
-    protected $description = 'Write a single public/sitemap.xml (urlset) listing every page + project';
+    public function __invoke(): Response
+    {
+        $xml = Cache::rememberForever(self::CACHE_KEY, fn (): string => $this->build());
 
-    public function handle(): int
+        return response($xml)->header('Content-Type', 'application/xml; charset=utf-8');
+    }
+
+    private function build(): string
     {
         $sitemap = Sitemap::create();
 
         $this->addPages($sitemap);
         $this->addProjects($sitemap);
 
-        $sitemap->writeToFile(public_path('sitemap.xml'));
-
-        // Drop the legacy split files from when sitemap.xml was an index, so an
-        // upgraded deploy stops serving orphaned, no-longer-referenced sitemaps.
-        foreach (['sitemap-pages.xml', 'sitemap-projects.xml'] as $legacy) {
-            $path = public_path($legacy);
-
-            if (is_file($path)) {
-                unlink($path);
-            }
-        }
-
-        $this->info('Wrote sitemap.xml');
-
-        return self::SUCCESS;
+        return $sitemap->render();
     }
 
     private function addPages(Sitemap $sitemap): void

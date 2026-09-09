@@ -17,11 +17,6 @@ Schedule::command('projects:sync-metrics')
     ->withoutOverlapping()
     ->runInBackground();
 
-Schedule::command('sitemap:generate')
-    ->dailyAt('04:00')
-    ->withoutOverlapping()
-    ->runInBackground();
-
 // MaxMind reissues GeoLite2 roughly twice a week; weekly keeps visitor city
 // data fresh without hammering the download endpoint.
 Schedule::command('geoip:update')

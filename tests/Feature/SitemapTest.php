@@ -25,9 +25,7 @@ it('writes a single urlset sitemap (not an index) with changefreq + priority on 
     sitemapProject('My Article', ProjectCategory::Article, 'article-my-article');
     sitemapProject('A Site', ProjectCategory::Website, 'site-a-site');
 
-    $this->artisan('sitemap:generate')->assertSuccessful();
-
-    $xml = (string) file_get_contents(public_path('sitemap.xml'));
+    $xml = $this->get(route('sitemap'))->assertOk()->getContent();
 
     expect($xml)
         // a single inline urlset, not a sitemapindex pointing at sub-files

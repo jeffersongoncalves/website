@@ -94,3 +94,15 @@ it('returns no versions for a non-filament-plugin category', function (): void {
     expect(ProjectClassifier::versions(['require' => ['filament/filament' => '^3.0']], [], 'laravel_package'))
         ->toBe([]);
 });
+
+it('does not mistake a minor version digit for a second major', function (): void {
+    // "^5.3" contains a "3" too — matching every digit in the string (the
+    // old approach) fabricated a phantom v3 alongside the real v5. This is
+    // the exact composer.json shape (default-branch constraint from a
+    // single Filament major) confirmed live on jeffersongoncalves/filament-ban.
+    expect(ProjectClassifier::versions(['require' => ['filament/filament' => '^5.3']], [], 'filament_plugin'))
+        ->toBe(['v5']);
+
+    expect(ProjectClassifier::versions(['require' => ['filament/filament' => '^4.8']], [], 'filament_plugin'))
+        ->toBe(['v4']);
+});

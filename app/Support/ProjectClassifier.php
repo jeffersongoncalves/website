@@ -276,9 +276,16 @@ class ProjectClassifier
 
         $versions = [];
 
-        if (preg_match_all('/(\d+)/', $constraint, $m)) {
-            foreach ($m[1] as $major) {
-                if ((int) $major >= 3 && (int) $major <= 9) {
+        // One major per OR-separated clause (composer constraints combine
+        // them with "|" or "||"), taken from the FIRST number in that
+        // clause only. Matching every digit in the whole string (the
+        // previous approach) also picks up the minor version — "^5.3" has
+        // a "3" too, fabricating a phantom v3 alongside the real v5.
+        foreach (preg_split('/\s*\|\|?\s*/', $constraint) ?: [] as $clause) {
+            if (preg_match('/(\d+)/', $clause, $m) === 1) {
+                $major = (int) $m[1];
+
+                if ($major >= 3 && $major <= 9) {
                     $versions[] = 'v'.$major;
                 }
             }

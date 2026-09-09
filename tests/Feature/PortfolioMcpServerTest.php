@@ -69,6 +69,8 @@ it('errors on an unknown slug for get_page', function () {
 });
 
 it('serves the llms.txt body as the site map resource', function () {
+    $this->artisan('llms:generate')->assertSuccessful();
+
     PortfolioServer::resource(SiteMapResource::class)
         ->assertOk()
         ->assertSee('# Jefferson Gonçalves');

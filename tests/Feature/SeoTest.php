@@ -13,6 +13,8 @@ it('renders per-page SEO meta on a site page', function () {
 });
 
 it('generates a valid XML sitemap', function () {
+    $this->artisan('sitemap:generate')->assertSuccessful();
+
     $xml = $this->get(route('sitemap'))->assertOk()->getContent();
 
     expect($xml)->toContain('<urlset')

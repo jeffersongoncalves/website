@@ -291,6 +291,8 @@ it('serves a valid RSS feed of articles', function () {
         'published_at' => now(),
     ]);
 
+    $this->artisan('articles-feed:generate')->assertSuccessful();
+
     $response = $this->get('/articles/feed')->assertOk();
 
     expect($response->headers->get('Content-Type'))->toContain('application/rss+xml');

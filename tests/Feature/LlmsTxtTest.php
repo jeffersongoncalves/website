@@ -31,6 +31,8 @@ it('serves a plain-text llms.txt map with pages, authored projects and articles'
         'published_at' => now(),
     ]);
 
+    $this->artisan('llms:generate')->assertSuccessful();
+
     $this->get('/llms.txt')
         ->assertOk()
         ->assertHeader('Content-Type', 'text/plain; charset=utf-8')
@@ -52,6 +54,8 @@ it('excludes a third-party (non-authored) repo from the project list', function 
         'github_url' => 'https://github.com/someoneelse/repo',
         'published_at' => now(),
     ]);
+
+    $this->artisan('llms:generate')->assertSuccessful();
 
     $this->get('/llms.txt')
         ->assertOk()

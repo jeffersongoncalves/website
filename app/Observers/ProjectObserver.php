@@ -6,8 +6,9 @@ namespace App\Observers;
 
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
-use App\Http\Controllers\Site\LlmsTxtController;
-use App\Http\Controllers\Site\SitemapController;
+use App\Jobs\GenerateArticlesFeedJob;
+use App\Jobs\GenerateLlmsTxtJob;
+use App\Jobs\GenerateSitemapJob;
 use App\Jobs\RefreshProjectStatsJob;
 use App\Jobs\SyncProjectMetricsJob;
 use App\Livewire\Site\LinksPage;
@@ -90,9 +91,6 @@ class ProjectObserver
                 Cache::delete('featured_projects');
             }
 
-            Cache::delete(LlmsTxtController::CACHE_KEY);
-            Cache::delete(SitemapController::CACHE_KEY);
-
             // Catalogue-only topic chips on /projects (SiteStats::catalogueTopics).
             Cache::delete('site_stats:catalogue_topics');
 
@@ -117,5 +115,11 @@ class ProjectObserver
         // saves hundreds of rows collapses into ~one recompute instead of one
         // per row on the worker path.
         RefreshProjectStatsJob::dispatch()->delay(now()->addSeconds(10));
+
+        // Delayed + unique-until-processing so a bulk import collapses to one
+        // trailing rebuild instead of one per saved row.
+        GenerateSitemapJob::dispatch()->delay(now()->addSeconds(15));
+        GenerateLlmsTxtJob::dispatch()->delay(now()->addSeconds(15));
+        GenerateArticlesFeedJob::dispatch()->delay(now()->addSeconds(15));
     }
 }

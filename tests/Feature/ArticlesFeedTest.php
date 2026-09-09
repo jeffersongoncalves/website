@@ -20,6 +20,8 @@ function makeArticle(array $overrides = []): Project
 it('serves an RSS feed of published articles', function () {
     makeArticle(['slug' => 'feed-me', 'name' => 'Feed Me']);
 
+    $this->artisan('articles-feed:generate')->assertSuccessful();
+
     $this->get('/articles/feed')
         ->assertOk()
         ->assertHeader('Content-Type', 'application/rss+xml; charset=UTF-8')
@@ -37,6 +39,8 @@ it('excludes unpublished articles and non-article projects from the feed', funct
         'status' => ProjectStatus::Published,
         'published_at' => now(),
     ]);
+
+    $this->artisan('articles-feed:generate')->assertSuccessful();
 
     $this->get('/articles/feed')
         ->assertOk()

@@ -11,6 +11,8 @@ it('renders the MCP guide page with the endpoint and setup snippets', function (
 });
 
 it('lists the MCP guide in llms.txt', function () {
+    $this->artisan('llms:generate')->assertSuccessful();
+
     $this->get('/llms.txt')
         ->assertOk()
         ->assertSee(route('developers.mcp'), false);

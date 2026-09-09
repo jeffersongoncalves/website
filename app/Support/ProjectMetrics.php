@@ -183,7 +183,13 @@ class ProjectMetrics
 
         if ($changed) {
             $project->last_synced_at = now();
-            $project->save();
+            // Quiet: ProjectObserver::updated() would otherwise bump
+            // CachePublicPage's global version token on every one of the
+            // 5500+ projects a daily projects:sync-metrics run touches,
+            // effectively flushing the whole site's page cache thousands
+            // of times a day. The command flushes once after the whole
+            // batch completes instead — see SyncProjectMetrics::handle().
+            $project->saveQuietly();
         }
 
         return $changed;

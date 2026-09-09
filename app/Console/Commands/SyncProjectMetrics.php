@@ -9,6 +9,7 @@ use App\Jobs\SyncProjectMetricsJob;
 use App\Models\Project;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Bus;
+use JeffersonGoncalves\PageCache\Middleware\CachePublicPage;
 
 class SyncProjectMetrics extends Command
 {
@@ -48,10 +49,20 @@ class SyncProjectMetrics extends Command
         // aggregate AFTER they all finish — otherwise PersistSiteStatsJob runs
         // early (while rate-limited project jobs are still queued) and sums
         // stale stars/downloads.
+        //
+        // ProjectMetrics::sync() saves quietly for this exact reason: flushing
+        // CachePublicPage's global version token once here, after the whole
+        // batch, instead of once per project (ProjectObserver::updated()'s
+        // normal behaviour) — flushing thousands of times during one run
+        // would keep resetting the entire site's page cache to empty all
+        // day, not just this batch's own projects.
         Bus::batch($projects->map(fn (Project $project): SyncProjectMetricsJob => new SyncProjectMetricsJob($project))->all())
             ->name('sync-project-metrics')
             ->onQueue('github')
-            ->then(fn () => PersistSiteStatsJob::dispatch())
+            ->then(function (): void {
+                CachePublicPage::flush();
+                PersistSiteStatsJob::dispatch();
+            })
             ->dispatch();
 
         $this->info("Dispatched {$projects->count()} project sync jobs; site stats job runs after the batch completes.");

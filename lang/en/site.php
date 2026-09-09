@@ -201,7 +201,7 @@ return [
 
     'articles' => [
         'title' => 'Articles',
-        'sub' => 'Posts and articles I wrote or worth reading.',
+        'sub' => 'Interesting articles and links worth reading.',
         'eyebrow' => 'articles',
         'feed_link' => 'RSS feed',
         'empty' => 'No articles yet.',

@@ -201,7 +201,7 @@ return [
 
     'articles' => [
         'title' => 'Artigos',
-        'sub' => 'Posts e artigos que escrevi ou que vale a pena ler.',
+        'sub' => 'Artigos e links interessantes que valem a pena ler.',
         'eyebrow' => 'artigos',
         'feed_link' => 'Feed RSS',
         'empty' => 'Nenhum artigo ainda.',

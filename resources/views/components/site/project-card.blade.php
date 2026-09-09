@@ -76,7 +76,7 @@
                         ? route('links.index', ['topic_'.$topicAnchor => $topic]).'#'.$topicAnchor
                         : route('projects.index', ['topic' => $topic]);
                 @endphp
-                <a href="{{ $topicHref }}" class="hover:text-ink-200">#{{ $topic }}</a>
+                <a href="{{ $topicHref }}" class="hover:text-ink-200" aria-label="{{ __('site.projects.topic_filter_aria', ['topic' => $topic]) }}">#{{ $topic }}</a>
             @endforeach
         </div>
     @endif

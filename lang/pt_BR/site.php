@@ -158,6 +158,7 @@ return [
         'filter_language' => 'Linguagem',
         'language_all' => 'Todas as linguagens',
         'filtering_by_topic' => 'Filtrando por topic',
+        'topic_filter_aria' => 'Projetos com a tag :topic',
         'clear_filter' => 'limpar',
         'popular_topics' => 'Topics populares',
         'filter_role' => 'Papel',

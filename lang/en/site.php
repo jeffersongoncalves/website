@@ -158,6 +158,7 @@ return [
         'filter_language' => 'Language',
         'language_all' => 'All languages',
         'filtering_by_topic' => 'Filtering by topic',
+        'topic_filter_aria' => 'Projects tagged :topic',
         'clear_filter' => 'clear',
         'popular_topics' => 'Popular topics',
         'filter_role' => 'Role',

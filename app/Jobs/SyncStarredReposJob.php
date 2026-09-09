@@ -169,7 +169,7 @@ class SyncStarredReposJob implements ShouldQueue
                 // thunder-herd the RateLimited middleware (grab → over-limit →
                 // release, repeated across the whole backlog every ~60s)
                 // instead of draining smoothly.
-                ImportStarredRepoJob::dispatch($htmlUrl, $starredAt)->delay(now()->addSeconds($dispatched));
+                ImportStarredRepoJob::dispatch($htmlUrl, $starredAt, $dispatched)->delay(now()->addSeconds($dispatched));
                 $dispatched++;
             }
 

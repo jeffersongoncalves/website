@@ -38,7 +38,7 @@ class ImportStarredRepoJob implements ShouldQueue
     // MaxAttemptsExceededException when GitHub rate-limit releases pile up.
     public int $tries = 0;
 
-    public function __construct(public string $htmlUrl, public string $starredAt)
+    public function __construct(public string $htmlUrl, public string $starredAt, public int $staggerSeconds = 0)
     {
         $this->onQueue('github');
     }
@@ -47,10 +47,19 @@ class ImportStarredRepoJob implements ShouldQueue
      * Time-based retries so a GitHub rate limit (the RateLimited middleware
      * releases the job) doesn't exhaust a fixed attempt budget — see
      * SyncProjectMetricsJob::retryUntil for the rationale.
+     *
+     * Laravel computes retryUntil() at dispatch time, not when the job
+     * actually becomes available — it does NOT account for ->delay(). A bulk
+     * sync staggers dispatch by 1s/job (SyncStarredReposJob), so a job late
+     * in a large batch could sit delayed for most of its window before ever
+     * running once, dying to a handful of GitHub rate-limit releases instead
+     * of getting the full 2h of retries. staggerSeconds mirrors that same
+     * delay here so the budget is measured from when the job actually starts
+     * running, not from when it was enqueued.
      */
     public function retryUntil(): \DateTimeInterface
     {
-        return now()->addHours(2);
+        return now()->addSeconds($this->staggerSeconds)->addHours(2);
     }
 
     /**

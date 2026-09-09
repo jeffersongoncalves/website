@@ -6,6 +6,7 @@ use App\Http\Controllers\Site\ArticlesFeedController;
 use App\Http\Controllers\Site\LlmsTxtController;
 use App\Http\Controllers\Site\OfflineController;
 use App\Http\Controllers\Site\OgImageController;
+use App\Http\Controllers\Site\ReadmeImageController;
 use App\Http\Controllers\Site\SitemapController;
 use App\Livewire\Site\AboutPage;
 use App\Livewire\Site\ArticlesPage;
@@ -34,6 +35,11 @@ Route::middleware([SecurityHeaders::class])->group(function () {
     // Cached social-card proxy. Outside the locale/page-cache group: it's a
     // binary response and the image is locale-independent.
     Route::get('/og/{slug}.png', OgImageController::class)->name('og.show')
+        ->middleware('throttle:60,1');
+
+    // Cached README-image proxy — see ReadmeImageCache's docblock (GitHub's
+    // raw-content CDN measured a 54s LCP on a hotlinked banner image).
+    Route::get('/readme-image/{encoded}', ReadmeImageController::class)->name('readme-image.show')
         ->middleware('throttle:60,1');
 
     // /favicon-proxy (name `favicon-proxy`) is registered by

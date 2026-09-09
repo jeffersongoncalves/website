@@ -280,3 +280,18 @@ it('wraps each README table in a horizontal-scroll container', function () {
         ->and($out)->toContain('</tbody></table></div>')
         ->and($out)->toContain('<p>intro</p>');
 });
+
+it('proxies img src on a GitHub asset host through readme-image.show', function () {
+    $html = '<img src="https://raw.githubusercontent.com/owner/repo/main/banner.png">';
+
+    $out = GithubReadme::proxyReadmeImages($html);
+
+    expect($out)->toContain('/readme-image/')
+        ->and($out)->not->toContain('raw.githubusercontent.com');
+});
+
+it('leaves img src on a non-GitHub host untouched', function () {
+    $html = '<img src="https://img.shields.io/badge/a.svg">';
+
+    expect(GithubReadme::proxyReadmeImages($html))->toBe($html);
+});

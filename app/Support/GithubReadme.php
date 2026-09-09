@@ -135,6 +135,31 @@ class GithubReadme
     }
 
     /**
+     * Rewrite `<img src="...">` pointing at a GitHub asset host (raw content,
+     * camo, user-uploaded images, avatars) to our own cached proxy — see
+     * ReadmeImageCache's docblock for why. Any other host (shields.io badges,
+     * a personal CDN, ...) is left as a direct hotlink.
+     */
+    public static function proxyReadmeImages(string $html): string
+    {
+        return preg_replace_callback(
+            '~(<img\b[^>]*?\ssrc=")([^"]+)(")~i',
+            function (array $m): string {
+                $src = html_entity_decode($m[2], ENT_QUOTES | ENT_HTML5);
+
+                if (! ReadmeImageCache::isAllowedHost($src)) {
+                    return $m[0];
+                }
+
+                $proxied = route('readme-image.show', ['encoded' => ReadmeImageCache::encode($src)]);
+
+                return $m[1].htmlspecialchars($proxied, ENT_QUOTES | ENT_HTML5).$m[3];
+            },
+            $html
+        ) ?? $html;
+    }
+
+    /**
      * Filament plugin branches follow a per-repo sequence: the lowest supported
      * Filament version maps to branch `1.x`, next to `2.x`, etc.
      * Example: plugin supporting [v3,v4,v5] → 1.x, 2.x, 3.x.

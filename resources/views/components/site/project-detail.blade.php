@@ -111,7 +111,6 @@
     $breadcrumbLd = [
         '@context' => 'https://schema.org',
         '@type' => 'BreadcrumbList',
-        'inLanguage' => str_replace('_', '-', app()->getLocale()),
         'itemListElement' => $crumbItems,
     ];
 @endphp

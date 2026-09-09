@@ -8,7 +8,6 @@
         'name' => 'Jefferson Gonçalves',
         'url' => route('home'),
         'jobTitle' => __('site.home.hero_l1'),
-        'inLanguage' => str_replace('_', '-', app()->getLocale()),
         'sameAs' => [
             'https://github.com/jeffersongoncalves',
             'https://www.linkedin.com/in/jeffersonsimaogoncalves/',

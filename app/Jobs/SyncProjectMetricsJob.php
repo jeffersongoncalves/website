@@ -60,6 +60,11 @@ class SyncProjectMetricsJob implements ShouldQueue
     {
         try {
             ProjectMetrics::sync($this->project);
+
+            // Warm the README cache with the just-synced version/branch data
+            // so the first real visitor after this sync gets a disk read
+            // instead of a cold GitHub fetch + render + sanitize.
+            WarmReadmeCacheJob::dispatch($this->project);
         } catch (GitHubRateLimitException $e) {
             // Limit won't clear until the window resets — release with a delay
             // until then instead of retrying immediately and 403-ing again.

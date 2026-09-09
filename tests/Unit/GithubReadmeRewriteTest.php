@@ -158,17 +158,26 @@ it('rewrites relative anchor hrefs into absolute GitHub blob URLs', function () 
         ->toContain('href="https://github.com/owner/myrepo/blob/2.x/docs/install.md"');
 });
 
-it('leaves absolute, mailto, hash, root-relative and tel links alone when rewriting relative links', function () {
+it('leaves absolute, mailto, hash and tel links alone when rewriting relative links', function () {
     $html = '<a href="https://example.com">abs</a> '
         .'<a href="//cdn.example.com/x">proto</a> '
         .'<a href="mailto:a@b.com">mail</a> '
         .'<a href="tel:+5511">tel</a> '
-        .'<a href="#anchor">hash</a> '
-        .'<a href="/root">root</a>';
+        .'<a href="#anchor">hash</a>';
 
     $out = GithubReadme::rewriteRelativeLinks($html, 'owner/myrepo', 'main');
 
     expect($out)->toBe($html);
+});
+
+it('rewrites a root-relative href as repo-root-relative, not domain-root', function () {
+    // On GitHub itself, a README link to "/root" resolves against the repo
+    // root, not the consuming site's own domain root.
+    $html = '<a href="/root">root</a>';
+
+    $out = GithubReadme::rewriteRelativeLinks($html, 'owner/myrepo', 'main');
+
+    expect($out)->toBe('<a href="https://github.com/owner/myrepo/blob/main/root">root</a>');
 });
 
 it('falls back to HEAD branch when no ref is supplied for relative link rewriting', function () {
@@ -200,14 +209,21 @@ it('rewrites relative <img src> in raw HTML and strips ?raw=true', function () {
         ->not->toContain('raw=true');
 });
 
-it('leaves absolute, data and root-relative asset sources alone', function () {
+it('leaves absolute and data asset sources alone', function () {
     $md = '![a](https://cdn.example.com/x.png) '
-        .'<img src="/abs/logo.png"> '
         .'<img src="data:image/png;base64,AAAA">';
 
     $out = GithubReadme::rewriteRelativeAssets($md, 'owner/myrepo', 'main');
 
     expect($out)->toBe($md);
+});
+
+it('rewrites a root-relative asset src as repo-root-relative, not domain-root', function () {
+    $md = '<img src="/abs/logo.png">';
+
+    $out = GithubReadme::rewriteRelativeAssets($md, 'owner/myrepo', 'main');
+
+    expect($out)->toBe('<img src="https://raw.githubusercontent.com/owner/myrepo/main/abs/logo.png">');
 });
 
 it('keeps the first README image eager and lazy-loads the rest', function () {

@@ -3379,16 +3379,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-github-readme",
-            "version": "v2.0.0",
+            "version": "v2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-github-readme.git",
-                "reference": "dad3f40b5ff24d973403388769833e21a9a44678"
+                "reference": "84d22889bc7452da5372ab3e890c139dcfb66a9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-readme/zipball/dad3f40b5ff24d973403388769833e21a9a44678",
-                "reference": "dad3f40b5ff24d973403388769833e21a9a44678",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-readme/zipball/84d22889bc7452da5372ab3e890c139dcfb66a9d",
+                "reference": "84d22889bc7452da5372ab3e890c139dcfb66a9d",
                 "shasum": ""
             },
             "require": {
@@ -3438,15 +3438,19 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-github-readme/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-github-readme/tree/v2.0.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-github-readme/tree/v2.0.1"
             },
             "funding": [
+                {
+                    "url": "https://buymeacoffee.com/jeffersongoncalves",
+                    "type": "custom"
+                },
                 {
                     "url": "https://github.com/jeffersongoncalves",
                     "type": "github"
                 }
             ],
-            "time": "2026-06-21T20:09:41+00:00"
+            "time": "2026-09-09T14:12:13+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-gtag",

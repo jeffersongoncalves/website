@@ -104,6 +104,9 @@
   --surface-terminal-bar:   var(--paper-200);
   --surface-code:           var(--paper-150);
   --surface-pill:           var(--paper-100);
+  /* Matches the admin theme's own --surface-scrim (theme.css) — same
+     treatment across both surfaces, not a bespoke value picked here. */
+  --surface-scrim:          rgba(255, 254, 249, 0.55);
 
   --text-strong:            var(--paper-900);
   --text-regular:           var(--paper-800);
@@ -159,6 +162,7 @@ html.dark {
   --surface-terminal-bar:   var(--ink-850);
   --surface-code:           var(--ink-950);
   --surface-pill:           var(--ink-900);
+  --surface-scrim:          rgba(11, 10, 9, 0.55);
 
   --text-strong:            var(--ink-100);
   --text-regular:           var(--ink-200);

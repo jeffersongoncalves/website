@@ -66,15 +66,39 @@ Alpine.data('countUp', (initial = []) => ({
 function openImageLightbox(src, alt) {
     let overlay = document.querySelector('.image-lightbox');
     if (!overlay) {
+        // No JS-side translation bridge exists — the <html lang> the layout
+        // already stamps (pt-BR/en/es) is enough to pick this one word.
+        const closeLabel = { pt: 'Fechar', es: 'Cerrar' }[document.documentElement.lang.slice(0, 2)] || 'Close';
+
         overlay = document.createElement('div');
         overlay.className = 'image-lightbox';
-        overlay.innerHTML = '<img class="image-lightbox__img">';
-        overlay.addEventListener('click', () => overlay.classList.remove('is-open'));
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+        overlay.innerHTML = `
+            <div class="image-lightbox__bar">
+                <span class="image-lightbox__name"></span>
+                <button type="button" class="image-lightbox__close" aria-label="${closeLabel}">&times;</button>
+            </div>
+            <img class="image-lightbox__img">
+        `;
+        const close = () => overlay.classList.remove('is-open');
+        // Clicking the backdrop or the bar closes it; clicking the image or
+        // the close button's own listener below still needs its own path —
+        // .self-equivalent via a target check, no framework needed here.
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay || e.target.closest('.image-lightbox__bar')) close();
+        });
+        overlay.querySelector('.image-lightbox__close').addEventListener('click', close);
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') overlay.classList.remove('is-open');
+            if (e.key === 'Escape') close();
         });
         document.body.appendChild(overlay);
     }
+
+    const label = (alt && alt.trim()) || decodeURIComponent(src.split('/').pop().split('?')[0].split('#')[0]);
+    overlay.setAttribute('aria-label', label);
+    overlay.querySelector('.image-lightbox__name').textContent = label;
+
     const img = overlay.querySelector('.image-lightbox__img');
     img.src = src;
     img.alt = alt || '';

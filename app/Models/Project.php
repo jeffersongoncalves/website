@@ -427,7 +427,11 @@ class Project extends Model
             : null;
 
         return new SEOData(
-            title: $this->name,
+            // Matches components.site.layouts.app's own $title concat (name +
+            // site name) — this page supplies a full SEOData object instead of
+            // that layout's `title` prop, so it has to replicate the suffix
+            // itself or the <title> would be the bare project name.
+            title: $this->name.' — '.config('app.name'),
             // Only attribute authorship for repos under the owner's account —
             // the catalogue is mostly third-party, so a blanket author would be
             // false (mirrors the JSON-LD author rule in project-detail).

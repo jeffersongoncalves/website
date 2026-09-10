@@ -46,7 +46,7 @@ final class LlmsTxtGenerator
 
         $lines[] = '';
         $lines[] = '## Open Source Projects';
-        foreach (Project::query()->published()->authored()->orderByDesc('stars')->orderBy('name')->get() as $project) {
+        foreach (Project::query()->published()->authored()->orderBy('name')->get() as $project) {
             $lines[] = self::projectLine($project);
         }
 
@@ -54,7 +54,7 @@ final class LlmsTxtGenerator
         $lines[] = '## Collaborator Projects';
         $lines[] = '';
         $lines[] = 'Repos Jefferson actively maintains but doesn\'t own.';
-        foreach (Project::query()->published()->collaborated()->orderByDesc('stars')->orderBy('name')->get() as $project) {
+        foreach (Project::query()->published()->collaborated()->orderBy('name')->get() as $project) {
             $lines[] = self::projectLine($project);
         }
 

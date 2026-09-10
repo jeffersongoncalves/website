@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Mcp\Tools;
 
+use App\Enums\PackageType;
+use App\Enums\ProjectCategory;
 use App\Models\Project;
 use App\Support\GithubReadme;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
@@ -68,12 +70,33 @@ class GetPageTool extends Tool
             $lines[] = 'Stars: '.$project->stars;
         }
 
+        $downloads = $project->downloads_label ?: ($project->downloads > 0 ? (string) $project->downloads : null);
+        if ($downloads !== null) {
+            $lines[] = 'Downloads: '.$downloads;
+        }
+
+        if ($project->license) {
+            $lines[] = 'License: '.$project->license;
+        }
+
+        if ($project->package_type && $project->package_type !== PackageType::None) {
+            $lines[] = 'Package type: '.$project->package_type->value;
+        }
+
+        if ($project->language) {
+            $lines[] = 'Primary language: '.$project->language->value;
+        }
+
         if (! empty($project->stack)) {
             $lines[] = 'Stack: '.implode(', ', $project->stack);
         }
 
         if (! empty($project->topics)) {
             $lines[] = 'Topics: '.implode(', ', $project->topics);
+        }
+
+        if ($project->category === ProjectCategory::FilamentPlugin && ! empty($project->versions)) {
+            $lines[] = 'Supported Filament versions: '.implode(', ', GithubReadme::sortedVersions($project->versions));
         }
 
         $excerpt = $this->readmeExcerpt($project);

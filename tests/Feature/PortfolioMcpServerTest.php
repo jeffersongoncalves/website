@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
+use App\Enums\ProjectLanguage;
 use App\Enums\ProjectStatus;
 use App\Mcp\Resources\SiteMapResource;
 use App\Mcp\Servers\PortfolioServer;
@@ -61,6 +63,32 @@ it('returns metadata and a readme excerpt for get_page', function () {
         ->assertSee('filament-gtag')
         ->assertSee('## README')
         ->assertSee('README');
+});
+
+it('includes license, downloads, package type, language and versions in get_page', function () {
+    Storage::fake('github');
+
+    $project = Project::query()->create([
+        'name' => 'filament-gtag',
+        'category' => ProjectCategory::FilamentPlugin,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/jeffersongoncalves/filament-gtag',
+        'published_at' => now(),
+        'license' => 'MIT',
+        'downloads' => 12345,
+        'downloads_label' => '12.3k',
+        'package_type' => PackageType::Composer,
+        'language' => ProjectLanguage::Php,
+        'versions' => ['v4', 'v3', 'v5'],
+    ]);
+
+    PortfolioServer::tool(GetPageTool::class, ['slug' => $project->slug])
+        ->assertOk()
+        ->assertSee('License: MIT')
+        ->assertSee('Downloads: 12.3k')
+        ->assertSee('Package type: composer')
+        ->assertSee('Primary language: PHP')
+        ->assertSee('Supported Filament versions: v3, v4, v5');
 });
 
 it('errors on an unknown slug for get_page', function () {

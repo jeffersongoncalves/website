@@ -283,6 +283,31 @@ class Project extends Model
     }
 
     /**
+     * The `title` translation for a locale, falling back to English when the
+     * requested locale is missing or blank (the MCP tools' locale param has
+     * no cookie/session to fall back on the way the site's own middleware
+     * does). Returns null only when neither the requested locale nor English
+     * has a usable value.
+     */
+    public function localizedTitle(?string $locale = null): ?string
+    {
+        $locale ??= 'en';
+
+        $title = $this->getTranslation('title', $locale, false);
+        if (is_string($title) && trim($title) !== '') {
+            return trim($title);
+        }
+
+        if ($locale === 'en') {
+            return null;
+        }
+
+        $fallback = $this->getTranslation('title', 'en', false);
+
+        return is_string($fallback) && trim($fallback) !== '' ? trim($fallback) : null;
+    }
+
+    /**
      * Retired slugs that 301-redirect to this project's current slug.
      *
      * @return HasMany<ProjectSlugAlias, $this>

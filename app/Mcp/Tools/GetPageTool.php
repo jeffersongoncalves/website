@@ -41,8 +41,8 @@ class GetPageTool extends Tool
             return Response::error("No published page found with slug \"{$slug}\".");
         }
 
-        $title = $project->getTranslation('title', 'en', false);
-        $description = is_string($title) && trim($title) !== '' ? trim($title) : $project->name;
+        $locale = (string) $request->get('locale', 'en');
+        $description = $project->localizedTitle($locale) ?? $project->name;
 
         $lines = [
             '# '.$project->name,
@@ -133,6 +133,11 @@ class GetPageTool extends Tool
             'slug' => $schema->string()
                 ->description('The page slug, e.g. "jeffersongoncalves-filament-gtag".')
                 ->required(),
+
+            'locale' => $schema->string()
+                ->enum(config('locale-cookie.supported'))
+                ->description('Language for the page title/summary. Falls back to English when the translation is missing.')
+                ->default('en'),
         ];
     }
 }

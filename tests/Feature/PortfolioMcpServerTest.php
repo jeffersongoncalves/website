@@ -33,6 +33,45 @@ it('finds a published project by name via search_projects', function () {
         ->assertSee(route('projects.show', 'jeffersongoncalves-filament-gtag'));
 });
 
+it('finds a published project by topic or stack via search_projects', function () {
+    Project::query()->create([
+        'name' => 'filament-gtag',
+        'category' => ProjectCategory::FilamentPlugin,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/jeffersongoncalves/filament-gtag',
+        'published_at' => now(),
+        'topics' => ['analytics', 'google-tag-manager'],
+        'stack' => ['Laravel', 'Filament'],
+    ]);
+
+    PortfolioServer::tool(SearchProjectsTool::class, ['query' => 'google-tag-manager'])
+        ->assertOk()
+        ->assertSee('filament-gtag');
+
+    PortfolioServer::tool(SearchProjectsTool::class, ['query' => 'Filament'])
+        ->assertOk()
+        ->assertSee('filament-gtag');
+});
+
+it('returns the requested locale\'s title in search_projects, falling back to English', function () {
+    Project::query()->create([
+        'name' => 'filament-gtag',
+        'category' => ProjectCategory::FilamentPlugin,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/jeffersongoncalves/filament-gtag',
+        'published_at' => now(),
+        'title' => ['en' => 'Google Tag Manager for Filament', 'pt_BR' => 'Google Tag Manager para Filament'],
+    ]);
+
+    PortfolioServer::tool(SearchProjectsTool::class, ['query' => 'gtag', 'locale' => 'pt_BR'])
+        ->assertOk()
+        ->assertSee('Google Tag Manager para Filament');
+
+    PortfolioServer::tool(SearchProjectsTool::class, ['query' => 'gtag', 'locale' => 'es'])
+        ->assertOk()
+        ->assertSee('Google Tag Manager for Filament');
+});
+
 it('excludes unpublished projects from search_projects', function () {
     Project::query()->create([
         'name' => 'hidden-project',
@@ -91,6 +130,27 @@ it('includes license, downloads, package type, language and versions in get_page
         ->assertSee('Package type: composer')
         ->assertSee('Primary language: PHP')
         ->assertSee('Supported Filament versions: v3, v4, v5');
+});
+
+it('returns the requested locale\'s title in get_page, falling back to English', function () {
+    Storage::fake('github');
+
+    $project = Project::query()->create([
+        'name' => 'filament-gtag',
+        'category' => ProjectCategory::FilamentPlugin,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/jeffersongoncalves/filament-gtag',
+        'published_at' => now(),
+        'title' => ['en' => 'Google Tag Manager for Filament', 'pt_BR' => 'Google Tag Manager para Filament'],
+    ]);
+
+    PortfolioServer::tool(GetPageTool::class, ['slug' => $project->slug, 'locale' => 'pt_BR'])
+        ->assertOk()
+        ->assertSee('Google Tag Manager para Filament');
+
+    PortfolioServer::tool(GetPageTool::class, ['slug' => $project->slug, 'locale' => 'es'])
+        ->assertOk()
+        ->assertSee('Google Tag Manager for Filament');
 });
 
 it('errors on an unknown slug for get_page', function () {

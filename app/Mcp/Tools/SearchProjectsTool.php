@@ -51,10 +51,20 @@ class SearchProjectsTool extends Tool
         }
 
         if ($query !== '') {
+            $isPostgres = $builder->getConnection() instanceof PostgresConnection;
             $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $query).'%';
-            $operator = $builder->getConnection() instanceof PostgresConnection ? 'ilike' : 'like';
-            $builder->where(function ($q) use ($like, $operator): void {
-                $q->where('name', $operator, $like)->orWhere('repo', $operator, $like);
+            $operator = $isPostgres ? 'ilike' : 'like';
+            // topics/stack are json(b) columns — Postgres needs an explicit
+            // ::text cast before ILIKE/LIKE will accept them; sqlite stores
+            // them as plain text already, so the cast would just be a no-op
+            // there (skipped rather than emitting invalid sqlite syntax).
+            $topicsColumn = $isPostgres ? 'topics::text' : 'topics';
+            $stackColumn = $isPostgres ? 'stack::text' : 'stack';
+            $builder->where(function ($q) use ($like, $operator, $topicsColumn, $stackColumn): void {
+                $q->where('name', $operator, $like)
+                    ->orWhere('repo', $operator, $like)
+                    ->orWhereRaw("{$topicsColumn} {$operator} ?", [$like])
+                    ->orWhereRaw("{$stackColumn} {$operator} ?", [$like]);
             });
         }
 
@@ -64,9 +74,10 @@ class SearchProjectsTool extends Tool
             return Response::text('No published pages matched that search.');
         }
 
-        $lines = $projects->map(function (Project $project): string {
-            $title = $project->getTranslation('title', 'en', false);
-            $summary = is_string($title) && trim($title) !== '' ? ': '.trim($title) : '';
+        $locale = (string) $request->get('locale', 'en');
+        $lines = $projects->map(function (Project $project) use ($locale): string {
+            $title = $project->localizedTitle($locale);
+            $summary = $title !== null ? ': '.$title : '';
 
             return '- ['.$project->name.']('.$project->publicUrl().') ('.$project->category->getLabel().')'.$summary;
         });
@@ -78,7 +89,7 @@ class SearchProjectsTool extends Tool
     {
         return [
             'query' => $schema->string()
-                ->description('Free-text search over the project/article/link name.'),
+                ->description('Free-text search over the project/article/link name, repo, tech stack and topics.'),
 
             'section' => $schema->string()
                 ->enum(['all', 'projects', 'articles', 'links'])
@@ -92,6 +103,11 @@ class SearchProjectsTool extends Tool
             'limit' => $schema->integer()
                 ->description('Max results to return (1-50).')
                 ->default(20),
+
+            'locale' => $schema->string()
+                ->enum(config('locale-cookie.supported'))
+                ->description('Language for each result\'s one-line summary. Falls back to English when the translation is missing.')
+                ->default('en'),
         ];
     }
 }

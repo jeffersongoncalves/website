@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\Project;
+use App\Support\GithubQuota;
 use App\Support\OgImageCache;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -22,7 +23,7 @@ use Throwable;
  * fetch — OgImageCache::warm() does the actual work, this job just calls it
  * ahead of time. Mirrors WarmReadmeCacheJob's split for the same reason.
  */
-class WarmOgImageJob implements ShouldQueue
+final class WarmOgImageJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -32,14 +33,30 @@ class WarmOgImageJob implements ShouldQueue
     // before it ever got a real turn. retryUntil() bounds it by time instead.
     public int $tries = 0;
 
-    public function __construct(public Project $project)
+    // One opengraph.githubassets.com fetch — CDN, not REST.
+    public const COST = 1;
+
+    public function __construct(public Project $project, public int $staggerSeconds = 0)
     {
         $this->onQueue('github');
     }
 
+    public static function make(Project $project): static
+    {
+        // 6000/h keeps headroom under the github-cdn limiter's 7200/h (120/min).
+        $delay = GithubQuota::reserve(self::COST, 'github-cdn', 6000);
+
+        return (new self($project, $delay))->delay($delay);
+    }
+
+    public static function enqueue(Project $project): void
+    {
+        dispatch(static::make($project));
+    }
+
     public function retryUntil(): \DateTimeInterface
     {
-        return now()->addHours(2);
+        return now()->addSeconds($this->staggerSeconds)->addHour();
     }
 
     /**

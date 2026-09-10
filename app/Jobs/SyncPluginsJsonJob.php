@@ -59,7 +59,7 @@ class SyncPluginsJsonJob extends DebouncedJob
         }
 
         foreach ($this->flatten($data) as [$slug, $category, $isMaintainer]) {
-            ImportGithubRepoJob::dispatch("https://github.com/{$slug}", $category, $isMaintainer);
+            ImportGithubRepoJob::enqueue("https://github.com/{$slug}", $category, $isMaintainer);
         }
     }
 

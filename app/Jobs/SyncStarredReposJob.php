@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\Project;
+use App\Support\GithubQuota;
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -121,6 +122,13 @@ class SyncStarredReposJob implements ShouldQueue
         $dispatched = 0;
 
         for ($page = 1; ; $page++) {
+            // Registers this page's REST call against the shared github-api
+            // bucket (ignoring the returned delay — this job still throttles
+            // itself reactively via throwIfRateLimited()/release() below), so
+            // ImportStarredRepoJob::make() reservations made after this page
+            // land correctly behind it in the shared counter.
+            GithubQuota::reserve(1);
+
             $response = Http::timeout(15)
                 ->withHeaders($this->headers())
                 ->get("https://api.github.com/users/{$username}/starred", [
@@ -162,14 +170,14 @@ class SyncStarredReposJob implements ShouldQueue
                     return $dispatched;
                 }
 
-                // Staggered by 1s/job (matches the shared 'github-api' 60/min
-                // limiter) instead of dumping the whole page onto the queue at
-                // once. A --full resync can dispatch thousands in one pass —
-                // without this, they all become ready simultaneously and
-                // thunder-herd the RateLimited middleware (grab → over-limit →
-                // release, repeated across the whole backlog every ~60s)
-                // instead of draining smoothly.
-                ImportStarredRepoJob::dispatch($htmlUrl, $starredAt, $dispatched)->delay(now()->addSeconds($dispatched));
+                // Staggered via GithubQuota::reserve() (ImportStarredRepoJob::make())
+                // instead of a flat 1s/job delay — the reservation already
+                // accounts for every other github-api consumer sharing the
+                // bucket (this job's own page fetches included), so a --full
+                // resync dispatching thousands in one pass lands them spread
+                // across the real budget instead of thunder-herding the
+                // RateLimited middleware.
+                ImportStarredRepoJob::enqueue($htmlUrl, $starredAt);
                 $dispatched++;
             }
 

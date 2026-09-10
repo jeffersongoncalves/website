@@ -39,7 +39,7 @@ class SyncProjectMetrics extends Command
         $projects = $query->get();
 
         if ($projects->isEmpty()) {
-            PersistSiteStatsJob::dispatch();
+            PersistSiteStatsJob::enqueue();
             $this->info('No projects to sync; dispatched site stats job.');
 
             return self::SUCCESS;
@@ -56,12 +56,12 @@ class SyncProjectMetrics extends Command
         // normal behaviour) — flushing thousands of times during one run
         // would keep resetting the entire site's page cache to empty all
         // day, not just this batch's own projects.
-        Bus::batch($projects->map(fn (Project $project): SyncProjectMetricsJob => new SyncProjectMetricsJob($project))->all())
+        Bus::batch($projects->map(fn (Project $project): SyncProjectMetricsJob => SyncProjectMetricsJob::make($project))->all())
             ->name('sync-project-metrics')
             ->onQueue('github')
             ->then(function (): void {
                 CachePublicPage::flush();
-                PersistSiteStatsJob::dispatch();
+                PersistSiteStatsJob::enqueue();
             })
             ->dispatch();
 

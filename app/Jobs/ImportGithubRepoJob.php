@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\Project;
+use App\Support\GithubQuota;
 use App\Support\GithubReadme;
 use App\Support\ProjectAttributes;
 use App\Support\ProjectImporter;
@@ -34,7 +35,7 @@ use Throwable;
  * The star-feed importer (ImportStarredRepoJob) stays separate: it stamps
  * starred_at and dedups differently. This job is for curated/catalogue repos.
  */
-class ImportGithubRepoJob implements ShouldQueue
+final class ImportGithubRepoJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -44,17 +45,35 @@ class ImportGithubRepoJob implements ShouldQueue
     // rate-limit release (RateLimited middleware) doesn't exhaust a fixed budget.
     public int $tries = 0;
 
+    // fetchRepo() + fetchBranches() — both REST, always called when the repo
+    // is new (fetchManifest/fileExists hit raw.githubusercontent, a separate
+    // github-cdn budget). Worst-case, não medido via GET /rate_limit.
+    public const COST = 2;
+
     public function __construct(
         public string $githubUrl,
         public string $fallbackCategory = 'awesome_list',
         public bool $isMaintainer = false,
+        public int $staggerSeconds = 0,
     ) {
         $this->onQueue('github');
     }
 
+    public static function make(string $githubUrl, string $fallbackCategory = 'awesome_list', bool $isMaintainer = false): static
+    {
+        $delay = GithubQuota::reserve(self::COST);
+
+        return (new self($githubUrl, $fallbackCategory, $isMaintainer, $delay))->delay($delay);
+    }
+
+    public static function enqueue(string $githubUrl, string $fallbackCategory = 'awesome_list', bool $isMaintainer = false): void
+    {
+        dispatch(static::make($githubUrl, $fallbackCategory, $isMaintainer));
+    }
+
     public function retryUntil(): \DateTimeInterface
     {
-        return now()->addHours(2);
+        return now()->addSeconds($this->staggerSeconds)->addHour();
     }
 
     /**

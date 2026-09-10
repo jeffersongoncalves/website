@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Support\GithubQuota;
 use App\Support\SiteStats;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 use Throwable;
 
-class PersistSiteStatsJob implements ShouldQueue
+final class PersistSiteStatsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -26,14 +27,31 @@ class PersistSiteStatsJob implements ShouldQueue
 
     public int $backoff = 30;
 
-    public function __construct()
+    // fetchGithubUser() only — fetchSponsorCount() goes through /graphql,
+    // which doesn't count against this quota. Worst-case, não medido via
+    // GET /rate_limit.
+    public const COST = 1;
+
+    public function __construct(public int $staggerSeconds = 0)
     {
         $this->onQueue('github');
     }
 
+    public static function make(): static
+    {
+        $delay = GithubQuota::reserve(self::COST);
+
+        return (new self($delay))->delay($delay);
+    }
+
+    public static function enqueue(): void
+    {
+        dispatch(static::make());
+    }
+
     public function retryUntil(): \DateTimeInterface
     {
-        return now()->addHours(2);
+        return now()->addSeconds($this->staggerSeconds)->addHour();
     }
 
     /**

@@ -28,7 +28,7 @@ class WarmOgImageCache extends Command
         $projects = $query->get();
 
         foreach ($projects as $project) {
-            WarmOgImageJob::dispatch($project);
+            WarmOgImageJob::enqueue($project);
         }
 
         $this->info("Dispatched {$projects->count()} social card warm jobs.");

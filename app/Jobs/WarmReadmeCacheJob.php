@@ -6,6 +6,7 @@ namespace App\Jobs;
 
 use App\Enums\ProjectCategory;
 use App\Models\Project;
+use App\Support\GithubQuota;
 use App\Support\GithubReadme;
 use App\Support\ReadmeImageCache;
 use Illuminate\Bus\Queueable;
@@ -33,7 +34,7 @@ use Throwable;
  * GitHub-hosted image found in the fetched HTML is pre-warmed too, via
  * ReadmeImageCache — see warmImages().
  */
-class WarmReadmeCacheJob implements ShouldQueue
+final class WarmReadmeCacheJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -43,14 +44,35 @@ class WarmReadmeCacheJob implements ShouldQueue
     // before it ever got a real turn. retryUntil() bounds it by time instead.
     public int $tries = 0;
 
-    public function __construct(public Project $project)
+    public function __construct(public Project $project, public int $staggerSeconds = 0)
     {
         $this->onQueue('github');
     }
 
+    /**
+     * Reserves refCount * 2 github-api slots (readme + default_branch REST
+     * calls per ref, worst-case) and returns an instance already delayed to
+     * that slot. The per-image raw.githubusercontent CDN fan-out inside
+     * warmImages() is NOT reserved here — it's only bounded by this job's
+     * RateLimited('github-cdn') middleware at the job level, not per image.
+     * Worst-case, não medido via GET /rate_limit.
+     */
+    public static function make(Project $project): static
+    {
+        $refCount = max(1, count(self::refsToWarm($project)));
+        $delay = GithubQuota::reserve($refCount * 2);
+
+        return (new self($project, $delay))->delay($delay);
+    }
+
+    public static function enqueue(Project $project): void
+    {
+        dispatch(static::make($project));
+    }
+
     public function retryUntil(): \DateTimeInterface
     {
-        return now()->addHours(2);
+        return now()->addSeconds($this->staggerSeconds)->addHour();
     }
 
     /**
@@ -68,7 +90,7 @@ class WarmReadmeCacheJob implements ShouldQueue
     {
         try {
             if ($this->project->github_url) {
-                foreach ($this->refsToWarm() as $ref) {
+                foreach (self::refsToWarm($this->project) as $ref) {
                     $html = GithubReadme::fetchHtml($this->project->github_url, $ref);
                     $this->warmImages($html);
                 }
@@ -108,16 +130,16 @@ class WarmReadmeCacheJob implements ShouldQueue
      *
      * @return list<string|null>
      */
-    private function refsToWarm(): array
+    private static function refsToWarm(Project $project): array
     {
-        $isFilamentPlugin = $this->project->category === ProjectCategory::FilamentPlugin;
-        $versions = $isFilamentPlugin && is_array($this->project->versions) ? $this->project->versions : [];
+        $isFilamentPlugin = $project->category === ProjectCategory::FilamentPlugin;
+        $versions = $isFilamentPlugin && is_array($project->versions) ? $project->versions : [];
 
         if ($versions === []) {
-            return [$this->project->readme_branch ?: null];
+            return [$project->readme_branch ?: null];
         }
 
-        $overrides = is_array($this->project->branch_overrides) ? $this->project->branch_overrides : [];
+        $overrides = is_array($project->branch_overrides) ? $project->branch_overrides : [];
 
         $refs = [];
 

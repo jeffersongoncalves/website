@@ -28,7 +28,7 @@ class WarmReadmeCache extends Command
         $projects = $query->get();
 
         foreach ($projects as $project) {
-            WarmReadmeCacheJob::dispatch($project);
+            WarmReadmeCacheJob::enqueue($project);
         }
 
         $this->info("Dispatched {$projects->count()} README warm jobs.");

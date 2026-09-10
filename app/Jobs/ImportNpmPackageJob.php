@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\Project;
+use App\Support\GithubQuota;
 use App\Support\ProjectAttributes;
 use App\Support\ProjectImporter;
 use App\Support\ProjectMatcher;
@@ -27,7 +28,7 @@ use Throwable;
  * first, then on the resolved github_url (cross-source), upserting missing
  * fields rather than duplicating.
  */
-class ImportNpmPackageJob implements ShouldQueue
+final class ImportNpmPackageJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -35,16 +36,35 @@ class ImportNpmPackageJob implements ShouldQueue
 
     public int $tries = 0;
 
+    // Typical cost is 0 — fetchNpmRegistry hits the npm registry, not GitHub.
+    // Worst-case is 2 REST calls (fetchDefaultBranchForSlug + subdirectoryHasReadme),
+    // only when the registry's `repository` field points at a subdirectory.
+    // Worst-case, não medido via GET /rate_limit.
+    public const COST = 2;
+
     public function __construct(
         public string $package,
         public string $fallbackCategory = 'tool',
+        public int $staggerSeconds = 0,
     ) {
         $this->onQueue('github');
     }
 
+    public static function make(string $package, string $fallbackCategory = 'tool'): static
+    {
+        $delay = GithubQuota::reserve(self::COST);
+
+        return (new self($package, $fallbackCategory, $delay))->delay($delay);
+    }
+
+    public static function enqueue(string $package, string $fallbackCategory = 'tool'): void
+    {
+        dispatch(static::make($package, $fallbackCategory));
+    }
+
     public function retryUntil(): \DateTimeInterface
     {
-        return now()->addHours(2);
+        return now()->addSeconds($this->staggerSeconds)->addHour();
     }
 
     /**

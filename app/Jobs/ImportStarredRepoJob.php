@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\Project;
+use App\Support\GithubQuota;
 use App\Support\GithubReadme;
 use App\Support\ProjectAttributes;
 use App\Support\ProjectImporter;
+use App\Support\ProjectMatcher;
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -28,7 +30,7 @@ use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
  * and never touched beyond back-filling its starred_at. Brand-new rows are
  * published straight away.
  */
-class ImportStarredRepoJob implements ShouldQueue
+final class ImportStarredRepoJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -38,9 +40,32 @@ class ImportStarredRepoJob implements ShouldQueue
     // MaxAttemptsExceededException when GitHub rate-limit releases pile up.
     public int $tries = 0;
 
+    // Same buildResult() pipeline as ImportGithubRepoJob (fetchRepo +
+    // fetchBranches, both REST). Worst-case, não medido via GET /rate_limit.
+    public const COST = 2;
+
     public function __construct(public string $htmlUrl, public string $starredAt, public int $staggerSeconds = 0)
     {
         $this->onQueue('github');
+    }
+
+    /**
+     * Reserves this job's github-api quota slot and returns an instance
+     * already delayed to that slot — the only place the quota is spent.
+     * SyncStarredReposJob's per-page GithubQuota::reserve(1) calls (registered
+     * ahead of this) push these reservations correctly behind the pagination
+     * cost in the shared bucket.
+     */
+    public static function make(string $htmlUrl, string $starredAt): static
+    {
+        $delay = GithubQuota::reserve(self::COST);
+
+        return (new self($htmlUrl, $starredAt, $delay))->delay($delay);
+    }
+
+    public static function enqueue(string $htmlUrl, string $starredAt): void
+    {
+        dispatch(static::make($htmlUrl, $starredAt));
     }
 
     /**
@@ -49,17 +74,14 @@ class ImportStarredRepoJob implements ShouldQueue
      * SyncProjectMetricsJob::retryUntil for the rationale.
      *
      * Laravel computes retryUntil() at dispatch time, not when the job
-     * actually becomes available — it does NOT account for ->delay(). A bulk
-     * sync staggers dispatch by 1s/job (SyncStarredReposJob), so a job late
-     * in a large batch could sit delayed for most of its window before ever
-     * running once, dying to a handful of GitHub rate-limit releases instead
-     * of getting the full 2h of retries. staggerSeconds mirrors that same
-     * delay here so the budget is measured from when the job actually starts
-     * running, not from when it was enqueued.
+     * actually becomes available — it does NOT account for ->delay(). 1h
+     * slack (one quota-window reset) is enough because GithubQuota::reserve
+     * already paces dispatch to stay inside the budget; staggerSeconds still
+     * shifts the deadline to when the job actually starts running.
      */
     public function retryUntil(): \DateTimeInterface
     {
-        return now()->addSeconds($this->staggerSeconds)->addHours(2);
+        return now()->addSeconds($this->staggerSeconds)->addHour();
     }
 
     /**
@@ -83,8 +105,9 @@ class ImportStarredRepoJob implements ShouldQueue
         // the timezone-offset window.
         $starredAt = CarbonImmutable::parse($this->starredAt)->utc();
 
-        // Dedup by owner/repo: never duplicate, never downgrade a published row.
-        $existing = Project::query()->where('github_url', $canonical)->first();
+        // Dedup by owner/repo (case-insensitive — ProjectMatcher::findByGithubUrl,
+        // not a raw exact match): never duplicate, never downgrade a published row.
+        $existing = ProjectMatcher::findByGithubUrl($canonical);
 
         if ($existing !== null) {
             if ($existing->starred_at === null) {
@@ -140,10 +163,26 @@ class ImportStarredRepoJob implements ShouldQueue
             $attributes['name'] = ProjectAttributes::prettifyName($attributes['name']);
         }
 
-        $attributes['github_url'] = $canonical;
+        // github_url/github_repo_id already came back canonicalised from
+        // fromGithub() (the API's html_url, following any rename) — do NOT
+        // overwrite with $canonical, which is only this job's own pre-fetch
+        // guess from the star feed's (possibly stale) html_url.
         $attributes['status'] = 'published';
         $attributes['is_maintainer'] = false;
         $attributes['is_daily_driver'] = false;
+
+        // Second canonical pass — the importer may have resolved a different
+        // github_repo_id/github_url than our pre-fetch guess (a rename since
+        // the row was last synced, or the star feed itself lagging a rename).
+        // Mirrors ImportGithubRepoJob/ImportNpmPackageJob's own second pass.
+        $existing = ProjectMatcher::findExisting('github', $attributes);
+        if ($existing !== null) {
+            if ($existing->starred_at === null) {
+                $existing->forceFill(['starred_at' => $starredAt])->save();
+            }
+
+            return;
+        }
 
         try {
             // starred_at is guarded (set only by this importer) — forceFill it

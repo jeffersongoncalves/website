@@ -41,7 +41,7 @@ class ProjectObserver
 
     public function created(Project $project): void
     {
-        SyncProjectMetricsJob::dispatch($project);
+        SyncProjectMetricsJob::enqueue($project);
 
         $this->flush($project, featuredAffected: (bool) $project->featured);
     }
@@ -53,7 +53,7 @@ class ProjectObserver
         // updates (stars, downloads, branch_overrides, last_synced_at) coming
         // from the job itself are excluded so we don't bounce-loop.
         if ($project->wasChanged(['repo', 'github_url', 'packagist_url', 'npm_url', 'docs_url', 'versions'])) {
-            SyncProjectMetricsJob::dispatch($project);
+            SyncProjectMetricsJob::enqueue($project);
         }
 
         // The landing featured list only changes when the row is (or just

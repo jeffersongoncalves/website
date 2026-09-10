@@ -116,7 +116,10 @@ class AppServiceProvider extends ServiceProvider
      */
     private function configureRateLimiting(): void
     {
-        RateLimiter::for('github-api', fn () => Limit::perMinute(120));
+        // 4.500/h, abaixo dos 5.000 da cota REST do GitHub.
+        RateLimiter::for('github-api', fn () => Limit::perMinute(75));
+        // raw.githubusercontent + opengraph, fora da cota REST.
+        RateLimiter::for('github-cdn', fn () => Limit::perMinute(120));
         // Packagist also rate-limits; keep verification jobs well under it.
         RateLimiter::for('packagist-api', fn () => Limit::perMinute(30));
     }

@@ -60,7 +60,7 @@ class WarmReadmeCacheJob implements ShouldQueue
     {
         return [
             (new WithoutOverlapping("readme-warm:{$this->project->getKey()}"))->dontRelease(),
-            new RateLimited('github-api'),
+            new RateLimited('github-cdn'),
         ];
     }
 

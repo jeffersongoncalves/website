@@ -49,7 +49,7 @@ class WarmOgImageJob implements ShouldQueue
     {
         return [
             (new WithoutOverlapping("og-image-warm:{$this->project->getKey()}"))->dontRelease(),
-            new RateLimited('github-api'),
+            new RateLimited('github-cdn'),
         ];
     }
 

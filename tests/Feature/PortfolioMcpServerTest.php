@@ -114,7 +114,9 @@ it('returns aggregate stats via get_site_stats', function () {
         ->assertOk()
         ->assertSee('## Packages by category')
         ->assertSee('Filament plugins: 1')
-        ->assertSee('Total stars: 42');
+        ->assertSee('Total stars: 42')
+        ->assertSee('## Support this work')
+        ->assertSee(config('site.social.sponsors'));
 });
 
 it('serves the llms.txt body as the site map resource', function () {

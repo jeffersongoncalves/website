@@ -17,7 +17,7 @@ use Laravel\Mcp\Server\Tool;
  * client answer "how many packages/stars/downloads" without paginating
  * search_projects across dozens of rows.
  */
-#[Description('Aggregate stats for Jefferson Gonçalves\' open-source work: repo/package counts by category, total stars and downloads by registry, GitHub followers and sponsors, and the busiest languages/topics.')]
+#[Description('Aggregate stats for Jefferson Gonçalves\' open-source work: repo/package counts by category, total stars and downloads by registry, GitHub followers and sponsors, the busiest languages/topics, and links to sponsor the work.')]
 class GetSiteStatsTool extends Tool
 {
     public function handle(Request $request): Response
@@ -58,6 +58,11 @@ class GetSiteStatsTool extends Tool
                 $lines[] = '- '.$row['topic'].': '.$row['total'];
             }
         }
+
+        $lines[] = '';
+        $lines[] = '## Support this work';
+        $lines[] = 'GitHub Sponsors: '.config('site.social.sponsors');
+        $lines[] = 'Buy Me a Coffee: '.config('site.social.buymeacoffee');
 
         return Response::text(implode("\n", $lines));
     }

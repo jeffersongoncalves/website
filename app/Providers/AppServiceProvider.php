@@ -99,15 +99,24 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Cap GitHub-API job throughput so parallel Horizon workers can't trip
-     * GitHub's *secondary* rate limit (~900 pts/min, separate from the 5000/h
-     * primary). 60 jobs/min × ~3 calls ≈ 180 calls/min — wide margin. The
-     * `RateLimited('github-api')` middleware on SyncProjectMetricsJob releases
-     * over-limit jobs back to the queue instead of failing them.
+     * Cap GitHub-API job throughput so parallel Horizon workers don't burn
+     * their retryUntil() window just losing the race for a shared slot — 9
+     * job classes now share this one limiter (see config/horizon.php's
+     * supervisor-github comment); a WarmReadmeCacheJob died with 78 releases
+     * and no real turn before this was raised (2026-09-09 21:23:27 UTC).
+     * This is a SOFT preventive throttle, not the hard safety boundary: a
+     * real overshoot of GitHub's actual limits (5000/h primary, ~900 pts/min
+     * secondary) is caught as GitHubRateLimitException and the job releases
+     * with GitHub's own Retry-After instead of failing — so raising this
+     * number risks a few wasted real-API round trips at worst, not crashes.
+     * 120 jobs/min × ~3 calls ≈ 360 calls/min, still well under the
+     * secondary ceiling. (README/OG image warming hits
+     * raw.githubusercontent.com/camo, not api.github.com, so it doesn't add
+     * to this budget.)
      */
     private function configureRateLimiting(): void
     {
-        RateLimiter::for('github-api', fn () => Limit::perMinute(60));
+        RateLimiter::for('github-api', fn () => Limit::perMinute(120));
         // Packagist also rate-limits; keep verification jobs well under it.
         RateLimiter::for('packagist-api', fn () => Limit::perMinute(30));
     }

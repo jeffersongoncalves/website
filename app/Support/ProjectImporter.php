@@ -859,8 +859,18 @@ class ProjectImporter
             $warnings[] = 'category_fallback';
         }
 
+        // Prefer GitHub's own html_url over the caller-supplied $url — a
+        // renamed/transferred repo's fetchRepo() already followed the 301, so
+        // this is the CURRENT canonical slug, not whatever the star feed or
+        // an old plugins.json entry still points at. Lowercased so two
+        // imports of the same repo in different casing land on one row.
+        $canonicalUrl = is_string($repo['html_url'] ?? null) && $repo['html_url'] !== ''
+            ? strtolower($repo['html_url'])
+            : $url;
+
         $fields = [
-            'github_url' => $url,
+            'github_url' => $canonicalUrl,
+            'github_repo_id' => is_int($repo['id'] ?? null) ? $repo['id'] : null,
             'slug' => Str::slug($owner.'-'.$repoName),
             'name' => self::prettifyName($repoName),
             'repo' => $repoName,

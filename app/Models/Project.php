@@ -42,6 +42,8 @@ use Spatie\Translatable\HasTranslations;
  * @property string|null $downloads_label
  * @property string $license
  * @property string|null $github_url
+ * @property int|null $github_repo_id
+ * @property Carbon|null $unavailable_at
  * @property string|null $packagist_url
  * @property string|null $docs_url
  * @property string|null $demo_url
@@ -156,6 +158,7 @@ class Project extends Model
         'user_contributions',
         'license',
         'github_url',
+        'github_repo_id',
         'packagist_url',
         'npm_url',
         'docker_url',
@@ -201,6 +204,7 @@ class Project extends Model
             'published_at' => 'datetime',
             'last_synced_at' => 'datetime',
             'starred_at' => 'datetime',
+            'unavailable_at' => 'datetime',
         ];
     }
 
@@ -329,7 +333,10 @@ class Project extends Model
             // forward), so null is treated as "already live".
             ->where(function (Builder $q): void {
                 $q->whereNull('published_at')->orWhere('published_at', '<=', now());
-            });
+            })
+            // A confirmed 404 on GitHub (BackfillGithubRepoIdJob) — hidden, not
+            // deleted, so a manual re-check can clear it later.
+            ->whereNull('unavailable_at');
     }
 
     /**

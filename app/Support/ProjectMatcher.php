@@ -18,6 +18,17 @@ class ProjectMatcher
     public static function findExisting(string $source, array $attrs): ?Project
     {
         if ($source === 'github') {
+            // The numeric id is the only identity a rename/transfer can't
+            // break — check it first so a repo re-imported under its new
+            // slug still lands on the same row instead of duplicating it.
+            $repoId = $attrs['github_repo_id'] ?? null;
+            if (is_int($repoId)) {
+                $byId = self::findByGithubRepoId($repoId);
+                if ($byId !== null) {
+                    return $byId;
+                }
+            }
+
             $byGithub = self::findByGithubUrl(self::stringOrNull($attrs['github_url'] ?? null));
             if ($byGithub !== null) {
                 return $byGithub;
@@ -71,6 +82,11 @@ class ProjectMatcher
         $variants = array_unique([$url, rtrim($url, '/'), rtrim($url, '/').'/']);
 
         return Project::query()->whereIn('docs_url', $variants)->first();
+    }
+
+    public static function findByGithubRepoId(int $repoId): ?Project
+    {
+        return Project::query()->where('github_repo_id', $repoId)->first();
     }
 
     public static function findByGithubUrl(?string $url): ?Project

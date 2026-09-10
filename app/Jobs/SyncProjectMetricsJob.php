@@ -55,7 +55,7 @@ final class SyncProjectMetricsJob implements ShouldQueue
 
     public static function enqueue(Project $project): void
     {
-        dispatch(static::make($project));
+        dispatch(self::make($project));
     }
 
     /**

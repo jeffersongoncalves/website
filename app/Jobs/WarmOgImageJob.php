@@ -51,7 +51,7 @@ final class WarmOgImageJob implements ShouldQueue
 
     public static function enqueue(Project $project): void
     {
-        dispatch(static::make($project));
+        dispatch(self::make($project));
     }
 
     public function retryUntil(): \DateTimeInterface

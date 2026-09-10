@@ -46,7 +46,7 @@ final class PersistSiteStatsJob implements ShouldQueue
 
     public static function enqueue(): void
     {
-        dispatch(static::make());
+        dispatch(self::make());
     }
 
     public function retryUntil(): \DateTimeInterface

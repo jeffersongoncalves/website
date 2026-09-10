@@ -65,7 +65,7 @@ final class ImportStarredRepoJob implements ShouldQueue
 
     public static function enqueue(string $htmlUrl, string $starredAt): void
     {
-        dispatch(static::make($htmlUrl, $starredAt));
+        dispatch(self::make($htmlUrl, $starredAt));
     }
 
     /**

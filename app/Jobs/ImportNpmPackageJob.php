@@ -59,7 +59,7 @@ final class ImportNpmPackageJob implements ShouldQueue
 
     public static function enqueue(string $package, string $fallbackCategory = 'tool'): void
     {
-        dispatch(static::make($package, $fallbackCategory));
+        dispatch(self::make($package, $fallbackCategory));
     }
 
     public function retryUntil(): \DateTimeInterface

@@ -68,7 +68,7 @@ final class ImportGithubRepoJob implements ShouldQueue
 
     public static function enqueue(string $githubUrl, string $fallbackCategory = 'awesome_list', bool $isMaintainer = false): void
     {
-        dispatch(static::make($githubUrl, $fallbackCategory, $isMaintainer));
+        dispatch(self::make($githubUrl, $fallbackCategory, $isMaintainer));
     }
 
     public function retryUntil(): \DateTimeInterface

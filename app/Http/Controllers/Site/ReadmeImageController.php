@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Site;
 
 use App\Support\ReadmeImageCache;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -28,19 +27,14 @@ class ReadmeImageController
 
         ReadmeImageCache::warm($url);
 
-        $disk = Storage::disk('github');
-        $path = ReadmeImageCache::path($url);
+        $response = ReadmeImageCache::response($url);
 
-        if (! $disk->exists($path)) {
+        if ($response === null) {
             abort(404);
         }
 
-        $typePath = $path.'.type';
-        $type = $disk->exists($typePath) ? $disk->get($typePath) : 'image/png';
+        $response->headers->set('Cache-Control', 'public, max-age='.ReadmeImageCache::TTL_SECONDS);
 
-        return response($disk->get($path), 200)
-            ->header('Content-Type', $type)
-            ->header('X-Content-Type-Options', 'nosniff')
-            ->header('Cache-Control', 'public, max-age='.ReadmeImageCache::TTL_SECONDS);
+        return $response;
     }
 }

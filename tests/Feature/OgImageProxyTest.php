@@ -90,6 +90,7 @@ it('serves a stale disk copy when GitHub rate-limits on a refresh attempt', func
 
     // Yesterday's successful fetch, now past the 1-day TTL.
     Storage::disk('github')->put('og-images/stale-ok', 'OLD-CARD-BYTES');
+    Storage::disk('github')->put('og-images/stale-ok.type', 'image/png');
     touch(Storage::disk('github')->path('og-images/stale-ok'), now()->subDays(2)->timestamp);
 
     Http::fake(['opengraph.githubassets.com/*' => Http::response('Too many requests', 429)]);

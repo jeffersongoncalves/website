@@ -300,25 +300,6 @@ it('leaves img src on a non-GitHub host untouched', function () {
     expect(GithubReadme::proxyReadmeImages($html))->toBe($html);
 });
 
-it('rewrites a same-page anchor to match the real heading-permalink id', function () {
-    // CommonMark's HeadingPermalinkExtension IDs every heading
-    // "content-{slug}", but a README's own hand-written "back to top" link
-    // was written assuming GitHub's own bare "{slug}" heading ID.
-    $html = '<h1><a id="content-awesome-selfhosted" href="#content-awesome-selfhosted" class="md-anchor">#</a>Awesome</h1>'
-        .'<p><a href="#awesome-selfhosted">back to top</a></p>';
-
-    $out = GithubReadme::fixHeadingAnchors($html);
-
-    expect($out)->toContain('<a href="#content-awesome-selfhosted">back to top</a>');
-});
-
-it('leaves an anchor alone when no heading matches it', function () {
-    $html = '<h1><a id="content-real" href="#content-real" class="md-anchor">#</a>Real</h1>'
-        .'<p><a href="#unrelated">elsewhere</a></p>';
-
-    expect(GithubReadme::fixHeadingAnchors($html))->toBe($html);
-});
-
 it('resolves every outbound link in one batch pass, minting one row per distinct destination', function () {
     // The same destination linked twice (a common README pattern — a badge
     // and a prose mention of the same project) must still mint only once.

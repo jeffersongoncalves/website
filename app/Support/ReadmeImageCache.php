@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Support;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use JeffersonGoncalves\SsrfGuard\SsrfGuard;
-use Throwable;
+use JeffersonGoncalves\ImageCache\ImageCache;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Fetch-and-persist cache for README images hotlinked from GitHub's own
@@ -17,9 +14,13 @@ use Throwable;
  * Contentful Paint of 54 SECONDS on a public-apis/public-apis banner image
  * loaded directly from raw.githubusercontent.com — GitHub's raw-content CDN
  * is unreliable for hotlinked traffic. Proxying through our own cached copy
- * (same `github` disk + fetch/persist shape as OgImageCache) means only the
- * first request after a cache miss pays that cost; every later visitor gets
- * our own fast, reliable copy.
+ * means only the first request after a cache miss pays that cost; every
+ * later visitor gets our own fast, reliable copy.
+ *
+ * The actual fetch/persist/serve mechanics (SSRF-pinned download, redirect
+ * re-validation, image/* gate, TTL-based disk caching) live in
+ * jeffersongoncalves/laravel-image-cache — this class keeps the app-specific
+ * bits: the host allow-list and the route's URL encode/decode.
  *
  * Only ALLOWED_HOSTS are ever fetched — this is reached via a public route
  * taking an arbitrary encoded URL, so the host allow-list is the actual
@@ -39,6 +40,11 @@ class ReadmeImageCache
         'user-images.githubusercontent.com',
         'avatars.githubusercontent.com',
     ];
+
+    private static function cache(): ImageCache
+    {
+        return new ImageCache('github', 'readme-images', self::TTL_SECONDS);
+    }
 
     /** URL-safe base64 — this round-trips through a route segment. */
     public static function encode(string $url): string
@@ -85,7 +91,7 @@ class ReadmeImageCache
 
     public static function path(string $url): string
     {
-        return 'readme-images/'.sha1($url);
+        return self::cache()->path(sha1($url));
     }
 
     /**
@@ -99,73 +105,15 @@ class ReadmeImageCache
             return;
         }
 
-        $disk = Storage::disk('github');
-        $path = self::path($url);
-
-        if ($disk->exists($path)
-            && $disk->lastModified($path) >= now()->subSeconds(self::TTL_SECONDS)->timestamp) {
-            return;
-        }
-
-        $fetched = self::fetch($url);
-
-        if ($fetched !== null) {
-            $disk->put($path, $fetched['body']);
-            $disk->put($path.'.type', $fetched['type']);
-        }
+        self::cache()->warm(sha1($url), $url);
     }
 
     /**
-     * @return array{body: string, type: string}|null
+     * A ready-to-send response for a previously-warmed image, or null when
+     * it hasn't been fetched successfully yet.
      */
-    private static function fetch(string $url): ?array
+    public static function response(string $url): ?Response
     {
-        $resolve = app(SsrfGuard::class)->resolveEntries($url);
-
-        if ($resolve === null) {
-            Log::warning('ReadmeImageCache refused a non-public host', ['url' => $url]);
-
-            return null;
-        }
-
-        try {
-            $response = Http::timeout(8)->withOptions([
-                'curl' => [CURLOPT_RESOLVE => $resolve],
-                'allow_redirects' => [
-                    'max' => 3,
-                    'strict' => true,
-                    'referer' => false,
-                    'protocols' => ['http', 'https'],
-                    'on_redirect' => function ($request, $response, $uri): void {
-                        if (app(SsrfGuard::class)->resolveEntries((string) $uri) === null) {
-                            throw new \RuntimeException('Readme image redirect to non-public host blocked: '.$uri);
-                        }
-                    },
-                ],
-            ])->get($url);
-        } catch (Throwable $e) {
-            Log::warning('ReadmeImageCache fetch threw', ['url' => $url, 'error' => $e->getMessage()]);
-
-            return null;
-        }
-
-        if (! $response->successful()) {
-            Log::warning('ReadmeImageCache fetch failed', ['url' => $url, 'status' => $response->status()]);
-
-            return null;
-        }
-
-        $type = strtolower(trim((string) $response->header('Content-Type')));
-
-        if (! str_starts_with($type, 'image/')) {
-            Log::warning('ReadmeImageCache rejected non-image upstream', ['url' => $url, 'type' => $type]);
-
-            return null;
-        }
-
-        return [
-            'body' => $response->body(),
-            'type' => $type,
-        ];
+        return self::cache()->response(sha1($url));
     }
 }

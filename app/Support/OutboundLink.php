@@ -51,11 +51,14 @@ final class OutboundLink
      * each paying its own cache-read + DB-lookup round trip sequentially.
      * A README with hundreds/thousands of links (a big awesome-list) turned
      * the naive per-link path into a multi-minute render (confirmed: a 504
-     * gateway timeout on awesome-selfhosted/awesome-selfhosted). Only
-     * destinations neither cached nor already in short_url_urls still pay
-     * the real create() cost (plan-limit check, key generation, insert,
-     * lock) — everything else resolves from one Cache::many() plus, for
-     * whatever that misses, one batched DB query.
+     * gateway timeout on awesome-selfhosted/awesome-selfhosted). Delegates
+     * the actual batching (cache + whereIn + create-only-what's-missing) to
+     * jeffersongoncalves/laravel-short-url's own ShortUrl::resolveMany() —
+     * this method only carries the app-specific bits: filtering out
+     * non-external urls up front, and stamping REF on rows resolveMany()
+     * mints so the admin can tell site-generated links apart from
+     * hand-created ones (same tagging to() already does for the single-url
+     * path).
      *
      * @param  list<string>  $urls
      * @return array<string, string> original url => resolved url (a short
@@ -82,66 +85,13 @@ final class OutboundLink
             return $result;
         }
 
-        $cacheKeys = array_combine(
-            $external,
-            array_map(static fn (string $url): string => 'outbound-link:'.sha1($url), $external)
-        );
-
         try {
-            $cached = Cache::many(array_values($cacheKeys));
+            $resolved = ShortUrl::resolveMany($external, ['internal_ref' => self::REF]);
         } catch (Throwable) {
-            $cached = [];
+            return $result + array_combine($external, $external);
         }
 
-        $missing = [];
-
-        foreach ($external as $url) {
-            $key = $cached[$cacheKeys[$url]] ?? null;
-
-            if (is_string($key)) {
-                $result[$url] = url('/'.$key);
-            } else {
-                $missing[] = $url;
-            }
-        }
-
-        if ($missing === []) {
-            return $result;
-        }
-
-        try {
-            $existing = ShortUrlModel::query()
-                ->whereIn('destination_url', $missing)
-                ->pluck('url_key', 'destination_url')
-                ->all();
-        } catch (Throwable) {
-            $existing = [];
-        }
-
-        $toCache = [];
-
-        foreach ($missing as $url) {
-            if (isset($existing[$url]) && is_string($existing[$url])) {
-                $result[$url] = url('/'.$existing[$url]);
-                $toCache[$url] = $existing[$url];
-
-                continue;
-            }
-
-            try {
-                $key = self::keyFor($url, null);
-                $result[$url] = url('/'.$key);
-                $toCache[$url] = $key;
-            } catch (Throwable) {
-                $result[$url] = $url;
-            }
-        }
-
-        foreach ($toCache as $url => $key) {
-            Cache::forever('outbound-link:'.sha1($url), $key);
-        }
-
-        return $result;
+        return $result + $resolved;
     }
 
     /**

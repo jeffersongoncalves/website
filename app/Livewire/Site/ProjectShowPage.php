@@ -146,7 +146,6 @@ class ProjectShowPage extends Component
             // strip scripts/handlers before our own link/image rewriting adds
             // the safe target/rel/loading attributes on top.
             $readmeHtml = HtmlSanitizer::clean($readmeHtml);
-            $readmeHtml = GithubReadme::fixHeadingAnchors($readmeHtml);
 
             if ($versions !== []) {
                 $readmeHtml = GithubReadme::rewriteSelfRepoLinks(

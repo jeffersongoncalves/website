@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Site;
 
 use App\Models\Project;
 use App\Support\OgImageCache;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -31,22 +30,17 @@ class OgImageController
 
         OgImageCache::warm($project);
 
-        $disk = Storage::disk('github');
-        $path = OgImageCache::path($slug);
+        $response = OgImageCache::response($slug);
 
-        if (! $disk->exists($path)) {
+        if ($response === null) {
             // Never fetched successfully (e.g. GitHub rate-limiting on the
             // very first visit) — nothing to serve from disk yet.
             return $this->fallback();
         }
 
-        $typePath = $path.'.type';
-        $type = $disk->exists($typePath) ? $disk->get($typePath) : 'image/png';
+        $response->headers->set('Cache-Control', 'public, max-age='.OgImageCache::TTL_SECONDS);
 
-        return response($disk->get($path), 200)
-            ->header('Content-Type', $type)
-            ->header('X-Content-Type-Options', 'nosniff')
-            ->header('Cache-Control', 'public, max-age='.OgImageCache::TTL_SECONDS);
+        return $response;
     }
 
     /**

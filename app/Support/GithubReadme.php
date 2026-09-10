@@ -79,6 +79,41 @@ class GithubReadme
         return Readme::wrapTables($html);
     }
 
+    /**
+     * Fix same-page anchors broken by our own heading-permalink scheme.
+     * CommonMark's HeadingPermalinkExtension (config/markdown.php,
+     * headingPermalinks: true) IDs every heading "content-{slug}" by
+     * default — but a README's own hand-written internal links (a TOC,
+     * "back to top" links after every section) were written assuming
+     * GitHub's own bare "{slug}" heading IDs, since that's what renders
+     * correctly on github.com itself. Rewrites `href="#{slug}"` to
+     * `href="#content-{slug}"` only when a heading with that exact
+     * permalink ID actually exists, so an unrelated `#slug` (a real
+     * external fragment, or one that just doesn't match any heading) is
+     * left alone.
+     */
+    public static function fixHeadingAnchors(string $html): string
+    {
+        // The permalink anchor's `id` sits on the inner <a> the extension
+        // injects (<h1><a id="content-slug" href="#content-slug">#</a>
+        // Heading</h1>), not on the heading tag itself.
+        if (preg_match_all('~\bid="(content-[^"]+)"~i', $html, $headings) === false) {
+            return $html;
+        }
+
+        $realIds = array_flip($headings[1]);
+
+        return preg_replace_callback(
+            '~href="#([^"]+)"~i',
+            function (array $m) use ($realIds): string {
+                $target = 'content-'.$m[1];
+
+                return isset($realIds[$target]) ? 'href="#'.$target.'"' : $m[0];
+            },
+            $html
+        ) ?? $html;
+    }
+
     public static function rewriteRelativeLinks(string $html, string $repo, ?string $ref = null): string
     {
         return Readme::rewriteRelativeLinks($html, $repo, $ref);

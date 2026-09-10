@@ -27,7 +27,7 @@ class McpGuidePage extends Component
 
         $bodyHtml = HtmlSanitizer::clean(Markdown::render($this->body($locale, $endpoint), headingPermalinks: true));
 
-        return view('livewire.site.mcp-guide-page', ['bodyHtml' => $bodyHtml])
+        return view('livewire.site.mcp-guide-page', ['bodyHtml' => $bodyHtml, 'endpoint' => $endpoint])
             ->layout('components.site.layouts.app', [
                 'title' => __('site.mcp_guide.title'),
                 'description' => __('site.seo.mcp_guide'),
@@ -46,25 +46,7 @@ class McpGuidePage extends Component
                 {$endpoint}
                 ```
 
-                Transporte HTTP (Streamable HTTP), sin autenticación — el contenido ya es público. Limitado a 60 solicitudes/min por IP.
-
-                ## Agregarlo en Claude Code
-
-                ```bash
-                claude mcp add --transport http portfolio {$endpoint}
-                ```
-
-                ## Agregarlo en un cliente MCP genérico
-
-                ```json
-                {
-                  "mcpServers": {
-                    "portfolio": {
-                      "url": "{$endpoint}"
-                    }
-                  }
-                }
-                ```
+                Transporte HTTP (Streamable HTTP), sin autenticación — el contenido ya es público. Limitado a 60 solicitudes/min por IP. Más abajo hay configuración lista para copiar según tu asistente de IA.
 
                 ## Probarlo localmente con el MCP Inspector
 
@@ -91,25 +73,7 @@ class McpGuidePage extends Component
                 {$endpoint}
                 ```
 
-                HTTP transport (Streamable HTTP), no auth — the content is already public. Throttled to 60 requests/min per IP.
-
-                ## Add it in Claude Code
-
-                ```bash
-                claude mcp add --transport http portfolio {$endpoint}
-                ```
-
-                ## Add it in a generic MCP client
-
-                ```json
-                {
-                  "mcpServers": {
-                    "portfolio": {
-                      "url": "{$endpoint}"
-                    }
-                  }
-                }
-                ```
+                HTTP transport (Streamable HTTP), no auth — the content is already public. Throttled to 60 requests/min per IP. Ready-to-copy config for your AI assistant is further down this page.
 
                 ## Test it locally with the MCP Inspector
 
@@ -136,25 +100,7 @@ class McpGuidePage extends Component
                 {$endpoint}
                 ```
 
-                Transporte HTTP (Streamable HTTP), sem autenticação — o conteúdo já é público. Limitado a 60 requisições/min por IP.
-
-                ## Adicionar no Claude Code
-
-                ```bash
-                claude mcp add --transport http portfolio {$endpoint}
-                ```
-
-                ## Adicionar em um cliente MCP genérico
-
-                ```json
-                {
-                  "mcpServers": {
-                    "portfolio": {
-                      "url": "{$endpoint}"
-                    }
-                  }
-                }
-                ```
+                Transporte HTTP (Streamable HTTP), sem autenticação — o conteúdo já é público. Limitado a 60 requisições/min por IP. Mais abaixo tem configuração pronta pra copiar de acordo com seu assistente de IA.
 
                 ## Testar localmente com o MCP Inspector
 

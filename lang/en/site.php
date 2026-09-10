@@ -24,6 +24,11 @@ return [
     'mcp_guide' => [
         'title' => 'MCP Server',
         'sub' => 'Query this portfolio from an AI assistant instead of scraping it — a public, read-only MCP server over the project catalogue.',
+        'setup_title' => 'Quick setup',
+        'setup_note' => 'Pick your AI assistant and paste the config below.',
+        'desktop_step_1' => 'Open Settings → Connectors → Add custom connector.',
+        'desktop_step_2' => 'Paste the endpoint URL below and confirm.',
+        'desktop_step_3' => 'The server is public — no token or login needed to authorize the connection.',
     ],
 
     'errors' => [

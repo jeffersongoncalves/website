@@ -24,6 +24,11 @@ return [
     'mcp_guide' => [
         'title' => 'Servidor MCP',
         'sub' => 'Consulte este portfólio a partir de um assistente de IA em vez de raspar o site — um servidor MCP público e somente leitura sobre o catálogo de projetos.',
+        'setup_title' => 'Configuração rápida',
+        'setup_note' => 'Escolha seu assistente de IA e cole a configuração abaixo.',
+        'desktop_step_1' => 'Abra Configurações → Conectores → Adicionar conector personalizado.',
+        'desktop_step_2' => 'Cole a URL do endpoint abaixo e confirme.',
+        'desktop_step_3' => 'O servidor é público — não é preciso token nem login para autorizar a conexão.',
     ],
 
     'errors' => [

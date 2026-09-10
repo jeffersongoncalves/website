@@ -242,8 +242,20 @@ return [
                 'balanceCooldown' => 3,
             ],
 
+            // 4, not 2: the shared `github-api` RateLimited(60/min) middleware
+            // is what actually caps GitHub API calls — process count doesn't
+            // touch that budget, it only decides how many jobs get a chance
+            // to compete for it concurrently. With 9 job classes now sharing
+            // that one limiter (ImportGithubRepoJob, ImportStarredRepoJob,
+            // PersistSiteStatsJob, ImportNpmPackageJob, SyncStarredReposJob,
+            // SyncProjectMetricsJob, PurgeMisattributedPackageLinksJob,
+            // WarmReadmeCacheJob, WarmOgImageJob), 2 processes starved jobs
+            // out entirely: confirmed in production, WarmReadmeCacheJob for
+            // project 83 hit 78 RateLimited releases and died via
+            // MaxAttemptsExceededException at its retryUntil() 2h deadline
+            // without ever running handle() once (2026-09-09 21:23:27 UTC).
             'supervisor-github' => [
-                'maxProcesses' => 2,
+                'maxProcesses' => 4,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],

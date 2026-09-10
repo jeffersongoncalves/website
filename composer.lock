@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b05d27a5c90c437e5071cd3912e709ad",
+    "content-hash": "df1ed5844e232a65073e472563a7763a",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -3679,6 +3679,81 @@
             "time": "2026-06-21T20:09:33+00:00"
         },
         {
+            "name": "jeffersongoncalves/laravel-image-cache",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-image-cache.git",
+                "reference": "3caf60d1a7eb1b287ba1b75846b47b127ef0fe0e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-image-cache/zipball/3caf60d1a7eb1b287ba1b75846b47b127ef0fe0e",
+                "reference": "3caf60d1a7eb1b287ba1b75846b47b127ef0fe0e",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "^12.0|^13.0",
+                "illuminate/support": "^12.0|^13.0",
+                "jeffersongoncalves/laravel-ssrf-guard": "^1.1",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.16",
+                "symfony/http-foundation": "^7.0|^8.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.24",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\ImageCache\\ImageCacheServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\ImageCache\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "SSRF-safe remote image fetch-and-cache for Laravel: pinned redirect-safe download, image content-type validation, and TTL-based disk caching",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-image-cache",
+            "keywords": [
+                "cache",
+                "http",
+                "image",
+                "image-cache",
+                "laravel",
+                "ssrf"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-image-cache/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-image-cache/tree/1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-09-10T02:34:50+00:00"
+        },
+        {
             "name": "jeffersongoncalves/laravel-locale-cookie",
             "version": "v1.3.0",
             "source": {
@@ -3748,16 +3823,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-markdown",
-            "version": "v2.0.0",
+            "version": "v2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-markdown.git",
-                "reference": "4a927bb284311807fac1033748bb54b3bcbb3e9c"
+                "reference": "c59a050f38060c867ccfb5ca59c710f7217a2e58"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-markdown/zipball/4a927bb284311807fac1033748bb54b3bcbb3e9c",
-                "reference": "4a927bb284311807fac1033748bb54b3bcbb3e9c",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-markdown/zipball/c59a050f38060c867ccfb5ca59c710f7217a2e58",
+                "reference": "c59a050f38060c867ccfb5ca59c710f7217a2e58",
                 "shasum": ""
             },
             "require": {
@@ -3771,8 +3846,8 @@
                 "larastan/larastan": "^3.0",
                 "laravel/pint": "^1.0",
                 "orchestra/testbench": "^9.0|^10.0|^11.0",
-                "pestphp/pest": "^3.7.4",
-                "pestphp/pest-plugin-laravel": "^3.0"
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
             },
             "type": "library",
             "extra": {
@@ -3807,15 +3882,19 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-markdown/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-markdown/tree/v2.0.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-markdown/tree/v2.1.0"
             },
             "funding": [
+                {
+                    "url": "https://buymeacoffee.com/jeffersongoncalves",
+                    "type": "custom"
+                },
                 {
                     "url": "https://github.com/jeffersongoncalves",
                     "type": "github"
                 }
             ],
-            "time": "2026-06-21T20:09:37+00:00"
+            "time": "2026-09-10T02:21:11+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-npm-readme",
@@ -4178,16 +4257,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-short-url",
-            "version": "v4.3.1",
+            "version": "4.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-short-url.git",
-                "reference": "61fd2c681682cc19504b5a8951c45478d2c62bef"
+                "reference": "060bf9181a0b1306985490e61dcf44ed2d03b8b3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-short-url/zipball/61fd2c681682cc19504b5a8951c45478d2c62bef",
-                "reference": "61fd2c681682cc19504b5a8951c45478d2c62bef",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-short-url/zipball/060bf9181a0b1306985490e61dcf44ed2d03b8b3",
+                "reference": "060bf9181a0b1306985490e61dcf44ed2d03b8b3",
                 "shasum": ""
             },
             "require": {
@@ -4243,15 +4322,19 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-short-url/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-short-url/tree/v4.3.1"
+                "source": "https://github.com/jeffersongoncalves/laravel-short-url/tree/4.4.1"
             },
             "funding": [
+                {
+                    "url": "https://buymeacoffee.com/jeffersongoncalves",
+                    "type": "custom"
+                },
                 {
                     "url": "https://github.com/jeffersongoncalves",
                     "type": "github"
                 }
             ],
-            "time": "2026-09-04T03:23:51+00:00"
+            "time": "2026-09-10T02:53:05+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-ssrf-guard",
@@ -6031,16 +6114,16 @@
         },
         {
             "name": "livewire/livewire",
-            "version": "v4.4.3",
+            "version": "v4.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/livewire.git",
-                "reference": "92f1427022714b34024459167aa6a85d4fb4af44"
+                "reference": "00bf1b9959807d7cbcf38fc088515a7261cb6fa8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/livewire/zipball/92f1427022714b34024459167aa6a85d4fb4af44",
-                "reference": "92f1427022714b34024459167aa6a85d4fb4af44",
+                "url": "https://api.github.com/repos/livewire/livewire/zipball/00bf1b9959807d7cbcf38fc088515a7261cb6fa8",
+                "reference": "00bf1b9959807d7cbcf38fc088515a7261cb6fa8",
                 "shasum": ""
             },
             "require": {
@@ -6095,7 +6178,7 @@
             "description": "A front-end framework for Laravel.",
             "support": {
                 "issues": "https://github.com/livewire/livewire/issues",
-                "source": "https://github.com/livewire/livewire/tree/v4.4.3"
+                "source": "https://github.com/livewire/livewire/tree/v4.4.4"
             },
             "funding": [
                 {
@@ -6103,7 +6186,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-31T15:40:58+00:00"
+            "time": "2026-09-07T16:02:43+00:00"
         },
         {
             "name": "maxmind-db/reader",

@@ -9,8 +9,10 @@ use App\Enums\ProjectStatus;
 use App\Mcp\Resources\SiteMapResource;
 use App\Mcp\Servers\PortfolioServer;
 use App\Mcp\Tools\GetPageTool;
+use App\Mcp\Tools\GetSiteStatsTool;
 use App\Mcp\Tools\SearchProjectsTool;
 use App\Models\Project;
+use App\Support\SiteStats;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 
@@ -94,6 +96,25 @@ it('includes license, downloads, package type, language and versions in get_page
 it('errors on an unknown slug for get_page', function () {
     PortfolioServer::tool(GetPageTool::class, ['slug' => 'does-not-exist'])
         ->assertHasErrors();
+});
+
+it('returns aggregate stats via get_site_stats', function () {
+    Project::query()->create([
+        'name' => 'filament-gtag',
+        'category' => ProjectCategory::FilamentPlugin,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/jeffersongoncalves/filament-gtag',
+        'published_at' => now(),
+        'stars' => 42,
+    ]);
+
+    SiteStats::refreshProjectDerived();
+
+    PortfolioServer::tool(GetSiteStatsTool::class)
+        ->assertOk()
+        ->assertSee('## Packages by category')
+        ->assertSee('Filament plugins: 1')
+        ->assertSee('Total stars: 42');
 });
 
 it('serves the llms.txt body as the site map resource', function () {

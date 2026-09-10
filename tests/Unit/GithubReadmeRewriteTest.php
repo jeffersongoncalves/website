@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 use App\Support\GithubReadme;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use JeffersonGoncalves\LaravelShortUrl\Models\ShortUrl;
+
+uses(RefreshDatabase::class);
 
 it('maps a real branch back to its user-facing version via overrides', function () {
     expect(GithubReadme::branchToVersion('main', ['v3', 'v4', 'v5'], ['1.x' => 'main']))->toBe('v3');
@@ -313,4 +317,19 @@ it('leaves an anchor alone when no heading matches it', function () {
         .'<p><a href="#unrelated">elsewhere</a></p>';
 
     expect(GithubReadme::fixHeadingAnchors($html))->toBe($html);
+});
+
+it('resolves every outbound link in one batch pass, minting one row per distinct destination', function () {
+    // The same destination linked twice (a common README pattern — a badge
+    // and a prose mention of the same project) must still mint only once.
+    $html = '<a href="https://github.com/jeffersongoncalves/filakitv5">Fila Kit</a> '
+        .'<a href="https://github.com/jeffersongoncalves/filament-ban">Filament Ban</a> '
+        .'<a href="https://github.com/jeffersongoncalves/filakitv5">again</a> '
+        .'<a href="/local">local</a>';
+
+    $out = GithubReadme::rewriteOutboundLinks($html);
+
+    expect(ShortUrl::query()->count())->toBe(2)
+        ->and($out)->toContain('href="/local"') // untouched — not off-site
+        ->and($out)->not->toContain('github.com'); // both github links rewritten to short urls
 });

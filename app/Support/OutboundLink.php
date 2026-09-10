@@ -47,6 +47,104 @@ final class OutboundLink
     }
 
     /**
+     * Batch counterpart to to() — resolves every url in one pass instead of
+     * each paying its own cache-read + DB-lookup round trip sequentially.
+     * A README with hundreds/thousands of links (a big awesome-list) turned
+     * the naive per-link path into a multi-minute render (confirmed: a 504
+     * gateway timeout on awesome-selfhosted/awesome-selfhosted). Only
+     * destinations neither cached nor already in short_url_urls still pay
+     * the real create() cost (plan-limit check, key generation, insert,
+     * lock) — everything else resolves from one Cache::many() plus, for
+     * whatever that misses, one batched DB query.
+     *
+     * @param  list<string>  $urls
+     * @return array<string, string> original url => resolved url (a short
+     *                               url for an external destination, or
+     *                               the original url unchanged otherwise —
+     *                               every input url is present in the
+     *                               result, so callers never need a
+     *                               separate null-check per lookup)
+     */
+    public static function resolveMany(array $urls): array
+    {
+        $result = [];
+        $external = [];
+
+        foreach (array_unique($urls) as $url) {
+            if (self::isExternal($url)) {
+                $external[] = $url;
+            } else {
+                $result[$url] = $url;
+            }
+        }
+
+        if ($external === []) {
+            return $result;
+        }
+
+        $cacheKeys = array_combine(
+            $external,
+            array_map(static fn (string $url): string => 'outbound-link:'.sha1($url), $external)
+        );
+
+        try {
+            $cached = Cache::many(array_values($cacheKeys));
+        } catch (Throwable) {
+            $cached = [];
+        }
+
+        $missing = [];
+
+        foreach ($external as $url) {
+            $key = $cached[$cacheKeys[$url]] ?? null;
+
+            if (is_string($key)) {
+                $result[$url] = url('/'.$key);
+            } else {
+                $missing[] = $url;
+            }
+        }
+
+        if ($missing === []) {
+            return $result;
+        }
+
+        try {
+            $existing = ShortUrlModel::query()
+                ->whereIn('destination_url', $missing)
+                ->pluck('url_key', 'destination_url')
+                ->all();
+        } catch (Throwable) {
+            $existing = [];
+        }
+
+        $toCache = [];
+
+        foreach ($missing as $url) {
+            if (isset($existing[$url]) && is_string($existing[$url])) {
+                $result[$url] = url('/'.$existing[$url]);
+                $toCache[$url] = $existing[$url];
+
+                continue;
+            }
+
+            try {
+                $key = self::keyFor($url, null);
+                $result[$url] = url('/'.$key);
+                $toCache[$url] = $key;
+            } catch (Throwable) {
+                $result[$url] = $url;
+            }
+        }
+
+        foreach ($toCache as $url => $key) {
+            Cache::forever('outbound-link:'.sha1($url), $key);
+        }
+
+        return $result;
+    }
+
+    /**
      * Off-site means an http(s) URL whose host is not this app's own — a
      * relative path, a mailto:, or a link back to the site is left alone.
      */

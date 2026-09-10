@@ -82,3 +82,48 @@ it('falls back to the raw destination when the short URL cannot be minted', func
 
     expect(OutboundLink::to('https://example.com/docs'))->toBe('https://example.com/docs');
 });
+
+it('resolves a batch of urls in one pass, deduping repeats and mapping every input', function () {
+    $urls = [
+        'https://github.com/jeffersongoncalves/filakitv5',
+        'https://github.com/jeffersongoncalves/filament-ban',
+        'https://github.com/jeffersongoncalves/filakitv5', // repeated
+        config('app.url').'/projects', // own host — passes through unresolved
+        '/relative', // not off-site at all
+    ];
+
+    $resolved = OutboundLink::resolveMany($urls);
+
+    expect($resolved)->toHaveCount(4) // dedup collapses the repeat
+        ->and($resolved['https://github.com/jeffersongoncalves/filakitv5'])
+        ->toBe(OutboundLink::to('https://github.com/jeffersongoncalves/filakitv5'))
+        ->and($resolved[config('app.url').'/projects'])->toBe(config('app.url').'/projects')
+        ->and($resolved['/relative'])->toBe('/relative')
+        ->and(ShortUrl::query()->count())->toBe(2); // filakitv5 + filament-ban only
+});
+
+it('reuses cached and already-persisted short urls instead of re-minting them', function () {
+    $destination = 'https://github.com/jeffersongoncalves/filament-logo';
+    $first = OutboundLink::to($destination);
+
+    // Cold cache — same shape as the single-url path's own reuse test —
+    // must still resolve from the DB row, not mint a second one.
+    Cache::flush();
+
+    expect(OutboundLink::resolveMany([$destination]))->toBe([$destination => $first])
+        ->and(ShortUrl::query()->count())->toBe(1);
+});
+
+it('falls back to the raw destination per-url when minting fails, without losing the rest', function () {
+    Schema::drop(ShortUrl::make()->getTable());
+
+    $resolved = OutboundLink::resolveMany([
+        'https://example.com/a',
+        'https://example.com/b',
+    ]);
+
+    expect($resolved)->toBe([
+        'https://example.com/a' => 'https://example.com/a',
+        'https://example.com/b' => 'https://example.com/b',
+    ]);
+});

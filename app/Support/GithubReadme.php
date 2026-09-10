@@ -127,9 +127,16 @@ class GithubReadme
     /**
      * Route every absolute `<a href="...">` in rendered README HTML through
      * OutboundLink, so README link clicks get counted the same as every other
-     * outbound link on the site. OutboundLink::to() no-ops on same-host URLs,
-     * so the local `projects.show` links left by rewriteSelfRepoLinks() (and
-     * any other self-host anchor) pass through untouched.
+     * outbound link on the site. OutboundLink::resolveMany() no-ops on
+     * same-host URLs, so the local `projects.show` links left by
+     * rewriteSelfRepoLinks() (and any other self-host anchor) pass through
+     * untouched.
+     *
+     * Every href is extracted up front and resolved in ONE batch pass
+     * instead of each `<a>` triggering its own cache+DB round trip during
+     * the regex replace — a big awesome-list can carry thousands of links,
+     * and doing that sequentially once turned into a multi-minute render
+     * (confirmed: a 504 on awesome-selfhosted/awesome-selfhosted).
      *
      * Must run AFTER markExternalLinks() — that method tags a link as
      * external by comparing its href host, so it needs the real destination
@@ -137,11 +144,22 @@ class GithubReadme
      */
     public static function rewriteOutboundLinks(string $html): string
     {
+        if (preg_match_all('~<a[^>]*?\shref="(https?://[^"]+)"~i', $html, $hrefs) === false || $hrefs[1] === []) {
+            return $html;
+        }
+
+        $urls = array_map(
+            static fn (string $href): string => html_entity_decode($href, ENT_QUOTES | ENT_HTML5),
+            $hrefs[1]
+        );
+
+        $resolved = OutboundLink::resolveMany($urls);
+
         return preg_replace_callback(
             '~<a([^>]*?)\shref="(https?://[^"]+)"([^>]*)>~i',
-            function (array $m): string {
+            function (array $m) use ($resolved): string {
                 $url = html_entity_decode($m[2], ENT_QUOTES | ENT_HTML5);
-                $short = OutboundLink::to($url) ?? $url;
+                $short = $resolved[$url] ?? $url;
 
                 return '<a'.$m[1].' href="'.htmlspecialchars($short, ENT_QUOTES | ENT_HTML5).'"'.$m[3].'>';
             },

@@ -47,6 +47,7 @@ class ImportGithubRepoJob implements ShouldQueue
     public function __construct(
         public string $githubUrl,
         public string $fallbackCategory = 'awesome_list',
+        public bool $isMaintainer = false,
     ) {
         $this->onQueue('github');
     }
@@ -109,6 +110,18 @@ class ImportGithubRepoJob implements ShouldQueue
         $existing = ProjectMatcher::findExisting('github', $attributes);
         if ($existing !== null) {
             ProjectMatcher::fillMissing($existing, $attributes);
+
+            // fillMissing() only ever fills an empty field, so it can't fix an
+            // already-persisted `false` — this is the one field where a
+            // plugins.json reclassification (moved into filament.collaborator)
+            // must win over whatever the row currently has. Never the other
+            // direction: dropping OUT of collaborator doesn't demote a flag
+            // that may have been set for an unrelated reason (e.g. a manual
+            // admin toggle).
+            if ($this->isMaintainer && ! $existing->is_maintainer) {
+                $existing->is_maintainer = true;
+            }
+
             $existing->save();
 
             return;
@@ -116,6 +129,7 @@ class ImportGithubRepoJob implements ShouldQueue
 
         $attributes['status'] = 'published';
         $attributes['is_daily_driver'] = false;
+        $attributes['is_maintainer'] = $this->isMaintainer;
 
         try {
             Project::create($attributes);

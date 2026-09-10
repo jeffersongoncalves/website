@@ -58,21 +58,21 @@ class SyncPluginsJsonJob extends DebouncedJob
             return;
         }
 
-        foreach ($this->flatten($data) as [$slug, $category]) {
-            ImportGithubRepoJob::dispatch("https://github.com/{$slug}", $category);
+        foreach ($this->flatten($data) as [$slug, $category, $isMaintainer]) {
+            ImportGithubRepoJob::dispatch("https://github.com/{$slug}", $category, $isMaintainer);
         }
     }
 
     /**
      * Walk every category in plugins.json (including the nested
      * startkit.legacy.{v3,v4,...} and filament.{plugins,collaborator} groups)
-     * and yield [owner/repo, fallback category] pairs. `repo` overrides
-     * `package` when a listing's Composer vendor differs from its GitHub
-     * owner (e.g. the CakePHP packages, published under
+     * and yield [owner/repo, fallback category, is_maintainer] tuples. `repo`
+     * overrides `package` when a listing's Composer vendor differs from its
+     * GitHub owner (e.g. the CakePHP packages, published under
      * jeffersonsimaogoncalves but hosted under jeffersongoncalves).
      *
      * @param  array<string, mixed>  $data
-     * @return list<array{0: string, 1: string}>
+     * @return list<array{0: string, 1: string, 2: bool}>
      */
     private function flatten(array $data): array
     {
@@ -102,9 +102,17 @@ class SyncPluginsJsonJob extends DebouncedJob
     }
 
     /**
-     * @return list<array{0: string, 1: string}>
+     * `$isMaintainer` starts false and flips true the moment recursion steps
+     * into a node keyed "collaborator" (currently only filament.collaborator)
+     * — every entry under it is a repo Jefferson actively maintains but
+     * doesn't own, as opposed to the sibling "plugins" group he owns
+     * outright. Generic on the key name rather than special-cased to
+     * "filament" so a future `collaborator` group anywhere else in
+     * plugins.json is picked up the same way without a code change here.
+     *
+     * @return list<array{0: string, 1: string, 2: bool}>
      */
-    private function collectEntries(mixed $node, string $fallback): array
+    private function collectEntries(mixed $node, string $fallback, bool $isMaintainer = false): array
     {
         if (! is_array($node)) {
             return [];
@@ -114,13 +122,14 @@ class SyncPluginsJsonJob extends DebouncedJob
         if (isset($node['package']) && is_string($node['package'])) {
             $slug = is_string($node['repo'] ?? null) ? $node['repo'] : $node['package'];
 
-            return [[$slug, $fallback]];
+            return [[$slug, $fallback, $isMaintainer]];
         }
 
         // A list of entries, or a nested group (legacy.v3/v4, plugins/collaborator, …).
         $out = [];
-        foreach ($node as $child) {
-            $out = [...$out, ...$this->collectEntries($child, $fallback)];
+        foreach ($node as $key => $child) {
+            $childIsMaintainer = $key === 'collaborator' ? true : $isMaintainer;
+            $out = [...$out, ...$this->collectEntries($child, $fallback, $childIsMaintainer)];
         }
 
         return $out;

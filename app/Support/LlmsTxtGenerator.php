@@ -51,6 +51,14 @@ final class LlmsTxtGenerator
         }
 
         $lines[] = '';
+        $lines[] = '## Collaborator Projects';
+        $lines[] = '';
+        $lines[] = 'Repos Jefferson actively maintains but doesn\'t own.';
+        foreach (Project::query()->published()->collaborated()->orderByDesc('stars')->orderBy('name')->get() as $project) {
+            $lines[] = self::projectLine($project);
+        }
+
+        $lines[] = '';
         $lines[] = '## Articles';
         foreach (Project::query()->published()->byCategory(ProjectCategory::Article)->orderByDesc('published_at')->get() as $article) {
             $lines[] = self::projectLine($article);

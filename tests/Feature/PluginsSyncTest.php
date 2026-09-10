@@ -49,6 +49,9 @@ it('fans out an ImportGithubRepoJob per plugins.json entry, following repo overr
                 'plugins' => [
                     ['title' => 'Filament Ban', 'package' => 'jeffersongoncalves/filament-ban'],
                 ],
+                'collaborator' => [
+                    ['title' => 'Filament Activity Log', 'package' => 'rmsramos/activitylog'],
+                ],
             ],
             'cakephp' => [
                 ['title' => 'CakePHP Analyzer', 'package' => 'jeffersonsimaogoncalves/cakephp-analyzer', 'repo' => 'jeffersongoncalves/cakephp-analyzer'],
@@ -59,8 +62,10 @@ it('fans out an ImportGithubRepoJob per plugins.json entry, following repo overr
 
     (new SyncPluginsJsonJob)->handle();
 
-    Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/jeffersongoncalves/filakitv5' && $job->fallbackCategory === 'starter_kit');
-    Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/jeffersongoncalves/filament-ban' && $job->fallbackCategory === 'filament_plugin');
+    Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/jeffersongoncalves/filakitv5' && $job->fallbackCategory === 'starter_kit' && $job->isMaintainer === false);
+    Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/jeffersongoncalves/filament-ban' && $job->fallbackCategory === 'filament_plugin' && $job->isMaintainer === false);
     // repo overrides package for the Composer-vendor-mismatch case.
-    Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/jeffersongoncalves/cakephp-analyzer' && $job->fallbackCategory === 'cakephp_package');
+    Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/jeffersongoncalves/cakephp-analyzer' && $job->fallbackCategory === 'cakephp_package' && $job->isMaintainer === false);
+    // filament.collaborator entries are repos Jefferson maintains but doesn't own.
+    Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/rmsramos/activitylog' && $job->isMaintainer === true);
 });

@@ -80,12 +80,13 @@ it('imports a new github repo into a published project', function () {
         'raw.githubusercontent.com/*' => Http::response('', 404),
     ]);
 
-    (new ImportGithubRepoJob('https://github.com/acme/widget', 'awesome_list'))->handle();
+    (new ImportGithubRepoJob('https://github.com/acme/widget', 'awesome_list', isMaintainer: true))->handle();
 
     $row = Project::query()->where('github_url', 'https://github.com/acme/widget')->first();
     expect($row)->not->toBeNull()
         ->and($row->status)->toBe(ProjectStatus::Published)
-        ->and($row->slug)->toBe('acme-widget');
+        ->and($row->slug)->toBe('acme-widget')
+        ->and($row->is_maintainer)->toBeTrue();
 });
 
 it('skips an npm import when the package is already cadastrado', function () {

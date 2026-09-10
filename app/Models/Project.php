@@ -395,6 +395,33 @@ class Project extends Model
     }
 
     /**
+     * Projects Jefferson actively maintains but doesn't own — `is_maintainer`
+     * true on a repo whose `github_owner` isn't his (the plugins.json
+     * `filament.collaborator` group, e.g. rmsramos/activitylog,
+     * joaopaulolndev/filament-*). Distinct from authored(): a repo can be
+     * both (rare — is_maintainer manually set true on his own repo means
+     * nothing extra) but the interesting set for a "not mine, but I help
+     * maintain it" listing is this one, authored() excluded.
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
+    public function scopeCollaborated(Builder $query): Builder
+    {
+        $username = config('services.github.username');
+        $normalized = is_string($username) && $username !== '' ? strtolower($username) : null;
+
+        return $query->where('is_maintainer', true)
+            ->where(function (Builder $q) use ($normalized): void {
+                $q->whereNull('github_owner');
+
+                if ($normalized !== null) {
+                    $q->orWhere('github_owner', '!=', $normalized);
+                }
+            });
+    }
+
+    /**
      * Third-party repos imported from the GitHub stars feed (starred_at set).
      *
      * @param  Builder<Project>  $query

@@ -4,16 +4,8 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\WithoutOverlapping;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Throwable;
 
 /**
  * Re-scans jeffersongoncalves/jeffersongoncalves's plugins.json (the catalog
@@ -26,18 +18,12 @@ use Throwable;
  * for every entry on every run is the simplest correct way to "find what's
  * new" — only the actually-new rows do any real work.
  *
- * ShouldBeUniqueUntilProcessing + WithoutOverlapping so a source push that
- * fires the webhook twice in quick succession collapses to one scan.
+ * See DebouncedJob for how the debounce itself works (a source push firing
+ * the webhook twice in quick succession collapses to one scan).
  */
-class SyncPluginsJsonJob implements ShouldBeUniqueUntilProcessing, ShouldQueue
+class SyncPluginsJsonJob extends DebouncedJob
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    public int $tries = 3;
-
-    public int $backoff = 30;
-
-    public int $uniqueFor = 120;
+    protected int $expireAfter = 180;
 
     public function __construct()
     {
@@ -47,14 +33,6 @@ class SyncPluginsJsonJob implements ShouldBeUniqueUntilProcessing, ShouldQueue
     public function uniqueId(): string
     {
         return 'plugins-json:sync';
-    }
-
-    /**
-     * @return array<int, object>
-     */
-    public function middleware(): array
-    {
-        return [(new WithoutOverlapping('plugins-json:sync'))->dontRelease()->expireAfter(180)];
     }
 
     public function handle(): void
@@ -146,12 +124,5 @@ class SyncPluginsJsonJob implements ShouldBeUniqueUntilProcessing, ShouldQueue
         }
 
         return $out;
-    }
-
-    public function failed(?Throwable $e): void
-    {
-        Log::error('SyncPluginsJsonJob failed', [
-            'error' => $e?->getMessage(),
-        ]);
     }
 }

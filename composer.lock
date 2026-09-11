@@ -4263,16 +4263,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-short-url",
-            "version": "4.4.2",
+            "version": "4.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-short-url.git",
-                "reference": "9dc870fcce3a53812b2245b68a864e5ac4f612d3"
+                "reference": "a0ded166f5d8fc415f59f889a507db27263a0bd7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-short-url/zipball/9dc870fcce3a53812b2245b68a864e5ac4f612d3",
-                "reference": "9dc870fcce3a53812b2245b68a864e5ac4f612d3",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-short-url/zipball/a0ded166f5d8fc415f59f889a507db27263a0bd7",
+                "reference": "a0ded166f5d8fc415f59f889a507db27263a0bd7",
                 "shasum": ""
             },
             "require": {
@@ -4328,7 +4328,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-short-url/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-short-url/tree/4.4.2"
+                "source": "https://github.com/jeffersongoncalves/laravel-short-url/tree/4.4.3"
             },
             "funding": [
                 {
@@ -4340,7 +4340,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-10T23:53:19+00:00"
+            "time": "2026-09-11T00:34:32+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-ssrf-guard",

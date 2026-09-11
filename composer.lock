@@ -2879,16 +2879,16 @@
         },
         {
             "name": "jeffersongoncalves/filament-page-visits",
-            "version": "3.0.1",
+            "version": "3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-page-visits.git",
-                "reference": "801455b583ddb57fd568fcf9d1bc655d90303259"
+                "reference": "ba94ece8fc8c16a24327690b4a3c7fba2472de4e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-page-visits/zipball/801455b583ddb57fd568fcf9d1bc655d90303259",
-                "reference": "801455b583ddb57fd568fcf9d1bc655d90303259",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-page-visits/zipball/ba94ece8fc8c16a24327690b4a3c7fba2472de4e",
+                "reference": "ba94ece8fc8c16a24327690b4a3c7fba2472de4e",
                 "shasum": ""
             },
             "require": {
@@ -2940,7 +2940,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-page-visits/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-page-visits/tree/3.0.1"
+                "source": "https://github.com/jeffersongoncalves/filament-page-visits/tree/3.0.2"
             },
             "funding": [
                 {
@@ -2952,7 +2952,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-11T20:38:56+00:00"
+            "time": "2026-09-11T20:51:10+00:00"
         },
         {
             "name": "jeffersongoncalves/filament-plugin-core",
@@ -3163,16 +3163,16 @@
         },
         {
             "name": "jeffersongoncalves/filament-short-url",
-            "version": "3.5.3",
+            "version": "3.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-short-url.git",
-                "reference": "99a49be4fafd8a472a3453f0e8c3248d401c4880"
+                "reference": "e5fe548a2886ce1b3dcd5611b61ba34c58df3ec5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-short-url/zipball/99a49be4fafd8a472a3453f0e8c3248d401c4880",
-                "reference": "99a49be4fafd8a472a3453f0e8c3248d401c4880",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-short-url/zipball/e5fe548a2886ce1b3dcd5611b61ba34c58df3ec5",
+                "reference": "e5fe548a2886ce1b3dcd5611b61ba34c58df3ec5",
                 "shasum": ""
             },
             "require": {
@@ -3228,7 +3228,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-short-url/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-short-url/tree/3.5.3"
+                "source": "https://github.com/jeffersongoncalves/filament-short-url/tree/3.5.4"
             },
             "funding": [
                 {
@@ -3240,7 +3240,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-11T01:20:08+00:00"
+            "time": "2026-09-11T20:47:16+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-favicon-proxy",

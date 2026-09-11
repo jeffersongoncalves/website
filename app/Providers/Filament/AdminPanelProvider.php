@@ -29,6 +29,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use JeffersonGoncalves\Filament\Gtag\GtagPlugin;
 use JeffersonGoncalves\Filament\Gtm\GtmPlugin;
 use JeffersonGoncalves\Filament\OneTimeOperations\OneTimeOperationsPlugin;
+use JeffersonGoncalves\Filament\PageVisits\FilamentPageVisitsPlugin;
 use JeffersonGoncalves\Filament\Pwa\FilamentPwaPlugin;
 use JeffersonGoncalves\Filament\ShortUrl\FilamentShortUrlPlugin;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
@@ -145,6 +146,9 @@ class AdminPanelProvider extends PanelProvider
                     ->hideFolders()
                     ->hideTags()
                     ->hideImport(),
+                // Read-only page-visit browser (jeffersongoncalves/laravel-page-visits
+                // data — device/browser/geo/locale/referer/UTM per pageview).
+                FilamentPageVisitsPlugin::make(),
                 GtmPlugin::make(),
                 GtagPlugin::make(),
                 FilamentEditProfilePlugin::make()

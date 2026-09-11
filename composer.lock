@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ae641d197611a48ecb2e3f04fa53051",
+    "content-hash": "5f98b7ffdd9ff21946abb7e401a98518",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2876,6 +2876,83 @@
                 }
             ],
             "time": "2026-03-04T03:17:04+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/filament-page-visits",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/filament-page-visits.git",
+                "reference": "c9e0ec3098c3b4ff9292038e3b7389e2aa49979f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-page-visits/zipball/c9e0ec3098c3b4ff9292038e3b7389e2aa49979f",
+                "reference": "c9e0ec3098c3b4ff9292038e3b7389e2aa49979f",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "jeffersongoncalves/laravel-page-visits": "^1.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^2.0|^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0",
+                "pestphp/pest-plugin-livewire": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\Filament\\PageVisits\\FilamentPageVisitsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\Filament\\PageVisits\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Filament admin resource for jeffersongoncalves/laravel-page-visits — browse and inspect tracked page visits from a Filament panel.",
+            "homepage": "https://github.com/jeffersongoncalves/filament-page-visits",
+            "keywords": [
+                "analytics",
+                "filament",
+                "filament-plugin",
+                "laravel",
+                "page-visits",
+                "tracking"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/filament-page-visits/issues",
+                "source": "https://github.com/jeffersongoncalves/filament-page-visits/tree/3.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://buymeacoffee.com/jeffersongoncalves",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-09-11T16:41:57+00:00"
         },
         {
             "name": "jeffersongoncalves/filament-plugin-core",

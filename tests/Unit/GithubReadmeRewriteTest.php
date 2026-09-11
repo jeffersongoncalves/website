@@ -314,3 +314,21 @@ it('resolves every outbound link in one batch pass, minting one row per distinct
         ->and($out)->toContain('href="/local"') // untouched — not off-site
         ->and($out)->not->toContain('github.com'); // both github links rewritten to short urls
 });
+
+it('leaves issue, PR, and internal-file GitHub links as real, untracked links', function () {
+    $html = '<a href="https://github.com/jeffersongoncalves/filakitv5/issues/12">issue</a> '
+        .'<a href="https://github.com/jeffersongoncalves/filakitv5/pull/34">pr</a> '
+        .'<a href="https://github.com/jeffersongoncalves/filakitv5/blob/main/LICENSE">license</a> '
+        .'<a href="https://github.com/jeffersongoncalves/filakitv5/tree/main/src">src</a> '
+        .'<a href="https://github.com/jeffersongoncalves/filakitv5/raw/main/logo.png">logo</a> '
+        .'<a href="https://github.com/jeffersongoncalves/filakitv5">repo root</a>';
+
+    $out = GithubReadme::rewriteOutboundLinks($html);
+
+    expect(ShortUrl::query()->count())->toBe(1) // only the repo root minted
+        ->and($out)->toContain('href="https://github.com/jeffersongoncalves/filakitv5/issues/12"')
+        ->and($out)->toContain('href="https://github.com/jeffersongoncalves/filakitv5/pull/34"')
+        ->and($out)->toContain('href="https://github.com/jeffersongoncalves/filakitv5/blob/main/LICENSE"')
+        ->and($out)->toContain('href="https://github.com/jeffersongoncalves/filakitv5/tree/main/src"')
+        ->and($out)->toContain('href="https://github.com/jeffersongoncalves/filakitv5/raw/main/logo.png"');
+});

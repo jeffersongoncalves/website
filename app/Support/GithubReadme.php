@@ -118,7 +118,16 @@ class GithubReadme
             $hrefs[1]
         );
 
-        $resolved = OutboundLink::resolveMany($urls);
+        // Deep GitHub sub-pages (an issue/PR permalink, a file browsed via
+        // blob/tree/raw) are single-use noise, not a destination worth
+        // tracking — a README with an auto-generated "recent issues" list or
+        // a big docs tree otherwise mints hundreds of short urls nobody ever
+        // clicks (confirmed in production: hkuds/vibe-trading alone minted
+        // 696, zero clicks). These stay as real, working, untracked links.
+        $resolved = OutboundLink::resolveMany(array_values(array_filter(
+            $urls,
+            static fn (string $url): bool => ! self::isNoisyGithubSubpage($url)
+        )));
 
         return preg_replace_callback(
             '~<a([^>]*?)\shref="(https?://[^"]+)"([^>]*)>~i',
@@ -130,6 +139,26 @@ class GithubReadme
             },
             $html
         ) ?? $html;
+    }
+
+    /**
+     * Whether a URL is a deep GitHub sub-page not worth minting a short url
+     * for: an issue/PR permalink, or a file/directory browsed via
+     * blob/tree/raw. These are single-use (an issue number, a specific
+     * file path) rather than a destination someone links to repeatedly, so
+     * the click count is meaningless and the row is pure bloat.
+     */
+    private static function isNoisyGithubSubpage(string $url): bool
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+
+        if (! is_string($host) || strcasecmp($host, 'github.com') !== 0) {
+            return false;
+        }
+
+        $path = (string) parse_url($url, PHP_URL_PATH);
+
+        return (bool) preg_match('~^/[^/]+/[^/]+/(issues|pull|blob|tree|raw)(/|$)~i', $path);
     }
 
     /**

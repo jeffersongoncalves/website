@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2c64edd10c62ee702651c7f7b2477d07",
+    "content-hash": "8ae641d197611a48ecb2e3f04fa53051",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -4049,6 +4049,82 @@
             "time": "2026-09-09T11:37:01+00:00"
         },
         {
+            "name": "jeffersongoncalves/laravel-page-visits",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-page-visits.git",
+                "reference": "ca6cb334c6f41566426fa20e1facb75300e85a1b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-page-visits/zipball/ca6cb334c6f41566426fa20e1facb75300e85a1b",
+                "reference": "ca6cb334c6f41566426fa20e1facb75300e85a1b",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^12.0|^13.0",
+                "jeffersongoncalves/laravel-visitor-fingerprint": "^1.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.24",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\LaravelPageVisits\\LaravelPageVisitsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\LaravelPageVisits\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Track page-view visits on any Laravel app's public routes, with device/browser/geo/locale/referer/UTM capture",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-page-visits",
+            "keywords": [
+                "analytics",
+                "geoip",
+                "laravel",
+                "page-visits",
+                "tracking"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-page-visits/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-page-visits/tree/1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://buymeacoffee.com/jeffersongoncalves",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-09-11T13:57:37+00:00"
+        },
+        {
             "name": "jeffersongoncalves/laravel-pwa-favicon",
             "version": "v1.0.1",
             "source": {
@@ -4479,6 +4555,89 @@
                 }
             ],
             "time": "2026-06-22T00:18:37+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-visitor-fingerprint",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint.git",
+                "reference": "c1e13372bf6fe5be229bb90b27cbcf665498cf37"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-visitor-fingerprint/zipball/c1e13372bf6fe5be229bb90b27cbcf665498cf37",
+                "reference": "c1e13372bf6fe5be229bb90b27cbcf665498cf37",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^12.0|^13.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-laravel": "^4.0"
+            },
+            "suggest": {
+                "geoip2/geoip2": "Required to resolve visitor geolocation with the MaxMind GeoIP driver."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "VisitorFingerprint": "JeffersonGoncalves\\VisitorFingerprint\\Facades\\VisitorFingerprint"
+                    },
+                    "providers": [
+                        "JeffersonGoncalves\\VisitorFingerprint\\VisitorFingerprintServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\VisitorFingerprint\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A zero-domain-knowledge visitor-fingerprinting toolkit for Laravel: device/browser/OS detection, IP anonymization, bot detection, GeoIP, VPN/proxy/Tor detection, and GDPR export/erasure",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint",
+            "keywords": [
+                "Fingerprint",
+                "bot-detection",
+                "gdpr",
+                "geoip",
+                "laravel",
+                "visitor",
+                "vpn-detection"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint/tree/1.0.1"
+            },
+            "funding": [
+                {
+                    "url": "https://buymeacoffee.com/jeffersongoncalves",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-09-11T14:19:36+00:00"
         },
         {
             "name": "jenssegers/agent",

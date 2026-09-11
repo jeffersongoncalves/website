@@ -118,6 +118,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 NavigationGroup::make()->label(fn () => __('admin.navigation.management')),
+                NavigationGroup::make()->label(fn () => __('admin.navigation.links')),
+                NavigationGroup::make()->label(fn () => __('admin.navigation.analytics')),
                 NavigationGroup::make()->label(fn () => __('admin.navigation.user')),
                 NavigationGroup::make()->label(fn () => __('admin.navigation.settings'))->collapsed(),
             ])
@@ -136,7 +138,7 @@ class AdminPanelProvider extends PanelProvider
                 // app *fallback* (SHORT_URL_ROUTE_FALLBACK=true in .env), so every
                 // site route wins over a short key sitting at the root.
                 FilamentShortUrlPlugin::make()
-                    ->navigationGroup(__('admin.navigation.management'))
+                    ->navigationGroup(__('admin.navigation.links'))
                     ->navigationIcon('heroicon-o-link')
                     ->navigationSort(30)
                     // Links here are minted by App\Support\OutboundLink, one per
@@ -149,7 +151,7 @@ class AdminPanelProvider extends PanelProvider
                 // Read-only page-visit browser (jeffersongoncalves/laravel-page-visits
                 // data — device/browser/geo/locale/referer/UTM per pageview).
                 FilamentPageVisitsPlugin::make()
-                    ->navigationGroup(__('admin.navigation.management')),
+                    ->navigationGroup(__('admin.navigation.analytics')),
                 GtmPlugin::make(),
                 GtagPlugin::make(),
                 FilamentEditProfilePlugin::make()

@@ -7,6 +7,8 @@ return [
         'management' => 'Management',
         'user' => 'User',
         'settings' => 'Settings',
+        'links' => 'Links',
+        'analytics' => 'Analytics',
     ],
 
     'profile' => [

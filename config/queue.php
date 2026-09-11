@@ -74,6 +74,21 @@ return [
             'after_commit' => false,
         ],
 
+        // Dedicated connection for the `github` queue (supervisor-github in
+        // horizon.php). retry_after must exceed that supervisor's job
+        // timeout (1800s) — otherwise Horizon assumes a still-running job
+        // was lost and requeues it, double-processing it once the original
+        // finishes. The default 'redis' connection's 90s retry_after would
+        // do exactly that to any GitHub job running past 90s.
+        'redis-github' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
+            'queue' => 'github',
+            'retry_after' => (int) env('REDIS_GITHUB_QUEUE_RETRY_AFTER', 1900),
+            'block_for' => null,
+            'after_commit' => false,
+        ],
+
     ],
 
     /*

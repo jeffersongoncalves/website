@@ -100,6 +100,7 @@ return [
 
     'waits' => [
         'redis:default' => 60,
+        'redis-github:github' => 60,
     ],
 
     /*
@@ -220,7 +221,7 @@ return [
         // generous so bulk-import one-time operations (which can make
         // dozens of sequential API calls) don't get killed mid-flight.
         'supervisor-github' => [
-            'connection' => 'redis',
+            'connection' => 'redis-github',
             'queue' => ['github'],
             'balance' => 'simple',
             'autoScalingStrategy' => 'time',

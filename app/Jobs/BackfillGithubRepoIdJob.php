@@ -20,13 +20,16 @@ use JeffersonGoncalves\GitHubClient\GitHubClient;
 use Throwable;
 
 /**
- * One-time backfill: resolves the numeric github_repo_id for a project and
- * normalises github_url to the canonical (lowercased) html_url GitHub
- * returns — following a 301 for a renamed/transferred repo picks up the
- * NEW slug here, which is what MergeDuplicateProjects groups duplicates by.
+ * One-time backfill: resolves the numeric github_repo_id for a project and,
+ * only when it diverges (case-insensitive), updates github_url to the
+ * canonical (lowercased) html_url GitHub returns — following a 301 for a
+ * renamed/transferred repo picks up the NEW slug here, which is what
+ * MergeDuplicateProjects groups duplicates by. Every actual URL change is
+ * logged individually ("github_url updated to canonical html_url") — grep
+ * the log for that line to count how many rows a backfill run touched.
  *
- * A 404/unresolvable repo is left alone (github_repo_id stays null) — this
- * job does not prune or flag unavailable rows, that's a separate decision.
+ * A confirmed 404 is left alone here beyond stamping unavailable_at (see
+ * handleUnresolvable()) — this job does not prune rows.
  */
 final class BackfillGithubRepoIdJob implements ShouldQueue
 {
@@ -41,7 +44,7 @@ final class BackfillGithubRepoIdJob implements ShouldQueue
 
     public function __construct(public Project $project, public int $staggerSeconds = 0)
     {
-        $this->onQueue('github');
+        $this->onQueue('github')->onConnection('redis-github');
     }
 
     public static function make(Project $project): static
@@ -97,8 +100,20 @@ final class BackfillGithubRepoIdJob implements ShouldQueue
             return;
         }
 
+        $canonicalUrl = strtolower($htmlUrl);
+        $urlChanged = strcasecmp((string) $this->project->github_url, $canonicalUrl) !== 0;
+
         $this->project->github_repo_id = $id;
-        $this->project->github_url = strtolower($htmlUrl);
+
+        if ($urlChanged) {
+            Log::info('BackfillGithubRepoIdJob: github_url updated to canonical html_url', [
+                'project' => $this->project->slug,
+                'old' => $this->project->github_url,
+                'new' => $canonicalUrl,
+            ]);
+            $this->project->github_url = $canonicalUrl;
+        }
+
         $this->project->saveQuietly();
     }
 

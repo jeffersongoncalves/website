@@ -47,7 +47,7 @@ final class ImportNpmPackageJob implements ShouldQueue
         public string $fallbackCategory = 'tool',
         public int $staggerSeconds = 0,
     ) {
-        $this->onQueue('github');
+        $this->onQueue('github')->onConnection('redis-github');
     }
 
     public static function make(string $package, string $fallbackCategory = 'tool'): static

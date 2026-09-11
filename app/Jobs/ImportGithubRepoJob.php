@@ -56,7 +56,7 @@ final class ImportGithubRepoJob implements ShouldQueue
         public bool $isMaintainer = false,
         public int $staggerSeconds = 0,
     ) {
-        $this->onQueue('github');
+        $this->onQueue('github')->onConnection('redis-github');
     }
 
     public static function make(string $githubUrl, string $fallbackCategory = 'awesome_list', bool $isMaintainer = false): static

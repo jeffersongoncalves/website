@@ -27,7 +27,7 @@ class SyncPluginsJsonJob extends DebouncedJob
 
     public function __construct()
     {
-        $this->onQueue('github');
+        $this->onQueue('github')->onConnection('redis-github');
     }
 
     public function uniqueId(): string

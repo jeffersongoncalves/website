@@ -757,9 +757,19 @@ class ProjectImporter
             return ['error' => 'repo_not_found'];
         }
 
+        // fetchRepo() transparently follows a rename/transfer's 301, but
+        // raw.githubusercontent.com does NOT — every raw fetch below must use
+        // the CURRENT slug from the API's own html_url, or a freshly renamed
+        // repo's composer.json/package.json/branches/Dockerfile lookups 404
+        // against the stale input slug. Falls back to the input slug only
+        // when html_url is missing/unparseable.
+        $canonicalSlug = is_string($repo['html_url'] ?? null)
+            ? (GithubReadme::repoFromUrl($repo['html_url']) ?? $repoSlug)
+            : $repoSlug;
+
         $branch = is_string($repo['default_branch'] ?? null) ? $repo['default_branch'] : 'main';
-        $composer = GitHubClient::fetchManifest($repoSlug, $branch, 'composer.json');
-        $package = GitHubClient::fetchManifest($repoSlug, $branch, 'package.json');
+        $composer = GitHubClient::fetchManifest($canonicalSlug, $branch, 'composer.json');
+        $package = GitHubClient::fetchManifest($canonicalSlug, $branch, 'package.json');
         // Docker classification signals — checked on root + the two common
         // self-hosted layouts (plausible/analytics ships `hosting/`, several
         // others ship `installer/`). HEAD against raw.githubusercontent.com
@@ -778,7 +788,7 @@ class ProjectImporter
         ];
         $hasDockerCompose = false;
         foreach ($composePaths as $path) {
-            if (GitHubClient::fileExists($repoSlug, $branch, $path)) {
+            if (GitHubClient::fileExists($canonicalSlug, $branch, $path)) {
                 $hasDockerCompose = true;
                 break;
             }
@@ -788,10 +798,10 @@ class ProjectImporter
         // Laravel app with a dev Dockerfile would be misclassified.
         $hasStandaloneDockerfile = $composer === null
             && $package === null
-            && GitHubClient::fileExists($repoSlug, $branch, 'Dockerfile');
-        $branches = GitHubClient::fetchBranches($repoSlug);
+            && GitHubClient::fileExists($canonicalSlug, $branch, 'Dockerfile');
+        $branches = GitHubClient::fetchBranches($canonicalSlug);
 
-        [$owner, $repoName] = explode('/', $repoSlug, 2);
+        [$owner, $repoName] = explode('/', $canonicalSlug, 2);
 
         $category = ProjectClassifier::category($composer, $repo, $hasDockerCompose || $hasStandaloneDockerfile);
 

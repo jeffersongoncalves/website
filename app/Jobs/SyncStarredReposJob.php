@@ -46,7 +46,7 @@ class SyncStarredReposJob implements ShouldQueue
 
     public function __construct(public bool $full = false)
     {
-        $this->onQueue('github');
+        $this->onQueue('github')->onConnection('redis-github');
     }
 
     /**

@@ -34,7 +34,7 @@ final class PersistSiteStatsJob implements ShouldQueue
 
     public function __construct(public int $staggerSeconds = 0)
     {
-        $this->onQueue('github');
+        $this->onQueue('github')->onConnection('redis-github');
     }
 
     public static function make(): static

@@ -46,7 +46,7 @@ final class ImportStarredRepoJob implements ShouldQueue
 
     public function __construct(public string $htmlUrl, public string $starredAt, public int $staggerSeconds = 0)
     {
-        $this->onQueue('github');
+        $this->onQueue('github')->onConnection('redis-github');
     }
 
     /**

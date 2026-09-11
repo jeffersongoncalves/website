@@ -3084,21 +3084,21 @@
         },
         {
             "name": "jeffersongoncalves/filament-short-url",
-            "version": "3.5.0",
+            "version": "3.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-short-url.git",
-                "reference": "4b5a22d13c793c6daacfc5b1e8338d10c0069e23"
+                "reference": "87335110e90ae812795790b96ad92e0a48f768cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-short-url/zipball/4b5a22d13c793c6daacfc5b1e8338d10c0069e23",
-                "reference": "4b5a22d13c793c6daacfc5b1e8338d10c0069e23",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-short-url/zipball/87335110e90ae812795790b96ad92e0a48f768cb",
+                "reference": "87335110e90ae812795790b96ad92e0a48f768cb",
                 "shasum": ""
             },
             "require": {
                 "filament/filament": "^5.3",
-                "jeffersongoncalves/laravel-short-url": "^4.3.1",
+                "jeffersongoncalves/laravel-short-url": "^4.4.2",
                 "php": "^8.3",
                 "spatie/laravel-package-tools": "^1.16"
             },
@@ -3149,15 +3149,19 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-short-url/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-short-url/tree/3.5.0"
+                "source": "https://github.com/jeffersongoncalves/filament-short-url/tree/3.5.1"
             },
             "funding": [
+                {
+                    "url": "https://buymeacoffee.com/jeffersongoncalves",
+                    "type": "custom"
+                },
                 {
                     "url": "https://github.com/jeffersongoncalves",
                     "type": "github"
                 }
             ],
-            "time": "2026-09-04T12:25:39+00:00"
+            "time": "2026-09-11T00:08:13+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-favicon-proxy",
@@ -4257,16 +4261,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-short-url",
-            "version": "4.4.1",
+            "version": "4.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-short-url.git",
-                "reference": "060bf9181a0b1306985490e61dcf44ed2d03b8b3"
+                "reference": "9dc870fcce3a53812b2245b68a864e5ac4f612d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-short-url/zipball/060bf9181a0b1306985490e61dcf44ed2d03b8b3",
-                "reference": "060bf9181a0b1306985490e61dcf44ed2d03b8b3",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-short-url/zipball/9dc870fcce3a53812b2245b68a864e5ac4f612d3",
+                "reference": "9dc870fcce3a53812b2245b68a864e5ac4f612d3",
                 "shasum": ""
             },
             "require": {
@@ -4322,7 +4326,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-short-url/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-short-url/tree/4.4.1"
+                "source": "https://github.com/jeffersongoncalves/laravel-short-url/tree/4.4.2"
             },
             "funding": [
                 {
@@ -4334,7 +4338,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-10T02:53:05+00:00"
+            "time": "2026-09-10T23:53:19+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-ssrf-guard",

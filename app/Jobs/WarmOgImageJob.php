@@ -43,8 +43,13 @@ final class WarmOgImageJob implements ShouldQueue
 
     public static function make(Project $project): static
     {
-        // 6000/h keeps headroom under the github-cdn limiter's 7200/h (120/min).
-        $delay = GithubQuota::reserve(self::COST, 'github-cdn', 6000);
+        // 1000/h keeps headroom under the github-opengraph limiter's 1200/h
+        // (20/min) — lowered from the shared github-cdn bucket after ~50% of
+        // opengraph.githubassets.com fetches came back 429 in production at
+        // 120/min (2026-09-11). raw.githubusercontent.com (README image
+        // warming, WarmReadmeCacheJob) never hit that ceiling, so it stays
+        // on github-cdn unchanged.
+        $delay = GithubQuota::reserve(self::COST, 'github-opengraph', 1000);
 
         return (new self($project, $delay))->delay($delay);
     }
@@ -66,7 +71,7 @@ final class WarmOgImageJob implements ShouldQueue
     {
         return [
             (new WithoutOverlapping("og-image-warm:{$this->project->getKey()}"))->dontRelease(),
-            new RateLimited('github-cdn'),
+            new RateLimited('github-opengraph'),
         ];
     }
 

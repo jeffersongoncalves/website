@@ -118,8 +118,15 @@ class AppServiceProvider extends ServiceProvider
     {
         // 4.500/h, abaixo dos 5.000 da cota REST do GitHub.
         RateLimiter::for('github-api', fn () => Limit::perMinute(75));
-        // raw.githubusercontent + opengraph, fora da cota REST.
+        // raw.githubusercontent (README image warming), fora da cota REST.
+        // 120/min nunca gerou 429 em produção — GitHub tolera esse ritmo aqui.
         RateLimiter::for('github-cdn', fn () => Limit::perMinute(120));
+        // opengraph.githubassets.com (WarmOgImageJob) tem teto MUITO mais
+        // baixo e não documentado — 120/min gerava ~50% de 429 em produção
+        // (2026-09-11, ~495 de 1000 linhas de log em ~40min). Limiter
+        // dedicado, bem mais conservador, separado do github-cdn acima para
+        // não penalizar o warming de README (que não tem esse problema).
+        RateLimiter::for('github-opengraph', fn () => Limit::perMinute(20));
         // Packagist also rate-limits; keep verification jobs well under it.
         RateLimiter::for('packagist-api', fn () => Limit::perMinute(30));
     }

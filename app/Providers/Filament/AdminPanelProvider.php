@@ -148,7 +148,8 @@ class AdminPanelProvider extends PanelProvider
                     ->hideImport(),
                 // Read-only page-visit browser (jeffersongoncalves/laravel-page-visits
                 // data — device/browser/geo/locale/referer/UTM per pageview).
-                FilamentPageVisitsPlugin::make(),
+                FilamentPageVisitsPlugin::make()
+                    ->navigationGroup(__('admin.navigation.management')),
                 GtmPlugin::make(),
                 GtagPlugin::make(),
                 FilamentEditProfilePlugin::make()

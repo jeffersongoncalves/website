@@ -303,16 +303,20 @@ it('leaves img src on a non-GitHub host untouched', function () {
 it('resolves every outbound link in one batch pass, minting one row per distinct destination', function () {
     // The same destination linked twice (a common README pattern — a badge
     // and a prose mention of the same project) must still mint only once.
+    // The non-GitHub link exercises isNoisyGithubSubpage()'s early return
+    // for a host that isn't github.com at all — still minted normally.
     $html = '<a href="https://github.com/jeffersongoncalves/filakitv5">Fila Kit</a> '
         .'<a href="https://github.com/jeffersongoncalves/filament-ban">Filament Ban</a> '
         .'<a href="https://github.com/jeffersongoncalves/filakitv5">again</a> '
+        .'<a href="https://example.com/docs">docs</a> '
         .'<a href="/local">local</a>';
 
     $out = GithubReadme::rewriteOutboundLinks($html);
 
-    expect(ShortUrl::query()->count())->toBe(2)
+    expect(ShortUrl::query()->count())->toBe(3)
         ->and($out)->toContain('href="/local"') // untouched — not off-site
-        ->and($out)->not->toContain('github.com'); // both github links rewritten to short urls
+        ->and($out)->not->toContain('github.com') // both github links rewritten to short urls
+        ->and($out)->not->toContain('example.com'); // non-GitHub outbound link rewritten too
 });
 
 it('leaves issue, PR, and internal-file GitHub links as real, untracked links', function () {

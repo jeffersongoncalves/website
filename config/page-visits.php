@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 return [
 
     /*
@@ -46,6 +44,27 @@ return [
     'exclude' => [
         'livewire/update', 'admin/*', 'app/*', 'horizon/*', '_debugbar/*',
         'sw.js', 'manifest.json', 'favicon-proxy', 'up', 'og/*',
+        'sitemap.xml', 'llms.txt', 'robots.txt', 'readme-image/*',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Excluded Route Names
+    |--------------------------------------------------------------------------
+    |
+    | Glob patterns (matched via Str::is()) against the current route's name
+    | — for routes a path glob can't reliably target, e.g. a short-link
+    | redirect fallback route that matches an arbitrary key at the root
+    | (jeffersongoncalves/laravel-short-url's "short-url.redirect"). Empty
+    | by default — this package doesn't know what other packages an app has
+    | installed, so add app-specific route names here after publishing this
+    | config.
+    |
+    */
+    'exclude_route_names' => [
+        // Short-link redirects (jeffersongoncalves/laravel-short-url) are
+        // already tracked in short_url_visits — don't double-track here.
+        'short-url.redirect',
     ],
 
     /*

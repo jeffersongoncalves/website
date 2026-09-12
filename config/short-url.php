@@ -131,48 +131,30 @@ return [
     |
     | - driver: VisitRepository implementation. "eloquent" ships with the
     |   package; "clickhouse" is added in a later phase.
-    | - trust_cdn_headers: read geo data from CDN-injected headers (see
-    |   HeadersGeoIpDriver) instead of/before calling an external service.
-    | - geoip.driver: headers|ip_api|maxmind.
     | - counter_buffering: buffer visit counters in Redis instead of writing
     |   the short_urls row on every redirect. Flushed by
     |   short-url:sync-counters. Falls back to a queued direct DB increment
     |   (IncrementVisitJob) when disabled or when Redis is unreachable.
-    | - ip_hash_salt: salt mixed into the stored IP hash. Rotate periodically;
-    |   rotating it breaks unique-visit continuity by design (LGPD).
     | - retention_days: visit rows older than this are pruned by
     |   short-url:aggregate-and-prune after being folded into daily_stats.
+    |
+    | GeoIP driver, IP hash salt, and CDN-header trust now live in
+    | config/visitor-fingerprint.php (jeffersongoncalves/laravel-visitor-fingerprint,
+    | pulled in by laravel-short-url v5). This app keeps its `headers` GeoIP
+    | driver there — selecting that driver *is* the CDN-header trust opt-in
+    | as of v5, no separate flag. No city: the `headers` driver only ever
+    | reads country (CloudFront-only header; Cloudflare free tier has no city
+    | header), so the city breakdown widget stays empty. The only driver that
+    | populates city here is `ip_api`, which trades the free/instant CF
+    | header for a per-visit external HTTP call — not worth it just for that
+    | widget.
     |
     */
     'tracking' => [
         'driver' => env('SHORT_URL_VISIT_REPOSITORY', 'eloquent'),
 
-        // On: the `headers` GeoIP driver reads Cloudflare's CF-IPCountry off
-        // the request, so visits carry a country with no external lookup.
-        //
-        // Accepted tradeoff: the origin also answers on its own address, so a
-        // caller bypassing Cloudflare can send whatever CF-IPCountry it likes.
-        // The blast radius is the geo column on visit rows — nothing here
-        // authorises, prices or rate-limits on country. Set in config, not env,
-        // so a missing key on one server can't silently blank the geo data.
-        //
-        // No city: the `headers` driver only ever reads country — that
-        // header is CloudFront-only, and this app sits behind Cloudflare
-        // (free tier has no city header), so the city breakdown widget stays
-        // empty. The only driver that populates city here is `ip_api`, which
-        // trades the free/instant CF header for a per-visit external HTTP
-        // call — not worth it just for that widget.
-        'trust_cdn_headers' => true,
-
-        'geoip' => [
-            'driver' => env('SHORT_URL_GEOIP_DRIVER', 'headers'),
-            'maxmind_database_path' => env('SHORT_URL_MAXMIND_DB_PATH', storage_path('app/geoip/GeoLite2-City.mmdb')),
-        ],
-
         'counter_buffering' => env('SHORT_URL_COUNTER_BUFFERING', false),
         'redis_connection' => env('SHORT_URL_REDIS_CONNECTION', 'default'),
-
-        'ip_hash_salt' => env('SHORT_URL_IP_HASH_SALT'),
 
         'retention_days' => env('SHORT_URL_VISIT_RETENTION_DAYS', 400),
 
@@ -230,7 +212,10 @@ return [
     | - rate_limit: per-IP throttling on the redirect route itself. Off by
     |   default — most installs sit behind an edge/CDN limiter already.
     | - vpn_detection.mode: off|flag|block. "flag" only records is_vpn/
-    |   is_proxy/... on the visit; "block" also 403s the redirect.
+    |   is_proxy/... on the visit; "block" also 403s the redirect. This is
+    |   this package's own enforcement policy — the driver/cache_ttl/
+    |   proxycheck_api_key that back the actual lookup moved to
+    |   config/visitor-fingerprint.php (vpn_detection.*) in v5.
     | - safe_browsing: scans a short url's destination (and, for split/
     |   rules types, every variant/rule destination) via Google Safe
     |   Browsing. mode "sync" blocks create/update on an unsafe verdict;
@@ -255,9 +240,6 @@ return [
 
         'vpn_detection' => [
             'mode' => env('SHORT_URL_VPN_DETECTION_MODE', 'off'),
-            'driver' => env('SHORT_URL_VPN_DETECTION_DRIVER', 'ip_api'),
-            'cache_ttl' => env('SHORT_URL_VPN_DETECTION_CACHE_TTL', 3600),
-            'proxycheck_api_key' => env('SHORT_URL_PROXYCHECK_API_KEY'),
         ],
 
         'safe_browsing' => [

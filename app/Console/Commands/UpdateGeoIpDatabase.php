@@ -11,8 +11,8 @@ use RuntimeException;
 
 /**
  * Downloads MaxMind's GeoLite2-City database and swaps it into place for
- * JeffersonGoncalves\LaravelShortUrl\GeoIp\MaxMindGeoIpDriver (config
- * short-url.tracking.geoip.maxmind_database_path). MaxMind reissues
+ * JeffersonGoncalves\VisitorFingerprint's MaxMind GeoIP driver (config
+ * visitor-fingerprint.geoip.maxmind_database_path). MaxMind reissues
  * GeoLite2 roughly twice a week as IP ranges get reassigned — scheduled
  * weekly in routes/console.php.
  *
@@ -37,7 +37,7 @@ class UpdateGeoIpDatabase extends Command
             return self::FAILURE;
         }
 
-        $targetPath = (string) config('short-url.tracking.geoip.maxmind_database_path');
+        $targetPath = (string) config('visitor-fingerprint.geoip.maxmind_database_path');
         $workDir = dirname($targetPath).'/.tmp-'.uniqid();
 
         try {

@@ -46,19 +46,19 @@ function bindFakeGeoReader(Closure $cityFor): void
 }
 
 it('fails cleanly when the database file is missing', function () {
-    config(['short-url.tracking.geoip.maxmind_database_path' => '/does/not/exist.mmdb']);
+    config(['visitor-fingerprint.geoip.maxmind_database_path' => '/does/not/exist.mmdb']);
 
     $this->artisan('short-url:backfill-geo')->assertFailed();
 });
 
 it('does nothing when no visit is missing a city', function () {
-    config(['short-url.tracking.geoip.maxmind_database_path' => __FILE__]); // any existing file
+    config(['visitor-fingerprint.geoip.maxmind_database_path' => __FILE__]); // any existing file
 
     $this->artisan('short-url:backfill-geo')->assertSuccessful();
 });
 
 it('resolves and stores geo data for visits missing a city, skipping addresses the database has no block for', function () {
-    config(['short-url.tracking.geoip.maxmind_database_path' => __FILE__]);
+    config(['visitor-fingerprint.geoip.maxmind_database_path' => __FILE__]);
 
     $resolvable = Visit::factory()->create(['ip_anonymized' => '203.0.113.0', 'city' => null]);
     $unresolvable = Visit::factory()->create(['ip_anonymized' => '10.0.0.0', 'city' => null]);

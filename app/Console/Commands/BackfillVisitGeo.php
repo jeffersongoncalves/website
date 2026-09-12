@@ -11,7 +11,7 @@ use Throwable;
 
 /**
  * One-off backfill: visits recorded before the MaxMind GeoLite2-City database
- * was installed (or while short-url.tracking.geoip.driver was still
+ * was installed (or while visitor-fingerprint.geoip.driver was still
  * "headers") have no city/region/lat/lng. Walks every such row and resolves
  * it from the now-local database.
  *
@@ -30,7 +30,7 @@ class BackfillVisitGeo extends Command
 
     public function handle(): int
     {
-        $path = (string) config('short-url.tracking.geoip.maxmind_database_path');
+        $path = (string) config('visitor-fingerprint.geoip.maxmind_database_path');
 
         if (! is_file($path)) {
             $this->error("GeoLite2-City database not found at {$path}. Run `php artisan geoip:update` first.");

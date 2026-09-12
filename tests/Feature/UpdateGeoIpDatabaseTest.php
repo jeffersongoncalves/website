@@ -43,7 +43,7 @@ it('downloads, extracts and installs the database, replacing any previous one', 
     $target = sys_get_temp_dir().'/geoip-test-'.uniqid().'/GeoLite2-City.mmdb';
     config([
         'services.maxmind.license_key' => 'test-key',
-        'short-url.tracking.geoip.maxmind_database_path' => $target,
+        'visitor-fingerprint.geoip.maxmind_database_path' => $target,
     ]);
 
     $fixture = sys_get_temp_dir().'/geoip-archive-'.uniqid().'.tar.gz';

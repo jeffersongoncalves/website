@@ -186,7 +186,13 @@ return [
     |
     */
 
-    'memory_limit' => 64,
+    // Raised from Horizon's 64MB default — google/apiclient-services alone
+    // (thousands of generated classes, pulled in by
+    // jeffersongoncalves/flysystem-google-drive) pushed the master
+    // supervisor's baseline PHP memory past 64MB just from loading the
+    // composer classmap, crash-looping the whole daemon in production
+    // (2026-09-12: "Memory limit exceeded: Using 67/64MB").
+    'memory_limit' => 128,
 
     /*
     |--------------------------------------------------------------------------

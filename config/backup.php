@@ -60,7 +60,10 @@ return [
                  * Set to `null` to include complete absolute path
                  * Example: base_path()
                  */
-                'relative_path' => null,
+                // Without this, .env is zipped under its full absolute release path
+                // (e.g. /home/forge/jeffersongoncalves.dev.br/releases/<id>/.env) —
+                // base_path() makes it just ".env" in the archive.
+                'relative_path' => base_path(),
             ],
 
             /*

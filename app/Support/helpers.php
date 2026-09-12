@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use BackedEnum;
+use Illuminate\Support\Arr;
 
 if (! function_exists('App\Support\enum_equals')) {
     /**
@@ -14,16 +15,8 @@ if (! function_exists('App\Support\enum_equals')) {
      */
     function enum_equals(BackedEnum|string|int|null $value, BackedEnum|array $enum): bool
     {
-        if (is_array($enum)) {
-            return array_reduce($enum, fn (bool $carry, BackedEnum $case) => $carry || enum_equals($value, $case), false);
-        }
+        $raw = $value instanceof BackedEnum ? $value->value : $value;
 
-        if (! $value instanceof BackedEnum) {
-            // A null/absent value (e.g. an unset Filament form field) never
-            // matches an enum case — and tryFrom() rejects null under strict types.
-            return $value !== null && $enum::tryFrom($value) === $enum;
-        }
-
-        return $enum === $value;
+        return $raw !== null && in_array($raw, array_column(Arr::wrap($enum), 'value'), true);
     }
 }

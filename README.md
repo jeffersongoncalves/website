@@ -66,7 +66,20 @@ any general `allow` for the same port (`ufw insert 1 deny ...`), otherwise the b
 rule matches first and the deny is a no-op.
 
 `fail2ban` runs the `sshd` jail (`bantime=600s`, `findtime=600s`, `maxretry=5`) as a second
-layer behind the firewall block.
+layer behind the firewall block. A `recidive` jail (`/etc/fail2ban/jail.d/recidive.conf`)
+escalates repeat offenders — 3 `sshd` bans within 24h triggers a 1-week, all-ports ban — which
+auto-handles brute-force sources that rotate IPs within a subnet instead of banning the whole
+CIDR by hand:
+
+```ini
+[recidive]
+enabled = true
+logpath = /var/log/fail2ban.log
+banaction = %(banaction_allports)s
+bantime = 1w
+findtime = 1d
+maxretry = 3
+```
 
 ## License
 

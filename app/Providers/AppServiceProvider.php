@@ -90,6 +90,8 @@ class AppServiceProvider extends ServiceProvider
                 $data->locale = match (LocaleCookie::short()) {
                     'en' => 'en_US',
                     'es' => 'es_ES',
+                    'fr' => 'fr_FR',
+                    'de' => 'de_DE',
                     default => 'pt_BR',
                 };
             }

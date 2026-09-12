@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "edf90f3b934733c3eb219912d199618f",
+    "content-hash": "c7e2939754b509014ca0e06020274198",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -5030,16 +5030,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-visitor-fingerprint",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint.git",
-                "reference": "9ec45c7a8c768a795507355d9150dbe0e3e73e21"
+                "reference": "ec525eeb2a8d05d29aff78df86448f16bcb9d15b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-visitor-fingerprint/zipball/9ec45c7a8c768a795507355d9150dbe0e3e73e21",
-                "reference": "9ec45c7a8c768a795507355d9150dbe0e3e73e21",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-visitor-fingerprint/zipball/ec525eeb2a8d05d29aff78df86448f16bcb9d15b",
+                "reference": "ec525eeb2a8d05d29aff78df86448f16bcb9d15b",
                 "shasum": ""
             },
             "require": {
@@ -5098,7 +5098,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint/tree/1.0.2"
+                "source": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint/tree/1.0.3"
             },
             "funding": [
                 {
@@ -5110,7 +5110,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-12T20:32:26+00:00"
+            "time": "2026-09-12T20:38:54+00:00"
         },
         {
             "name": "jenssegers/agent",

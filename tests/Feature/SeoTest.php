@@ -10,6 +10,9 @@ it('renders per-page SEO meta on a site page', function () {
     $response->assertSee('<link rel="canonical"', false);
     $response->assertSee('property="og:title"', false);
     $response->assertSee('name="twitter:card"', false);
+    // AppServiceProvider::configureSeo()'s SEODataTransformer fills in a
+    // locale-aware banner whenever a page (like the home page) sets no image.
+    $response->assertSee('property="og:image"', false);
 });
 
 it('generates a valid XML sitemap', function () {

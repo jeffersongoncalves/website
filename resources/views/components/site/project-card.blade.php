@@ -21,8 +21,8 @@
         <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
     </svg>
 
-    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 pr-6">
-        <h3 class="flex-1 min-w-0 m-0">
+    <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-start sm:justify-between gap-2 sm:gap-4 pr-6">
+        <h3 class="flex-1 min-w-0 basis-40 m-0">
             <a href="{{ route($showRoute, ['slug' => $project->slug]) }}"
                class="mono text-[0.95rem] font-semibold text-ink-100 break-words">{{ $project->name }}</a>
         </h3>
@@ -38,7 +38,7 @@
             @if($project->is_paid)
                 <x-site.badge variant="warning" :title="__('site.projects.badge_paid')">@lang('site.projects.badge_paid')</x-site.badge>
             @endif
-            @if($project->starred_at)
+            @if($project->starred_at && !$project->isCreatedByOwner())
                 <x-site.badge :title="__('site.projects.badge_starred_help')"><span aria-hidden="true">★</span> @lang('site.projects.badge_starred')</x-site.badge>
             @endif
             <x-site.badge>{{ $project->category->getLabel() }}</x-site.badge>

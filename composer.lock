@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "05c12bf8c46cee13438eb7af6a3f6371",
+    "content-hash": "edf90f3b934733c3eb219912d199618f",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -5030,16 +5030,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-visitor-fingerprint",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint.git",
-                "reference": "c1e13372bf6fe5be229bb90b27cbcf665498cf37"
+                "reference": "9ec45c7a8c768a795507355d9150dbe0e3e73e21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-visitor-fingerprint/zipball/c1e13372bf6fe5be229bb90b27cbcf665498cf37",
-                "reference": "c1e13372bf6fe5be229bb90b27cbcf665498cf37",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-visitor-fingerprint/zipball/9ec45c7a8c768a795507355d9150dbe0e3e73e21",
+                "reference": "9ec45c7a8c768a795507355d9150dbe0e3e73e21",
                 "shasum": ""
             },
             "require": {
@@ -5048,6 +5048,7 @@
                 "spatie/laravel-package-tools": "^1.16"
             },
             "require-dev": {
+                "geoip2/geoip2": "^3.4",
                 "larastan/larastan": "^3.0",
                 "laravel/pint": "^1.0",
                 "orchestra/testbench": "^10.0|^11.0",
@@ -5097,7 +5098,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint/tree/1.0.1"
+                "source": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint/tree/1.0.2"
             },
             "funding": [
                 {
@@ -5109,7 +5110,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-11T14:19:36+00:00"
+            "time": "2026-09-12T20:32:26+00:00"
         },
         {
             "name": "jenssegers/agent",

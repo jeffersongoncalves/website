@@ -10,22 +10,29 @@ use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 /**
- * Downloads MaxMind's GeoLite2-City database and swaps it into place for
- * JeffersonGoncalves\VisitorFingerprint's MaxMind GeoIP driver (config
- * visitor-fingerprint.geoip.maxmind_database_path). MaxMind reissues
- * GeoLite2 roughly twice a week as IP ranges get reassigned — scheduled
- * weekly in routes/console.php.
+ * Downloads MaxMind's GeoLite2-City and GeoLite2-ASN databases and swaps them
+ * into place for JeffersonGoncalves\VisitorFingerprint's MaxMind GeoIP driver
+ * (config visitor-fingerprint.geoip.maxmind_database_path /
+ * maxmind_asn_database_path). MaxMind reissues GeoLite2 roughly twice a week
+ * as IP ranges get reassigned — scheduled weekly in routes/console.php.
  *
- * The existing database is only replaced after a full, verified download +
+ * Each database is only replaced after its own full, verified download +
  * extraction — a failed run (missing license key, network error, corrupt
- * archive) leaves visitor geolocation on the last-known-good database
- * instead of breaking it.
+ * archive) leaves that database on the last-known-good file instead of
+ * breaking it. The two editions are independent: a failure downloading one
+ * doesn't stop the other from updating.
  */
 class UpdateGeoIpDatabase extends Command
 {
     protected $signature = 'geoip:update';
 
-    protected $description = 'Download and install the latest MaxMind GeoLite2-City database';
+    protected $description = 'Download and install the latest MaxMind GeoLite2 City and ASN databases';
+
+    /** @var array<string, string> edition => config key for its target path */
+    private const EDITIONS = [
+        'GeoLite2-City' => 'visitor-fingerprint.geoip.maxmind_database_path',
+        'GeoLite2-ASN' => 'visitor-fingerprint.geoip.maxmind_asn_database_path',
+    ];
 
     public function handle(): int
     {
@@ -37,16 +44,28 @@ class UpdateGeoIpDatabase extends Command
             return self::FAILURE;
         }
 
-        $targetPath = (string) config('visitor-fingerprint.geoip.maxmind_database_path');
+        $exitCode = self::SUCCESS;
+
+        foreach (self::EDITIONS as $edition => $configKey) {
+            if (! $this->updateEdition($edition, (string) config($configKey), $licenseKey)) {
+                $exitCode = self::FAILURE;
+            }
+        }
+
+        return $exitCode;
+    }
+
+    private function updateEdition(string $edition, string $targetPath, string $licenseKey): bool
+    {
         $workDir = dirname($targetPath).'/.tmp-'.uniqid();
 
         try {
             @mkdir($workDir, 0755, recursive: true);
 
-            $archivePath = $workDir.'/GeoLite2-City.tar.gz';
-            $this->download($licenseKey, $archivePath);
+            $archivePath = "{$workDir}/{$edition}.tar.gz";
+            $this->download($edition, $licenseKey, $archivePath);
 
-            $mmdbPath = $this->extractMmdb($archivePath, $workDir);
+            $mmdbPath = $this->extractMmdb($edition, $archivePath, $workDir);
 
             @mkdir(dirname($targetPath), 0755, recursive: true);
             // rename() is atomic on the same filesystem — readers never see a
@@ -55,41 +74,41 @@ class UpdateGeoIpDatabase extends Command
                 throw new RuntimeException("Could not move the extracted database to {$targetPath}.");
             }
 
-            $this->info("GeoLite2-City database updated at {$targetPath}.");
+            $this->info("{$edition} database updated at {$targetPath}.");
 
-            return self::SUCCESS;
+            return true;
         } catch (RuntimeException $e) {
-            Log::error('geoip:update failed', ['error' => $e->getMessage()]);
+            Log::error('geoip:update failed', ['edition' => $edition, 'error' => $e->getMessage()]);
             $this->error($e->getMessage());
 
-            return self::FAILURE;
+            return false;
         } finally {
             $this->cleanUp($workDir);
         }
     }
 
-    private function download(string $licenseKey, string $destination): void
+    private function download(string $edition, string $licenseKey, string $destination): void
     {
         $response = Http::timeout(60)->get('https://download.maxmind.com/app/geoip_download', [
-            'edition_id' => 'GeoLite2-City',
+            'edition_id' => $edition,
             'license_key' => $licenseKey,
             'suffix' => 'tar.gz',
         ]);
 
         if (! $response->successful()) {
-            throw new RuntimeException("MaxMind download failed with HTTP {$response->status()}.");
+            throw new RuntimeException("MaxMind download of {$edition} failed with HTTP {$response->status()}.");
         }
 
         file_put_contents($destination, $response->body());
     }
 
     /**
-     * MaxMind ships GeoLite2-City_<date>.tar.gz containing one
-     * GeoLite2-City_<date>/GeoLite2-City.mmdb — the exact date-stamped
-     * folder name isn't predictable, so the file is located by extension
-     * after extracting.
+     * MaxMind ships <edition>_<date>.tar.gz containing one
+     * <edition>_<date>/<edition>.mmdb — the exact date-stamped folder name
+     * isn't predictable, so the file is located by extension after
+     * extracting.
      */
-    private function extractMmdb(string $archivePath, string $workDir): string
+    private function extractMmdb(string $edition, string $archivePath, string $workDir): string
     {
         $phar = new \PharData($archivePath);
         $phar->decompress(); // .tar.gz -> .tar, written alongside it.
@@ -97,10 +116,10 @@ class UpdateGeoIpDatabase extends Command
         $tarPath = substr($archivePath, 0, -3); // strip ".gz"
         (new \PharData($tarPath))->extractTo($workDir);
 
-        $matches = glob($workDir.'/*/GeoLite2-City.mmdb');
+        $matches = glob("{$workDir}/*/{$edition}.mmdb");
 
         if ($matches === false || $matches === []) {
-            throw new RuntimeException('Extracted archive did not contain a GeoLite2-City.mmdb file.');
+            throw new RuntimeException("Extracted archive did not contain a {$edition}.mmdb file.");
         }
 
         return $matches[0];

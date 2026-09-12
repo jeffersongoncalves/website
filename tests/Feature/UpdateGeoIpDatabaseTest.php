@@ -5,19 +5,19 @@ declare(strict_types=1);
 use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Facades\Http;
 
-function buildFakeGeoLiteArchive(string $destination): void
+function buildFakeGeoLiteArchive(string $edition, string $destination): void
 {
     // Source content and the tar being built live in separate directories —
     // building the tar into the same tree it's reading would otherwise
     // recursively pick up its own (still-growing) output file.
     $srcDir = sys_get_temp_dir().'/geoip-src-'.uniqid();
-    $folder = $srcDir.'/GeoLite2-City_20260101';
+    $folder = $srcDir.'/'.$edition.'_20260101';
     mkdir($folder, 0755, recursive: true);
-    file_put_contents($folder.'/GeoLite2-City.mmdb', 'fake-mmdb-bytes');
+    file_put_contents($folder.'/'.$edition.'.mmdb', 'fake-'.$edition.'-bytes');
 
     $outDir = sys_get_temp_dir().'/geoip-out-'.uniqid();
     mkdir($outDir, 0755, recursive: true);
-    $tarPath = $outDir.'/GeoLite2-City.tar';
+    $tarPath = $outDir.'/'.$edition.'.tar';
 
     $tar = new PharData($tarPath);
     $tar->buildFromDirectory($srcDir);
@@ -27,7 +27,7 @@ function buildFakeGeoLiteArchive(string $destination): void
     rename($tarPath.'.gz', $destination);
 
     unlink($tarPath);
-    unlink($folder.'/GeoLite2-City.mmdb');
+    unlink($folder.'/'.$edition.'.mmdb');
     rmdir($folder);
     rmdir($srcDir);
     rmdir($outDir);
@@ -39,24 +39,66 @@ it('fails cleanly with no license key configured', function () {
     $this->artisan('geoip:update')->assertFailed();
 });
 
-it('downloads, extracts and installs the database, replacing any previous one', function () {
-    $target = sys_get_temp_dir().'/geoip-test-'.uniqid().'/GeoLite2-City.mmdb';
+it('downloads, extracts and installs both the city and asn databases', function () {
+    $cityTarget = sys_get_temp_dir().'/geoip-test-'.uniqid().'/GeoLite2-City.mmdb';
+    $asnTarget = sys_get_temp_dir().'/geoip-test-'.uniqid().'/GeoLite2-ASN.mmdb';
     config([
         'services.maxmind.license_key' => 'test-key',
-        'visitor-fingerprint.geoip.maxmind_database_path' => $target,
+        'visitor-fingerprint.geoip.maxmind_database_path' => $cityTarget,
+        'visitor-fingerprint.geoip.maxmind_asn_database_path' => $asnTarget,
     ]);
 
-    $fixture = sys_get_temp_dir().'/geoip-archive-'.uniqid().'.tar.gz';
-    buildFakeGeoLiteArchive($fixture);
+    $cityFixture = sys_get_temp_dir().'/geoip-archive-'.uniqid().'.tar.gz';
+    $asnFixture = sys_get_temp_dir().'/geoip-archive-'.uniqid().'.tar.gz';
+    buildFakeGeoLiteArchive('GeoLite2-City', $cityFixture);
+    buildFakeGeoLiteArchive('GeoLite2-ASN', $asnFixture);
 
     Http::swap(new Factory);
-    Http::fake([
-        'download.maxmind.com/*' => Http::response(file_get_contents($fixture), 200),
-    ]);
+    Http::fake(function ($request) use ($cityFixture, $asnFixture) {
+        $edition = $request->data()['edition_id'] ?? null;
+
+        return match ($edition) {
+            'GeoLite2-City' => Http::response(file_get_contents($cityFixture), 200),
+            'GeoLite2-ASN' => Http::response(file_get_contents($asnFixture), 200),
+            default => Http::response('', 404),
+        };
+    });
 
     $this->artisan('geoip:update')->assertSuccessful();
 
-    expect(file_get_contents($target))->toBe('fake-mmdb-bytes');
+    expect(file_get_contents($cityTarget))->toBe('fake-GeoLite2-City-bytes')
+        ->and(file_get_contents($asnTarget))->toBe('fake-GeoLite2-ASN-bytes');
 
-    unlink($fixture);
+    unlink($cityFixture);
+    unlink($asnFixture);
+});
+
+it('updates the city database even when the asn download fails', function () {
+    $cityTarget = sys_get_temp_dir().'/geoip-test-'.uniqid().'/GeoLite2-City.mmdb';
+    $asnTarget = sys_get_temp_dir().'/geoip-test-'.uniqid().'/GeoLite2-ASN.mmdb';
+    config([
+        'services.maxmind.license_key' => 'test-key',
+        'visitor-fingerprint.geoip.maxmind_database_path' => $cityTarget,
+        'visitor-fingerprint.geoip.maxmind_asn_database_path' => $asnTarget,
+    ]);
+
+    $cityFixture = sys_get_temp_dir().'/geoip-archive-'.uniqid().'.tar.gz';
+    buildFakeGeoLiteArchive('GeoLite2-City', $cityFixture);
+
+    Http::swap(new Factory);
+    Http::fake(function ($request) use ($cityFixture) {
+        $edition = $request->data()['edition_id'] ?? null;
+
+        return match ($edition) {
+            'GeoLite2-City' => Http::response(file_get_contents($cityFixture), 200),
+            default => Http::response('', 500),
+        };
+    });
+
+    $this->artisan('geoip:update')->assertFailed();
+
+    expect(file_get_contents($cityTarget))->toBe('fake-GeoLite2-City-bytes')
+        ->and(file_exists($asnTarget))->toBeFalse();
+
+    unlink($cityFixture);
 });

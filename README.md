@@ -104,6 +104,37 @@ locked behind the Business plan on this account. If the whole box goes down, the
 with it; enabling that Forge feature (or a manual `pg_dump` → S3/rclone script) is the
 remaining gap for real disaster recovery.
 
+### Offsite backup (Google Drive)
+
+`spatie/laravel-backup` covers the disaster-recovery gap above: `.env` + a `pgsql` dump, zipped
+and shipped to Google Drive daily. Scheduled in `routes/console.php` — `backup:run` at 01:00,
+`backup:clean` at 01:30, `backup:monitor` at 05:00. Config in `config/backup.php`; the `google`
+disk (`config/filesystems.php`) uses `masbug/flysystem-google-drive-ext`, which has no Laravel
+service provider of its own — wired up manually in
+`AppServiceProvider::registerGoogleDriveDisk()`.
+
+Requires `GOOGLE_DRIVE_CLIENT_ID`/`_CLIENT_SECRET`/`_REFRESH_TOKEN` (OAuth "Web application"
+client, not "Desktop app" — the Playground's redirect URI needs a configurable allow-list;
+Desktop-type clients hardcode `http://localhost`). The refresh token only survives long-term
+once the consent screen's publishing status is **"In production"** — tokens issued while it's
+still "Testing" expire in 7 days regardless of being on the test-users list.
+
+Two bugs hit setting this up, both fixed in this repo (not just worked around):
+
+- **Empty `BACKUP_ARCHIVE_PASSWORD` silently enabled AES encryption.** `env()` returns `''` (not
+  `null`) for a key present-but-blank in `.env`; `spatie/laravel-backup`'s config only treated a
+  *missing* password as "no encryption", so the blank string still flipped `Zip` into encryption
+  mode and libzip threw `ZipArchive::close(): Invalid argument` with no indication why — same
+  error whether zipping 1 file or 20, reproducible in production but never in an isolated
+  `ZipArchive` script (which doesn't touch that config path). Fixed upstream:
+  [spatie/laravel-backup#1984](https://github.com/spatie/laravel-backup/pull/1984) — `config/backup.php`
+  also coerces it defensively (`?: null`) so the app doesn't depend on the PR landing.
+- **Google Drive `isReachable()` check fails on the very first run.** `masbug/flysystem-google-drive-ext`
+  auto-creates the remote folder on *upload*, but `BackupDestination::isReachable()` lists that
+  folder *before* any upload happens — a chicken-and-egg 404 the first time. One-off fix, not a
+  recurring one: `Storage::disk('google')->makeDirectory(config('backup.backup.name'))` via
+  `artisan tinker`, once.
+
 ## License
 
 MIT

@@ -81,6 +81,29 @@ findtime = 1d
 maxretry = 3
 ```
 
+### Database backups (***REMOVED***)
+
+Weekly local dumps via the OS-native `postgresql-common` timer — no cron, no custom script:
+
+```bash
+sudo systemctl enable --now pg_dump@18-main.timer
+```
+
+Dumps every database in the cluster to `/var/backups/postgresql/18-main/<timestamp>.dump/`
+(one `.dump` file per database, plus `globals.sql` and cluster config), keeps the last 3
+(`KEEP=3` in the unit). Trigger manually with
+`sudo systemctl start pg_dump@18-main.service` or `sudo -u postgres pg_backupcluster 18-main dump`.
+
+The template unit's identifier is `<version>-<cluster>` (`18-main`), **not** just the version
+(`18`) — using the bare version fails with `AssertPathExists=/etc/postgresql/%I/postgresql.conf`
+(assertion failure, not a real error) because the config actually lives at
+`/etc/postgresql/18/main/postgresql.conf`.
+
+This covers local-disk loss only — Forge's own automated backup-to-storage-provider feature is
+locked behind the Business plan on this account. If the whole box goes down, these dumps go
+with it; enabling that Forge feature (or a manual `pg_dump` → S3/rclone script) is the
+remaining gap for real disaster recovery.
+
 ## License
 
 MIT

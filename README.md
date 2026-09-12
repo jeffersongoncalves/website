@@ -51,6 +51,23 @@ Production assets (`public/build`) are committed to the repo — run `bun run bu
 commit after any change under `resources/`. Production uses PostgreSQL via env and requires
 a reachable Redis instance with `QUEUE_CONNECTION=redis` (Horizon).
 
+### Server firewall (Forge / ***REMOVED***)
+
+`ufw` allow list — SSH is **not** on port 22 (default-denied), it's on a custom port:
+
+| Port | Access |
+| --- | --- |
+| ***REMOVED*** | SSH — allowed, except `***REMOVED***` (blocked: recurring brute-force subnet) |
+| 80 / 443 | HTTP/HTTPS — open |
+| 6379 (Redis) | localhost-only (`127.0.0.1:6379`), never firewall-exposed |
+
+`ufw` evaluates rules top-down, first match wins — a subnet-specific `deny` must sit **above**
+any general `allow` for the same port (`ufw insert 1 deny ...`), otherwise the broader allow
+rule matches first and the deny is a no-op.
+
+`fail2ban` runs the `sshd` jail (`bantime=600s`, `findtime=600s`, `maxretry=5`) as a second
+layer behind the firewall block.
+
 ## License
 
 MIT

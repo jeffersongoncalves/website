@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Models\Project;
+use App\Models\SiteStat;
 
 it('renders home', function () {
     Project::query()->create([
@@ -313,6 +314,14 @@ it('renders the links hub with the nav link present', function () {
 
 it('renders sponsors page', function () {
     $this->get('/sponsors')->assertOk();
+});
+
+it('shows the synced sponsor count on the sponsors page, hidden at zero', function () {
+    $this->get('/sponsors')->assertOk()->assertDontSee('já patrocina', escape: false);
+
+    SiteStat::query()->create(['public_sponsors' => 3]);
+
+    $this->get('/sponsors')->assertOk()->assertSee('3 pessoas já patrocinam', escape: false);
 });
 
 it('serves the service worker as javascript with no-cache headers', function () {

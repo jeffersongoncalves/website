@@ -7,6 +7,9 @@
                 <span class="h-sub">@lang('site.sponsors.title_2')</span>
             </h1>
             <p class="lede mt-6">@lang('site.sponsors.sub')</p>
+            @if($sponsorCount > 0)
+                <p class="mono-meta-sm mt-4 text-amber">{{ trans_choice('site.sponsors.count', $sponsorCount, ['count' => $sponsorCount]) }}</p>
+            @endif
         </div>
     </section>
 

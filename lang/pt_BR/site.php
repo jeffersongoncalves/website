@@ -260,6 +260,7 @@ return [
         'github_sub' => 'recorrente · USD/BRL',
         'buymeacoffee' => 'Buy Me a Coffee',
         'buymeacoffee_sub' => 'contribuição avulsa',
+        'count' => ':count pessoa já patrocina este trabalho|:count pessoas já patrocinam este trabalho',
     ],
 
     'footer' => [

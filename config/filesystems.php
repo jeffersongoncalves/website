@@ -72,10 +72,11 @@ return [
         ],
 
         // Offsite destination for spatie/laravel-backup (see config/backup.php).
-        // Driver registered manually in AppServiceProvider::registerGoogleDriveDisk()
-        // — masbug/flysystem-google-drive-ext ships no Laravel provider of its own.
-        'google' => [
-            'driver' => 'google',
+        // jeffersongoncalves/flysystem-google-drive auto-registers this driver —
+        // no manual Storage::extend() needed (replaces masbug/flysystem-google-drive-ext,
+        // unmaintained and missing this file's own AppServiceProvider wiring).
+        'google-drive' => [
+            'driver' => 'google-drive',
             'clientId' => env('GOOGLE_DRIVE_CLIENT_ID'),
             'clientSecret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
             'refreshToken' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),

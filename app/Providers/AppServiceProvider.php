@@ -6,23 +6,17 @@ namespace App\Providers;
 
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
-use Google\Client;
-use Google\Service\Drive;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use JeffersonGoncalves\LocaleCookie\LocaleCookie;
 use JeffersonGoncalves\LocaleCookie\Middleware\SetLocale;
-use League\Flysystem\Filesystem;
 use Livewire\Livewire;
-use Masbug\Flysystem\GoogleDriveAdapter;
 use RalphJSmit\Laravel\SEO\Facades\SEOManager;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 
@@ -40,28 +34,6 @@ class AppServiceProvider extends ServiceProvider
         // public site emits the same tags via <x-favicon/>. No favicon render
         // hook needed here.
         FilamentView::registerRenderHook(PanelsRenderHook::HEAD_START, fn (): View => view('components.js-md5'));
-
-        $this->registerGoogleDriveDisk();
-    }
-
-    /**
-     * spatie/laravel-backup's offsite copy (see config/backup.php) ships to
-     * this disk. The masbug adapter has no Laravel service provider of its
-     * own — it must be wired up manually via Storage::extend().
-     */
-    private function registerGoogleDriveDisk(): void
-    {
-        Storage::extend('google', function ($app, array $config): FilesystemAdapter {
-            $client = new Client;
-            $client->setClientId($config['clientId']);
-            $client->setClientSecret($config['clientSecret']);
-            $client->refreshToken($config['refreshToken']);
-
-            $service = new Drive($client);
-            $adapter = new GoogleDriveAdapter($service, $config['folder'] ?? '/');
-
-            return new FilesystemAdapter(new Filesystem($adapter), $adapter);
-        });
     }
 
     /**

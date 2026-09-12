@@ -174,7 +174,7 @@ return [
              * The disk names on which the backups will be stored.
              */
             'disks' => [
-                'google',
+                'google-drive',
             ],
 
             /*
@@ -315,7 +315,7 @@ return [
     'monitor_backups' => [
         [
             'name' => env('APP_NAME', 'laravel-backup'),
-            'disks' => ['google'],
+            'disks' => ['google-drive'],
             'health_checks' => [
                 MaximumAgeInDays::class => 1,
                 MaximumStorageInMegabytes::class => 5000,

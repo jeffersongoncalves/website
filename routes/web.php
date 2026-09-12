@@ -39,8 +39,14 @@ Route::middleware([SecurityHeaders::class])->group(function () {
 
     // Cached README-image proxy — see ReadmeImageCache's docblock (GitHub's
     // raw-content CDN measured a 54s LCP on a hotlinked banner image).
+    //
+    // Unlike og.show (1 request/page), a single README can embed hundreds of
+    // images (e.g. a big contributor-avatar grid) — all requested by one
+    // visitor's browser on one page load. A 60/min per-IP cap was tripping
+    // real visitors on those READMEs (every avatar past the 60th got a 429),
+    // not abuse — bumped to comfortably cover a heavy single page load.
     Route::get('/readme-image/{encoded}', ReadmeImageController::class)->name('readme-image.show')
-        ->middleware('throttle:60,1');
+        ->middleware('throttle:600,1');
 
     // /favicon-proxy (name `favicon-proxy`) is registered by
     // jeffersongoncalves/laravel-favicon-proxy (config favicon-proxy.*).

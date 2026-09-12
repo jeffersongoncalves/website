@@ -38,3 +38,21 @@ Schedule::command('geoip:update')
     ->weeklyOn(1, '02:00')
     ->withoutOverlapping()
     ->runInBackground();
+
+// Offsite (.env + database) backup to Google Drive — the native pg_dump@
+// systemd timer on the server already covers local-disk DB backups; this
+// covers full server loss.
+Schedule::command('backup:run')
+    ->dailyAt('01:00')
+    ->withoutOverlapping()
+    ->runInBackground();
+
+Schedule::command('backup:clean')
+    ->dailyAt('01:30')
+    ->withoutOverlapping()
+    ->runInBackground();
+
+Schedule::command('backup:monitor')
+    ->dailyAt('05:00')
+    ->withoutOverlapping()
+    ->runInBackground();

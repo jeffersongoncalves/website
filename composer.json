@@ -53,7 +53,9 @@
         "laravel/tinker": "^3.0",
         "livewire/blaze": "^1.0",
         "livewire/livewire": "^4.4",
+        "masbug/flysystem-google-drive-ext": "^2.5",
         "ralphjsmit/laravel-seo": "^1.8",
+        "spatie/laravel-backup": "^10.3",
         "spatie/laravel-sitemap": "^8.2",
         "spatie/laravel-sluggable": "^4.0",
         "spatie/laravel-translatable": "^6.14"

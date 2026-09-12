@@ -189,7 +189,12 @@ return [
          * The password to be used for archive encryption.
          * Set to `null` to disable encryption.
          */
-        'password' => env('BACKUP_ARCHIVE_PASSWORD'),
+        // env() returns '' (not null) for a key present-but-empty in .env — an
+        // empty non-null password still flips Zip::open() into AES-encryption
+        // mode, and libzip throws "ZipArchive::close(): Invalid argument"
+        // trying to encrypt with an empty password. `?: null` coerces '' back
+        // to null so a blank BACKUP_ARCHIVE_PASSWORD actually disables it.
+        'password' => env('BACKUP_ARCHIVE_PASSWORD') ?: null,
 
         /*
          * The encryption algorithm to be used for archive encryption.

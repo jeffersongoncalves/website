@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Support\SiteStats;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\PostgresConnection;
+use JeffersonGoncalves\LaravelPageVisits\Models\PageVisit;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -149,6 +150,14 @@ class ProjectsList extends Component
         match ($this->sort) {
             'downloads' => $query->orderByDesc('downloads'),
             'name' => $query->orderBy('name'),
+            'trending' => $query->orderByDesc(
+                PageVisit::query()
+                    ->selectRaw('count(*)')
+                    ->where('route_name', 'projects.show')
+                    ->where('is_bot', false)
+                    ->where('visited_at', '>=', now()->subDays(30))
+                    ->whereRaw("path = ('projects/' || projects.slug)")
+            ),
             default => $query->orderByDesc('stars'),
         };
 

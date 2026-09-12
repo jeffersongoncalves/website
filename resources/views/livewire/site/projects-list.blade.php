@@ -48,6 +48,7 @@
                 <span class="projects-filter-label">@lang('site.common.sort_by')</span>
                 <select wire:model.live="sort" class="projects-filter-select">
                     <option value="stars">@lang('site.common.sort_stars')</option>
+                    <option value="trending">@lang('site.common.sort_trending')</option>
                     <option value="downloads">@lang('site.common.sort_downloads')</option>
                     <option value="name">@lang('site.common.sort_az')</option>
                 </select>

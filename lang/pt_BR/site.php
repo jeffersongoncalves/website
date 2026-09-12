@@ -71,6 +71,7 @@ return [
         'send' => 'Enviar',
         'sort_by' => 'ordenar:',
         'sort_stars' => '★ stars',
+        'sort_trending' => '🔥 em alta',
         'sort_downloads' => '↓ downloads',
         'sort_az' => 'a-z',
         'sort_za' => 'z-a',

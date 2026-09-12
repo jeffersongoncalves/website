@@ -71,6 +71,7 @@ return [
         'send' => 'Send',
         'sort_by' => 'sort:',
         'sort_stars' => '★ stars',
+        'sort_trending' => '🔥 trending',
         'sort_downloads' => '↓ downloads',
         'sort_az' => 'a-z',
         'sort_za' => 'z-a',

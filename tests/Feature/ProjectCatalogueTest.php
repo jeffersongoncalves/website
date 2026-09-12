@@ -8,6 +8,7 @@ use App\Livewire\Site\ProjectsList;
 use App\Models\Project;
 use App\Support\SiteStats;
 use Illuminate\Support\Str;
+use JeffersonGoncalves\LaravelPageVisits\Models\PageVisit;
 use Livewire\Livewire;
 
 function publishedProject(string $name, array $attrs = []): Project
@@ -107,6 +108,23 @@ it('sorts by name, stars and downloads', function () {
 
     $byDownloads = $this->get('/projects?sort=downloads')->getContent();
     expect(strpos($byDownloads, 'zeta'))->toBeLessThan(strpos($byDownloads, 'alpha'));
+});
+
+it('sorts by trending (recent projects.show visits, bots excluded)', function () {
+    publishedProject('quiet-one', ['slug' => 'quiet-one', 'stars' => 999]);
+    publishedProject('hot-one', ['slug' => 'hot-one', 'stars' => 1]);
+
+    PageVisit::query()->insert([
+        ['path' => 'projects/hot-one', 'route_name' => 'projects.show', 'method' => 'GET', 'visited_at' => now(), 'is_bot' => false],
+        ['path' => 'projects/hot-one', 'route_name' => 'projects.show', 'method' => 'GET', 'visited_at' => now(), 'is_bot' => false],
+        // A bot hit on quiet-one must not count toward trending.
+        ['path' => 'projects/quiet-one', 'route_name' => 'projects.show', 'method' => 'GET', 'visited_at' => now(), 'is_bot' => true],
+        // Outside the 30-day trending window — must not count either.
+        ['path' => 'projects/quiet-one', 'route_name' => 'projects.show', 'method' => 'GET', 'visited_at' => now()->subDays(31), 'is_bot' => false],
+    ]);
+
+    $byTrending = $this->get('/projects?sort=trending')->getContent();
+    expect(strpos($byTrending, 'hot-one'))->toBeLessThan(strpos($byTrending, 'quiet-one'));
 });
 
 it('filters by topic', function () {

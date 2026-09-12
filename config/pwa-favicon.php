@@ -43,8 +43,4 @@ return [
             '192' => '4.0',
         ],
     ],
-
-    // Path (resolvable by Vite) to the favicon.ico served at /favicon.ico.
-    // Leave empty/null to skip registering the /favicon.ico route.
-    'favicon' => 'resources/favicon/favicon.ico',
 ];

@@ -147,7 +147,10 @@ return [
              *
              * For more check https://www.php.net/manual/zip.constants.php and confirm it's supported by your system.
              */
-            'compression_method' => ZipArchive::CM_DEFAULT,
+            // CM_DEFAULT triggers "ZipArchive::close(): Invalid argument" on
+            // PHP 8.4's bundled libzip (known spatie/laravel-backup issue) —
+            // CM_DEFLATE is the documented workaround.
+            'compression_method' => ZipArchive::CM_DEFLATE,
 
             /*
              * The compression level corresponding to the used algorithm; an integer between 0 and 9.

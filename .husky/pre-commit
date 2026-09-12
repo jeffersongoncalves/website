@@ -1,0 +1,5 @@
+if git diff --cached --name-only | grep -q '^resources/'; then
+  echo "resources/ changed — rebuilding Vite assets..."
+  bun run build
+  git add public/build
+fi

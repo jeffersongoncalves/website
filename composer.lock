@@ -3337,16 +3337,16 @@
         },
         {
             "name": "jeffersongoncalves/filament-scanner-guard",
-            "version": "3.0.0",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-scanner-guard.git",
-                "reference": "5236e7ee4aead61d909fd9b11d88e9a60429d271"
+                "reference": "88253e2cfc3dac060085c5fbc79586f0d5deaf6a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-scanner-guard/zipball/5236e7ee4aead61d909fd9b11d88e9a60429d271",
-                "reference": "5236e7ee4aead61d909fd9b11d88e9a60429d271",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-scanner-guard/zipball/88253e2cfc3dac060085c5fbc79586f0d5deaf6a",
+                "reference": "88253e2cfc3dac060085c5fbc79586f0d5deaf6a",
                 "shasum": ""
             },
             "require": {
@@ -3400,7 +3400,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-scanner-guard/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-scanner-guard/tree/3.0.0"
+                "source": "https://github.com/jeffersongoncalves/filament-scanner-guard/tree/3.0.1"
             },
             "funding": [
                 {
@@ -3412,7 +3412,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-13T03:21:26+00:00"
+            "time": "2026-09-13T03:42:08+00:00"
         },
         {
             "name": "jeffersongoncalves/filament-sensible-defaults",

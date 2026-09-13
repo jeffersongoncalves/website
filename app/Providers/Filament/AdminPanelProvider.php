@@ -154,9 +154,8 @@ class AdminPanelProvider extends PanelProvider
                 FilamentPageVisitsPlugin::make()
                     ->navigationGroup(__('admin.navigation.analytics')),
                 // Vulnerability-scanner ban list (jeffersongoncalves/laravel-scanner-guard).
-                // No fluent nav-group setter on this plugin — the resource
-                // isn't grouped under one of the panel's NavigationGroups yet.
-                ScannerGuardPlugin::make(),
+                ScannerGuardPlugin::make()
+                    ->navigationGroup(__('admin.navigation.settings')),
                 GtmPlugin::make(),
                 GtagPlugin::make(),
                 FilamentEditProfilePlugin::make()

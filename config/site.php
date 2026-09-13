@@ -8,6 +8,11 @@ return [
         'linkedin' => 'https://www.linkedin.com/in/jeffersonsimaogoncalves/',
         'packagist' => 'https://packagist.org/packages/jeffersongoncalves/',
         'x' => 'https://x.com/gersonsimao92',
+        // Plain anchor with rel="me" in the footer, deliberately NOT routed
+        // through OutboundLink::to() — Mastodon's profile-verification
+        // crawler checks this site for a direct rel="me" link back to the
+        // profile, and a tracking redirect hop risks breaking that check.
+        'mastodon' => 'https://mastodon.social/@jeffersongoncalves',
         'email' => 'contato@jeffersongoncalves.dev.br',
         'sponsors' => 'https://github.com/sponsors/jeffersongoncalves',
         'buymeacoffee' => 'https://buymeacoffee.com/jeffersongoncalves',

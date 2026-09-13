@@ -31,9 +31,7 @@
                     <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.linkedin'), 'LinkedIn') }}"  rel="noopener" target="_blank">LinkedIn ↗</a></li>
                     <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.packagist'), 'Packagist') }}" rel="noopener" target="_blank">Packagist ↗</a></li>
                     <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.x'), 'X (Twitter)') }}"         rel="noopener" target="_blank">X (Twitter) ↗</a></li>
-                    {{-- rel="me" direct (no OutboundLink tracking hop) so Mastodon's
-                         profile-verification crawler can follow it straight through. --}}
-                    <li><a href="{{ config('site.social.mastodon') }}" rel="me noopener" target="_blank">Mastodon ↗</a></li>
+                    <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.mastodon'), 'Mastodon') }}" rel="noopener" target="_blank">Mastodon ↗</a></li>
                 </ul>
             </div>
         </div>

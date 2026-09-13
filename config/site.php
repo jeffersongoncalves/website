@@ -8,15 +8,24 @@ return [
         'linkedin' => 'https://www.linkedin.com/in/jeffersonsimaogoncalves/',
         'packagist' => 'https://packagist.org/packages/jeffersongoncalves/',
         'x' => 'https://x.com/gersonsimao92',
-        // Plain anchor with rel="me" in the footer, deliberately NOT routed
-        // through OutboundLink::to() — Mastodon's profile-verification
-        // crawler checks this site for a direct rel="me" link back to the
-        // profile, and a tracking redirect hop risks breaking that check.
+        // Primary Mastodon profile — the visible footer link (routed through
+        // OutboundLink::to() like every other social link) and the identity
+        // behind fediverse_creator below.
         'mastodon' => 'https://mastodon.social/@jeffersongoncalves',
         // "@user@instance" form Google's fediverse:creator meta tag expects —
         // kept as its own key rather than derived from the URL above since
         // the format differs (no scheme/host split, @-delimited instead).
         'fediverse_creator' => '@jeffersongoncalves@mastodon.social',
+        // Every Mastodon (or other rel="me"-verifiable) profile that needs a
+        // <link rel="me"> in <head> — one per instance, direct URL (no
+        // OutboundLink tracking hop), since each instance's profile
+        // verification crawler follows this straight through. Includes the
+        // primary above plus any secondary account (e.g. a topic-specific
+        // instance like phpc.social).
+        'mastodon_rel_me' => [
+            'https://mastodon.social/@jeffersongoncalves',
+            'https://phpc.social/@jeffersongoncalves',
+        ],
         'email' => 'contato@jeffersongoncalves.dev.br',
         'sponsors' => 'https://github.com/sponsors/jeffersongoncalves',
         'buymeacoffee' => 'https://buymeacoffee.com/jeffersongoncalves',

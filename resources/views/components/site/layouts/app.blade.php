@@ -36,9 +36,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="color-scheme" content="{{ $isDarkInitial ? 'dark' : 'light' }}">
     <meta name="fediverse:creator" content="{{ config('site.social.fediverse_creator') }}">
-    {{-- Direct URL (no OutboundLink tracking hop) — Mastodon's profile-
-         verification crawler follows this straight through. --}}
-    <link rel="me" href="{{ config('site.social.mastodon') }}">
+    {{-- Direct URLs (no OutboundLink tracking hop) — each instance's profile-
+         verification crawler follows these straight through. --}}
+    @foreach(config('site.social.mastodon_rel_me', []) as $mastodonUrl)
+        <link rel="me" href="{{ $mastodonUrl }}">
+    @endforeach
     {{-- Preload the body font (above-the-fold text → LCP). Favicons are now
          served same-origin (laravel-favicon-proxy), so no third-party preconnect. --}}
     <link rel="preload" href="{{ Vite::asset('resources/fonts/dmsans_400.ttf') }}" as="font" type="font/ttf" crossorigin>

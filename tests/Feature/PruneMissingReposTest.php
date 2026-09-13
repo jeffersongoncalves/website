@@ -125,3 +125,53 @@ it('never deletes a repo it could not verify (5xx = unknown)', function () {
 
     expect(Project::query()->where('slug', 'flaky-pkg')->exists())->toBeTrue();
 });
+
+it('only scans the given slug when --slug is passed', function () {
+    repoProject('gone-pkg', 'acme/gone');
+    repoProject('alive-pkg', 'acme/alive');
+
+    $this->artisan('projects:prune-missing-repos --delete --no-interaction --slug=gone-pkg')->assertSuccessful();
+
+    expect(Project::query()->where('slug', 'gone-pkg')->exists())->toBeFalse();
+});
+
+it('skips a project whose github_url has no parseable owner/repo slug', function () {
+    // Passes the SQL filter (github_url not null/empty) but GithubReadme::
+    // repoFromUrl() can't extract an owner/repo from it — never even reaches
+    // GitHubClient, so nothing is scanned or removed.
+    repoProject('unparseable', 'acme/whatever', ['github_url' => 'https://example.com/not-a-github-repo']);
+
+    $this->artisan('projects:prune-missing-repos --delete --no-interaction')
+        ->expectsOutputToContain('Scanned 0 orphan-profile project(s).')
+        ->assertSuccessful();
+
+    expect(Project::query()->where('slug', 'unparseable')->exists())->toBeTrue();
+});
+
+it('stops the scan early and warns on a GitHub rate limit, without deleting anything', function () {
+    Http::swap($factory = new Factory);
+    $factory->preventStrayRequests();
+    $factory->fake(['api.github.com/repos/acme/limited' => Http::response('', 403, [
+        'X-RateLimit-Remaining' => '0',
+        'X-RateLimit-Reset' => (string) (time() + 60),
+    ])]);
+
+    repoProject('limited-pkg', 'acme/limited');
+
+    $this->artisan('projects:prune-missing-repos --delete --no-interaction')
+        ->expectsOutputToContain('Stopped early on a GitHub rate limit — re-run later to finish.')
+        ->assertSuccessful();
+
+    expect(Project::query()->where('slug', 'limited-pkg')->exists())->toBeTrue();
+});
+
+it('aborts and deletes nothing when the interactive confirmation is declined', function () {
+    repoProject('gone-pkg', 'acme/gone');
+
+    $this->artisan('projects:prune-missing-repos --delete')
+        ->expectsConfirmation('Permanently delete these 1 project(s)?', 'no')
+        ->expectsOutputToContain('Aborted — nothing removed.')
+        ->assertSuccessful();
+
+    expect(Project::query()->where('slug', 'gone-pkg')->exists())->toBeTrue();
+});

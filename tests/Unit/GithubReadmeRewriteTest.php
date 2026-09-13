@@ -36,6 +36,30 @@ it('resolves the auto-branch by numeric major regardless of storage order', func
         ->and(GithubReadme::branchForFilamentVersion('v5', $scrambled))->toBe('3.x');
 });
 
+it('returns null from branchForFilamentVersion for a version the project does not support', function () {
+    expect(GithubReadme::branchForFilamentVersion('v9', ['v3', 'v4', 'v5']))->toBeNull();
+});
+
+it('stamps a blank alt attribute on an img tag missing one', function () {
+    $html = '<p>before</p><img src="banner.png"><p>after</p>';
+
+    expect(GithubReadme::ensureImageAlt($html))
+        ->toBe('<p>before</p><img src="banner.png" alt=""><p>after</p>');
+});
+
+it('leaves an img tag with an existing alt attribute untouched', function () {
+    $html = '<img src="banner.png" alt="Banner">';
+
+    expect(GithubReadme::ensureImageAlt($html))->toBe($html);
+});
+
+it('stamps alt on every img in a README with a mix of tagged and untagged images', function () {
+    $html = '<img src="a.png"><img src="b.png" alt="B">';
+
+    expect(GithubReadme::ensureImageAlt($html))
+        ->toBe('<img src="a.png" alt=""><img src="b.png" alt="B">');
+});
+
 it('sorts and dedupes versions by numeric major', function () {
     expect(GithubReadme::sortedVersions(['v5', 'v3', 'v4', 'v3']))->toBe(['v3', 'v4', 'v5']);
 });

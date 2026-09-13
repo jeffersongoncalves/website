@@ -70,6 +70,35 @@ it('returns null for a github import with no urls at all', function () {
     expect(ProjectMatcher::findExisting('github', []))->toBeNull();
 });
 
+it('matches a github import by github_repo_id ahead of github_url', function () {
+    $project = projectMatcher_make([
+        'slug' => 'renamed-repo',
+        'name' => 'Renamed Repo',
+        'github_url' => 'https://github.com/acme/renamed-repo',
+        'github_repo_id' => 999888,
+    ]);
+
+    // The repo was renamed on GitHub since we last synced — url no longer
+    // matches, but the numeric id (immutable across a rename) still does.
+    $found = ProjectMatcher::findExisting('github', [
+        'github_repo_id' => 999888,
+        'github_url' => 'https://github.com/acme/renamed-repo-new-name',
+    ]);
+
+    expect($found?->id)->toBe($project->id);
+});
+
+it('finds a project directly by github_repo_id', function () {
+    $project = projectMatcher_make([
+        'slug' => 'by-id',
+        'name' => 'By Id',
+        'github_repo_id' => 12345,
+    ]);
+
+    expect(ProjectMatcher::findByGithubRepoId(12345)?->id)->toBe($project->id);
+    expect(ProjectMatcher::findByGithubRepoId(99999999))->toBeNull();
+});
+
 // ---------------------------------------------------------------------------
 // findExisting — npm source
 // ---------------------------------------------------------------------------

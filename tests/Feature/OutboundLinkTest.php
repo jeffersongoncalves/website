@@ -44,7 +44,19 @@ it('leaves links that are not off-site http(s) alone', function (?string $url) {
     'mailto' => ['mailto:contato@jeffersongoncalves.dev.br'],
     'empty' => [''],
     'null' => [null],
+    'non-http(s) scheme with a real external host' => ['ftp://example.com/file'],
 ]);
+
+it('resolveMany short-circuits without a short-url lookup when every url is internal', function () {
+    $urls = [config('app.url').'/projects', '/relative', 'mailto:hi@example.com'];
+
+    expect(OutboundLink::resolveMany($urls))->toBe([
+        config('app.url').'/projects' => config('app.url').'/projects',
+        '/relative' => '/relative',
+        'mailto:hi@example.com' => 'mailto:hi@example.com',
+    ]);
+    expect(ShortUrl::query()->count())->toBe(0);
+});
 
 it('redirects the minted short URL to its destination and queues the click', function () {
     $destination = 'https://packagist.org/packages/jeffersongoncalves/filakitv5';

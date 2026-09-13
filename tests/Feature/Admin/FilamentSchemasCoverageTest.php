@@ -145,6 +145,40 @@ it('hydrates the edit form schema from an existing project', function () {
         ]);
 });
 
+it('auto-fills branch_overrides from versions on hydrate when none is stored yet', function () {
+    $project = createProject([
+        'slug' => 'auto-branches',
+        'name' => 'Auto Branches',
+        'category' => ProjectCategory::FilamentPlugin,
+        'status' => ProjectStatus::Published,
+        'has_branches' => true,
+        'versions' => ['v3', 'v4'],
+        'branch_overrides' => null,
+        'published_at' => now(),
+    ]);
+
+    Livewire::test(EditProject::class, ['record' => $project->getRouteKey()])
+        ->assertOk()
+        ->assertFormSet(['branch_overrides' => ['1.x' => '1.x', '2.x' => '2.x']]);
+});
+
+it('leaves an already-stored branch_overrides map alone on hydrate', function () {
+    $project = createProject([
+        'slug' => 'manual-branches',
+        'name' => 'Manual Branches',
+        'category' => ProjectCategory::FilamentPlugin,
+        'status' => ProjectStatus::Published,
+        'has_branches' => true,
+        'versions' => ['v3', 'v4'],
+        'branch_overrides' => ['1.x' => 'legacy-branch'],
+        'published_at' => now(),
+    ]);
+
+    Livewire::test(EditProject::class, ['record' => $project->getRouteKey()])
+        ->assertOk()
+        ->assertFormSet(['branch_overrides' => ['1.x' => 'legacy-branch']]);
+});
+
 it('renders the project infolist on the view page', function () {
     $project = createProject([
         'slug' => 'view-me',
@@ -183,8 +217,24 @@ it('renders the site metrics widget', function () {
     Livewire::test(SiteMetricsWidget::class)->assertOk();
 });
 
+it('formats followers in the metrics widget across the compact-number branches (plain, k, M)', function () {
+    filamentSchemas_seedSiteStat();
+    SiteStat::query()->update(['followers' => 42]);
+    Livewire::test(SiteMetricsWidget::class)->assertOk();
+
+    SiteStat::query()->update(['followers' => 2_500_000]);
+    Livewire::test(SiteMetricsWidget::class)->assertOk();
+});
+
 it('renders the site downloads widget', function () {
     filamentSchemas_seedSiteStat();
+
+    Livewire::test(SiteDownloadsWidget::class)->assertOk();
+});
+
+it('formats a small download count in the downloads widget (plain-number branch)', function () {
+    filamentSchemas_seedSiteStat();
+    SiteStat::query()->update(['downloads_docker' => 7]);
 
     Livewire::test(SiteDownloadsWidget::class)->assertOk();
 });

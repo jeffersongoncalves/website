@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\SiteStat;
 use App\Support\GithubReadme;
 use App\Support\SiteStats;
+use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -102,6 +103,79 @@ it('computes the per-topic breakdown busiest first', function () {
         ['topic' => 'filament', 'total' => 1],
         ['topic' => 'cli', 'total' => 1],
     ]);
+});
+
+it('fetches the real sponsor count over GraphQL when a github token is configured', function () {
+    // The global beforeEach fake already stubs these same URLs (with a zero
+    // sponsor count) and Http::fake() resolves first-registered-stub-wins —
+    // swap in a fresh factory so only this test's fakes are in play (same
+    // trick PluginsSyncTest/SyncStarredReposTest use for the same reason).
+    Http::swap(new HttpFactory);
+    config(['services.github.token' => 'test-token']);
+    Http::fake([
+        'api.github.com/users/*' => Http::response(['followers' => 10, 'public_repos' => 5]),
+        'api.github.com/graphql' => Http::response(['data' => ['user' => [
+            'sponsorshipsAsMaintainer' => ['totalCount' => 7],
+            'contributionsCollection' => ['contributionCalendar' => ['totalContributions' => 0, 'weeks' => []]],
+        ]]]),
+    ]);
+
+    SiteStats::persist();
+
+    expect(SiteStat::query()->first()->public_sponsors)->toBe(7);
+});
+
+it('returns zero sponsors without a github token', function () {
+    config(['services.github.token' => null]);
+
+    SiteStats::persist();
+
+    expect(SiteStat::query()->first()->public_sponsors)->toBe(0);
+});
+
+it('skips a project row whose topics column holds malformed json instead of an array', function () {
+    $project = makeProject(1, ProjectCategory::PhpPackage);
+    $project->update(['topics' => ['laravel']]);
+    DB::table('projects')->where('id', $project->id)->update(['topics' => '"not-an-array"']);
+
+    makeProject(2, ProjectCategory::PhpPackage)->update(['topics' => ['filament']]);
+
+    SiteStats::persist();
+
+    // The malformed row is silently skipped, not fatal — only the healthy
+    // second row's topic is counted.
+    expect(SiteStats::all()['topics'])->toBe([
+        ['topic' => 'filament', 'total' => 1],
+    ]);
+});
+
+it('formats homeCards and osCards with k/M abbreviation thresholds', function () {
+    SiteStat::query()->create([
+        'repos' => 3,
+        'catalogue' => 5,
+        'filament' => 2,
+        'laravel' => 1,
+        'starter' => 1,
+        'followers' => 500, // below 1k — no suffix
+        'stars' => 1500, // above 1k — k suffix
+        'downloads' => 2_500_000, // above 1M — M suffix
+        'downloads_packagist' => 2_500, // above 1k, below 1M — k suffix via scaleM/suffixM
+        'downloads_npm' => 500, // below 1k — no suffix via scaleM/suffixM
+        'downloads_jetbrains' => 0,
+        'public_sponsors' => 4,
+        'synced_at' => now(),
+    ]);
+
+    $home = SiteStats::homeCards();
+    expect($home[1])->toBe(['label_key' => 'os.followers', 'target' => 500]); // abbrevK, no suffix
+    expect($home[2])->toBe(['label_key' => 'os.downloads', 'target' => 2.5, 'suffix' => 'M', 'decimals' => 1]);
+
+    $os = SiteStats::osCards();
+    $byLabel = collect($os)->keyBy('label_key');
+    expect($byLabel['os.downloads_packagist'])->toBe(['label_key' => 'os.downloads_packagist', 'target' => 2.5, 'suffix' => 'k', 'decimals' => 1]);
+    expect($byLabel['os.downloads_npm'])->toBe(['label_key' => 'os.downloads_npm', 'target' => 500]);
+    expect($byLabel['os.stars'])->toBe(['label_key' => 'os.stars', 'target' => 1.5, 'suffix' => 'k', 'decimals' => 1]);
+    expect($byLabel['os.public_sponsors'])->toBe(['label_key' => 'os.public_sponsors', 'target' => 4]);
 });
 
 it('renders the README and writes it to the github disk', function () {

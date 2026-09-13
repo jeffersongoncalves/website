@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
+use App\Jobs\BackfillGithubRepoIdJob;
 use App\Jobs\PersistSiteStatsJob;
 use App\Jobs\PurgeMisattributedPackageLinksJob;
 use App\Jobs\SyncPluginsJsonJob;
@@ -314,4 +315,58 @@ it('queues a plugins.json sync', function () {
         ->assertSuccessful();
 
     Queue::assertPushed(SyncPluginsJsonJob::class);
+});
+
+// ---------------------------------------------------------------------------
+// projects:sync-metrics — the batch's "then" callback (never runs under
+// Bus::fake(), which only records the pending batch) — see #post-batch line.
+// ---------------------------------------------------------------------------
+
+it('flushes the page cache and dispatches the stats job once the sync batch completes', function () {
+    Bus::fake();
+    consoleCmd_publishedProject(['slug' => 'p1']);
+
+    $this->artisan('projects:sync-metrics')->assertSuccessful();
+
+    Bus::assertBatched(function ($batch): bool {
+        // Bus::fake() never runs a batch's callbacks — invoke them by hand
+        // to cover the ->then() closure itself.
+        foreach ($batch->thenCallbacks() as $callback) {
+            $callback();
+        }
+
+        return true;
+    });
+
+    // Bus::fake() (not Queue::fake()) is active in this test, and dispatch()
+    // for a ShouldQueue job routes through the Bus contract either way.
+    Bus::assertDispatched(PersistSiteStatsJob::class);
+});
+
+// ---------------------------------------------------------------------------
+// projects:backfill-github-repo-id (BackfillGithubRepoId)
+// ---------------------------------------------------------------------------
+
+it('dispatches a backfill job only for projects missing github_repo_id', function () {
+    consoleCmd_publishedProject(['slug' => 'missing-id', 'github_url' => 'https://github.com/owner/a', 'github_repo_id' => null]);
+    consoleCmd_publishedProject(['slug' => 'has-id', 'github_url' => 'https://github.com/owner/b', 'github_repo_id' => 123]);
+    consoleCmd_publishedProject(['slug' => 'no-url', 'github_url' => null]);
+    consoleCmd_publishedProject(['slug' => 'unavailable', 'github_url' => 'https://github.com/owner/c'])
+        ->forceFill(['unavailable_at' => now()])->save();
+
+    $this->artisan('projects:backfill-github-repo-id')
+        ->expectsOutputToContain('Dispatched 1 backfill jobs')
+        ->assertSuccessful();
+
+    Queue::assertPushed(BackfillGithubRepoIdJob::class, 1);
+});
+
+it('dispatches nothing and reports 0 jobs when every project already has a github_repo_id', function () {
+    consoleCmd_publishedProject(['slug' => 'has-id', 'github_url' => 'https://github.com/owner/a', 'github_repo_id' => 123]);
+
+    $this->artisan('projects:backfill-github-repo-id')
+        ->expectsOutputToContain('Dispatched 0 backfill jobs')
+        ->assertSuccessful();
+
+    Queue::assertNotPushed(BackfillGithubRepoIdJob::class);
 });

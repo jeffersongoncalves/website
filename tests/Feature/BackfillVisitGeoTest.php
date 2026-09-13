@@ -7,6 +7,7 @@ use GeoIp2\Database\Reader;
 use GeoIp2\Exception\AddressNotFoundException;
 use GeoIp2\Model\City;
 use JeffersonGoncalves\LaravelShortUrl\Models\Visit;
+use MaxMind\Db\Reader\InvalidDatabaseException;
 
 function fakeMaxmindCity(): City
 {
@@ -87,4 +88,18 @@ it('resolves and stores geo data for visits missing a city, skipping addresses t
         ->timezone->toBe('America/Sao_Paulo');
 
     expect($unresolvable->refresh()->city)->toBeNull();
+});
+
+it('makeReader() constructs a real GeoIp2 Reader from the configured path', function () {
+    // Every other test overrides this seam (see bindFakeGeoReader) since a
+    // real Reader needs a real binary MMDB file. Exercise the un-overridden
+    // method directly: passing a non-MMDB file still executes the `new
+    // Reader($path)` call, it just throws while validating the file's
+    // metadata — which is enough to cover the line without needing a real
+    // GeoLite2 database fixture.
+    $command = new BackfillVisitGeo;
+    $method = new ReflectionMethod($command, 'makeReader');
+    $method->setAccessible(true);
+
+    expect(fn () => $method->invoke($command, __FILE__))->toThrow(InvalidDatabaseException::class);
 });

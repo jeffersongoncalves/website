@@ -54,3 +54,31 @@ it('404s when the upstream fetch fails and nothing was ever cached', function ()
 
     $this->get('/readme-image/'.ReadmeImageCache::encode($url))->assertNotFound();
 });
+
+it('extracts only allow-listed image srcs from README html, deduped', function () {
+    $html = '<img src="https://raw.githubusercontent.com/o/r/main/a.png">'
+        .'<img src="https://evil.example.com/x.png">'
+        .'<img src="https://raw.githubusercontent.com/o/r/main/a.png">'
+        .'<img src="https://camo.githubusercontent.com/abc">'
+        .'no img here at all';
+
+    expect(ReadmeImageCache::extractAllowedImageUrls($html))->toBe([
+        'https://raw.githubusercontent.com/o/r/main/a.png',
+        'https://camo.githubusercontent.com/abc',
+    ]);
+});
+
+it('returns no urls when the html has no allow-listed images', function () {
+    expect(ReadmeImageCache::extractAllowedImageUrls('<img src="https://evil.example.com/x.png">'))
+        ->toBe([]);
+    expect(ReadmeImageCache::extractAllowedImageUrls('<p>no images</p>'))->toBe([]);
+});
+
+it('never fetches a disallowed host when warming', function () {
+    // No Http::fake at all for this host — a stray request would throw
+    // (Http::preventStrayRequests() from the global beforeEach), proving
+    // warm() returns before ever attempting the fetch.
+    ReadmeImageCache::warm('https://evil.example.com/x.png');
+
+    Storage::disk('github')->assertMissing(ReadmeImageCache::path('https://evil.example.com/x.png'));
+});

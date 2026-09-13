@@ -8,7 +8,10 @@ use App\Enums\ProjectStatus;
 use App\Jobs\PurgeMisattributedPackageLinksJob;
 use App\Models\Project;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Illuminate\Queue\Middleware\RateLimited;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 beforeEach(function (): void {
     // The global Pest fake stubs packagist.org/* and api.npmjs.org/* with
@@ -161,4 +164,55 @@ it('keeps links the repo genuinely owns', function (): void {
     expect($fresh->packagist_url)->toBe('https://packagist.org/packages/jeffersongoncalves/filament-gtag')
         ->and($fresh->package_type)->toBe(PackageType::Composer)
         ->and($fresh->downloads)->toBe(4200);
+});
+
+it('does nothing when the project no longer exists', function (): void {
+    purge(999999);
+})->throwsNoExceptions();
+
+it('does nothing when the project has no github_url', function (): void {
+    $project = Project::query()->create([
+        'slug' => 'no-github',
+        'name' => 'No Github',
+        'category' => ProjectCategory::Website,
+        'status' => ProjectStatus::Published,
+        'packagist_url' => 'https://packagist.org/packages/acme/lib',
+    ]);
+
+    purge($project->id);
+
+    expect($project->fresh()->packagist_url)->toBe('https://packagist.org/packages/acme/lib');
+});
+
+it('does nothing when the project has neither a packagist nor an npm link', function (): void {
+    $project = Project::query()->create([
+        'slug' => 'no-links',
+        'name' => 'No Links',
+        'category' => ProjectCategory::Tool,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/acme/tool',
+    ]);
+
+    purge($project->id);
+
+    expect($project->fresh()->github_url)->toBe('https://github.com/acme/tool');
+});
+
+it('bounds retries by 2 hours and guards with overlap/rate-limit middleware', function (): void {
+    $job = new PurgeMisattributedPackageLinksJob(1);
+
+    expect($job->retryUntil())->toBeGreaterThan(now()->addMinutes(119));
+
+    $middleware = $job->middleware();
+    expect($middleware)->toHaveCount(2)
+        ->and($middleware[0])->toBeInstanceOf(WithoutOverlapping::class)
+        ->and($middleware[1])->toBeInstanceOf(RateLimited::class);
+});
+
+it('logs context when PurgeMisattributedPackageLinksJob fails', function (): void {
+    Log::shouldReceive('error')
+        ->once()
+        ->with('PurgeMisattributedPackageLinksJob failed', Mockery::on(fn ($ctx) => $ctx['project_id'] === 42 && $ctx['error'] === 'boom'));
+
+    (new PurgeMisattributedPackageLinksJob(42))->failed(new RuntimeException('boom'));
 });

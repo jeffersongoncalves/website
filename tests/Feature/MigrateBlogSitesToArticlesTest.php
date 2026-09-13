@@ -7,6 +7,8 @@ use App\Enums\ProjectStatus;
 use App\Jobs\MigrateBlogSitesToArticlesJob;
 use App\Models\Project;
 use App\Models\ProjectSlugAlias;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
+use Illuminate\Support\Facades\Log;
 
 function runMigrateBlogSitesOp(): int
 {
@@ -85,4 +87,19 @@ it('runs via the projects:migrate-blog-sites command', function () {
         ->where('slug', 'article-cmd')
         ->where('category', ProjectCategory::Article->value)
         ->exists())->toBeTrue();
+});
+
+it('guards against overlapping runs', function () {
+    $middleware = (new MigrateBlogSitesToArticlesJob)->middleware();
+
+    expect($middleware)->toHaveCount(1)
+        ->and($middleware[0])->toBeInstanceOf(WithoutOverlapping::class);
+});
+
+it('logs context when MigrateBlogSitesToArticlesJob fails', function () {
+    Log::shouldReceive('error')
+        ->once()
+        ->with('MigrateBlogSitesToArticlesJob failed', Mockery::on(fn ($ctx) => $ctx['error'] === 'boom'));
+
+    (new MigrateBlogSitesToArticlesJob)->failed(new RuntimeException('boom'));
 });

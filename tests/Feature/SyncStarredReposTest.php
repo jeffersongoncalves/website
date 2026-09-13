@@ -8,10 +8,14 @@ use App\Jobs\ImportStarredRepoJob;
 use App\Jobs\SyncStarredReposJob;
 use App\Models\Project;
 use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Queue\Job;
 use Illuminate\Http\Client\Factory as HttpFactory;
+use Illuminate\Queue\Middleware\RateLimited;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Read starred_at as the TRUE raw DB scalar (via the query builder, bypassing
@@ -248,4 +252,211 @@ it('does not skip a new star inside the app timezone offset window', function ()
 
     Bus::assertDispatchedTimes(ImportStarredRepoJob::class, 1);
     Bus::assertDispatched(ImportStarredRepoJob::class, fn (ImportStarredRepoJob $j) => str_contains($j->htmlUrl, 'fresh'));
+});
+
+// ----------------------------------------------------------------------------
+// SyncStarredReposJob — remaining branches
+// ----------------------------------------------------------------------------
+
+it('skips the sync and logs a warning when no github username is configured', function (): void {
+    config(['services.github.username' => null]);
+
+    Log::shouldReceive('warning')
+        ->once()
+        ->with('SyncStarredReposJob skipped: services.github.username not set');
+
+    (new SyncStarredReposJob)->handle();
+
+    Bus::assertNotDispatched(ImportStarredRepoJob::class);
+});
+
+it('bounds SyncStarredReposJob retries by time and guards with overlap/rate-limit middleware', function (): void {
+    $job = new SyncStarredReposJob;
+
+    expect($job->retryUntil())->toBeGreaterThan(now()->addMinutes(90));
+
+    $middleware = $job->middleware();
+    expect($middleware)->toHaveCount(2)
+        ->and($middleware[0])->toBeInstanceOf(WithoutOverlapping::class)
+        ->and($middleware[1])->toBeInstanceOf(RateLimited::class);
+});
+
+it('releases SyncStarredReposJob when the starred-list page is rate-limited', function (): void {
+    Http::fake([
+        '*api.github.com/users/*/starred*' => Http::response('', 403, [
+            'X-RateLimit-Remaining' => '0',
+            'X-RateLimit-Reset' => (string) (time() + 90),
+        ]),
+    ]);
+
+    $queueJob = Mockery::mock(Job::class);
+    $queueJob->shouldReceive('release')->once();
+
+    (new SyncStarredReposJob)->setJob($queueJob)->handle();
+
+    Bus::assertNotDispatched(ImportStarredRepoJob::class);
+});
+
+it('stops the page and logs a warning when GitHub returns a non-rate-limit error', function (): void {
+    Http::fake([
+        '*api.github.com/users/*/starred*' => Http::response('', 500),
+    ]);
+
+    Log::shouldReceive('warning')
+        ->once()
+        ->with('SyncStarredReposJob: GitHub returned an error', Mockery::on(fn ($ctx) => $ctx['status'] === 500 && $ctx['page'] === 1));
+    Log::shouldReceive('info')->once();
+
+    (new SyncStarredReposJob)->handle();
+
+    Bus::assertNotDispatched(ImportStarredRepoJob::class);
+});
+
+it('stops when the starred list page decodes to an empty array', function (): void {
+    Http::fake([
+        '*api.github.com/users/*/starred*' => Http::response([]),
+    ]);
+
+    (new SyncStarredReposJob)->handle();
+
+    Bus::assertNotDispatched(ImportStarredRepoJob::class);
+});
+
+it('logs context when SyncStarredReposJob fails', function (): void {
+    Log::shouldReceive('error')
+        ->once()
+        ->with('SyncStarredReposJob failed', Mockery::on(fn ($ctx) => $ctx['full'] === false && $ctx['error'] === 'boom'));
+
+    (new SyncStarredReposJob)->failed(new RuntimeException('boom'));
+});
+
+it('does not treat an ordinary 403 with quota remaining and no Retry-After as a rate limit', function (): void {
+    // throwIfRateLimited's early-return branch: 403 but neither signal present.
+    Http::fake([
+        '*api.github.com/users/*/starred*' => Http::response('', 403, ['X-RateLimit-Remaining' => '10']),
+    ]);
+
+    Log::shouldReceive('warning')->once();
+    Log::shouldReceive('info')->once();
+
+    (new SyncStarredReposJob)->handle();
+
+    Bus::assertNotDispatched(ImportStarredRepoJob::class);
+});
+
+it('honours a Retry-After header over X-RateLimit-Reset on a secondary-limit 429', function (): void {
+    Http::fake([
+        '*api.github.com/users/*/starred*' => Http::response('', 429, ['Retry-After' => '45']),
+    ]);
+
+    $queueJob = Mockery::mock(Job::class);
+    $queueJob->shouldReceive('release')->once();
+
+    (new SyncStarredReposJob)->setJob($queueJob)->handle();
+
+    Bus::assertNotDispatched(ImportStarredRepoJob::class);
+});
+
+// ----------------------------------------------------------------------------
+// ImportStarredRepoJob — remaining branches
+// ----------------------------------------------------------------------------
+
+it('bounds ImportStarredRepoJob retries by time and guards with overlap/rate-limit middleware', function (): void {
+    $job = new ImportStarredRepoJob('https://github.com/acme/widget', '2026-05-25T10:00:00Z', staggerSeconds: 30);
+
+    expect($job->retryUntil())->toBeGreaterThan(now()->addMinutes(59));
+
+    $middleware = $job->middleware();
+    expect($middleware)->toHaveCount(2)
+        ->and($middleware[0])->toBeInstanceOf(WithoutOverlapping::class)
+        ->and($middleware[1])->toBeInstanceOf(RateLimited::class);
+});
+
+it('releases ImportStarredRepoJob when the importer hits a github rate limit', function (): void {
+    Http::fake([
+        'api.github.com/repos/*' => Http::response('', 403, [
+            'X-RateLimit-Remaining' => '0',
+            'X-RateLimit-Reset' => (string) (time() + 60),
+        ]),
+    ]);
+
+    $queueJob = Mockery::mock(Job::class);
+    $queueJob->shouldReceive('release')->once();
+
+    (new ImportStarredRepoJob('https://github.com/acme/widget', '2026-05-25T10:00:00Z'))
+        ->setJob($queueJob)->handle();
+
+    expect(Project::query()->count())->toBe(0);
+});
+
+it('drops a star permanently when the importer reports the repo does not exist', function (): void {
+    Http::fake(['*api.github.com/repos/*' => Http::response('', 404)]);
+
+    Log::shouldReceive('warning')
+        ->once()
+        ->with('ImportStarredRepoJob: importer failed permanently', Mockery::on(fn ($ctx) => $ctx['error'] === 'repo_not_found'));
+
+    (new ImportStarredRepoJob('https://github.com/acme/gone', '2026-05-25T10:00:00Z'))->handle();
+
+    expect(Project::query()->count())->toBe(0);
+});
+
+it('fills a docs_url-matched website seed instead of duplicating a starred repo', function (): void {
+    $seed = Project::query()->create([
+        'slug' => 'site-acme',
+        'name' => 'Acme Site',
+        'category' => ProjectCategory::Website,
+        'status' => ProjectStatus::Published,
+        'docs_url' => 'https://acme.example.com',
+        'published_at' => now(),
+    ]);
+
+    Http::fake([
+        '*api.github.com/repos/acme/widget' => Http::response([
+            'full_name' => 'acme/widget',
+            'html_url' => 'https://github.com/acme/widget',
+            'default_branch' => 'main',
+            'license' => ['spdx_id' => 'MIT'],
+            'homepage' => 'https://acme.example.com',
+        ]),
+        '*' => Http::response('', 404),
+    ]);
+
+    (new ImportStarredRepoJob('https://github.com/acme/widget', '2026-05-25T10:00:00Z'))->handle();
+
+    // Unlike ImportGithubRepoJob's second pass, this branch only back-fills
+    // starred_at — it does not fillMissing() the rest onto the matched row.
+    expect(Project::query()->count())->toBe(1);
+    expect($seed->refresh())
+        ->github_url->toBeNull()
+        ->starred_at->not->toBeNull();
+});
+
+it('logs context when ImportStarredRepoJob fails', function (): void {
+    Log::shouldReceive('error')
+        ->once()
+        ->with('ImportStarredRepoJob failed', Mockery::on(fn ($ctx) => $ctx['html_url'] === 'https://github.com/acme/widget' && $ctx['error'] === 'boom'));
+
+    (new ImportStarredRepoJob('https://github.com/acme/widget', '2026-05-25T10:00:00Z'))->failed(new RuntimeException('boom'));
+});
+
+// ---------------------------------------------------------------------------
+// projects:sync-stars (SyncStarredRepos console command) — thin dispatcher
+// ---------------------------------------------------------------------------
+
+it('dispatches a non-full star sync job by default', function (): void {
+    $this->artisan('projects:sync-stars')
+        ->expectsOutputToContain('Dispatched star sync on the `github` queue.')
+        ->assertSuccessful();
+
+    // This file's beforeEach calls Bus::fake() (not Queue::fake()) — dispatch()
+    // for a ShouldQueue job routes through the Bus contract either way, so the
+    // assertion belongs on Bus here, not Queue.
+    Bus::assertDispatched(SyncStarredReposJob::class, fn (SyncStarredReposJob $job) => $job->full === false);
+});
+
+it('dispatches a full star sync job with --full', function (): void {
+    $this->artisan('projects:sync-stars --full')->assertSuccessful();
+
+    Bus::assertDispatched(SyncStarredReposJob::class, fn (SyncStarredReposJob $job) => $job->full === true);
 });

@@ -160,6 +160,34 @@ it('role=authored lists only repos under the owner account, not starred third-pa
         ->assertDontSee('someone-else-repo');
 });
 
+it('setRole switches to the maintainer facet via the Livewire action', function () {
+    publishedProject('maintained-repo', ['slug' => 'maintained-repo', 'is_maintainer' => true]);
+    publishedProject('unmaintained-repo', ['slug' => 'unmaintained-repo', 'is_maintainer' => false]);
+
+    Livewire::test(ProjectsList::class)
+        ->assertSee('maintained-repo')
+        ->assertSee('unmaintained-repo')
+        ->call('setRole', 'maintainer')
+        ->assertSet('role', 'maintainer')
+        ->assertSee('maintained-repo')
+        ->assertDontSee('unmaintained-repo');
+});
+
+it('setSource switches between own and starred facets via the Livewire action', function () {
+    publishedProject('own-repo', ['slug' => 'own-repo']);
+    publishedProject('starred-repo', ['slug' => 'starred-repo', 'starred_at' => now()]);
+
+    Livewire::test(ProjectsList::class)
+        ->call('setSource', 'own')
+        ->assertSet('source', 'own')
+        ->assertSee('own-repo')
+        ->assertDontSee('starred-repo')
+        ->call('setSource', 'starred')
+        ->assertSet('source', 'starred')
+        ->assertSee('starred-repo')
+        ->assertDontSee('own-repo');
+});
+
 it('filters by language when the language is in the persisted facet', function () {
     publishedProject('php-lib', ['slug' => 'php-lib', 'category' => ProjectCategory::PhpPackage])->update(['language' => 'PHP']);
     publishedProject('js-lib', ['slug' => 'js-lib', 'category' => ProjectCategory::JavascriptPackage])->update(['language' => 'JavaScript']);

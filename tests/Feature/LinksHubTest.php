@@ -6,6 +6,7 @@ use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Livewire\Site\LinksSection;
 use App\Models\Project;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 
@@ -196,4 +197,34 @@ it('drives a section search and topic filter through wire actions', function () 
         ->call('clearTopic')
         ->assertSet('topic', '')
         ->assertSee('beta-site');
+});
+
+it('resolves the anchor from an already-hydrated component on a follow-up wire update', function () {
+    externalLink('gamma-site', ProjectCategory::Website);
+
+    // The first render mounts and sets $this->anchor; a later ->set() drives a
+    // full Livewire round trip that re-invokes queryString() (and therefore
+    // resolveAnchor()) with $this->anchor already populated from mount().
+    Livewire::test(LinksSection::class, ['category' => ProjectCategory::Website, 'index' => 0])
+        ->assertSee('gamma-site')
+        ->set('dir', 'desc')
+        ->assertSee('gamma-site');
+});
+
+it('skips a topics row whose stored topics column is not a JSON array', function () {
+    // sectionTopics() scans every published row in the category regardless of
+    // pagination, but the card partial for the CURRENT page reads the same
+    // (Eloquent-cast) `topics` column — so keep the malformed row off page 1
+    // (PER_PAGE = 6) by giving it a name that sorts last, instead of letting
+    // its own card try to array_slice() a non-array and 500.
+    for ($i = 1; $i <= 6; $i++) {
+        externalLink(sprintf('aaa-site-%02d', $i), ProjectCategory::Website);
+    }
+    $malformed = externalLink('zzz-malformed-topics-site', ProjectCategory::Website, ['topics' => ['design']]);
+
+    // Bypass the Eloquent array cast to store a JSON-encoded scalar directly,
+    // simulating a malformed row — sectionTopics() must skip it, not crash.
+    DB::table('projects')->where('id', $malformed->id)->update(['topics' => json_encode('not-an-array')]);
+
+    $this->get('/links')->assertOk();
 });

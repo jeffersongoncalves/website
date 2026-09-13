@@ -14,6 +14,8 @@ use App\Models\SiteStat;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Factory;
+use Illuminate\Queue\Middleware\RateLimited;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -137,6 +139,17 @@ it('logs context when ImportNpmPackageJob fails', function () {
     (new ImportNpmPackageJob('broken-pkg'))->failed(new RuntimeException('boom'));
 });
 
+it('bounds ImportNpmPackageJob retries by time and guards with overlap/rate-limit middleware', function () {
+    $job = new ImportNpmPackageJob('acme-pkg', 'tool', staggerSeconds: 30);
+
+    expect($job->retryUntil())->toBeGreaterThan(now()->addMinutes(59));
+
+    $middleware = $job->middleware();
+    expect($middleware)->toHaveCount(2)
+        ->and($middleware[0])->toBeInstanceOf(WithoutOverlapping::class)
+        ->and($middleware[1])->toBeInstanceOf(RateLimited::class);
+});
+
 // ----------------------------------------------------------------------------
 // ImportGithubRepoJob
 // ----------------------------------------------------------------------------
@@ -165,6 +178,76 @@ it('logs context when ImportGithubRepoJob fails', function () {
     (new ImportGithubRepoJob('https://github.com/acme/widget'))->failed(new RuntimeException('boom'));
 });
 
+it('bounds ImportGithubRepoJob retries by time and guards with overlap/rate-limit middleware', function () {
+    $job = new ImportGithubRepoJob('https://github.com/acme/widget', staggerSeconds: 30);
+
+    expect($job->retryUntil())->toBeGreaterThan(now()->addMinutes(59));
+
+    $middleware = $job->middleware();
+    expect($middleware)->toHaveCount(2)
+        ->and($middleware[0])->toBeInstanceOf(WithoutOverlapping::class)
+        ->and($middleware[1])->toBeInstanceOf(RateLimited::class);
+});
+
+it('fills a docs_url-matched website seed instead of duplicating, on the second canonical pass', function () {
+    $seed = Project::query()->create([
+        'slug' => 'site-acme',
+        'name' => 'Acme Site',
+        'category' => ProjectCategory::Website,
+        'status' => ProjectStatus::Published,
+        'docs_url' => 'https://acme.example.com',
+        'published_at' => now(),
+    ]);
+
+    importJobs_stub([
+        'api.github.com/repos/*' => Http::response([
+            'full_name' => 'acme/widget',
+            'html_url' => 'https://github.com/acme/widget',
+            'description' => 'd',
+            'homepage' => 'https://acme.example.com',
+            'default_branch' => 'main',
+            'license' => ['spdx_id' => 'MIT'],
+            'stargazers_count' => 5,
+        ]),
+        '*' => Http::response('', 404),
+    ]);
+
+    (new ImportGithubRepoJob('https://github.com/acme/widget'))->handle();
+
+    expect(Project::query()->count())->toBe(1);
+    $seed->refresh();
+    expect($seed->github_url)->toBe('https://github.com/acme/widget')
+        ->and($seed->is_maintainer)->toBeFalse();
+});
+
+it('promotes an existing docs_url-matched project to is_maintainer on the second canonical pass', function () {
+    $seed = Project::query()->create([
+        'slug' => 'site-acme',
+        'name' => 'Acme Site',
+        'category' => ProjectCategory::Website,
+        'status' => ProjectStatus::Published,
+        'docs_url' => 'https://acme.example.com',
+        'published_at' => now(),
+        'is_maintainer' => false,
+    ]);
+
+    importJobs_stub([
+        'api.github.com/repos/*' => Http::response([
+            'full_name' => 'acme/widget',
+            'html_url' => 'https://github.com/acme/widget',
+            'description' => 'd',
+            'homepage' => 'https://acme.example.com',
+            'default_branch' => 'main',
+            'license' => ['spdx_id' => 'MIT'],
+        ]),
+        '*' => Http::response('', 404),
+    ]);
+
+    (new ImportGithubRepoJob('https://github.com/acme/widget', isMaintainer: true))->handle();
+
+    expect($seed->refresh()->is_maintainer)->toBeTrue();
+});
+
 // ----------------------------------------------------------------------------
 // ImportWebsiteJob / ImportYoutubeChannelJob
 // ----------------------------------------------------------------------------
@@ -183,6 +266,13 @@ it('logs context when ImportYoutubeChannelJob fails', function () {
         ->with('ImportYoutubeChannelJob failed', Mockery::on(fn ($ctx) => $ctx['handle'] === 'someone' && $ctx['name'] === 'Someone' && $ctx['error'] === 'boom'));
 
     (new ImportYoutubeChannelJob('someone', 'Someone'))->failed(new RuntimeException('boom'));
+});
+
+it('is idempotent on the youtube- slug — a second run does not duplicate', function () {
+    (new ImportYoutubeChannelJob('someone', 'Someone'))->handle();
+    (new ImportYoutubeChannelJob('someone', 'Someone'))->handle();
+
+    expect(Project::query()->where('slug', 'youtube-someone')->count())->toBe(1);
 });
 
 // ----------------------------------------------------------------------------
@@ -236,4 +326,15 @@ it('logs context when PersistSiteStatsJob fails', function () {
         ->with('PersistSiteStatsJob failed', Mockery::on(fn ($ctx) => $ctx['error'] === 'boom'));
 
     (new PersistSiteStatsJob)->failed(new RuntimeException('boom'));
+});
+
+it('bounds PersistSiteStatsJob retries by time and guards with overlap/rate-limit middleware', function () {
+    $job = new PersistSiteStatsJob(staggerSeconds: 30);
+
+    expect($job->retryUntil())->toBeGreaterThan(now()->addMinutes(59));
+
+    $middleware = $job->middleware();
+    expect($middleware)->toHaveCount(2)
+        ->and($middleware[0])->toBeInstanceOf(WithoutOverlapping::class)
+        ->and($middleware[1])->toBeInstanceOf(RateLimited::class);
 });

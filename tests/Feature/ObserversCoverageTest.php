@@ -8,7 +8,11 @@ use App\Models\Admin;
 use App\Models\Project;
 use App\Models\ProjectSlugAlias;
 use App\Models\User;
+use App\Observers\AdminObserver;
+use App\Observers\ProjectObserver;
+use App\Observers\UserObserver;
 use Illuminate\Support\Facades\Cache;
+use Psr\SimpleCache\InvalidArgumentException;
 
 // ---------------------------------------------------------------------------
 // UserObserver -> users_count cache invalidation
@@ -54,6 +58,101 @@ it('forgets the admins_count cache when an Admin is deleted', function () {
     $admin->delete();
 
     expect(Cache::has('admins_count'))->toBeFalse();
+});
+
+it('swallows an InvalidArgumentException from the cache store on User create/delete', function () {
+    $exception = new class extends Exception implements InvalidArgumentException {};
+    Cache::partialMock()->shouldReceive('delete')->with('users_count')->twice()->andThrow($exception);
+
+    $user = User::factory()->create(); // created() — must not bubble the exception
+    $user->delete(); // deleted() — same
+
+    expect($user->wasRecentlyCreated)->toBeTrue();
+});
+
+it('swallows an InvalidArgumentException from the cache store on Admin create/delete', function () {
+    $exception = new class extends Exception implements InvalidArgumentException {};
+    Cache::partialMock()->shouldReceive('delete')->with('admins_count')->twice()->andThrow($exception);
+
+    $admin = Admin::factory()->create();
+    $admin->delete();
+
+    expect($admin->wasRecentlyCreated)->toBeTrue();
+});
+
+it('has no-op updated/restored/forceDeleted handlers on UserObserver', function () {
+    $observer = new UserObserver;
+    $user = User::factory()->make();
+
+    $observer->updated($user);
+    $observer->restored($user);
+    $observer->forceDeleted($user);
+
+    expect(true)->toBeTrue();
+});
+
+it('has no-op updated/restored/forceDeleted handlers on AdminObserver', function () {
+    $observer = new AdminObserver;
+    $admin = Admin::factory()->make();
+
+    $observer->updated($admin);
+    $observer->restored($admin);
+    $observer->forceDeleted($admin);
+
+    expect(true)->toBeTrue();
+});
+
+// ---------------------------------------------------------------------------
+// ProjectObserver — restored/forceDeleted (Project has no SoftDeletes, so
+// Eloquent never fires these for real; called directly since they're still
+// real, reachable code paths a future SoftDeletes addition would trigger)
+// and the flush() cache-exception swallow.
+// ---------------------------------------------------------------------------
+
+function observerCoverage_publishedProject(): Project
+{
+    return createProject([
+        'slug' => 'observer-coverage',
+        'name' => 'Observer Coverage',
+        'category' => ProjectCategory::Tool,
+        'status' => ProjectStatus::Published,
+        'featured' => true,
+    ]);
+}
+
+it('flush()es caches on ProjectObserver::restored', function () {
+    $project = observerCoverage_publishedProject();
+    Cache::rememberForever('featured_projects', fn () => 'stale');
+
+    (new ProjectObserver)->restored($project);
+
+    expect(Cache::has('featured_projects'))->toBeFalse();
+});
+
+it('flush()es caches on ProjectObserver::forceDeleted', function () {
+    $project = observerCoverage_publishedProject();
+    Cache::rememberForever('featured_projects', fn () => 'stale');
+
+    (new ProjectObserver)->forceDeleted($project);
+
+    expect(Cache::has('featured_projects'))->toBeFalse();
+});
+
+it('swallows an InvalidArgumentException from the cache store during ProjectObserver flush', function () {
+    $project = observerCoverage_publishedProject();
+    $exception = new class extends Exception implements InvalidArgumentException {};
+    // Full replacement: stub every method this flow actually calls — `delete`
+    // (throws, inside ProjectObserver::flush()'s try/catch) plus `add`/
+    // `increment` (CachePublicPage::flush()'s own calls, unconditional,
+    // running right after the try/catch regardless of the swallowed
+    // exception).
+    Cache::shouldReceive('delete')->once()->andThrow($exception);
+    Cache::shouldReceive('add')->andReturn(true);
+    Cache::shouldReceive('increment')->andReturn(1);
+
+    (new ProjectObserver)->deleted($project);
+
+    expect(true)->toBeTrue();
 });
 
 // ---------------------------------------------------------------------------

@@ -6,6 +6,7 @@ use App\Jobs\BackfillVisitAsnChunkJob;
 use GeoIp2\Database\Reader;
 use GeoIp2\Exception\AddressNotFoundException;
 use GeoIp2\Model\Asn;
+use Illuminate\Support\Facades\Log;
 use JeffersonGoncalves\LaravelShortUrl\Models\Visit;
 
 function fakeMaxmindAsn(int $number, string $org): Asn
@@ -86,4 +87,12 @@ it('skips a visit with no stored ip', function () {
     $job->handle();
 
     expect($visit->refresh()->isp)->toBeNull();
+});
+
+it('logs context when BackfillVisitAsnChunkJob fails', function () {
+    Log::shouldReceive('error')
+        ->once()
+        ->with('BackfillVisitAsnChunkJob failed', Mockery::on(fn ($ctx) => $ctx['model'] === Visit::class && $ctx['chunk_size'] === 2 && $ctx['error'] === 'boom'));
+
+    (new BackfillVisitAsnChunkJob(Visit::class, [1, 2]))->failed(new RuntimeException('boom'));
 });

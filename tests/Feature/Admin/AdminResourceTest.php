@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Filament\Admin\Resources\Admins\AdminResource;
 use App\Filament\Admin\Resources\Admins\Pages\CreateAdmin;
 use App\Filament\Admin\Resources\Admins\Pages\ListAdmins;
 use App\Models\Admin;
@@ -34,4 +35,13 @@ it('creates an admin via the admin resource', function () {
         ->assertHasNoFormErrors();
 
     expect(Admin::query()->where('email', 'new.admin@example.test')->exists())->toBeTrue();
+});
+
+it('builds a global search result url for an admin', function () {
+    $admin = Admin::factory()->create(['status' => true]);
+
+    expect(AdminResource::getGlobalSearchResultUrl($admin))
+        ->toBe(AdminResource::getUrl('view', ['record' => $admin]))
+        ->and(AdminResource::getGloballySearchableAttributes())
+        ->toBe(['name', 'email']);
 });

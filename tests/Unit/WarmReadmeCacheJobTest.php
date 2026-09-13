@@ -8,9 +8,11 @@ use App\Jobs\WarmReadmeCacheJob;
 use App\Models\Project;
 use App\Support\ReadmeImageCache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Queue\Middleware\RateLimited;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use JeffersonGoncalves\GitHubReadme\Models\ReadmeCache;
 
@@ -120,4 +122,74 @@ it('warms the npm README for a package with no github_url', function () {
     (new WarmReadmeCacheJob($project))->handle();
 
     Http::assertSent(fn ($request) => str_contains($request->url(), 'registry.npmjs.org/pkg'));
+});
+
+it('does nothing when the npm package has no readme', function () {
+    Http::fake(['registry.npmjs.org/*' => Http::response(['name' => 'pkg'])]);
+
+    $project = Project::query()->create([
+        'name' => 'Pkg',
+        'slug' => 'pkg',
+        'category' => ProjectCategory::JavascriptPackage,
+        'status' => ProjectStatus::Published,
+        'npm_url' => 'https://www.npmjs.com/package/pkg',
+        'stars' => 0,
+        'downloads' => 0,
+    ]);
+
+    (new WarmReadmeCacheJob($project))->handle();
+
+    expect(ReadmeCache::query()->count())->toBe(0);
+});
+
+it('bounds WarmReadmeCacheJob retries by time', function () {
+    $project = Project::query()->create([
+        'name' => 'Repo',
+        'slug' => 'repo',
+        'category' => ProjectCategory::LaravelPackage,
+        'status' => ProjectStatus::Published,
+        'stars' => 0,
+        'downloads' => 0,
+    ]);
+
+    expect((new WarmReadmeCacheJob($project, staggerSeconds: 30))->retryUntil())
+        ->toBeGreaterThan(now()->addMinutes(59));
+});
+
+it('logs a warning instead of throwing when fetching the readme fails', function () {
+    Http::fake(fn () => throw new ConnectionException('timeout'));
+
+    $project = Project::query()->create([
+        'name' => 'Repo',
+        'slug' => 'repo',
+        'category' => ProjectCategory::LaravelPackage,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/owner/repo',
+        'readme_branch' => 'main',
+        'stars' => 0,
+        'downloads' => 0,
+    ]);
+
+    Log::shouldReceive('warning')
+        ->once()
+        ->with('WarmReadmeCacheJob failed', Mockery::on(fn ($ctx) => $ctx['project'] === 'repo'));
+
+    (new WarmReadmeCacheJob($project))->handle();
+});
+
+it('logs context when WarmReadmeCacheJob permanently fails', function () {
+    $project = Project::query()->create([
+        'name' => 'Repo',
+        'slug' => 'repo',
+        'category' => ProjectCategory::LaravelPackage,
+        'status' => ProjectStatus::Published,
+        'stars' => 0,
+        'downloads' => 0,
+    ]);
+
+    Log::shouldReceive('error')
+        ->once()
+        ->with('WarmReadmeCacheJob permanently failed', Mockery::on(fn ($ctx) => $ctx['project'] === 'repo' && $ctx['error'] === 'boom'));
+
+    (new WarmReadmeCacheJob($project))->failed(new RuntimeException('boom'));
 });

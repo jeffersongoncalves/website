@@ -8,6 +8,7 @@ use App\Enums\ProjectStatus;
 use App\Models\Project;
 use App\Support\OutboundLink;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
@@ -71,6 +72,79 @@ it('renders a project page under its canonical section without redirecting', fun
     $this->get('/projects/filament-thing')
         ->assertOk()
         ->assertSee('Filament Thing');
+});
+
+it('sanitizes untrusted script/event-handler/Alpine markup out of a third-party README', function () {
+    Storage::fake('github');
+    Http::swap(new Factory);
+    Http::fake([
+        'api.github.com/repos/*/readme' => Http::response(
+            "# Cool Tool\n\n".
+            "<script>alert('xss')</script>\n\n".
+            '<img src="x" onerror="alert(1)">'."\n\n".
+            '<div x-data="{ open: true }" x-on:click="alert(2)">Alpine payload</div>'."\n\n".
+            'Some **safe** text with a [link](https://example.test) and `inline code`.',
+            200,
+            ['Content-Type' => 'text/plain'],
+        ),
+        'api.github.com/repos/*' => Http::response(['default_branch' => 'main', 'stargazers_count' => 0]),
+    ]);
+
+    // Not a Filament plugin: no branch resolution needed, exercises the plain
+    // github_url + null $ref path through the sanitizer.
+    $project = Project::query()->create([
+        'name' => 'Untrusted Readme Tool',
+        'slug' => 'untrusted-readme-tool',
+        'category' => ProjectCategory::Tool,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/acme/untrusted-readme-tool',
+        'published_at' => now(),
+    ]);
+
+    $response = $this->get('/projects/'.$project->slug)->assertOk();
+
+    // Check the exact injected payload strings, not generic tokens like
+    // "<script" or "x-data" — the page's OWN trusted chrome legitimately has
+    // <script> tags (Vite, GTM) and Alpine x-data elsewhere on this page.
+    $response->assertDontSee("<script>alert('xss')</script>", false)
+        ->assertDontSee('alert(1)', false)
+        ->assertDontSee('alert(2)', false)
+        ->assertDontSee('onerror="alert(1)"', false)
+        ->assertDontSee('x-data="{ open: true }"', false)
+        ->assertDontSee('x-on:click="alert(2)"', false)
+        // Safe formatting survives sanitization (the link itself is rewritten
+        // to an internal outbound short-url by GithubReadme::rewriteOutboundLinks,
+        // so check the anchor text/tag rather than the literal external host).
+        ->assertSee('safe', false)
+        ->assertSee('inline code', false)
+        ->assertSee('>link<', false)
+        ->assertSee('Alpine payload', false);
+});
+
+it('assigns readme_branch as the ref for a non-Filament-plugin project', function () {
+    Storage::fake('github');
+    Http::swap(new Factory);
+    Http::fake([
+        // Trailing wildcard: a non-null $ref appends ?ref=<branch> to this
+        // URL, and Http::fake's pattern match needs it or the broader
+        // 'api.github.com/repos/*' stub below wins instead.
+        'api.github.com/repos/*/readme*' => Http::response('# From develop', 200, ['Content-Type' => 'text/plain']),
+        'api.github.com/repos/*' => Http::response(['default_branch' => 'main', 'stargazers_count' => 0]),
+    ]);
+
+    $project = Project::query()->create([
+        'name' => 'Branch Pinned Tool',
+        'slug' => 'branch-pinned-tool',
+        'category' => ProjectCategory::Tool,
+        'status' => ProjectStatus::Published,
+        'github_url' => 'https://github.com/acme/branch-pinned-tool',
+        'readme_branch' => 'develop',
+        'published_at' => now(),
+    ]);
+
+    $this->get('/projects/'.$project->slug)
+        ->assertOk()
+        ->assertSee('From develop');
 });
 
 it('renders the npm registry README for an npm-only package with no repo', function () {

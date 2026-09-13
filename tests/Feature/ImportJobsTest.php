@@ -17,6 +17,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 
 uses(RefreshDatabase::class);
@@ -155,4 +156,12 @@ it('refreshes the derived site stats without error', function () {
     (new RefreshProjectStatsJob)->handle();
 
     expect(SiteStats::all()['filament'])->toBeGreaterThanOrEqual(1);
+});
+
+it('logs context when a DebouncedJob subclass fails', function () {
+    Log::shouldReceive('error')
+        ->once()
+        ->with(RefreshProjectStatsJob::class.' failed', Mockery::on(fn ($ctx) => $ctx['error'] === 'boom'));
+
+    (new RefreshProjectStatsJob)->failed(new RuntimeException('boom'));
 });

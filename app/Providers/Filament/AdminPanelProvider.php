@@ -31,6 +31,7 @@ use JeffersonGoncalves\Filament\Gtm\GtmPlugin;
 use JeffersonGoncalves\Filament\OneTimeOperations\OneTimeOperationsPlugin;
 use JeffersonGoncalves\Filament\PageVisits\FilamentPageVisitsPlugin;
 use JeffersonGoncalves\Filament\Pwa\FilamentPwaPlugin;
+use JeffersonGoncalves\Filament\ScannerGuard\ScannerGuardPlugin;
 use JeffersonGoncalves\Filament\ShortUrl\FilamentShortUrlPlugin;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
@@ -152,6 +153,10 @@ class AdminPanelProvider extends PanelProvider
                 // data — device/browser/geo/locale/referer/UTM per pageview).
                 FilamentPageVisitsPlugin::make()
                     ->navigationGroup(__('admin.navigation.analytics')),
+                // Vulnerability-scanner ban list (jeffersongoncalves/laravel-scanner-guard).
+                // No fluent nav-group setter on this plugin — the resource
+                // isn't grouped under one of the panel's NavigationGroups yet.
+                ScannerGuardPlugin::make(),
                 GtmPlugin::make(),
                 GtagPlugin::make(),
                 FilamentEditProfilePlugin::make()

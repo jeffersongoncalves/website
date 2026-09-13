@@ -27,6 +27,7 @@
         "jeffersongoncalves/filament-one-time-operations": "^3.0",
         "jeffersongoncalves/filament-page-visits": "^3.0",
         "jeffersongoncalves/filament-pwa": "^3.1",
+        "jeffersongoncalves/filament-scanner-guard": "^3.0",
         "jeffersongoncalves/filament-sensible-defaults": "^3.1",
         "jeffersongoncalves/filament-short-url": "^3.5",
         "jeffersongoncalves/flysystem-google-drive": "^1.0",

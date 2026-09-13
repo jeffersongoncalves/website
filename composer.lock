@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5e7d61084dd965708c3e10bb015644f5",
+    "content-hash": "588b2f2553f3f0df60d0f78f1c3068a8",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -3334,6 +3334,85 @@
                 "source": "https://github.com/jeffersongoncalves/filament-pwa/tree/3.1.0"
             },
             "time": "2026-08-27T14:28:03+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/filament-scanner-guard",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/filament-scanner-guard.git",
+                "reference": "5236e7ee4aead61d909fd9b11d88e9a60429d271"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-scanner-guard/zipball/5236e7ee4aead61d909fd9b11d88e9a60429d271",
+                "reference": "5236e7ee4aead61d909fd9b11d88e9a60429d271",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.3",
+                "jeffersongoncalves/laravel-scanner-guard": "^1.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.21",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^3.7.4|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\Filament\\ScannerGuard\\ScannerGuardServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\Filament\\ScannerGuard\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Filament UI for jeffersongoncalves/laravel-scanner-guard: list, filter and unban vulnerability-scanner bans from your admin panel",
+            "homepage": "https://github.com/jeffersongoncalves/filament-scanner-guard",
+            "keywords": [
+                "ban",
+                "filament",
+                "filament-plugin",
+                "firewall",
+                "laravel",
+                "scanner-guard",
+                "security",
+                "waf"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/filament-scanner-guard/issues",
+                "source": "https://github.com/jeffersongoncalves/filament-scanner-guard/tree/3.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://buymeacoffee.com/jeffersongoncalves",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-09-13T03:21:26+00:00"
         },
         {
             "name": "jeffersongoncalves/filament-sensible-defaults",

@@ -5030,16 +5030,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-visitor-fingerprint",
-            "version": "1.0.3",
+            "version": "1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint.git",
-                "reference": "ec525eeb2a8d05d29aff78df86448f16bcb9d15b"
+                "reference": "39838e3a7d35719638e883a9ff5852ab777e5686"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-visitor-fingerprint/zipball/ec525eeb2a8d05d29aff78df86448f16bcb9d15b",
-                "reference": "ec525eeb2a8d05d29aff78df86448f16bcb9d15b",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-visitor-fingerprint/zipball/39838e3a7d35719638e883a9ff5852ab777e5686",
+                "reference": "39838e3a7d35719638e883a9ff5852ab777e5686",
                 "shasum": ""
             },
             "require": {
@@ -5098,7 +5098,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint/tree/1.0.3"
+                "source": "https://github.com/jeffersongoncalves/laravel-visitor-fingerprint/tree/1.0.4"
             },
             "funding": [
                 {
@@ -5110,7 +5110,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-12T20:38:54+00:00"
+            "time": "2026-09-13T01:09:07+00:00"
         },
         {
             "name": "jenssegers/agent",

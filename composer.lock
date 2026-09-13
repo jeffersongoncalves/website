@@ -3123,16 +3123,16 @@
         },
         {
             "name": "jeffersongoncalves/filament-page-visits",
-            "version": "3.0.3",
+            "version": "3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-page-visits.git",
-                "reference": "fa2a8477b986b832162358626214439601d86422"
+                "reference": "d91b8acd139b138f849e2bba3c2714625029ca7d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-page-visits/zipball/fa2a8477b986b832162358626214439601d86422",
-                "reference": "fa2a8477b986b832162358626214439601d86422",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-page-visits/zipball/d91b8acd139b138f849e2bba3c2714625029ca7d",
+                "reference": "d91b8acd139b138f849e2bba3c2714625029ca7d",
                 "shasum": ""
             },
             "require": {
@@ -3184,7 +3184,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-page-visits/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-page-visits/tree/3.0.3"
+                "source": "https://github.com/jeffersongoncalves/filament-page-visits/tree/3.0.4"
             },
             "funding": [
                 {
@@ -3196,7 +3196,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-11T21:13:30+00:00"
+            "time": "2026-09-13T00:14:38+00:00"
         },
         {
             "name": "jeffersongoncalves/filament-plugin-core",

@@ -4,41 +4,48 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 /**
- * Re-scans jeffersongoncalves/jeffersongoncalves's plugins.json (the catalog
- * driving that repo's profile README) and fans out one ImportGithubRepoJob
- * per entry that's new or newly promoted to maintainer status — dispatched
- * by POST /api/plugins-sync, which the source repo's notify-site-plugins-sync
+ * Fans out one ImportGithubRepoJob per newly-added entry in
+ * jeffersongoncalves/jeffersongoncalves's plugin catalog — dispatched by
+ * POST /api/plugins-sync, which the source repo's notify-site-plugins-sync
  * workflow calls whenever plugins.json changes.
  *
- * Diffs the flattened entry list against the slug => is_maintainer snapshot
- * cached from the previous run (LAST_SYNC_CACHE_KEY, forever — no TTL, this
- * is durable state, not a cache in the "may expire" sense) rather than
- * re-dispatching all ~250+ entries on every run: ImportGithubRepoJob already
- * no-ops on an already-cadastrado repo (a cheap DB pre-check), but each
- * dispatch still reserves GitHub-quota budget up front (GithubQuota::reserve
- * in ImportGithubRepoJob::make()), so the volume of dispatches itself is the
- * cost worth avoiding, not just the DB check.
+ * Diffs against a local copy kept in storage/app/plugins-sync/ (survives an
+ * atomic deploy's release swap, unlike public/) rather than re-dispatching
+ * all ~250+ catalog entries on every run: ImportGithubRepoJob already no-ops
+ * on an already-cadastrado repo (a cheap DB pre-check), but each dispatch
+ * still reserves GitHub-quota budget up front (GithubQuota::reserve in
+ * ImportGithubRepoJob::make()), so the dispatch volume itself is the cost
+ * worth avoiding, not just the DB check.
  *
- * A category reclassification for an EXISTING project was never applied by
- * this job even before this diffing was added — ImportGithubRepoJob::handle()
- * only fills missing fields on an existing row, never overwrites `category`
- * — so skipping unchanged entries here doesn't drop any capability the
- * dispatch-everything approach actually had. An entry moving INTO
- * `filament.collaborator` (is_maintainer flips false -> true) still
- * re-dispatches, since ImportGithubRepoJob::handle() does apply that one
- * promotion to an existing row.
+ * The diff runs against plugins-packages-owner.json/
+ * plugins-packages-collaborator.json — flat, sorted "owner/repo" string
+ * lists the source repo generates (extract-plugin-packages.js, run from its
+ * pre-commit hook) from the same nested plugins.json using identical
+ * flatten/collectEntries logic. Diffing these instead of the full nested
+ * plugins.json means a GitHub-side reviewer sees exactly which packages
+ * were added/removed in a plain one-line-per-entry diff, and this job's own
+ * diff is a trivial array_diff instead of re-deriving structure.
+ *
+ * plugins.json itself is still fetched once per run, purely to build a
+ * slug => fallback-category lookup (the flat files don't carry category) —
+ * see flatten()/collectEntries(), unchanged from before this diffing was
+ * added. A category reclassification for an EXISTING project was never
+ * applied by this job even before — ImportGithubRepoJob::handle() only
+ * fills missing fields on an existing row, never overwrites `category` — so
+ * skipping unchanged entries here doesn't drop any capability the
+ * dispatch-everything approach actually had.
  *
  * See DebouncedJob for how the debounce itself works (a source push firing
  * the webhook twice in quick succession collapses to one scan).
  */
 class SyncPluginsJsonJob extends DebouncedJob
 {
-    private const LAST_SYNC_CACHE_KEY = 'plugins-json:last-synced-slugs';
+    private const STORAGE_DIR = 'plugins-sync';
 
     protected int $expireAfter = 180;
 
@@ -54,6 +61,108 @@ class SyncPluginsJsonJob extends DebouncedJob
 
     public function handle(): void
     {
+        $categoryBySlug = $this->fetchCategoryMap();
+
+        $this->diffAndDispatch(
+            url: (string) config('services.plugins_sync.owner_packages_url'),
+            storageFile: 'owner.json',
+            isMaintainer: false,
+            categoryBySlug: $categoryBySlug,
+        );
+
+        $this->diffAndDispatch(
+            url: (string) config('services.plugins_sync.collaborator_packages_url'),
+            storageFile: 'collaborator.json',
+            isMaintainer: true,
+            categoryBySlug: $categoryBySlug,
+        );
+    }
+
+    /**
+     * @param  array<string, string>  $categoryBySlug
+     */
+    private function diffAndDispatch(string $url, string $storageFile, bool $isMaintainer, array $categoryBySlug): void
+    {
+        $current = $this->fetchSlugList($url);
+
+        if ($current === null) {
+            return;
+        }
+
+        $path = self::STORAGE_DIR.'/'.$storageFile;
+        $previous = $this->readStoredList($path);
+
+        $added = array_diff($current, $previous);
+        $removed = array_diff($previous, $current);
+
+        foreach ($added as $slug) {
+            $category = $categoryBySlug[$slug] ?? 'awesome_list';
+            ImportGithubRepoJob::enqueue("https://github.com/{$slug}", $category, $isMaintainer);
+        }
+
+        if ($removed !== []) {
+            Log::info('SyncPluginsJsonJob: entries removed since last sync', [
+                'file' => $storageFile,
+                'slugs' => array_values($removed),
+            ]);
+        }
+
+        Storage::put($path, json_encode($current, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * @return list<string>|null null on a fetch/decode failure (already logged)
+     */
+    private function fetchSlugList(string $url): ?array
+    {
+        $response = Http::timeout(15)->get($url);
+
+        if (! $response->successful()) {
+            Log::warning('SyncPluginsJsonJob: failed to fetch package list', [
+                'url' => $url,
+                'status' => $response->status(),
+            ]);
+
+            return null;
+        }
+
+        $data = $response->json();
+
+        if (! is_array($data)) {
+            Log::warning('SyncPluginsJsonJob: package list did not decode to an array', ['url' => $url]);
+
+            return null;
+        }
+
+        return array_values(array_filter($data, is_string(...)));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function readStoredList(string $path): array
+    {
+        if (! Storage::exists($path)) {
+            return [];
+        }
+
+        $data = json_decode(Storage::get($path), true);
+
+        return is_array($data) ? array_values(array_filter($data, is_string(...))) : [];
+    }
+
+    /**
+     * Fetches the nested plugins.json purely to map slug => fallback
+     * category — the flat owner/collaborator files used for the actual
+     * added/removed diff don't carry category. Returns [] on any
+     * fetch/decode failure (already logged by the same warnings as before)
+     * rather than aborting the sync — a missing category just falls back to
+     * ImportGithubRepoJob's own default for any newly-added slug.
+     *
+     * @return array<string, string>
+     */
+    private function fetchCategoryMap(): array
+    {
         $url = (string) config('services.plugins_sync.source_url');
 
         $response = Http::timeout(15)->get($url);
@@ -64,7 +173,7 @@ class SyncPluginsJsonJob extends DebouncedJob
                 'status' => $response->status(),
             ]);
 
-            return;
+            return [];
         }
 
         $data = $response->json();
@@ -72,45 +181,27 @@ class SyncPluginsJsonJob extends DebouncedJob
         if (! is_array($data)) {
             Log::warning('SyncPluginsJsonJob: plugins.json did not decode to an array', ['url' => $url]);
 
-            return;
+            return [];
         }
 
-        $entries = $this->flatten($data);
-
-        /** @var array<string, bool> $previous */
-        $previous = Cache::get(self::LAST_SYNC_CACHE_KEY, []);
-        $current = [];
-
-        foreach ($entries as [$slug, $category, $isMaintainer]) {
-            $current[$slug] = $isMaintainer;
-
-            $isNew = ! array_key_exists($slug, $previous);
-            $promoted = ! $isNew && $isMaintainer && ! $previous[$slug];
-
-            if ($isNew || $promoted) {
-                ImportGithubRepoJob::enqueue("https://github.com/{$slug}", $category, $isMaintainer);
-            }
+        $map = [];
+        foreach ($this->flatten($data) as [$slug, $category]) {
+            $map[$slug] = $category;
         }
 
-        if ($removed = array_diff_key($previous, $current)) {
-            Log::info('SyncPluginsJsonJob: entries removed from plugins.json since last sync', [
-                'slugs' => array_keys($removed),
-            ]);
-        }
-
-        Cache::forever(self::LAST_SYNC_CACHE_KEY, $current);
+        return $map;
     }
 
     /**
      * Walk every category in plugins.json (including the nested
      * startkit.legacy.{v3,v4,...} and filament.{plugins,collaborator} groups)
-     * and yield [owner/repo, fallback category, is_maintainer] tuples. `repo`
-     * overrides `package` when a listing's Composer vendor differs from its
-     * GitHub owner (e.g. the CakePHP packages, published under
+     * and yield [owner/repo, fallback category] tuples. `repo` overrides
+     * `package` when a listing's Composer vendor differs from its GitHub
+     * owner (e.g. the CakePHP packages, published under
      * jeffersonsimaogoncalves but hosted under jeffersongoncalves).
      *
      * @param  array<string, mixed>  $data
-     * @return list<array{0: string, 1: string, 2: bool}>
+     * @return list<array{0: string, 1: string}>
      */
     private function flatten(array $data): array
     {
@@ -140,17 +231,9 @@ class SyncPluginsJsonJob extends DebouncedJob
     }
 
     /**
-     * `$isMaintainer` starts false and flips true the moment recursion steps
-     * into a node keyed "collaborator" (currently only filament.collaborator)
-     * — every entry under it is a repo Jefferson actively maintains but
-     * doesn't own, as opposed to the sibling "plugins" group he owns
-     * outright. Generic on the key name rather than special-cased to
-     * "filament" so a future `collaborator` group anywhere else in
-     * plugins.json is picked up the same way without a code change here.
-     *
-     * @return list<array{0: string, 1: string, 2: bool}>
+     * @return list<array{0: string, 1: string}>
      */
-    private function collectEntries(mixed $node, string $fallback, bool $isMaintainer = false): array
+    private function collectEntries(mixed $node, string $fallback): array
     {
         if (! is_array($node)) {
             return [];
@@ -160,14 +243,13 @@ class SyncPluginsJsonJob extends DebouncedJob
         if (isset($node['package']) && is_string($node['package'])) {
             $slug = is_string($node['repo'] ?? null) ? $node['repo'] : $node['package'];
 
-            return [[$slug, $fallback, $isMaintainer]];
+            return [[$slug, $fallback]];
         }
 
         // A list of entries, or a nested group (legacy.v3/v4, plugins/collaborator, …).
         $out = [];
-        foreach ($node as $key => $child) {
-            $childIsMaintainer = $key === 'collaborator' ? true : $isMaintainer;
-            $out = [...$out, ...$this->collectEntries($child, $fallback, $childIsMaintainer)];
+        foreach ($node as $child) {
+            $out = [...$out, ...$this->collectEntries($child, $fallback)];
         }
 
         return $out;

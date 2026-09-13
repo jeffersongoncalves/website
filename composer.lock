@@ -4520,16 +4520,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-page-visits",
-            "version": "1.0.3",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-page-visits.git",
-                "reference": "0734d269dcafd6dfcc4b4309bf7bcc89687920ca"
+                "reference": "6f6ecfcaac08849b9ee5a65ea536ebba40dc6378"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-page-visits/zipball/0734d269dcafd6dfcc4b4309bf7bcc89687920ca",
-                "reference": "0734d269dcafd6dfcc4b4309bf7bcc89687920ca",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-page-visits/zipball/6f6ecfcaac08849b9ee5a65ea536ebba40dc6378",
+                "reference": "6f6ecfcaac08849b9ee5a65ea536ebba40dc6378",
                 "shasum": ""
             },
             "require": {
@@ -4580,7 +4580,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-page-visits/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-page-visits/tree/1.0.3"
+                "source": "https://github.com/jeffersongoncalves/laravel-page-visits/tree/1.1.0"
             },
             "funding": [
                 {
@@ -4592,7 +4592,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-11T19:05:25+00:00"
+            "time": "2026-09-12T22:54:30+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-pwa-favicon",

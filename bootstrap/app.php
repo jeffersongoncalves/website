@@ -6,6 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use JeffersonGoncalves\LocaleCookie\Middleware\SetLocale;
+use JeffersonGoncalves\ScannerGuard\Http\Middleware\BlockScannerRequests;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -42,6 +43,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // so EncryptCookies must skip it — otherwise the decrypt step strips
         // the plain "dark"/"light" value before Blade can read it back.
         $middleware->encryptCookies(except: ['theme']);
+
+        // Prepended (not appended): a banned/ASN-blocked request should skip
+        // session start, CSRF, cookie encryption, etc. entirely, not just
+        // the route handler. Runs after TrustProxies (global, above), so
+        // request()->ip() is already the real client IP through Cloudflare.
+        $middleware->prependToGroup('web', BlockScannerRequests::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

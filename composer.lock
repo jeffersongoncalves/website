@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c7e2939754b509014ca0e06020274198",
+    "content-hash": "5e7d61084dd965708c3e10bb015644f5",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -4735,6 +4735,86 @@
                 }
             ],
             "time": "2026-06-22T00:00:19+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-scanner-guard",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-scanner-guard.git",
+                "reference": "d42ca4fb4045582829c83a78a77a2ebcfa27595e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-scanner-guard/zipball/d42ca4fb4045582829c83a78a77a2ebcfa27595e",
+                "reference": "d42ca4fb4045582829c83a78a77a2ebcfa27595e",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^12.0|^13.0",
+                "jeffersongoncalves/laravel-visitor-fingerprint": "^1.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.24",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "ScannerGuard": "JeffersonGoncalves\\ScannerGuard\\Facades\\ScannerGuard"
+                    },
+                    "providers": [
+                        "JeffersonGoncalves\\ScannerGuard\\ScannerGuardServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\ScannerGuard\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Detect and ban vulnerability-scanner traffic on Laravel apps, with optional ASN-level blocking via laravel-visitor-fingerprint",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-scanner-guard",
+            "keywords": [
+                "ban",
+                "firewall",
+                "laravel",
+                "scanner-guard",
+                "security",
+                "waf"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-scanner-guard/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-scanner-guard/tree/1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://buymeacoffee.com/jeffersongoncalves",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-09-13T01:33:27+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-security-headers",

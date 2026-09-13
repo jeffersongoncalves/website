@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+$mastodonPrimary = 'https://mastodon.social/@jeffersongoncalves';
+$mastodonPhpc = 'https://phpc.social/@jeffersongoncalves';
+
 return [
     'social' => [
         'github' => 'https://github.com/jeffersongoncalves',
@@ -11,7 +14,10 @@ return [
         // Primary Mastodon profile — the visible footer link (routed through
         // OutboundLink::to() like every other social link) and the identity
         // behind fediverse_creator below.
-        'mastodon' => 'https://mastodon.social/@jeffersongoncalves',
+        'mastodon' => $mastodonPrimary,
+        // Secondary account, PHP-community instance — also shown as its own
+        // footer link (distinct label so visitors can tell the two apart).
+        'mastodon_phpc' => $mastodonPhpc,
         // "@user@instance" form Google's fediverse:creator meta tag expects —
         // kept as its own key rather than derived from the URL above since
         // the format differs (no scheme/host split, @-delimited instead).
@@ -19,13 +25,8 @@ return [
         // Every Mastodon (or other rel="me"-verifiable) profile that needs a
         // <link rel="me"> in <head> — one per instance, direct URL (no
         // OutboundLink tracking hop), since each instance's profile
-        // verification crawler follows this straight through. Includes the
-        // primary above plus any secondary account (e.g. a topic-specific
-        // instance like phpc.social).
-        'mastodon_rel_me' => [
-            'https://mastodon.social/@jeffersongoncalves',
-            'https://phpc.social/@jeffersongoncalves',
-        ],
+        // verification crawler follows this straight through.
+        'mastodon_rel_me' => [$mastodonPrimary, $mastodonPhpc],
         'email' => 'contato@jeffersongoncalves.dev.br',
         'sponsors' => 'https://github.com/sponsors/jeffersongoncalves',
         'buymeacoffee' => 'https://buymeacoffee.com/jeffersongoncalves',

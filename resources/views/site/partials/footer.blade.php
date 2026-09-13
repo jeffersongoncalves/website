@@ -32,6 +32,7 @@
                     <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.packagist'), 'Packagist') }}" rel="noopener" target="_blank">Packagist ↗</a></li>
                     <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.x'), 'X (Twitter)') }}"         rel="noopener" target="_blank">X (Twitter) ↗</a></li>
                     <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.mastodon'), 'Mastodon') }}" rel="noopener" target="_blank">Mastodon ↗</a></li>
+                    <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.mastodon_phpc'), 'Mastodon (PHPC)') }}" rel="noopener" target="_blank">Mastodon (PHPC) ↗</a></li>
                 </ul>
             </div>
         </div>

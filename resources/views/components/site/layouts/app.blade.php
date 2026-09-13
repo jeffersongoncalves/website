@@ -35,6 +35,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="color-scheme" content="{{ $isDarkInitial ? 'dark' : 'light' }}">
+    <meta name="fediverse:creator" content="{{ config('site.social.fediverse_creator') }}">
     {{-- Preload the body font (above-the-fold text → LCP). Favicons are now
          served same-origin (laravel-favicon-proxy), so no third-party preconnect. --}}
     <link rel="preload" href="{{ Vite::asset('resources/fonts/dmsans_400.ttf') }}" as="font" type="font/ttf" crossorigin>

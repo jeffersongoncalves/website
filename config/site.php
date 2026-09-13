@@ -13,6 +13,10 @@ return [
         // crawler checks this site for a direct rel="me" link back to the
         // profile, and a tracking redirect hop risks breaking that check.
         'mastodon' => 'https://mastodon.social/@jeffersongoncalves',
+        // "@user@instance" form Google's fediverse:creator meta tag expects —
+        // kept as its own key rather than derived from the URL above since
+        // the format differs (no scheme/host split, @-delimited instead).
+        'fediverse_creator' => '@jeffersongoncalves@mastodon.social',
         'email' => 'contato@jeffersongoncalves.dev.br',
         'sponsors' => 'https://github.com/sponsors/jeffersongoncalves',
         'buymeacoffee' => 'https://buymeacoffee.com/jeffersongoncalves',

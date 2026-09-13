@@ -19,9 +19,13 @@ return [
         // footer link (distinct label so visitors can tell the two apart).
         'mastodon_phpc' => $mastodonPhpc,
         // "@user@instance" form Google's fediverse:creator meta tag expects —
-        // kept as its own key rather than derived from the URL above since
+        // kept as its own key rather than derived from the URLs above since
         // the format differs (no scheme/host split, @-delimited instead).
-        'fediverse_creator' => '@jeffersongoncalves@mastodon.social',
+        // Multiple accounts each get their own <meta> tag (see the layout).
+        'fediverse_creator' => [
+            '@jeffersongoncalves@mastodon.social',
+            '@jeffersongoncalves@phpc.social',
+        ],
         // Every Mastodon (or other rel="me"-verifiable) profile that needs a
         // <link rel="me"> in <head> — one per instance, direct URL (no
         // OutboundLink tracking hop), since each instance's profile

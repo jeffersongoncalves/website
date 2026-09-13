@@ -35,7 +35,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="color-scheme" content="{{ $isDarkInitial ? 'dark' : 'light' }}">
-    <meta name="fediverse:creator" content="{{ config('site.social.fediverse_creator') }}">
+    @foreach(config('site.social.fediverse_creator', []) as $fediverseCreator)
+        <meta name="fediverse:creator" content="{{ $fediverseCreator }}">
+    @endforeach
     {{-- Direct URLs (no OutboundLink tracking hop) — each instance's profile-
          verification crawler follows these straight through. --}}
     @foreach(config('site.social.mastodon_rel_me', []) as $mastodonUrl)

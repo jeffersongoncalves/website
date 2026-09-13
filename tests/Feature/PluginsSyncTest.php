@@ -6,6 +6,7 @@ use App\Jobs\ImportGithubRepoJob;
 use App\Jobs\SyncPluginsJsonJob;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 
@@ -68,4 +69,67 @@ it('fans out an ImportGithubRepoJob per plugins.json entry, following repo overr
     Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/jeffersongoncalves/cakephp-analyzer' && $job->fallbackCategory === 'cakephp_package' && $job->isMaintainer === false);
     // filament.collaborator entries are repos Jefferson maintains but doesn't own.
     Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/rmsramos/activitylog' && $job->isMaintainer === true);
+});
+
+it('does not re-dispatch an entry already present in the last-synced snapshot', function () {
+    Cache::forever('plugins-json:last-synced-slugs', [
+        'jeffersongoncalves/filament-ban' => false,
+    ]);
+
+    Http::swap(new Factory);
+    Http::fake([
+        'raw.githubusercontent.com/*' => Http::response([
+            'filament' => [
+                'plugins' => [
+                    ['title' => 'Filament Ban', 'package' => 'jeffersongoncalves/filament-ban'],
+                ],
+            ],
+        ], 200),
+    ]);
+    Bus::fake();
+
+    (new SyncPluginsJsonJob)->handle();
+
+    Bus::assertNotDispatched(ImportGithubRepoJob::class);
+});
+
+it('re-dispatches an entry promoted to maintainer status even though its slug was already synced', function () {
+    Cache::forever('plugins-json:last-synced-slugs', [
+        'rmsramos/activitylog' => false,
+    ]);
+
+    Http::swap(new Factory);
+    Http::fake([
+        'raw.githubusercontent.com/*' => Http::response([
+            'filament' => [
+                'collaborator' => [
+                    ['title' => 'Filament Activity Log', 'package' => 'rmsramos/activitylog'],
+                ],
+            ],
+        ], 200),
+    ]);
+    Bus::fake();
+
+    (new SyncPluginsJsonJob)->handle();
+
+    Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/rmsramos/activitylog' && $job->isMaintainer === true);
+});
+
+it('persists the current entry list as the new last-synced snapshot', function () {
+    Http::swap(new Factory);
+    Http::fake([
+        'raw.githubusercontent.com/*' => Http::response([
+            'filament' => [
+                'plugins' => [
+                    ['title' => 'Filament Ban', 'package' => 'jeffersongoncalves/filament-ban'],
+                ],
+            ],
+        ], 200),
+    ]);
+    Bus::fake();
+
+    (new SyncPluginsJsonJob)->handle();
+
+    expect(Cache::get('plugins-json:last-synced-slugs'))
+        ->toBe(['jeffersongoncalves/filament-ban' => false]);
 });

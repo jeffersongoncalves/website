@@ -4,25 +4,42 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Re-scans jeffersongoncalves/jeffersongoncalves's plugins.json (the catalog
  * driving that repo's profile README) and fans out one ImportGithubRepoJob
- * per entry — dispatched by POST /api/plugins-sync, which the source repo's
- * notify-site-plugins-sync workflow calls whenever plugins.json changes.
+ * per entry that's new or newly promoted to maintainer status — dispatched
+ * by POST /api/plugins-sync, which the source repo's notify-site-plugins-sync
+ * workflow calls whenever plugins.json changes.
  *
- * Does no diffing itself: ImportGithubRepoJob already no-ops on a repo that's
- * already cadastrado (a cheap DB pre-check, no GitHub call), so dispatching
- * for every entry on every run is the simplest correct way to "find what's
- * new" — only the actually-new rows do any real work.
+ * Diffs the flattened entry list against the slug => is_maintainer snapshot
+ * cached from the previous run (LAST_SYNC_CACHE_KEY, forever — no TTL, this
+ * is durable state, not a cache in the "may expire" sense) rather than
+ * re-dispatching all ~250+ entries on every run: ImportGithubRepoJob already
+ * no-ops on an already-cadastrado repo (a cheap DB pre-check), but each
+ * dispatch still reserves GitHub-quota budget up front (GithubQuota::reserve
+ * in ImportGithubRepoJob::make()), so the volume of dispatches itself is the
+ * cost worth avoiding, not just the DB check.
+ *
+ * A category reclassification for an EXISTING project was never applied by
+ * this job even before this diffing was added — ImportGithubRepoJob::handle()
+ * only fills missing fields on an existing row, never overwrites `category`
+ * — so skipping unchanged entries here doesn't drop any capability the
+ * dispatch-everything approach actually had. An entry moving INTO
+ * `filament.collaborator` (is_maintainer flips false -> true) still
+ * re-dispatches, since ImportGithubRepoJob::handle() does apply that one
+ * promotion to an existing row.
  *
  * See DebouncedJob for how the debounce itself works (a source push firing
  * the webhook twice in quick succession collapses to one scan).
  */
 class SyncPluginsJsonJob extends DebouncedJob
 {
+    private const LAST_SYNC_CACHE_KEY = 'plugins-json:last-synced-slugs';
+
     protected int $expireAfter = 180;
 
     public function __construct()
@@ -58,9 +75,30 @@ class SyncPluginsJsonJob extends DebouncedJob
             return;
         }
 
-        foreach ($this->flatten($data) as [$slug, $category, $isMaintainer]) {
-            ImportGithubRepoJob::enqueue("https://github.com/{$slug}", $category, $isMaintainer);
+        $entries = $this->flatten($data);
+
+        /** @var array<string, bool> $previous */
+        $previous = Cache::get(self::LAST_SYNC_CACHE_KEY, []);
+        $current = [];
+
+        foreach ($entries as [$slug, $category, $isMaintainer]) {
+            $current[$slug] = $isMaintainer;
+
+            $isNew = ! array_key_exists($slug, $previous);
+            $promoted = ! $isNew && $isMaintainer && ! $previous[$slug];
+
+            if ($isNew || $promoted) {
+                ImportGithubRepoJob::enqueue("https://github.com/{$slug}", $category, $isMaintainer);
+            }
         }
+
+        if ($removed = array_diff_key($previous, $current)) {
+            Log::info('SyncPluginsJsonJob: entries removed from plugins.json since last sync', [
+                'slugs' => array_keys($removed),
+            ]);
+        }
+
+        Cache::forever(self::LAST_SYNC_CACHE_KEY, $current);
     }
 
     /**

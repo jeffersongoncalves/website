@@ -146,6 +146,82 @@ it('falls back to a generic category when a slug is missing from plugins.json', 
     Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/someowner/unlisted-repo' && $job->fallbackCategory === 'awesome_list');
 });
 
+it('logs a warning and skips the diff when the owner/collaborator list fetch fails', function () {
+    Storage::fake('local');
+    Http::swap(new Factory);
+    Http::fake([
+        PLUGINS_JSON_URL => Http::response([], 200),
+        OWNER_PACKAGES_URL => Http::response('server error', 500),
+        COLLABORATOR_PACKAGES_URL => Http::response([], 200),
+    ]);
+    Bus::fake();
+
+    (new SyncPluginsJsonJob)->handle();
+
+    Bus::assertNotDispatched(ImportGithubRepoJob::class);
+    Storage::disk('local')->assertMissing('plugins-sync/owner.json');
+});
+
+it('logs a warning and skips the diff when the owner/collaborator list does not decode to an array', function () {
+    Storage::fake('local');
+    Http::swap(new Factory);
+    Http::fake([
+        PLUGINS_JSON_URL => Http::response([], 200),
+        OWNER_PACKAGES_URL => Http::response('not json', 200),
+        COLLABORATOR_PACKAGES_URL => Http::response([], 200),
+    ]);
+    Bus::fake();
+
+    (new SyncPluginsJsonJob)->handle();
+
+    Bus::assertNotDispatched(ImportGithubRepoJob::class);
+    Storage::disk('local')->assertMissing('plugins-sync/owner.json');
+});
+
+it('still diffs and dispatches with a fallback category when plugins.json fetch fails', function () {
+    Storage::fake('local');
+    Http::swap(new Factory);
+    Http::fake([
+        PLUGINS_JSON_URL => Http::response('server error', 500),
+        OWNER_PACKAGES_URL => Http::response(['someowner/unlisted-repo'], 200),
+        COLLABORATOR_PACKAGES_URL => Http::response([], 200),
+    ]);
+    Bus::fake();
+
+    (new SyncPluginsJsonJob)->handle();
+
+    Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/someowner/unlisted-repo' && $job->fallbackCategory === 'awesome_list');
+});
+
+it('still diffs and dispatches with a fallback category when plugins.json does not decode to an array', function () {
+    Storage::fake('local');
+    Http::swap(new Factory);
+    Http::fake([
+        PLUGINS_JSON_URL => Http::response('not json', 200),
+        OWNER_PACKAGES_URL => Http::response(['someowner/unlisted-repo'], 200),
+        COLLABORATOR_PACKAGES_URL => Http::response([], 200),
+    ]);
+    Bus::fake();
+
+    (new SyncPluginsJsonJob)->handle();
+
+    Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/someowner/unlisted-repo' && $job->fallbackCategory === 'awesome_list');
+});
+
+it('ignores a malformed non-array group in plugins.json instead of throwing', function () {
+    Storage::fake('local');
+    fakePluginsSyncSources(
+        owner: ['jeffersongoncalves/filament-ban'],
+        collaborator: [],
+        pluginsJson: ['startkit' => 'this-should-be-an-object-not-a-string'],
+    );
+    Bus::fake();
+
+    (new SyncPluginsJsonJob)->handle();
+
+    Bus::assertDispatched(ImportGithubRepoJob::class, fn (ImportGithubRepoJob $job) => $job->githubUrl === 'https://github.com/jeffersongoncalves/filament-ban' && $job->fallbackCategory === 'awesome_list');
+});
+
 it('persists the fetched lists to storage for the next run\'s diff', function () {
     Storage::fake('local');
     fakePluginsSyncSources(

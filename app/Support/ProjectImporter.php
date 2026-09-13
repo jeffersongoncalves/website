@@ -899,7 +899,7 @@ class ProjectImporter
                 is_array($composer['keywords'] ?? null) ? $composer['keywords'] : [],
                 is_array($package['keywords'] ?? null) ? $package['keywords'] : [],
             ),
-            'versions' => ProjectClassifier::versions($composer, $branches, $category),
+            'versions' => self::resolveVersions($canonicalSlug, $branch, $composer, $branches, $category),
             'has_branches' => ProjectClassifier::hasVersionBranches($branches, $category),
         ];
 
@@ -1088,6 +1088,50 @@ class ProjectImporter
      * malformed. Does NOT prove the package is published — callers must verify
      * ownership with packagistOwnershipForName before trusting it.
      *
+     * @param  array<string, mixed>|null  $composer
+     */
+    /**
+     * `ProjectClassifier::versions()` only reads ONE composer.json — fine for
+     * a single-branch plugin, but a multi-branch Filament plugin (`1.x`,
+     * `2.x`, `3.x`, one Filament major each) declares a different
+     * `filament/filament` constraint on EACH branch. Reading only the
+     * already-fetched $composer (the default/readme branch) silently drops
+     * every other branch's version — e.g. a `3.x`-default repo would only
+     * ever report `v5`, never the `v3`/`v4` its `1.x`/`2.x` branches support.
+     *
+     * Falls back to the cheap single-composer path (no extra fetches) when
+     * the repo doesn't keep a branch per version at all.
+     *
+     * @param  array<string, mixed>|null  $composer
+     * @param  list<string>  $branches
+     * @return list<string>
+     */
+    private static function resolveVersions(string $canonicalSlug, string $currentBranch, ?array $composer, array $branches, string $category): array
+    {
+        if (! ProjectClassifier::hasVersionBranches($branches, $category)) {
+            return ProjectClassifier::versions($composer, $branches, $category);
+        }
+
+        $versions = [];
+
+        foreach ($branches as $branchName) {
+            if (preg_match('/^\d+\.x$/', $branchName) !== 1) {
+                continue;
+            }
+
+            // Already have the current branch's composer.json — no need to
+            // re-fetch it.
+            $branchComposer = $branchName === $currentBranch
+                ? $composer
+                : GitHubClient::fetchManifest($canonicalSlug, $branchName, 'composer.json');
+
+            $versions = [...$versions, ...ProjectClassifier::versions($branchComposer, $branches, $category)];
+        }
+
+        return array_values(array_unique($versions));
+    }
+
+    /**
      * @param  array<string, mixed>|null  $composer
      */
     private static function packagistNameFromComposer(?array $composer): ?string

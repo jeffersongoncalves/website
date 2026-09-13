@@ -120,6 +120,35 @@ it('leaves has_branches off for a plugin that ships every version from one branc
         ->and($result['fields']['has_branches'])->toBeFalse();
 });
 
+it('unions versions across every N.x branch instead of only the default branch (real bug: jeffersongoncalves-filament-page-visits reported only v5)', function (): void {
+    // Real-world shape: unlike the combined-constraint fixture above, each
+    // branch here declares only ITS OWN Filament major — the default branch
+    // (3.x, current) only knows about v5, so reading just that composer.json
+    // (the pre-fix behavior) silently drops v3/v4 entirely.
+    $repo = fakeGithubRepo([
+        'full_name' => 'jeffersongoncalves/filament-page-visits',
+        'default_branch' => '3.x',
+    ]);
+
+    Http::fake([
+        'packagist.org/packages/*.json' => Http::response(['package' => ['repository' => 'https://github.com/jeffersongoncalves/filament-page-visits']], 200),
+        'api.github.com/repos/*/branches*' => Http::response([['name' => '1.x'], ['name' => '2.x'], ['name' => '3.x']]),
+        'api.github.com/repos/*' => Http::response($repo),
+        'raw.githubusercontent.com/jeffersongoncalves/filament-page-visits/1.x/composer.json' => Http::response(fakeComposer(['require' => ['filament/filament' => '^3.0']])),
+        'raw.githubusercontent.com/jeffersongoncalves/filament-page-visits/2.x/composer.json' => Http::response(fakeComposer(['require' => ['filament/filament' => '^4.0']])),
+        'raw.githubusercontent.com/jeffersongoncalves/filament-page-visits/3.x/composer.json' => Http::response(fakeComposer(['require' => ['filament/filament' => '^5.0']])),
+        'raw.githubusercontent.com/*/package.json' => Http::response('', 404),
+        'raw.githubusercontent.com/*docker*' => Http::response('', 404),
+        'raw.githubusercontent.com/*Dockerfile' => Http::response('', 404),
+        'registry.npmjs.org/*' => Http::response('', 404),
+    ]);
+
+    $result = ProjectImporter::fromGithub('https://github.com/jeffersongoncalves/filament-page-visits');
+
+    expect($result['fields']['versions'])->toBe(['v3', 'v4', 'v5'])
+        ->and($result['fields']['has_branches'])->toBeTrue();
+});
+
 it('does not attach packagist_url when composer.json ships a borrowed name (app skeleton)', function (): void {
     // Real-world bug: savanihd/Laravel-11-Livewire-CRUD ships composer.json with
     // "name": "laravel/laravel". laravel/laravel IS a real package, but its

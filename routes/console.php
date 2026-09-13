@@ -57,11 +57,7 @@ Schedule::command('backup:monitor')
     ->withoutOverlapping()
     ->runInBackground();
 
-// Rolls yesterday's raw page_visits rows into daily_stats, then prunes rows
-// past the retention window — keeps the table from growing unbounded.
-// (short-url's equivalent command self-schedules at 02:00 from within the
-// package — no entry needed here.)
-Schedule::command('page-visits:aggregate-and-prune')
-    ->dailyAt('02:30')
-    ->withoutOverlapping()
-    ->runInBackground();
+// page-visits:aggregate-and-prune (1.2.0+) and short-url:aggregate-and-prune
+// both self-schedule at 02:30/02:00 from inside their own packages — no
+// entries needed here. See config('page-visits.scheduling') /
+// config('short-url.scheduling') to change the time or opt out.

@@ -4520,16 +4520,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-page-visits",
-            "version": "1.1.0",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-page-visits.git",
-                "reference": "6f6ecfcaac08849b9ee5a65ea536ebba40dc6378"
+                "reference": "7a851ee0f74c5fd92b4b0d01c77b24dfdf007497"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-page-visits/zipball/6f6ecfcaac08849b9ee5a65ea536ebba40dc6378",
-                "reference": "6f6ecfcaac08849b9ee5a65ea536ebba40dc6378",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-page-visits/zipball/7a851ee0f74c5fd92b4b0d01c77b24dfdf007497",
+                "reference": "7a851ee0f74c5fd92b4b0d01c77b24dfdf007497",
                 "shasum": ""
             },
             "require": {
@@ -4580,7 +4580,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-page-visits/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-page-visits/tree/1.1.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-page-visits/tree/1.2.0"
             },
             "funding": [
                 {
@@ -4592,7 +4592,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-12T22:54:30+00:00"
+            "time": "2026-09-13T00:32:20+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-pwa-favicon",
@@ -4810,16 +4810,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-short-url",
-            "version": "5.0.0",
+            "version": "5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-short-url.git",
-                "reference": "e429ed2236490846caa64cb18f8ea60160a9bc3b"
+                "reference": "8d89aaef5ba862cd20b023730769f63622be1b6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-short-url/zipball/e429ed2236490846caa64cb18f8ea60160a9bc3b",
-                "reference": "e429ed2236490846caa64cb18f8ea60160a9bc3b",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-short-url/zipball/8d89aaef5ba862cd20b023730769f63622be1b6f",
+                "reference": "8d89aaef5ba862cd20b023730769f63622be1b6f",
                 "shasum": ""
             },
             "require": {
@@ -4876,7 +4876,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-short-url/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-short-url/tree/5.0.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-short-url/tree/v4.5.0"
             },
             "funding": [
                 {
@@ -4888,7 +4888,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-11T23:19:11+00:00"
+            "time": "2026-09-13T00:29:39+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-ssrf-guard",

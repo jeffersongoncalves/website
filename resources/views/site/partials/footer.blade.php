@@ -33,6 +33,21 @@
                     <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.x'), 'X (Twitter)') }}"         rel="noopener" target="_blank">X (Twitter) ↗</a></li>
                     <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.mastodon'), 'Mastodon') }}" rel="noopener" target="_blank">Mastodon ↗</a></li>
                     <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.mastodon_phpc'), 'Mastodon (PHPC)') }}" rel="noopener" target="_blank">Mastodon (PHPC) ↗</a></li>
+                    <li>
+                        <a
+                            id="cy-effective-orcid-url"
+                            class="underline"
+                            href="{{ config('site.social.orcid') }}"
+                            target="orcid.widget"
+                            rel="me noopener noreferrer"
+                            style="vertical-align: top">
+                            <img
+                                src="https://orcid.org/sites/default/files/images/orcid_16x16.png"
+                                style="width: 1em; margin-inline-start: 0.5em"
+                                alt="ORCID iD icon"/>
+                            {{ config('site.social.orcid') }}
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

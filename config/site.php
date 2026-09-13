@@ -31,6 +31,7 @@ return [
         // OutboundLink tracking hop), since each instance's profile
         // verification crawler follows this straight through.
         'mastodon_rel_me' => [$mastodonPrimary, $mastodonPhpc],
+        'orcid' => 'https://orcid.org/0009-0006-2279-1538',
         'email' => 'contato@jeffersongoncalves.dev.br',
         'sponsors' => 'https://github.com/sponsors/jeffersongoncalves',
         'buymeacoffee' => 'https://buymeacoffee.com/jeffersongoncalves',

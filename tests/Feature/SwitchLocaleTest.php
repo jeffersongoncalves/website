@@ -22,5 +22,5 @@ it('falls back home when no referer is present', function () {
 });
 
 it('rejects an unsupported locale at the route level', function () {
-    $this->get('/locale/de')->assertNotFound();
+    $this->get('/locale/ja')->assertNotFound();
 });

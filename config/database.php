@@ -97,6 +97,13 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'prefer',
+            // Pins every connection's Postgres session to the same zone PHP's
+            // now() uses, regardless of a given process's own env/cache state
+            // (e.g. a queue worker not yet restarted after a config change).
+            // Without this, timestamptz columns would interpret naive input
+            // against Postgres's own default (UTC), which can silently diverge
+            // from a business-logic now() computed under APP_TIMEZONE.
+            'timezone' => env('APP_TIMEZONE', 'UTC'),
         ],
 
         'sqlsrv' => [

@@ -4817,16 +4817,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-scanner-guard",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-scanner-guard.git",
-                "reference": "d42ca4fb4045582829c83a78a77a2ebcfa27595e"
+                "reference": "5488323fec50bd37204977e702328fe8eff56614"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-scanner-guard/zipball/d42ca4fb4045582829c83a78a77a2ebcfa27595e",
-                "reference": "d42ca4fb4045582829c83a78a77a2ebcfa27595e",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-scanner-guard/zipball/5488323fec50bd37204977e702328fe8eff56614",
+                "reference": "5488323fec50bd37204977e702328fe8eff56614",
                 "shasum": ""
             },
             "require": {
@@ -4881,7 +4881,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-scanner-guard/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-scanner-guard/tree/1.0.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-scanner-guard/tree/1.1.0"
             },
             "funding": [
                 {
@@ -4893,7 +4893,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-13T01:33:27+00:00"
+            "time": "2026-09-14T21:25:58+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-security-headers",

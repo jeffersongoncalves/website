@@ -3486,16 +3486,16 @@
         },
         {
             "name": "jeffersongoncalves/filament-short-url",
-            "version": "3.8.0",
+            "version": "3.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-short-url.git",
-                "reference": "f5e0d63bc129cd71fbdc93a81d6a341ebbac371a"
+                "reference": "5c40a1b15d9e8d4bfb3294270f32a1b9347d59c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-short-url/zipball/f5e0d63bc129cd71fbdc93a81d6a341ebbac371a",
-                "reference": "f5e0d63bc129cd71fbdc93a81d6a341ebbac371a",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-short-url/zipball/5c40a1b15d9e8d4bfb3294270f32a1b9347d59c3",
+                "reference": "5c40a1b15d9e8d4bfb3294270f32a1b9347d59c3",
                 "shasum": ""
             },
             "require": {
@@ -3551,7 +3551,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-short-url/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-short-url/tree/3.8.0"
+                "source": "https://github.com/jeffersongoncalves/filament-short-url/tree/3.8.1"
             },
             "funding": [
                 {
@@ -3563,7 +3563,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-14T21:05:12+00:00"
+            "time": "2026-09-14T21:33:09+00:00"
         },
         {
             "name": "jeffersongoncalves/flysystem-google-drive",

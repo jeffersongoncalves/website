@@ -3486,16 +3486,16 @@
         },
         {
             "name": "jeffersongoncalves/filament-short-url",
-            "version": "3.5.9",
+            "version": "3.5.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-short-url.git",
-                "reference": "ab909dc8fd603dc35c1dc6e547a5c551a86c1afe"
+                "reference": "177828131fc87be35cbe20c5ceedb13d97f8c531"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-short-url/zipball/ab909dc8fd603dc35c1dc6e547a5c551a86c1afe",
-                "reference": "ab909dc8fd603dc35c1dc6e547a5c551a86c1afe",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-short-url/zipball/177828131fc87be35cbe20c5ceedb13d97f8c531",
+                "reference": "177828131fc87be35cbe20c5ceedb13d97f8c531",
                 "shasum": ""
             },
             "require": {
@@ -3551,7 +3551,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-short-url/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-short-url/tree/3.5.9"
+                "source": "https://github.com/jeffersongoncalves/filament-short-url/tree/3.5.10"
             },
             "funding": [
                 {
@@ -3563,7 +3563,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-13T00:46:33+00:00"
+            "time": "2026-09-14T14:52:56+00:00"
         },
         {
             "name": "jeffersongoncalves/flysystem-google-drive",
@@ -5035,7 +5035,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-short-url/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-short-url/tree/v4.5.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-short-url/tree/5.1.0"
             },
             "funding": [
                 {

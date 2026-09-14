@@ -4310,16 +4310,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-locale-cookie",
-            "version": "v1.3.0",
+            "version": "v1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-locale-cookie.git",
-                "reference": "1202a22b0ca435b40b62a09995cbdf2a4fe5b299"
+                "reference": "ae1e8a7ec915fe250013b219a4f3fbe85e1ff71c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-locale-cookie/zipball/1202a22b0ca435b40b62a09995cbdf2a4fe5b299",
-                "reference": "1202a22b0ca435b40b62a09995cbdf2a4fe5b299",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-locale-cookie/zipball/ae1e8a7ec915fe250013b219a4f3fbe85e1ff71c",
+                "reference": "ae1e8a7ec915fe250013b219a4f3fbe85e1ff71c",
                 "shasum": ""
             },
             "require": {
@@ -4366,15 +4366,19 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-locale-cookie/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-locale-cookie/tree/v1.3.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-locale-cookie/tree/v1.4.0"
             },
             "funding": [
+                {
+                    "url": "https://buymeacoffee.com/jeffersongoncalves",
+                    "type": "custom"
+                },
                 {
                     "url": "https://github.com/jeffersongoncalves",
                     "type": "github"
                 }
             ],
-            "time": "2026-06-22T00:39:44+00:00"
+            "time": "2026-09-14T21:33:07+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-markdown",

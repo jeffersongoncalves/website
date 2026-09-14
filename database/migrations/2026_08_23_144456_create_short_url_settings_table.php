@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +13,7 @@ return new class extends Migration
         Schema::create($table, function (Blueprint $table) {
             $table->id();
             $table->string('key')->unique();
-            $table->json('value')->nullable();
+            $table->jsonb('value')->nullable();
             $table->unsignedBigInteger('tenant_id')->nullable()->index();
             $table->timestamps();
         });

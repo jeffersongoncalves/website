@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -60,9 +58,9 @@ return new class extends Migration
             $table->string('ga_tracking_id')->nullable();
             $table->string('ga_api_secret_override')->nullable();
 
-            $table->json('targeting_rules')->nullable();
-            $table->json('rotation_variants')->nullable();
-            $table->json('geo_fence')->nullable();
+            $table->jsonb('targeting_rules')->nullable();
+            $table->jsonb('rotation_variants')->nullable();
+            $table->jsonb('geo_fence')->nullable();
 
             $table->string('utm_source')->nullable();
             $table->string('utm_medium')->nullable();

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,8 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
 
             $table->string('event', 20); // created|updated|deleted — validated at app layer
-            $table->json('before')->nullable();
-            $table->json('after')->nullable();
+            $table->jsonb('before')->nullable();
+            $table->jsonb('after')->nullable();
 
             $table->timestamp('created_at')->nullable();
 

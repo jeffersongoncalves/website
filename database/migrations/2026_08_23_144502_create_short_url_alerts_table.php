@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +17,7 @@ return new class extends Migration
             $table->string('type', 30); // visit_spike|visit_drop — validated at app layer
             $table->string('severity', 10)->default('warning');
             $table->text('message');
-            $table->json('metrics')->nullable();
+            $table->jsonb('metrics')->nullable();
 
             $table->timestamp('triggered_at');
             $table->timestamp('resolved_at')->nullable();

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -21,7 +19,7 @@ return new class extends Migration
             $table->decimal('value', 12, 2)->nullable();
             $table->string('currency', 3)->nullable();
             $table->string('external_id')->nullable();
-            $table->json('metadata')->nullable();
+            $table->jsonb('metadata')->nullable();
 
             $table->timestamp('occurred_at');
             $table->timestamp('created_at')->nullable();

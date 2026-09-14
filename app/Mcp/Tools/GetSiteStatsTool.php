@@ -63,6 +63,7 @@ class GetSiteStatsTool extends Tool
         $lines[] = '## Support this work';
         $lines[] = 'GitHub Sponsors: '.config('site.social.sponsors');
         $lines[] = 'Buy Me a Coffee: '.config('site.social.buymeacoffee');
+        $lines[] = 'Patreon: '.config('site.social.patreon');
 
         return Response::text(implode("\n", $lines));
     }

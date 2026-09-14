@@ -220,6 +220,18 @@
                         </div>
                         <span class="mono text-[0.875rem] text-ink-400">→</span>
                     </a>
+
+                    <a href="{{ \App\Support\OutboundLink::to(config('site.social.patreon'), 'Patreon') }}" rel="noopener" target="_blank"
+                       class="card flex items-center justify-between mt-4">
+                        <div class="flex items-center gap-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="text-amber"><circle cx="15" cy="8.5" r="6.5"/><rect x="2" y="2" width="4" height="20"/></svg>
+                            <div>
+                                <div class="font-medium text-[1.0625rem] text-ink-100">@lang('site.sponsors.patreon')</div>
+                                <div class="mt-1 mono-meta">@lang('site.sponsors.patreon_sub')</div>
+                            </div>
+                        </div>
+                        <span class="mono text-[0.875rem] text-ink-400">→</span>
+                    </a>
                 </div>
             </div>
         </div>

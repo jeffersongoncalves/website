@@ -42,6 +42,18 @@
                 </div>
                 <span class="mono text-base text-ink-400">→</span>
             </a>
+
+            <a href="{{ \App\Support\OutboundLink::to(config('site.social.patreon'), 'Patreon') }}" rel="noopener" target="_blank"
+               class="card card-pad-lg flex items-center justify-between mt-4">
+                <div class="flex items-center gap-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" class="text-amber"><circle cx="15" cy="8.5" r="6.5"/><rect x="2" y="2" width="4" height="20"/></svg>
+                    <div>
+                        <div class="font-medium text-[1.25rem] text-ink-100 font-[Fraunces]">@lang('site.sponsors.patreon')</div>
+                        <div class="mt-1 mono-meta-sm">@lang('site.sponsors.patreon_sub')</div>
+                    </div>
+                </div>
+                <span class="mono text-base text-ink-400">→</span>
+            </a>
         </div>
     </section>
 </div>

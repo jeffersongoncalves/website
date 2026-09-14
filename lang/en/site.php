@@ -260,6 +260,8 @@ return [
         'github_sub' => 'recurring · USD/BRL',
         'buymeacoffee' => 'Buy Me a Coffee',
         'buymeacoffee_sub' => 'one-off contribution',
+        'patreon' => 'Patreon',
+        'patreon_sub' => 'recurring membership',
         'count' => ':count person already sponsors this work|:count people already sponsor this work',
     ],
 

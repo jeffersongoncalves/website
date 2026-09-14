@@ -35,6 +35,7 @@ return [
         'email' => 'contato@jeffersongoncalves.dev.br',
         'sponsors' => 'https://github.com/sponsors/jeffersongoncalves',
         'buymeacoffee' => 'https://buymeacoffee.com/jeffersongoncalves',
+        'patreon' => 'https://patreon.com/jeffersongoncalves',
     ],
 
     // home_stats and os_stats are now computed dynamically by App\Support\SiteStats.

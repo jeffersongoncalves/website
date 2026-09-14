@@ -260,6 +260,8 @@ return [
         'github_sub' => 'recurrente · USD/EUR',
         'buymeacoffee' => 'Buy Me a Coffee',
         'buymeacoffee_sub' => 'contribución puntual',
+        'patreon' => 'Patreon',
+        'patreon_sub' => 'membresía recurrente',
         'count' => ':count persona ya patrocina este trabajo|:count personas ya patrocinan este trabajo',
     ],
 

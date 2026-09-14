@@ -3934,16 +3934,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-github-readme",
-            "version": "v2.0.1",
+            "version": "v2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-github-readme.git",
-                "reference": "84d22889bc7452da5372ab3e890c139dcfb66a9d"
+                "reference": "4556cd75a3b33185597c7ae7580c57beed13530a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-readme/zipball/84d22889bc7452da5372ab3e890c139dcfb66a9d",
-                "reference": "84d22889bc7452da5372ab3e890c139dcfb66a9d",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-github-readme/zipball/4556cd75a3b33185597c7ae7580c57beed13530a",
+                "reference": "4556cd75a3b33185597c7ae7580c57beed13530a",
                 "shasum": ""
             },
             "require": {
@@ -3993,7 +3993,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-github-readme/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-github-readme/tree/v2.0.1"
+                "source": "https://github.com/jeffersongoncalves/laravel-github-readme/tree/v2.0.2"
             },
             "funding": [
                 {
@@ -4005,7 +4005,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-09T14:12:13+00:00"
+            "time": "2026-09-14T20:43:51+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-gtag",

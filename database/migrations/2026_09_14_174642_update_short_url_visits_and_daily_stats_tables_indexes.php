@@ -15,12 +15,21 @@ return new class extends Migration
         // The global (site-wide) dashboard aggregates across every short_url_id at
         // once — an id-led index serves that IN (...) list poorly. A date-led index
         // matches the query's real selectivity (a narrow date range). See issue #18.
-        Schema::table($prefix.'visits', function (Blueprint $table) {
-            $table->index(['visited_at', 'short_url_id']);
+        //
+        // This app already created the same two indexes via the now-superseded
+        // 2026_09_11_120000_add_date_led_indexes_to_short_url_tables workaround
+        // (laravel-short-url#18/#19), so guard both — this migration is only a
+        // real no-op here, not on a fresh install that never had that workaround.
+        Schema::table($prefix.'visits', function (Blueprint $table) use ($prefix) {
+            if (! Schema::hasIndex($prefix.'visits', ['visited_at', 'short_url_id'])) {
+                $table->index(['visited_at', 'short_url_id']);
+            }
         });
 
-        Schema::table($prefix.'daily_stats', function (Blueprint $table) {
-            $table->index(['date', 'short_url_id']);
+        Schema::table($prefix.'daily_stats', function (Blueprint $table) use ($prefix) {
+            if (! Schema::hasIndex($prefix.'daily_stats', ['date', 'short_url_id'])) {
+                $table->index(['date', 'short_url_id']);
+            }
         });
     }
 

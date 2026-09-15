@@ -26,6 +26,12 @@
       @class(['dark' => $isDarkInitial])
       style="background: {{ $isDarkInitial ? '#0B0A09' : '#FFFEF9' }}; color-scheme: {{ $isDarkInitial ? 'dark' : 'light' }};">
 <head>
+    <link rel="preconnect" href="https://static.cloudflareinsights.com">
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://info.orcid.org">
+    <link rel="dns-prefetch" href="https://static.cloudflareinsights.com">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://info.orcid.org">
     @include('gtm::head')
     @include('gtag::script')
     <meta charset="UTF-8">
@@ -49,7 +55,7 @@
     <x-favicon/>
     {!! seo($resolvedSeo) !!}
     @livewireStyles
-    @vite(['resources/css/site.css', 'resources/js/site.js'])
+    @vite(['resources/css/site.css'])
     @stack('head')
 </head>
 <body>
@@ -93,12 +99,8 @@
             </button>
         </div>
     </div>
-
-    @stack('scripts')
-
-    {{-- Manual Livewire bundle (config/livewire.php inject_assets=false): the
-         runtime is shipped via @vite(site.js); this only emits the JSON config
-         (update endpoint, csrf) the bundle reads. No @livewireScripts here. --}}
+    @vite(['resources/js/site.js'])
     @livewireScriptConfig
+    @stack('scripts')
 </body>
 </html>

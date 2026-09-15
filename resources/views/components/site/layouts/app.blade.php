@@ -22,6 +22,7 @@
     $isDarkInitial = $themeCookie !== 'light';
 @endphp
 <!DOCTYPE html>
+<!--suppress HtmlRequiredTitleElement -->
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
       @class(['dark' => $isDarkInitial])
       style="background: {{ $isDarkInitial ? '#0B0A09' : '#FFFEF9' }}; color-scheme: {{ $isDarkInitial ? 'dark' : 'light' }};">

@@ -1,5 +1,5 @@
-@php $locale = \JeffersonGoncalves\LocaleCookie\LocaleCookie::short(); @endphp
-
+@use(App\Support\OutboundLink)
+@use(JeffersonGoncalves\LocaleCookie\LocaleCookie)
 <footer class="site-footer">
     <div class="wrap site-footer-inner">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
@@ -27,25 +27,39 @@
             <div>
                 <div class="site-footer-title">@lang('site.footer.social')</div>
                 <ul class="site-footer-list">
-                    <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.github'), 'GitHub') }}"    rel="noopener" target="_blank">GitHub ↗</a></li>
-                    <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.linkedin'), 'LinkedIn') }}"  rel="noopener" target="_blank">LinkedIn ↗</a></li>
-                    <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.packagist'), 'Packagist') }}" rel="noopener" target="_blank">Packagist ↗</a></li>
-                    <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.x'), 'X (Twitter)') }}"         rel="noopener" target="_blank">X (Twitter) ↗</a></li>
-                    <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.mastodon'), 'Mastodon') }}" rel="noopener" target="_blank">Mastodon ↗</a></li>
-                    <li><a href="{{ \App\Support\OutboundLink::to(config('site.social.mastodon_phpc'), 'Mastodon (PHPC)') }}" rel="noopener" target="_blank">Mastodon (PHPC) ↗</a></li>
                     <li>
-                        <a
-                            id="cy-effective-orcid-url"
-                            class="underline"
-                            href="{{ config('site.social.orcid') }}"
-                            target="orcid.widget"
-                            rel="me noopener noreferrer"
-                            style="vertical-align: top">
-                            <img
-                                src="https://orcid.org/sites/default/files/images/orcid_16x16.png"
-                                style="width: 1em; margin-inline-start: 0.5em"
-                                alt="ORCID iD icon"/>
-                            {{ config('site.social.orcid') }}
+                        <a href="{{ OutboundLink::to(config('site.social.github'), 'GitHub') }}" rel="noopener" target="_blank">
+                            GitHub ↗
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ OutboundLink::to(config('site.social.linkedin'), 'LinkedIn') }}" rel="noopener" target="_blank">
+                            LinkedIn ↗
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ OutboundLink::to(config('site.social.packagist'), 'Packagist') }}" rel="noopener" target="_blank">
+                            Packagist ↗
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ OutboundLink::to(config('site.social.x'), 'X (Twitter)') }}" rel="noopener" target="_blank">
+                            X (Twitter) ↗
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ OutboundLink::to(config('site.social.mastodon'), 'Mastodon') }}" rel="noopener" target="_blank">
+                            Mastodon ↗
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ OutboundLink::to(config('site.social.mastodon_phpc'), 'Mastodon (PHPC)') }}" rel="noopener" target="_blank">
+                            Mastodon (PHPC) ↗
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ OutboundLink::to(config('site.social.orcid'), 'ORCID iD') }}" rel="noopener" target="_blank">
+                            ORCID iD ↗
                         </a>
                     </li>
                 </ul>

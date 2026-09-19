@@ -20,7 +20,8 @@ it('lists the MCP guide in llms.txt', function () {
 
 it('renders the Spanish MCP guide body', function () {
     // Locale now lives in the URL segment (see routes/web.php's
-    // Route::prefix('{locale}') group + SetLocaleFromRoute), not the cookie.
+    // Route::prefix('{locale}') group + config/locale-cookie.php's
+    // url_prefix.enabled), not the cookie.
     $this->get('/es/developers/mcp')
         ->assertOk()
         ->assertSee('Este sitio publica un servidor', false)

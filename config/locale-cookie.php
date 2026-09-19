@@ -63,4 +63,25 @@ return [
         'middleware' => ['web', SecurityHeaders::class],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | URL-Prefix Locale Mode
+    |--------------------------------------------------------------------------
+    |
+    | Only `enabled` is used here — every locale (including the "default")
+    | gets its own /{locale} prefix group in routes/web.php, registered once
+    | as a single dynamic Route::prefix('{locale}') rather than through this
+    | package's own LocaleCookie::routes() (which keeps one locale unprefixed
+    | at root). Enabling this makes SetLocale fall back to the `{locale}`
+    | route parameter when there's no static route action (v1.5.0+, see
+    | jeffersongoncalves/laravel-locale-cookie#7) — the `default_locale`/
+    | `segments` keys below are that package's own routing helper and don't
+    | apply to how this app registers routes, so they're left unset.
+    |
+    */
+
+    'url_prefix' => [
+        'enabled' => true,
+    ],
+
 ];

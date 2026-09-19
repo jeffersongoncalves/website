@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3163b6b73795708ac2f0bb9f635f6d32",
+    "content-hash": "cd4fc9e41636c7b16f7113dc8b385fcd",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -4310,16 +4310,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-locale-cookie",
-            "version": "v1.4.0",
+            "version": "v1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-locale-cookie.git",
-                "reference": "ae1e8a7ec915fe250013b219a4f3fbe85e1ff71c"
+                "reference": "4ba643115c49a07b5329ad8df79beb071c4965e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-locale-cookie/zipball/ae1e8a7ec915fe250013b219a4f3fbe85e1ff71c",
-                "reference": "ae1e8a7ec915fe250013b219a4f3fbe85e1ff71c",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-locale-cookie/zipball/4ba643115c49a07b5329ad8df79beb071c4965e1",
+                "reference": "4ba643115c49a07b5329ad8df79beb071c4965e1",
                 "shasum": ""
             },
             "require": {
@@ -4329,6 +4329,7 @@
             },
             "require-dev": {
                 "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.32",
                 "orchestra/testbench": "^9.0|^10.0|^11.0",
                 "pestphp/pest": "^3.7.4|^4.0",
                 "pestphp/pest-plugin-laravel": "^3.0|^4.0"
@@ -4366,7 +4367,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-locale-cookie/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-locale-cookie/tree/v1.4.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-locale-cookie/tree/v1.5.0"
             },
             "funding": [
                 {
@@ -4378,7 +4379,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-14T21:33:07+00:00"
+            "time": "2026-09-19T22:59:07+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-markdown",

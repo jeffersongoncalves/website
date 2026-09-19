@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Http\Middleware\SetLocaleFromRoute;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -16,6 +15,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use JeffersonGoncalves\LocaleCookie\LocaleCookie;
+use JeffersonGoncalves\LocaleCookie\Middleware\SetLocale;
 use Livewire\Livewire;
 use RalphJSmit\Laravel\SEO\Facades\SEOManager;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
@@ -64,17 +64,17 @@ class AppServiceProvider extends ServiceProvider
         Model::automaticallyEagerLoadRelationships();
 
         // route()/URL generation outside an HTTP request (tests, artisan
-        // commands, queued jobs) has no SetLocaleFromRoute middleware to set
-        // this — without a baseline, a required `{locale}` route param with
-        // no default would throw. Per-request middleware below overrides it.
+        // commands, queued jobs) has no SetLocale middleware to set this —
+        // without a baseline, a required `{locale}` route param with no
+        // default would throw. Per-request middleware below overrides it.
         URL::defaults(['locale' => config('locale-cookie.fallback', 'en')]);
 
-        // SetLocaleFromRoute is a route-group middleware, so Livewire /update
-        // requests (live search/sort/topic/pagination on /projects, /links,
-        // /articles) would otherwise run without it and re-render under the
-        // fallback locale, flipping en/es visitors to pt_BR mid-interaction.
-        // Persist it so it re-runs on every component update.
-        Livewire::addPersistentMiddleware(SetLocaleFromRoute::class);
+        // SetLocale is a route-group middleware, so Livewire /update requests
+        // (live search/sort/topic/pagination on /projects, /links, /articles)
+        // would otherwise run without it and re-render under the fallback
+        // locale, flipping en/es visitors to pt_BR mid-interaction. Persist it
+        // so it re-runs on every component update.
+        Livewire::addPersistentMiddleware(SetLocale::class);
 
         Paginator::defaultView('pagination.site');
         Paginator::defaultSimpleView('pagination.site-simple');

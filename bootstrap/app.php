@@ -42,7 +42,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // The theme cookie is written by JS on the client (no PHP touchpoint),
         // so EncryptCookies must skip it — otherwise the decrypt step strips
         // the plain "dark"/"light" value before Blade can read it back.
-        $middleware->encryptCookies(except: ['theme']);
+        //
+        // The locale cookie is meant to be readable/writable by client-side
+        // JavaScript too (see SetLocale's and SwitchLocaleController's own
+        // docblocks in jeffersongoncalves/laravel-locale-cookie) — same reason.
+        $middleware->encryptCookies(except: ['theme', 'locale']);
 
         // Prepended (not appended): a banned/ASN-blocked request should skip
         // session start, CSRF, cookie encryption, etc. entirely, not just

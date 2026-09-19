@@ -3,10 +3,12 @@
 declare(strict_types=1);
 
 it('switches the locale cookie and returns to a same-host referer', function () {
+    // Unencrypted: the locale cookie is excepted from EncryptCookies (see
+    // bootstrap/app.php) so client-side JS can read it directly.
     $this->withHeaders(['referer' => url('/projects')])
         ->get('/locale/en')
         ->assertRedirect(url('/projects'))
-        ->assertCookie('locale', 'en');
+        ->assertCookie('locale', 'en', false);
 });
 
 it('ignores a cross-origin referer and falls back home (open-redirect guard)', function () {
@@ -18,7 +20,7 @@ it('ignores a cross-origin referer and falls back home (open-redirect guard)', f
 it('falls back home when no referer is present', function () {
     $this->get('/locale/pt_BR')
         ->assertRedirect('/')
-        ->assertCookie('locale', 'pt_BR');
+        ->assertCookie('locale', 'pt_BR', false);
 });
 
 it('rejects an unsupported locale at the route level', function () {

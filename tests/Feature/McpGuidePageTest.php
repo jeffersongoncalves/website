@@ -20,9 +20,11 @@ it('lists the MCP guide in llms.txt', function () {
 
 it('renders the Spanish MCP guide body', function () {
     // JeffersonGoncalves\LocaleCookie\Middleware\SetLocale deliberately reads
-    // the RAW request cookie (bypassing EncryptCookies) so client-set (JS)
-    // cookies work — a plain value is the real mechanism here, not a shortcut.
-    $this->withCookie('locale', 'es')
+    // the RAW request cookie (bypassing EncryptCookies, which excepts it —
+    // see bootstrap/app.php) so client-set (JS) cookies work. withCookie()
+    // always encrypts regardless of that except-list, so the real plain
+    // value must go through withUnencryptedCookie() instead.
+    $this->withUnencryptedCookie('locale', 'es')
         ->get('/developers/mcp')
         ->assertOk()
         ->assertSee('Este sitio publica un servidor', false)
@@ -30,7 +32,7 @@ it('renders the Spanish MCP guide body', function () {
 });
 
 it('renders the English MCP guide body', function () {
-    $this->withCookie('locale', 'en')
+    $this->withUnencryptedCookie('locale', 'en')
         ->get('/developers/mcp')
         ->assertOk()
         ->assertSee('Test it locally', false);

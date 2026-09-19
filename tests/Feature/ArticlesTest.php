@@ -23,7 +23,7 @@ function article(string $name, array $attrs = []): Project
 it('renders the /articles page with the list and feed link', function () {
     article('my-first-article');
 
-    $this->get('/articles')
+    $this->get('/pt_BR/articles')
         ->assertOk()
         ->assertSee('my-first-article')
         ->assertSee(__('site.articles.title'))

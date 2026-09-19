@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 uses(RefreshDatabase::class);
 
 it('emits Person JSON-LD and a skip link on the home page', function () {
-    $response = $this->get('/')->assertOk();
+    $response = $this->get('/pt_BR')->assertOk();
 
     $response->assertSee('application/ld+json', false);
     $response->assertSee('"@type":"Person"', false);
@@ -31,7 +31,7 @@ it('emits SoftwareSourceCode + BreadcrumbList JSON-LD and a per-repo OG image on
         'published_at' => now(),
     ]);
 
-    $response = $this->get('/projects/'.$project->slug)->assertOk();
+    $response = $this->get('/pt_BR/projects/'.$project->slug)->assertOk();
 
     $response->assertSee('"@type":"SoftwareSourceCode"', false);
     $response->assertSee('"@type":"BreadcrumbList"', false);
@@ -59,7 +59,7 @@ it('claims authorship only for repos under the owner account', function () {
         'published_at' => now(),
     ]);
 
-    $this->get('/projects/'.$owned->slug)
+    $this->get('/pt_BR/projects/'.$owned->slug)
         ->assertOk()
         ->assertSee('"author":{', false)
         ->assertSee('"name":"Jefferson Gonçalves"', false);
@@ -78,7 +78,7 @@ it('uses the project name (not its description) as the breadcrumb leaf', functio
         'published_at' => now(),
     ]);
 
-    $this->get('/projects/'.$project->slug)
+    $this->get('/pt_BR/projects/'.$project->slug)
         ->assertOk()
         ->assertSee('"@type":"BreadcrumbList"', false)
         // leaf crumb is the name, never the long description

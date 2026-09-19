@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 it('renders per-page SEO meta on a site page', function () {
-    $response = $this->get('/');
+    $response = $this->get('/pt_BR');
 
     $response->assertOk();
     $response->assertSee('<meta name="description"', false);

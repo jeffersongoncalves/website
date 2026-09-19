@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Http\Middleware\SetLocaleFromRoute;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use JeffersonGoncalves\LocaleCookie\Middleware\SetLocale;
 use JeffersonGoncalves\ScannerGuard\Http\Middleware\BlockScannerRequests;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -17,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'set.locale' => SetLocale::class,
+            'set.locale' => SetLocaleFromRoute::class,
         ]);
 
         // The site is served through Cloudflare, so every request arrives from

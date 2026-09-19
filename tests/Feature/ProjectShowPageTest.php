@@ -44,9 +44,9 @@ function npmOnlyProject(array $attrs = []): Project
 it('301s a project requested under the wrong section to its canonical section', function () {
     pluginProject(); // a Filament plugin is canonical under /projects/{slug}
 
-    $this->get('/articles/filament-thing')
+    $this->get('/pt_BR/articles/filament-thing')
         ->assertStatus(301)
-        ->assertRedirect('/projects/filament-thing');
+        ->assertRedirect(route('projects.show', ['slug' => 'filament-thing']));
 });
 
 it('merges consecutive versions that resolve to the same branch into one chip', function () {
@@ -59,7 +59,7 @@ it('merges consecutive versions that resolve to the same branch into one chip', 
         'branch_overrides' => ['2.x' => 'master', '3.x' => 'master'],
     ]);
 
-    $this->get('/projects/filament-thing')
+    $this->get('/pt_BR/projects/filament-thing')
         ->assertOk()
         ->assertSee('v4/v5')
         ->assertSee('v3');
@@ -69,7 +69,7 @@ it('renders a project page under its canonical section without redirecting', fun
     Storage::fake('github');
     pluginProject();
 
-    $this->get('/projects/filament-thing')
+    $this->get('/pt_BR/projects/filament-thing')
         ->assertOk()
         ->assertSee('Filament Thing');
 });
@@ -101,7 +101,7 @@ it('sanitizes untrusted script/event-handler/Alpine markup out of a third-party 
         'published_at' => now(),
     ]);
 
-    $response = $this->get('/projects/'.$project->slug)->assertOk();
+    $response = $this->get('/pt_BR/projects/'.$project->slug)->assertOk();
 
     // Check the exact injected payload strings, not generic tokens like
     // "<script" or "x-data" — the page's OWN trusted chrome legitimately has
@@ -142,7 +142,7 @@ it('assigns readme_branch as the ref for a non-Filament-plugin project', functio
         'published_at' => now(),
     ]);
 
-    $this->get('/projects/'.$project->slug)
+    $this->get('/pt_BR/projects/'.$project->slug)
         ->assertOk()
         ->assertSee('From develop');
 });
@@ -154,7 +154,7 @@ it('renders the npm registry README for an npm-only package with no repo', funct
 
     npmOnlyProject();
 
-    $this->get('/projects/tailwindcss-animate')
+    $this->get('/pt_BR/projects/tailwindcss-animate')
         ->assertOk()
         ->assertSee('Animate utilities');
 });
@@ -167,7 +167,7 @@ it('shows the npm link and hides stars for an npm-only package with no repo', fu
     npmOnlyProject();
 
     // Off-site, so the button points at the tracked short URL, not npm itself.
-    $this->get('/projects/tailwindcss-animate')
+    $this->get('/pt_BR/projects/tailwindcss-animate')
         ->assertOk()
         ->assertSee(OutboundLink::to('https://www.npmjs.com/package/tailwindcss-animate'))
         ->assertDontSee(__('site.projects.label_stars'));

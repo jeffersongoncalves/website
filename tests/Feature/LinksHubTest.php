@@ -30,7 +30,7 @@ it('shows external links grouped on the /links hub', function () {
     externalLink('a-course', ProjectCategory::LearningResource);
     externalLink('awesome-things', ProjectCategory::AwesomeList);
 
-    $this->get('/links')
+    $this->get('/pt_BR/links')
         ->assertOk()
         ->assertSee('my-fav-site')
         ->assertSee('a-channel')
@@ -42,7 +42,7 @@ it('shows external links grouped on the /links hub', function () {
 
 it('invalidates the cached /links sections + topics when a project is published', function () {
     // Warm the section + topic caches while the channel does not exist yet.
-    $this->get('/links')
+    $this->get('/pt_BR/links')
         ->assertOk()
         ->assertDontSee('fresh-channel');
 
@@ -54,7 +54,7 @@ it('invalidates the cached /links sections + topics when a project is published'
         'topics' => ['streaming'],
     ]);
 
-    $this->get('/links')
+    $this->get('/pt_BR/links')
         ->assertOk()
         ->assertSee('fresh-channel')
         ->assertSee('streaming');
@@ -70,13 +70,13 @@ it('keeps external links out of the code catalogue at /projects', function () {
     ]);
     externalLink('external-site', ProjectCategory::Website);
 
-    $this->get('/projects')
+    $this->get('/pt_BR/projects')
         ->assertOk()
         ->assertSee('a-real-tool')
         ->assertDontSee('external-site');
 
     // An explicit external-category filter shows nothing in the catalogue.
-    $this->get('/projects?cat=website')
+    $this->get('/pt_BR/projects?cat=website')
         ->assertOk()
         ->assertDontSee('external-site');
 });
@@ -84,7 +84,7 @@ it('keeps external links out of the code catalogue at /projects', function () {
 it('serves external links under /links/{slug} with a back link to the right section', function () {
     externalLink('my-fav-site', ProjectCategory::Website);
 
-    $this->get('/links/my-fav-site')
+    $this->get('/pt_BR/links/my-fav-site')
         ->assertOk()
         ->assertSee('my-fav-site')
         ->assertSee(__('site.links.back_to_list'))
@@ -95,7 +95,7 @@ it('serves external links under /links/{slug} with a back link to the right sect
 it('301s an external link served under /projects to its /links section', function () {
     externalLink('external-site', ProjectCategory::Website);
 
-    $this->get('/projects/external-site')
+    $this->get('/pt_BR/projects/external-site')
         ->assertRedirect(route('links.show', ['slug' => 'external-site']));
 });
 
@@ -108,7 +108,7 @@ it('301s a code project served under /links back to /projects', function () {
         'published_at' => now(),
     ]);
 
-    $this->get('/links/a-real-tool')
+    $this->get('/pt_BR/links/a-real-tool')
         ->assertRedirect(route('projects.show', ['slug' => 'a-real-tool']));
 });
 
@@ -119,7 +119,7 @@ it('searches within a single section without touching the others', function () {
         'docs_url' => 'https://www.youtube.com/@alpha-channel',
     ]);
 
-    $this->get('/links?q_sites=alpha')
+    $this->get('/pt_BR/links?q_sites=alpha')
         ->assertOk()
         ->assertSee('alpha-site')
         ->assertDontSee('beta-site')
@@ -131,7 +131,7 @@ it('sorts a section by name descending', function () {
     externalLink('aaa-site', ProjectCategory::Website);
     externalLink('zzz-site', ProjectCategory::Website);
 
-    $html = $this->get('/links?sort_sites=desc')->getContent();
+    $html = $this->get('/pt_BR/links?sort_sites=desc')->getContent();
 
     expect(strpos($html, 'zzz-site'))->toBeLessThan(strpos($html, 'aaa-site'));
 });
@@ -141,11 +141,11 @@ it('filters a section by topic and points card topic links into /links', functio
     externalLink('plain-site', ProjectCategory::Website);
 
     // The card's topic chip links into the Sites section, not /projects.
-    $this->get('/links')
+    $this->get('/pt_BR/links')
         ->assertOk()
         ->assertSee('topic_sites=design', false);
 
-    $this->get('/links?topic_sites=design')
+    $this->get('/pt_BR/links?topic_sites=design')
         ->assertOk()
         ->assertSee('topic-site')
         ->assertDontSee('plain-site');
@@ -163,7 +163,7 @@ it('paginates each link group independently', function () {
 
     // Each section shows its own page 1 (PER_PAGE = 6); Livewire paginates via
     // wire:click, so the page number lives in the action, not an href.
-    $this->get('/links')
+    $this->get('/pt_BR/links')
         ->assertOk()
         ->assertSee('site-01')   // page 1 of the Sites group
         ->assertDontSee('site-07') // page 2 only
@@ -171,7 +171,7 @@ it('paginates each link group independently', function () {
         ->assertDontSee('chan-07');
 
     // Paging the Sites group must not move the YouTube group off its page 1.
-    $this->get('/links?sites=2')
+    $this->get('/pt_BR/links?sites=2')
         ->assertOk()
         ->assertSee('site-07')   // Sites now on page 2
         ->assertDontSee('site-01')
@@ -226,5 +226,5 @@ it('skips a topics row whose stored topics column is not a JSON array', function
     // simulating a malformed row — sectionTopics() must skip it, not crash.
     DB::table('projects')->where('id', $malformed->id)->update(['topics' => json_encode('not-an-array')]);
 
-    $this->get('/links')->assertOk();
+    $this->get('/pt_BR/links')->assertOk();
 });

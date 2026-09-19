@@ -2,7 +2,17 @@
     $current = app()->getLocale();
     $locales = config('locale-cookie.supported', []);
     $label = fn (string $c): string => strtoupper(preg_split('/[_-]/', $c)[0] ?? $c);
-    $localeUrl = fn (string $target) => route('locale.switch', ['locale' => $target]);
+    // Same page, different locale — not the cookie+referer round-trip, since
+    // the locale now lives in the URL itself (see routes/web.php).
+    $localeUrl = function (string $target): string {
+        $route = request()->route();
+
+        if ($route === null || $route->getName() === null) {
+            return url('/'.$target);
+        }
+
+        return route($route->getName(), [...$route->parameters(), 'locale' => $target]);
+    };
     $active = fn (string ...$patterns): bool => request()->routeIs(...$patterns);
 @endphp
 

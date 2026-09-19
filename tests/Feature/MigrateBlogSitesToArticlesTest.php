@@ -41,7 +41,7 @@ it('reclassifies a website with a blog-post path as an article and aliases the o
         ->exists())->toBeTrue();
 
     // The retired website slug 301s to the new article URL.
-    $this->get('/links/site-cool-post')
+    $this->get('/pt_BR/links/site-cool-post')
         ->assertRedirect(route('articles.show', ['slug' => 'article-cool-post']));
 });
 

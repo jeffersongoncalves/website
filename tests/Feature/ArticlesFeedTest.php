@@ -22,7 +22,7 @@ it('serves an RSS feed of published articles', function () {
 
     $this->artisan('articles-feed:generate')->assertSuccessful();
 
-    $this->get('/articles/feed')
+    $this->get('/pt_BR/articles/feed')
         ->assertOk()
         ->assertHeader('Content-Type', 'application/rss+xml; charset=UTF-8')
         ->assertSee('Feed Me')
@@ -42,7 +42,7 @@ it('excludes unpublished articles and non-article projects from the feed', funct
 
     $this->artisan('articles-feed:generate')->assertSuccessful();
 
-    $this->get('/articles/feed')
+    $this->get('/pt_BR/articles/feed')
         ->assertOk()
         ->assertSee('Visible Article')
         ->assertDontSee('Draft Article')

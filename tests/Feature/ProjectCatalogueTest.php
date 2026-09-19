@@ -30,13 +30,13 @@ it('excludes articles from the projects catalogue', function () {
         'docs_url' => 'https://blog.test/some-article',
     ]);
 
-    $this->get('/projects')
+    $this->get('/pt_BR/projects')
         ->assertOk()
         ->assertSee('a-real-tool')
         ->assertDontSee('some-article');
 
     // Even an explicit cat=article filter shows nothing in the catalogue.
-    $this->get('/projects?cat=article')
+    $this->get('/pt_BR/projects?cat=article')
         ->assertOk()
         ->assertDontSee('some-article');
 });
@@ -45,7 +45,7 @@ it('finds projects by free-text search on name and repo', function () {
     publishedProject('alpha-widget', ['repo' => 'alpha-widget']);
     publishedProject('beta-gadget', ['repo' => 'beta-gadget']);
 
-    $this->get('/projects?search=widget')
+    $this->get('/pt_BR/projects?search=widget')
         ->assertOk()
         ->assertSee('alpha-widget')
         ->assertDontSee('beta-gadget');
@@ -58,7 +58,7 @@ it('escapes LIKE wildcards so _ is literal, not any-char', function () {
     publishedProject('axc', ['slug' => 'axc-repo', 'repo' => 'axc']);
 
     // With _ escaped, "a_c" matches only the literal a_c, not the any-char axc.
-    $this->get('/projects?search=a_c')
+    $this->get('/pt_BR/projects?search=a_c')
         ->assertOk()
         ->assertSee('a_c')
         ->assertDontSee('axc');
@@ -67,7 +67,7 @@ it('escapes LIKE wildcards so _ is literal, not any-char', function () {
 it('shows the empty state when nothing matches', function () {
     publishedProject('something');
 
-    $this->get('/projects?search=zzz-no-match')
+    $this->get('/pt_BR/projects?search=zzz-no-match')
         ->assertOk()
         ->assertSee(__('site.common.no_results'));
 });
@@ -84,14 +84,14 @@ it('paginates and preserves filters on page 2', function () {
     // Page 1 of the filtered catalogue shows the high-stars plugins (10/page).
     // (plugin-2 has stars=2 so it falls to page 2 — and isn't a substring of
     // any page-1 name, unlike plugin-1 which lives inside plugin-1{0,1,2}.)
-    $this->get('/projects?cat=filament_plugin')
+    $this->get('/pt_BR/projects?cat=filament_plugin')
         ->assertOk()
         ->assertSee('plugin-12')
         ->assertDontSee('plugin-2');
 
     // Deep-linking ?page=2 (Livewire's WithPagination reads it on mount) still
     // applies the cat filter and lands on the lowest-stars plugins.
-    $this->get('/projects?cat=filament_plugin&page=2')
+    $this->get('/pt_BR/projects?cat=filament_plugin&page=2')
         ->assertOk()
         ->assertSee('plugin-2'); // lowest stars land on the last page
 });
@@ -100,13 +100,13 @@ it('sorts by name, stars and downloads', function () {
     publishedProject('zeta', ['slug' => 'zeta', 'stars' => 1, 'downloads' => 999]);
     publishedProject('alpha', ['slug' => 'alpha', 'stars' => 50, 'downloads' => 1]);
 
-    $byName = $this->get('/projects?sort=name')->getContent();
+    $byName = $this->get('/pt_BR/projects?sort=name')->getContent();
     expect(strpos($byName, 'alpha'))->toBeLessThan(strpos($byName, 'zeta'));
 
-    $byStars = $this->get('/projects?sort=stars')->getContent();
+    $byStars = $this->get('/pt_BR/projects?sort=stars')->getContent();
     expect(strpos($byStars, 'alpha'))->toBeLessThan(strpos($byStars, 'zeta'));
 
-    $byDownloads = $this->get('/projects?sort=downloads')->getContent();
+    $byDownloads = $this->get('/pt_BR/projects?sort=downloads')->getContent();
     expect(strpos($byDownloads, 'zeta'))->toBeLessThan(strpos($byDownloads, 'alpha'));
 });
 
@@ -123,7 +123,7 @@ it('sorts by trending (recent projects.show visits, bots excluded)', function ()
         ['path' => 'projects/quiet-one', 'route_name' => 'projects.show', 'method' => 'GET', 'visited_at' => now()->subDays(31), 'is_bot' => false],
     ]);
 
-    $byTrending = $this->get('/projects?sort=trending')->getContent();
+    $byTrending = $this->get('/pt_BR/projects?sort=trending')->getContent();
     expect(strpos($byTrending, 'hot-one'))->toBeLessThan(strpos($byTrending, 'quiet-one'));
 });
 
@@ -131,7 +131,7 @@ it('filters by topic', function () {
     publishedProject('laravel-thing', ['slug' => 'laravel-thing', 'topics' => ['laravel', 'php']]);
     publishedProject('vue-thing', ['slug' => 'vue-thing', 'topics' => ['vue']]);
 
-    $this->get('/projects?topic=laravel')
+    $this->get('/pt_BR/projects?topic=laravel')
         ->assertOk()
         ->assertSee('laravel-thing')
         ->assertDontSee('vue-thing');
@@ -154,7 +154,7 @@ it('role=authored lists only repos under the owner account, not starred third-pa
         'starred_at' => now(),
     ]);
 
-    $this->get('/projects?role=authored')
+    $this->get('/pt_BR/projects?role=authored')
         ->assertOk()
         ->assertSee('my-own-pkg')
         ->assertDontSee('someone-else-repo');
@@ -195,7 +195,7 @@ it('filters by language when the language is in the persisted facet', function (
     // The language facet is validated against the persisted SiteStats breakdown.
     SiteStats::persist();
 
-    $this->get('/projects?language=PHP')
+    $this->get('/pt_BR/projects?language=PHP')
         ->assertOk()
         ->assertSee('php-lib')
         ->assertDontSee('js-lib');

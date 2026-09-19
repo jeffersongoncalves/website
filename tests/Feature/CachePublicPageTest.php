@@ -14,10 +14,10 @@ beforeEach(function (): void {
 });
 
 it('serves a MISS then a HIT for the same public page', function (): void {
-    $first = $this->get('/about');
+    $first = $this->get('/pt_BR/about');
     $first->assertOk()->assertHeader('X-Page-Cache', 'MISS');
 
-    $second = $this->get('/about');
+    $second = $this->get('/pt_BR/about');
     $second->assertOk()->assertHeader('X-Page-Cache', 'HIT');
 });
 
@@ -25,8 +25,8 @@ it('busts the cache when a project changes', function (): void {
     // /projects is excluded from the page cache (it's a Livewire component), so
     // assert against /about, which stays cached. A project mutation bumps the
     // shared page-cache version via ProjectObserver and invalidates every page.
-    $this->get('/about')->assertHeader('X-Page-Cache', 'MISS');
-    $this->get('/about')->assertHeader('X-Page-Cache', 'HIT');
+    $this->get('/pt_BR/about')->assertHeader('X-Page-Cache', 'MISS');
+    $this->get('/pt_BR/about')->assertHeader('X-Page-Cache', 'HIT');
 
     Project::query()->create([
         'slug' => 'fresh',
@@ -36,13 +36,13 @@ it('busts the cache when a project changes', function (): void {
         'published_at' => now(),
     ]);
 
-    $this->get('/about')->assertHeader('X-Page-Cache', 'MISS');
+    $this->get('/pt_BR/about')->assertHeader('X-Page-Cache', 'MISS');
 });
 
 it('does not cache when disabled', function (): void {
     config(['page-cache.enabled' => false]);
 
-    $res = $this->get('/about');
+    $res = $this->get('/pt_BR/about');
     $res->assertOk();
     expect($res->headers->get('X-Page-Cache'))->toBeNull();
 });

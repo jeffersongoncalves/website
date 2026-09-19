@@ -26,27 +26,27 @@ it('301-redirects a retired slug to the current slug', function () {
     $project = aliasProject('mbostock-d3');
     ProjectSlugAlias::query()->create(['project_id' => $project->id, 'slug' => 'd3']);
 
-    $this->get('/projects/d3')
+    $this->get('/pt_BR/projects/d3')
         ->assertStatus(301)
-        ->assertRedirect('/projects/mbostock-d3');
+        ->assertRedirect(route('projects.show', ['slug' => 'mbostock-d3']));
 });
 
 it('preserves the readme-version query string through the redirect', function () {
     $project = aliasProject('mbostock-d3');
     ProjectSlugAlias::query()->create(['project_id' => $project->id, 'slug' => 'd3']);
 
-    $this->get('/projects/d3?v=2.x')
+    $this->get('/pt_BR/projects/d3?v=2.x')
         ->assertStatus(301)
-        ->assertRedirect('/projects/mbostock-d3?v=2.x');
+        ->assertRedirect(route('projects.show', ['slug' => 'mbostock-d3']).'?v=2.x');
 });
 
 it('404s an unknown slug with no alias', function () {
-    $this->get('/projects/does-not-exist')->assertNotFound();
+    $this->get('/pt_BR/projects/does-not-exist')->assertNotFound();
 });
 
 it('404s when the aliased project is no longer published', function () {
     $project = aliasProject('mbostock-d3', ProjectStatus::Draft);
     ProjectSlugAlias::query()->create(['project_id' => $project->id, 'slug' => 'd3']);
 
-    $this->get('/projects/d3')->assertNotFound();
+    $this->get('/pt_BR/projects/d3')->assertNotFound();
 });

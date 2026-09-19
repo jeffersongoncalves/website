@@ -22,18 +22,18 @@ it('renders home', function () {
         'published_at' => now(),
     ]);
 
-    $this->get('/')
+    $this->get('/pt_BR')
         ->assertOk()
         ->assertSee('sample-plugin')
         ->assertSee(__('site.nav.articles'));   // Articles nav link present
 });
 
 it('renders about page', function () {
-    $this->get('/about')->assertOk();
+    $this->get('/pt_BR/about')->assertOk();
 });
 
 it('sends security headers on public pages', function () {
-    $this->get('/about')
+    $this->get('/pt_BR/about')
         ->assertOk()
         ->assertHeader('X-Content-Type-Options', 'nosniff')
         ->assertHeader('X-Frame-Options', 'SAMEORIGIN')
@@ -44,7 +44,7 @@ it('sends security headers on public pages', function () {
 });
 
 it('renders the stack page with masked major versions', function () {
-    $this->get('/stack')
+    $this->get('/pt_BR/stack')
         ->assertOk()
         ->assertSee('Filament')
         ->assertSee('Laravel')
@@ -54,19 +54,19 @@ it('renders the stack page with masked major versions', function () {
 });
 
 it('marks the current page in the nav with aria-current and is-active', function () {
-    $this->get('/about')
+    $this->get('/pt_BR/about')
         ->assertOk()
         ->assertSee('aria-current="page"', false)
         ->assertSee('nav-link is-active', false);
 
     // The articles page activates the Articles item, not Projects.
-    $this->get('/articles')
+    $this->get('/pt_BR/articles')
         ->assertOk()
         ->assertSee('aria-current="page"', false);
 });
 
 it('renders projects index', function () {
-    $this->get('/projects')->assertOk();
+    $this->get('/pt_BR/projects')->assertOk();
 });
 
 it('filters projects by category', function () {
@@ -85,7 +85,7 @@ it('filters projects by category', function () {
         'published_at' => now(),
     ]);
 
-    $this->get('/projects?cat=filament_plugin')
+    $this->get('/pt_BR/projects?cat=filament_plugin')
         ->assertOk()
         ->assertSee('a-plugin')
         ->assertDontSee('b-package');
@@ -109,7 +109,7 @@ it('filters projects by daily driver role', function () {
         'published_at' => now(),
     ]);
 
-    $this->get('/projects?role=daily_driver')
+    $this->get('/pt_BR/projects?role=daily_driver')
         ->assertOk()
         ->assertSee('a-tool')
         ->assertDontSee('b-plugin');
@@ -132,13 +132,13 @@ it('filters projects by origin (own vs starred) and badges starred ones', functi
         'published_at' => now(),
     ]);
 
-    $this->get('/projects?source=starred')
+    $this->get('/pt_BR/projects?source=starred')
         ->assertOk()
         ->assertSee('starred-thing')
         ->assertDontSee('my-own-pkg')
         ->assertSee(__('site.projects.badge_starred'));
 
-    $this->get('/projects?source=own')
+    $this->get('/pt_BR/projects?source=own')
         ->assertOk()
         ->assertSee('my-own-pkg')
         ->assertDontSee('starred-thing');
@@ -164,15 +164,15 @@ it('badges the owner-created packages as creator, third-party as not', function 
         'published_at' => now(),
     ]);
 
-    $this->get('/projects')
+    $this->get('/pt_BR/projects')
         ->assertOk()
         ->assertSee(__('site.projects.badge_creator'));
 
-    $this->get('/projects/my-pkg')
+    $this->get('/pt_BR/projects/my-pkg')
         ->assertOk()
         ->assertSee(__('site.projects.badge_creator'));
 
-    $this->get('/projects/their-pkg')
+    $this->get('/pt_BR/projects/their-pkg')
         ->assertOk()
         ->assertDontSee(__('site.projects.badge_creator'));
 });
@@ -186,7 +186,7 @@ it('renders project show', function () {
         'published_at' => now(),
     ]);
 
-    $this->get('/projects/my-plugin')
+    $this->get('/pt_BR/projects/my-plugin')
         ->assertOk()
         ->assertSee('my-plugin');
 });
@@ -203,10 +203,10 @@ it('gives an article an article- slug and renders it as an external link card', 
     expect($project->slug)->toBe('article-automate-your-php-security-updates');
 
     // Articles are canonical under /articles/{slug}; the old /projects path 301s.
-    $this->get('/projects/'.$project->slug)
+    $this->get('/pt_BR/projects/'.$project->slug)
         ->assertRedirect(route('articles.show', ['slug' => $project->slug]));
 
-    $this->get('/articles/'.$project->slug)
+    $this->get('/pt_BR/articles/'.$project->slug)
         ->assertOk()
         // Renders the external "visit" card (host + deep link), not a README.
         ->assertSee('yoeri.me')
@@ -224,7 +224,7 @@ it('renders the article body as content and emits Article JSON-LD', function () 
         'published_at' => now(),
     ]);
 
-    $this->get('/articles/'.$project->slug)
+    $this->get('/pt_BR/articles/'.$project->slug)
         ->assertOk()
         ->assertSee('Why patch')                          // rendered markdown body
         ->assertSee(__('site.projects.article_read'))     // "read article" CTA
@@ -234,7 +234,7 @@ it('renders the article body as content and emits Article JSON-LD', function () 
         ->assertSee(route('articles.index'), false);
 
     // The legacy /projects path 301s to the canonical /articles URL.
-    $this->get('/projects/'.$project->slug)
+    $this->get('/pt_BR/projects/'.$project->slug)
         ->assertRedirect(route('articles.show', ['slug' => $project->slug]));
 });
 
@@ -246,7 +246,7 @@ it('404s on draft project show', function () {
         'status' => ProjectStatus::Draft,
     ]);
 
-    $this->get('/projects/draft-plugin')->assertNotFound();
+    $this->get('/pt_BR/projects/draft-plugin')->assertNotFound();
 });
 
 it('renders the articles index listing only articles, newest first', function () {
@@ -272,7 +272,7 @@ it('renders the articles index listing only articles, newest first', function ()
         'published_at' => now(),
     ]);
 
-    $response = $this->get('/articles')->assertOk()
+    $response = $this->get('/pt_BR/articles')->assertOk()
         ->assertSee('Newer Post')
         ->assertSee('Older Post')
         ->assertDontSee('a-plugin-not-article');
@@ -294,7 +294,7 @@ it('serves a valid RSS feed of articles', function () {
 
     $this->artisan('articles-feed:generate')->assertSuccessful();
 
-    $response = $this->get('/articles/feed')->assertOk();
+    $response = $this->get('/pt_BR/articles/feed')->assertOk();
 
     expect($response->headers->get('Content-Type'))->toContain('application/rss+xml');
     $response->assertSee('<rss version="2.0"', false)
@@ -303,25 +303,25 @@ it('serves a valid RSS feed of articles', function () {
 });
 
 it('renders open-source page', function () {
-    $this->get('/open-source')->assertOk();
+    $this->get('/pt_BR/open-source')->assertOk();
 });
 
 it('renders the links hub with the nav link present', function () {
-    $this->get('/links')
+    $this->get('/pt_BR/links')
         ->assertOk()
         ->assertSee(__('site.nav.links'));
 });
 
 it('renders sponsors page', function () {
-    $this->get('/sponsors')->assertOk();
+    $this->get('/pt_BR/sponsors')->assertOk();
 });
 
 it('shows the synced sponsor count on the sponsors page, hidden at zero', function () {
-    $this->get('/sponsors')->assertOk()->assertDontSee('já patrocina', escape: false);
+    $this->get('/pt_BR/sponsors')->assertOk()->assertDontSee('já patrocina', escape: false);
 
     SiteStat::query()->create(['public_sponsors' => 3]);
 
-    $this->get('/sponsors')->assertOk()->assertSee('3 pessoas já patrocinam', escape: false);
+    $this->get('/pt_BR/sponsors')->assertOk()->assertSee('3 pessoas já patrocinam', escape: false);
 });
 
 it('serves the service worker as javascript with no-cache headers', function () {

@@ -45,13 +45,15 @@ final class SitemapGenerator
             ['developers.mcp', Url::CHANGE_FREQUENCY_MONTHLY, 0.4],
         ];
 
-        foreach ($pages as [$route, $frequency, $priority]) {
-            $sitemap->add(
-                Url::create(route($route))
-                    ->setLastModificationDate($now)
-                    ->setChangeFrequency($frequency)
-                    ->setPriority($priority)
-            );
+        foreach (self::locales() as $locale) {
+            foreach ($pages as [$route, $frequency, $priority]) {
+                $sitemap->add(
+                    Url::create(route($route, ['locale' => $locale]))
+                        ->setLastModificationDate($now)
+                        ->setChangeFrequency($frequency)
+                        ->setPriority($priority)
+                );
+            }
         }
     }
 
@@ -70,13 +72,21 @@ final class SitemapGenerator
                     default => [0.7, Url::CHANGE_FREQUENCY_WEEKLY],
                 };
 
-                $sitemap->add(
-                    Url::create(route($project->canonicalRouteName(), ['slug' => $project->slug]))
-                        ->setLastModificationDate($project->updated_at ?? now())
-                        ->setChangeFrequency($frequency)
-                        ->setPriority($priority)
-                );
+                foreach (self::locales() as $locale) {
+                    $sitemap->add(
+                        Url::create(route($project->canonicalRouteName(), ['locale' => $locale, 'slug' => $project->slug]))
+                            ->setLastModificationDate($project->updated_at ?? now())
+                            ->setChangeFrequency($frequency)
+                            ->setPriority($priority)
+                    );
+                }
             }
         );
+    }
+
+    /** @return array<int, string> */
+    private static function locales(): array
+    {
+        return (array) config('locale-cookie.supported', ['en']);
     }
 }

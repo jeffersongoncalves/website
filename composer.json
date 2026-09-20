@@ -30,6 +30,7 @@
         "jeffersongoncalves/filament-scanner-guard": "^3.0",
         "jeffersongoncalves/filament-sensible-defaults": "^3.1",
         "jeffersongoncalves/filament-short-url": "^3.5",
+        "jeffersongoncalves/filament-widget-configuration": "^3.0",
         "jeffersongoncalves/flysystem-google-drive": "^1.0",
         "jeffersongoncalves/laravel-favicon-proxy": "^1.0",
         "jeffersongoncalves/laravel-github-client": "^1.1",

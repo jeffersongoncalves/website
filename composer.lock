@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cd4fc9e41636c7b16f7113dc8b385fcd",
+    "content-hash": "efdaead8b7ae694e57b19b76d6bd7ce9",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -3564,6 +3564,81 @@
                 }
             ],
             "time": "2026-09-14T21:33:09+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/filament-widget-configuration",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/filament-widget-configuration.git",
+                "reference": "062ce44afc0d8d27ce2d505a69e09902218bbd38"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-widget-configuration/zipball/062ce44afc0d8d27ce2d505a69e09902218bbd38",
+                "reference": "062ce44afc0d8d27ce2d505a69e09902218bbd38",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^2.0|^3.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\Filament\\WidgetConfiguration\\WidgetConfigurationServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\Filament\\WidgetConfiguration\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Configure global defaults for Filament widget polling interval and lazy loading, without editing every widget class by hand",
+            "homepage": "https://github.com/jeffersongoncalves/filament-widget-configuration",
+            "keywords": [
+                "filament",
+                "filament-plugin",
+                "laravel",
+                "lazy-loading",
+                "polling",
+                "widget"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/filament-widget-configuration/issues",
+                "source": "https://github.com/jeffersongoncalves/filament-widget-configuration/tree/3.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://buymeacoffee.com/jeffersongoncalves",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-09-20T15:47:38+00:00"
         },
         {
             "name": "jeffersongoncalves/flysystem-google-drive",

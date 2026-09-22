@@ -196,6 +196,7 @@ All notable changes to this project will be documented in this file.
 
 ### CI/CD
 
+- Standardize dependabot config
 - Generate CHANGELOG with git-cliff on push
 - Add git-cliff config
 - Drop the mutation workflow (keep the local composer test:mutate script)

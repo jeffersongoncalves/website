@@ -208,6 +208,20 @@ class Project extends Model
         ];
     }
 
+    /**
+     * Eloquent writes a datetime as a naive wall-clock in whatever zone the
+     * Carbon carries, but every driver reads it back in app.timezone (the cast,
+     * and Postgres timestamptz via the session TIME ZONE pinned to APP_TIMEZONE).
+     * Normalise to app.timezone first so a UTC value (e.g. a GitHub starred_at)
+     * persists as the same instant instead of landing offset hours late.
+     */
+    public function fromDateTime($value)
+    {
+        return blank($value) ? null : $this->asDateTime($value)
+            ->setTimezone(config('app.timezone'))
+            ->format($this->getDateFormat());
+    }
+
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()

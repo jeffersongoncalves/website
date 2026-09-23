@@ -80,14 +80,14 @@ class SyncStarredReposJob implements ShouldQueue
         }
 
         // max() is an aggregate — it returns the raw DB scalar, not a cast
-        // Carbon. ImportStarredRepoJob stores starred_at in UTC, so read it back
-        // as UTC (NOT app.timezone) and format to the same Z-suffixed ISO the API
-        // emits. Parsing without an explicit zone would apply the app offset and
-        // skip stars inside that window.
+        // Carbon. ImportStarredRepoJob stores starred_at in app.timezone, so read
+        // a naive scalar (SQLite/MySQL) in that zone — Postgres timestamptz comes
+        // back with its own offset, which parse() honours — then convert to the
+        // same Z-suffixed UTC ISO the API emits.
         $max = Project::max('starred_at');
         $cursor = ($this->full || $max === null)
             ? self::EPOCH
-            : CarbonImmutable::parse($max, 'UTC')->format('Y-m-d\TH:i:s\Z');
+            : CarbonImmutable::parse($max, config('app.timezone'))->utc()->format('Y-m-d\TH:i:s\Z');
 
         try {
             $dispatched = $this->paginate($username, $cursor);

@@ -98,12 +98,9 @@ final class ImportStarredRepoJob implements ShouldQueue
     public function handle(): void
     {
         $canonical = $this->canonicalUrl();
-        // Keep the star timestamp in UTC end-to-end. The sync cursor reads this
-        // column back as UTC too (SyncStarredReposJob), so storage and compare
-        // stay consistent regardless of app.timezone — converting to local here
-        // would shift the stored wall-clock and let the cursor skip stars inside
-        // the timezone-offset window.
-        $starredAt = CarbonImmutable::parse($this->starredAt)->utc();
+        // Project::fromDateTime() normalises to app.timezone on write, so the
+        // persisted instant matches the API's UTC timestamp on every driver.
+        $starredAt = CarbonImmutable::parse($this->starredAt);
 
         // Dedup by owner/repo (case-insensitive — ProjectMatcher::findByGithubUrl,
         // not a raw exact match): never duplicate, never downgrade a published row.

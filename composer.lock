@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7ef55c85b811629f3e5f4c5806f4602b",
+    "content-hash": "075f7f813ea08342c7f40a12f0e9b987",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -3820,16 +3820,16 @@
         },
         {
             "name": "jeffersongoncalves/filament-short-url",
-            "version": "3.9.0",
+            "version": "3.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-short-url.git",
-                "reference": "7db8be7df82350f97c691b4c9615efb29d009351"
+                "reference": "fd426e61067b043175f3b25171d58ff174bfc998"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-short-url/zipball/7db8be7df82350f97c691b4c9615efb29d009351",
-                "reference": "7db8be7df82350f97c691b4c9615efb29d009351",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-short-url/zipball/fd426e61067b043175f3b25171d58ff174bfc998",
+                "reference": "fd426e61067b043175f3b25171d58ff174bfc998",
                 "shasum": ""
             },
             "require": {
@@ -3885,7 +3885,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-short-url/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-short-url/tree/3.9.0"
+                "source": "https://github.com/jeffersongoncalves/filament-short-url/tree/3.9.1"
             },
             "funding": [
                 {
@@ -3897,7 +3897,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-23T04:21:13+00:00"
+            "time": "2026-09-23T22:28:45+00:00"
         },
         {
             "name": "jeffersongoncalves/filament-widget-configuration",
@@ -5383,16 +5383,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-short-url",
-            "version": "5.2.1",
+            "version": "5.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-short-url.git",
-                "reference": "cf13e1188a4621f19f28c6cf960f6e84ac37875e"
+                "reference": "f8b8ba7fdd9e1ab0f316ab4d83707c2c9714495c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-short-url/zipball/cf13e1188a4621f19f28c6cf960f6e84ac37875e",
-                "reference": "cf13e1188a4621f19f28c6cf960f6e84ac37875e",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-short-url/zipball/f8b8ba7fdd9e1ab0f316ab4d83707c2c9714495c",
+                "reference": "f8b8ba7fdd9e1ab0f316ab4d83707c2c9714495c",
                 "shasum": ""
             },
             "require": {
@@ -5449,7 +5449,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-short-url/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-short-url/tree/5.2.1"
+                "source": "https://github.com/jeffersongoncalves/laravel-short-url/tree/5.2.2"
             },
             "funding": [
                 {
@@ -5461,7 +5461,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-14T18:35:21+00:00"
+            "time": "2026-09-23T22:22:18+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-ssrf-guard",

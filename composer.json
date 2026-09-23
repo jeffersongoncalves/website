@@ -29,7 +29,7 @@
         "jeffersongoncalves/filament-pwa": "^3.1",
         "jeffersongoncalves/filament-scanner-guard": "^3.1",
         "jeffersongoncalves/filament-sensible-defaults": "^3.1",
-        "jeffersongoncalves/filament-short-url": "^3.9",
+        "jeffersongoncalves/filament-short-url": "^3.9.1",
         "jeffersongoncalves/filament-widget-configuration": "^3.0",
         "jeffersongoncalves/flysystem-google-drive": "^1.0",
         "jeffersongoncalves/laravel-favicon-proxy": "^1.0",

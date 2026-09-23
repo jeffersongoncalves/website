@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
+- **short-url:** Switch short links to 301 permanent redirects
 - **seo:** Emit sitemap.xml entries for every supported locale
 - **locale:** Except the locale cookie from EncryptCookies
 - **layouts:** Add preconnect and dns-prefetch links, adjust asset loading

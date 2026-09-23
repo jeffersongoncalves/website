@@ -167,7 +167,7 @@ it('skips projects synced within the last 20h on a full-catalogue run, but not v
         ->assertSuccessful();
 
     Bus::assertBatched(fn ($batch) => $batch->jobs->count() === 2
-        && $batch->jobs->pluck('project.slug')->all() === ['stale', 'never']);
+        && $batch->jobs->pluck('project.slug')->sort()->values()->all() === ['never', 'stale']);
 
     // --slug is an explicit manual resync — always runs, freshness aside.
     $this->artisan('projects:sync-metrics', ['--slug' => 'fresh'])

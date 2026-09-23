@@ -85,7 +85,8 @@ it('computes the per-language breakdown busiest first', function () {
 
     SiteStats::persist();
 
-    expect(SiteStats::all()['languages'])->toBe([
+    // toEqual: MySQL's JSON type does not preserve object key order.
+    expect(SiteStats::all()['languages'])->toEqual([
         ['language' => 'PHP', 'total' => 2],
         ['language' => 'JavaScript', 'total' => 1],
     ]);

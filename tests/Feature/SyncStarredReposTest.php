@@ -19,15 +19,15 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Read starred_at as the TRUE raw DB scalar (via the query builder, bypassing
- * the model's datetime cast) and interpret it as UTC. The job stores the column
- * in UTC; the Eloquent cast would re-read it in app.timezone and report an
- * instant shifted by the offset, so we read it raw to assert what was persisted.
+ * the model's datetime cast) and report the persisted instant in UTC. A naive
+ * scalar (SQLite/MySQL) is app.timezone wall-clock; Postgres timestamptz
+ * carries its own offset, which parse() honours.
  */
 function storedStarredAtUtc(string $githubUrl): ?string
 {
     $raw = DB::table('projects')->where('github_url', $githubUrl)->value('starred_at');
 
-    return $raw === null ? null : CarbonImmutable::parse($raw, 'UTC')->toIso8601ZuluString();
+    return $raw === null ? null : CarbonImmutable::parse($raw, config('app.timezone'))->utc()->toIso8601ZuluString();
 }
 
 /**

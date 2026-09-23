@@ -8,6 +8,7 @@ use App\Enums\ProjectCategory;
 use App\Models\Project;
 use App\Support\SiteStats;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
 use JeffersonGoncalves\LaravelPageVisits\Models\PageVisit;
 use Livewire\Attributes\Url;
@@ -156,7 +157,10 @@ class ProjectsList extends Component
                     ->where('route_name', 'projects.show')
                     ->where('is_bot', false)
                     ->where('visited_at', '>=', now()->subDays(30))
-                    ->whereRaw("path = ('projects/' || projects.slug)")
+                    // MySQL parses || as logical OR, not concatenation.
+                    ->whereRaw($query->getConnection() instanceof MySqlConnection
+                        ? "path = concat('projects/', projects.slug)"
+                        : "path = ('projects/' || projects.slug)")
             ),
             default => $query->orderByDesc('stars'),
         };

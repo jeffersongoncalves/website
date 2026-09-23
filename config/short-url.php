@@ -105,7 +105,7 @@ return [
     |
     */
     'redirect' => [
-        'default_status_code' => env('SHORT_URL_DEFAULT_STATUS_CODE', 302),
+        'default_status_code' => env('SHORT_URL_DEFAULT_STATUS_CODE', 301),
     ],
 
     /*

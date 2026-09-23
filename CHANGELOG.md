@@ -616,6 +616,7 @@ All notable changes to this project will be documented in this file.
 
 ### Testing
 
+- Simulate a broken short-url side without dropping the table
 - Close the long-standing CI coverage gap (87.5% -> 96.6%)
 - Cover SyncPluginsJsonJob's fetch-failure and malformed-input branches
 - Fix stale unsupported-locale assertion after adding fr/de

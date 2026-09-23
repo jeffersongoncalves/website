@@ -7,7 +7,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Facades\Schema;
 use JeffersonGoncalves\LaravelShortUrl\Jobs\TrackShortUrlVisitJob;
 use JeffersonGoncalves\LaravelShortUrl\Models\ShortUrl;
 use JeffersonGoncalves\LaravelShortUrl\Models\Visit;
@@ -90,7 +89,10 @@ it('records the Cloudflare country on the visit even though the job runs off-req
 it('falls back to the raw destination when the short URL cannot be minted', function () {
     // Tracking must never take an outbound link — or the page around it —
     // down: a broken short-url side drops back to the plain destination.
-    Schema::drop(ShortUrl::make()->getTable());
+    // Point the model at a table that does not exist instead of dropping the real one:
+    // DROP fails on MySQL/PostgreSQL (short_url_visits references it) and, being DDL,
+    // would escape the RefreshDatabase transaction and break the following tests.
+    config(['short-url.table_prefix' => 'missing_short_url_']);
 
     expect(OutboundLink::to('https://example.com/docs'))->toBe('https://example.com/docs');
 });
@@ -127,7 +129,10 @@ it('reuses cached and already-persisted short urls instead of re-minting them', 
 });
 
 it('falls back to the raw destination per-url when minting fails, without losing the rest', function () {
-    Schema::drop(ShortUrl::make()->getTable());
+    // Point the model at a table that does not exist instead of dropping the real one:
+    // DROP fails on MySQL/PostgreSQL (short_url_visits references it) and, being DDL,
+    // would escape the RefreshDatabase transaction and break the following tests.
+    config(['short-url.table_prefix' => 'missing_short_url_']);
 
     $resolved = OutboundLink::resolveMany([
         'https://example.com/a',

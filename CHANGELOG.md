@@ -214,6 +214,7 @@ All notable changes to this project will be documented in this file.
 
 ### Dependencies
 
+- **deps:** Update composer dependencies to latest versions
 - **deps:** Bump laravel-github-readme to v2.0.3, laravel-visitor-fingerprint to 1.0.5
 - **deps:** Bump jeffersongoncalves/laravel-locale-cookie to v1.4.0
 - **deps:** Bump jeffersongoncalves/filament-short-url to 3.8.1
@@ -511,6 +512,7 @@ All notable changes to this project will be documented in this file.
 
 ### Other
 
+- Merge remote-tracking branch 'origin/main'
 - Merge remote-tracking branch 'origin/main'
 - Update assets.
 - **mcp:** Expand /developers/mcp with tool params and response shape

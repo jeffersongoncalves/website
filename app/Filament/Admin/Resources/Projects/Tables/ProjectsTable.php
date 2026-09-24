@@ -113,6 +113,7 @@ class ProjectsTable
                         ->label(__('admin.actions.publish'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
+                        ->chunkSelectedRecords(500)
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion()
                         ->action(function (Collection $records): void {
@@ -132,7 +133,8 @@ class ProjectsTable
                                 ->title(__('admin.actions.publish_success', ['count' => $count]))
                                 ->send();
                         }),
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->chunkSelectedRecords(500),
                 ]),
             ]);
     }

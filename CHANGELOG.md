@@ -254,6 +254,7 @@ All notable changes to this project will be documented in this file.
 
 ### Features
 
+- **php-config:** Increase FPM process limits and optimize OPcache settings
 - **scanner-guard:** Expand dotfile probe coverage, update NGINX config, and add tests
 - **widgets:** Add filament-widget-configuration, poll interval 60s
 - **stack:** List every composer package actually in use
@@ -518,6 +519,7 @@ All notable changes to this project will be documented in this file.
 
 ### Other
 
+- Merge remote-tracking branch 'origin/main'
 - Merge remote-tracking branch 'origin/main'
 - Merge remote-tracking branch 'origin/main'
 - Merge remote-tracking branch 'origin/main'

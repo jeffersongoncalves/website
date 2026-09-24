@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "075f7f813ea08342c7f40a12f0e9b987",
+    "content-hash": "ecce567842e5e186d5a935ba4120686b",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -2953,16 +2953,16 @@
         },
         {
             "name": "jeffersongoncalves/filament-action-export",
-            "version": "3.8.0",
+            "version": "3.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-action-export.git",
-                "reference": "68df8e3847d163f776f462a4dbaf4022980d62e5"
+                "reference": "adf725cb42f3f1092ce48746c7c8cf199e791246"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-action-export/zipball/68df8e3847d163f776f462a4dbaf4022980d62e5",
-                "reference": "68df8e3847d163f776f462a4dbaf4022980d62e5",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-action-export/zipball/adf725cb42f3f1092ce48746c7c8cf199e791246",
+                "reference": "adf725cb42f3f1092ce48746c7c8cf199e791246",
                 "shasum": ""
             },
             "require": {
@@ -3011,7 +3011,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-action-export/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-action-export/tree/3.8.0"
+                "source": "https://github.com/jeffersongoncalves/filament-action-export/tree/3.9.0"
             },
             "funding": [
                 {
@@ -3023,7 +3023,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-23T04:15:45+00:00"
+            "time": "2026-09-24T12:20:48+00:00"
         },
         {
             "name": "jeffersongoncalves/filament-additional-information",

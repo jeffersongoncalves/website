@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
+- **short-url:** Chunk the 301 switch so it fits the queue timeout
 - Store starred_at as the real instant and make tests portable to MySQL/Postgres
 - **short-url:** Switch short links to 301 permanent redirects
 - **seo:** Emit sitemap.xml entries for every supported locale
@@ -217,6 +218,7 @@ All notable changes to this project will be documented in this file.
 
 ### Dependencies
 
+- **deps:** Bump short-url to apply stored settings
 - **deps:** Update composer dependencies to latest versions
 - **deps:** Bump laravel-github-readme to v2.0.3, laravel-visitor-fingerprint to 1.0.5
 - **deps:** Bump jeffersongoncalves/laravel-locale-cookie to v1.4.0

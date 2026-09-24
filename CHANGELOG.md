@@ -255,6 +255,7 @@ All notable changes to this project will be documented in this file.
 
 ### Features
 
+- **seo:** Noindex starred repos, add hreflang, honest lastmod
 - **projects-table:** Add chunking to bulk actions for better scalability
 - **php-config:** Increase FPM process limits and optimize OPcache settings
 - **scanner-guard:** Expand dotfile probe coverage, update NGINX config, and add tests

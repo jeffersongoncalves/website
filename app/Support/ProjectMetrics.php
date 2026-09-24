@@ -189,7 +189,10 @@ class ProjectMetrics
             // effectively flushing the whole site's page cache thousands
             // of times a day. The command flushes once after the whole
             // batch completes instead — see SyncProjectMetrics::handle().
-            $project->saveQuietly();
+            //
+            // Without timestamps too: metric churn isn't a content change, and
+            // updated_at feeds the sitemap <lastmod> + article:modified_time.
+            Project::withoutTimestamps(fn (): bool => $project->saveQuietly());
         }
 
         return $changed;

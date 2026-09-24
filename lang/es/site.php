@@ -5,6 +5,7 @@ declare(strict_types=1);
 return [
     'seo' => [
         'default_description' => 'Jefferson Gonçalves — Desarrollador PHP Full Stack. 18 años construyendo con Laravel, Filament y el stack TALL. Mantenedor de más de 20 plugins Filament y paquetes Laravel.',
+        'project_fallback' => ':name — proyecto open source: resumen, README, licencia, estrellas y enlaces.',
         'home' => 'Desarrollador PHP Full Stack desde hace 18 años. Mantenedor de más de 20 plugins Filament y paquetes Laravel enfocados en el mercado SaaS brasileño.',
         'about' => 'Jefferson Gonçalves — 18 años como Desarrollador PHP Full Stack. Trayectoria, principios y el stack detrás de más de 20 plugins Filament y paquetes Laravel open source.',
         'projects' => 'Plugins Filament, paquetes Laravel y starter kits open source mantenidos activamente — todos con licencia MIT, con CI, tests y releases regulares.',

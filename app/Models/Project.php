@@ -484,8 +484,14 @@ class Project extends Model
 
     public function getDynamicSEOData(): SEOData
     {
-        $locale = LocaleCookie::short();
-        $description = $this->getTranslation('title', $locale, false) ?: $this->name;
+        // Titles are imported for pt/en/es only — fall back to the English one
+        // (fr/de) and then to a per-locale sentence, never the bare name.
+        $description = $this->getTranslation('title', LocaleCookie::short(), false)
+            ?: $this->getTranslation('title', 'en', false);
+
+        if (! is_string($description) || trim($description) === '' || $description === $this->name) {
+            $description = __('site.seo.project_fallback', ['name' => $this->name]);
+        }
 
         // Point og:image at our own cached proxy (/og/{slug}.png) rather than
         // GitHub's opengraph endpoint directly — that endpoint 429s crawlers.
@@ -514,6 +520,10 @@ class Project extends Model
             published_time: $this->published_at,
             modified_time: $this->updated_at,
             type: 'article',
+            // Starred third-party repos mirror READMEs already on GitHub — thin
+            // duplicates that drag the whole site's crawl budget. Keep them out
+            // of the index (and the sitemap) but let link equity flow.
+            robots: $this->starred_at !== null ? 'noindex, follow' : null,
         );
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Support\SitemapGenerator;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -11,6 +12,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -18,6 +20,7 @@ use JeffersonGoncalves\LocaleCookie\LocaleCookie;
 use JeffersonGoncalves\LocaleCookie\Middleware\SetLocale;
 use Livewire\Livewire;
 use RalphJSmit\Laravel\SEO\Facades\SEOManager;
+use RalphJSmit\Laravel\SEO\Support\AlternateTag;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 use function view;
@@ -100,6 +103,23 @@ class AppServiceProvider extends ServiceProvider
                     'de' => 'de_DE',
                     default => 'pt_BR',
                 };
+            }
+
+            // hreflang alternates: the same route in every locale + x-default,
+            // so the five translations aren't read as duplicate pages.
+            $route = Route::current();
+
+            if (empty($data->alternates) && $route?->getName() !== null && $route->hasParameter('locale')) {
+                $data->alternates = [
+                    ...array_map(
+                        fn (string $locale): AlternateTag => new AlternateTag(
+                            SitemapGenerator::hreflang($locale),
+                            route($route->getName(), ['locale' => $locale] + $route->parameters()),
+                        ),
+                        SitemapGenerator::locales(),
+                    ),
+                    new AlternateTag('x-default', url('/')),
+                ];
             }
 
             return $data;

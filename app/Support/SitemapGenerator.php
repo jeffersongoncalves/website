@@ -28,11 +28,11 @@ final class SitemapGenerator
 
     private static function addPages(Sitemap $sitemap): void
     {
-        $now = now();
-
         // Each static page carries a changefreq + priority so crawlers can
         // budget their re-crawls: the catalogue indexes change often and rank
         // highest; the evergreen pages (about/stack/sponsors) change rarely.
+        // No <lastmod>: a generation-time stamp on every run is a lie Google
+        // learns to ignore sitewide, so these pages simply omit it.
         $pages = [
             ['home', Url::CHANGE_FREQUENCY_DAILY, 1.0],
             ['projects.index', Url::CHANGE_FREQUENCY_DAILY, 0.9],
@@ -48,8 +48,7 @@ final class SitemapGenerator
         foreach (self::locales() as $locale) {
             foreach ($pages as [$route, $frequency, $priority]) {
                 $sitemap->add(
-                    Url::create(route($route, ['locale' => $locale]))
-                        ->setLastModificationDate($now)
+                    self::localizedUrl($route, $locale)
                         ->setChangeFrequency($frequency)
                         ->setPriority($priority)
                 );
@@ -59,7 +58,10 @@ final class SitemapGenerator
 
     private static function addProjects(Sitemap $sitemap): void
     {
-        Project::query()->published()->orderBy('slug')->get(['slug', 'category', 'updated_at'])->each(
+        // Starred third-party repos are noindex (Project::getDynamicSEOData) —
+        // thin mirrors of READMEs already on GitHub — so they stay out of the
+        // sitemap and the crawl budget goes to own/curated pages.
+        Project::query()->published()->own()->orderBy('slug')->get(['slug', 'category', 'updated_at'])->each(
             function (Project $project) use ($sitemap): void {
                 // Emit each project's canonical section URL (articles → /articles,
                 // external links → /links, code → /projects) so the sitemap never
@@ -73,19 +75,46 @@ final class SitemapGenerator
                 };
 
                 foreach (self::locales() as $locale) {
-                    $sitemap->add(
-                        Url::create(route($project->canonicalRouteName(), ['locale' => $locale, 'slug' => $project->slug]))
-                            ->setLastModificationDate($project->updated_at ?? now())
-                            ->setChangeFrequency($frequency)
-                            ->setPriority($priority)
-                    );
+                    $url = self::localizedUrl($project->canonicalRouteName(), $locale, ['slug' => $project->slug])
+                        ->setChangeFrequency($frequency)
+                        ->setPriority($priority);
+
+                    if ($project->updated_at !== null) {
+                        $url->setLastModificationDate($project->updated_at);
+                    }
+
+                    $sitemap->add($url);
                 }
             }
         );
     }
 
+    /**
+     * The `$locale` URL of a route plus hreflang alternates for every locale
+     * (and x-default → the locale-negotiating root) so Google treats the five
+     * translations as one page instead of five near-duplicates.
+     *
+     * @param  array<string, string>  $params
+     */
+    private static function localizedUrl(string $route, string $locale, array $params = []): Url
+    {
+        $url = Url::create(route($route, ['locale' => $locale, ...$params]));
+
+        foreach (self::locales() as $alternate) {
+            $url->addAlternate(route($route, ['locale' => $alternate, ...$params]), self::hreflang($alternate));
+        }
+
+        return $url->addAlternate(url('/'), 'x-default');
+    }
+
+    /** `pt_BR` → `pt-BR` (hreflang wants BCP 47). */
+    public static function hreflang(string $locale): string
+    {
+        return str_replace('_', '-', $locale);
+    }
+
     /** @return array<int, string> */
-    private static function locales(): array
+    public static function locales(): array
     {
         return (array) config('locale-cookie.supported', ['en']);
     }

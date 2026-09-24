@@ -48,3 +48,25 @@ it('writes a single urlset sitemap (not an index) with changefreq + priority on 
         ->toContain('<priority>0.6</priority>') // article
         ->toContain('<priority>0.5</priority>'); // external link
 });
+
+it('leaves starred repos out and emits hreflang alternates', function () {
+    sitemapProject('My Package', ProjectCategory::LaravelPackage, 'pkg');
+    createProject([
+        'name' => 'Starred',
+        'slug' => 'someone-starred',
+        'category' => ProjectCategory::LaravelPackage,
+        'status' => ProjectStatus::Published,
+        'published_at' => now(),
+        'starred_at' => now(),
+    ]);
+
+    $this->artisan('sitemap:generate')->assertSuccessful();
+
+    $xml = $this->get(route('sitemap'))->assertOk()->getContent();
+
+    expect($xml)
+        ->toContain('/projects/pkg')
+        ->not->toContain('someone-starred')
+        ->toContain('hreflang="pt-BR" href="'.route('projects.show', ['locale' => 'pt_BR', 'slug' => 'pkg']).'"')
+        ->toContain('hreflang="x-default" href="'.url('/').'"');
+});

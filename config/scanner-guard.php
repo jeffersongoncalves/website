@@ -53,7 +53,13 @@ return [
         // Version control / config leaks
         '*.git/config',
         '*.git/HEAD',
+        // Any file under a .git/ dir, e.g. /.git/.env — the trailing slash keeps
+        // .github/ out (README images like projects/.github/readme/*.png are real
+        // visitors, not probes).
+        '*.git/*',
         '.env*',
+        // Nested probes: /laravel/.env, /api/v1/.env, /var/www/html/.env.
+        '*/.env*',
         '.docker/*',
         '.aws/*',
         '.vscode/sftp.json',

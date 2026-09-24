@@ -78,6 +78,7 @@ use Spatie\Translatable\HasTranslations;
  * @method static Builder<static>|Project byCategory(\App\Enums\ProjectCategory|string $category)
  * @method static Builder<static>|Project byLanguage(string $language)
  * @method static Builder<static>|Project featured()
+ * @method static Builder<static>|Project indexable()
  * @method static Builder<static>|Project maintained()
  * @method static Builder<static>|Project newModelQuery()
  * @method static Builder<static>|Project newQuery()
@@ -465,6 +466,32 @@ class Project extends Model
     }
 
     /**
+     * Pages worth indexing: everything except third-party stars. The owner
+     * stars his own repos too, so starred_at alone isn't "third-party" —
+     * authored (github_owner) and maintained repos stay indexable.
+     *
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
+    public function scopeIndexable(Builder $query): Builder
+    {
+        $username = config('services.github.username');
+
+        return $query->where(function (Builder $q) use ($username): void {
+            $q->whereNull('starred_at')->orWhere('is_maintainer', true);
+
+            if (is_string($username) && $username !== '') {
+                $q->orWhere('github_owner', strtolower($username));
+            }
+        });
+    }
+
+    public function isIndexable(): bool
+    {
+        return $this->starred_at === null || $this->is_maintainer || $this->isCreatedByOwner();
+    }
+
+    /**
      * Whether this repo lives under the site owner's GitHub account — i.e. a
      * package Jefferson created himself, as opposed to one he only maintains or
      * starred. Drives the "creator" badge.
@@ -523,7 +550,7 @@ class Project extends Model
             // Starred third-party repos mirror READMEs already on GitHub — thin
             // duplicates that drag the whole site's crawl budget. Keep them out
             // of the index (and the sitemap) but let link equity flow.
-            robots: $this->starred_at !== null ? 'noindex, follow' : null,
+            robots: $this->isIndexable() ? null : 'noindex, follow',
         );
     }
 }

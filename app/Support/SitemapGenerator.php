@@ -58,10 +58,10 @@ final class SitemapGenerator
 
     private static function addProjects(Sitemap $sitemap): void
     {
-        // Starred third-party repos are noindex (Project::getDynamicSEOData) —
+        // Third-party stars are noindex (Project::isIndexable/getDynamicSEOData) —
         // thin mirrors of READMEs already on GitHub — so they stay out of the
         // sitemap and the crawl budget goes to own/curated pages.
-        Project::query()->published()->own()->orderBy('slug')->get(['slug', 'category', 'updated_at'])->each(
+        Project::query()->published()->indexable()->orderBy('slug')->get(['slug', 'category', 'updated_at'])->each(
             function (Project $project) use ($sitemap): void {
                 // Emit each project's canonical section URL (articles → /articles,
                 // external links → /links, code → /projects) so the sitemap never

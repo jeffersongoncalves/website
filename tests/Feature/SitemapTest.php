@@ -60,12 +60,23 @@ it('leaves starred repos out and emits hreflang alternates', function () {
         'starred_at' => now(),
     ]);
 
+    createProject([
+        'name' => 'Own Star',
+        'slug' => 'own-star',
+        'github_url' => 'https://github.com/jeffersongoncalves/own-star',
+        'category' => ProjectCategory::LaravelPackage,
+        'status' => ProjectStatus::Published,
+        'published_at' => now(),
+        'starred_at' => now(),
+    ]);
+
     $this->artisan('sitemap:generate')->assertSuccessful();
 
     $xml = $this->get(route('sitemap'))->assertOk()->getContent();
 
     expect($xml)
         ->toContain('/projects/pkg')
+        ->toContain('/projects/own-star')
         ->not->toContain('someone-starred')
         ->toContain('hreflang="pt-BR" href="'.route('projects.show', ['locale' => 'pt_BR', 'slug' => 'pkg']).'"')
         ->toContain('hreflang="x-default" href="'.url('/').'"');

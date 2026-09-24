@@ -32,8 +32,13 @@ it('noindexes starred third-party repos but not own projects', function () {
     $base = ['category' => ProjectCategory::LaravelPackage, 'status' => ProjectStatus::Published, 'published_at' => now()];
     createProject([...$base, 'name' => 'Mine', 'slug' => 'mine-pkg']);
     createProject([...$base, 'name' => 'Theirs', 'slug' => 'theirs-pkg', 'starred_at' => now()]);
+    // The owner stars his own repos too — authored + maintained stay indexable.
+    createProject([...$base, 'name' => 'Own Star', 'slug' => 'own-star', 'starred_at' => now(), 'github_url' => 'https://github.com/jeffersongoncalves/own-star']);
+    createProject([...$base, 'name' => 'Collab', 'slug' => 'collab-star', 'starred_at' => now(), 'is_maintainer' => true]);
 
     $this->get('/en/projects/mine-pkg')->assertOk()->assertDontSee('noindex', false);
+    $this->get('/en/projects/own-star')->assertOk()->assertDontSee('noindex', false);
+    $this->get('/en/projects/collab-star')->assertOk()->assertDontSee('noindex', false);
     $this->get('/en/projects/theirs-pkg')->assertOk()->assertSee('content="noindex, follow"', false);
 });
 

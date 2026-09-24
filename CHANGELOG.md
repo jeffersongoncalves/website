@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
+- **seo:** Keep own and maintained starred repos indexable
 - **short-url:** Chunk the 301 switch so it fits the queue timeout
 - Store starred_at as the real instant and make tests portable to MySQL/Postgres
 - **short-url:** Switch short links to 301 permanent redirects

@@ -218,6 +218,7 @@ All notable changes to this project will be documented in this file.
 
 ### Dependencies
 
+- **deps:** Add filament-action-export dependency and update to v3.9.0
 - **deps:** Bump short-url to apply stored settings
 - **deps:** Update composer dependencies to latest versions
 - **deps:** Bump laravel-github-readme to v2.0.3, laravel-visitor-fingerprint to 1.0.5
@@ -520,6 +521,7 @@ All notable changes to this project will be documented in this file.
 
 ### Other
 
+- Merge remote-tracking branch 'origin/main'
 - Merge remote-tracking branch 'origin/main'
 - Merge remote-tracking branch 'origin/main'
 - Merge remote-tracking branch 'origin/main'

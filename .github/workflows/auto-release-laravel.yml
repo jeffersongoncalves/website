@@ -1,0 +1,104 @@
+name: Auto Release on Laravel Update
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - composer.lock
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  auto-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Extract Laravel version from current code
+        id: current
+        run: |
+          VERSION=$(jq -r '.packages[] | select(.name == "laravel/framework") | .version' composer.lock)
+          # Strip 'v' prefix to match tag format
+          echo "version=${VERSION#v}" >> $GITHUB_OUTPUT
+
+      - name: Get latest tag and its Laravel version
+        id: previous
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LATEST_TAG" ]; then
+            echo "No existing tags found"
+            echo "tag=" >> $GITHUB_OUTPUT
+            echo "version=" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+
+          TAG_VERSION=$(git show "$LATEST_TAG":composer.lock | jq -r '.packages[] | select(.name == "laravel/framework") | .version')
+          echo "version=${TAG_VERSION#v}" >> $GITHUB_OUTPUT
+
+      - name: Check if Laravel was updated since last release
+        id: check
+        run: |
+          echo "Current Laravel: ${{ steps.current.outputs.version }}"
+          echo "Latest tag: ${{ steps.previous.outputs.tag }} (Laravel: ${{ steps.previous.outputs.version }})"
+
+          if [ -z "${{ steps.previous.outputs.tag }}" ]; then
+            echo "First release - no previous tags found"
+            echo "updated=true" >> $GITHUB_OUTPUT
+          elif [ "${{ steps.current.outputs.version }}" != "${{ steps.previous.outputs.version }}" ] && [ -n "${{ steps.previous.outputs.version }}" ]; then
+            echo "updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "updated=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        if: steps.check.outputs.updated == 'true'
+        run: |
+          gh release create "${{ steps.current.outputs.version }}" \
+            --target main \
+            --title "${{ steps.current.outputs.version }}" \
+            --notes "Bump Laravel to v${{ steps.current.outputs.version }}" \
+            --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # A release created with GITHUB_TOKEN does not trigger update-changelog.yml,
+      # so the CHANGELOG is updated here in the same run.
+      - name: Read release notes
+        if: steps.check.outputs.updated == 'true'
+        id: release
+        run: |
+          {
+            echo "body<<RELEASE_BODY_EOF"
+            gh release view "${{ steps.current.outputs.version }}" --json body --jq .body
+            echo "RELEASE_BODY_EOF"
+            echo "date=$(date -u +%Y-%m-%d)"
+          } >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Changelog
+        if: steps.check.outputs.updated == 'true'
+        uses: stefanzweifel/changelog-updater-action@a938690fad7edf25368f37e43a1ed1b34303eb36 # v1
+        with:
+          release-date: ${{ steps.release.outputs.date }}
+          release-notes: ${{ steps.release.outputs.body }}
+          latest-version: ${{ steps.current.outputs.version }}
+          compare-url-target-revision: main
+
+      - name: Commit updated CHANGELOG
+        if: steps.check.outputs.updated == 'true'
+        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7
+        with:
+          branch: main
+          commit_message: Update CHANGELOG
+          file_pattern: CHANGELOG.md

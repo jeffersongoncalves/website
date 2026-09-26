@@ -76,9 +76,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->brandLogo(fn () => view('filament.admin.logo'))
             ->favicon(asset('favicon.ico'))
-            ->font('DM Sans', url: Vite::asset('resources/css/fonts/dm-sans.css'), provider: LocalFontProvider::class)
-            ->monoFont('JetBrains Mono', url: Vite::asset('resources/css/fonts/jetbrains-mono.css'), provider: LocalFontProvider::class)
-            ->serifFont('Fraunces', url: Vite::asset('resources/css/fonts/fraunces.css'), provider: LocalFontProvider::class)
+            // Closures: resolved at render, so boot (e.g. package:discover) works without a Vite build.
+            ->font('DM Sans', url: fn (): string => Vite::asset('resources/css/fonts/dm-sans.css'), provider: LocalFontProvider::class)
+            ->monoFont('JetBrains Mono', url: fn (): string => Vite::asset('resources/css/fonts/jetbrains-mono.css'), provider: LocalFontProvider::class)
+            ->serifFont('Fraunces', url: fn (): string => Vite::asset('resources/css/fonts/fraunces.css'), provider: LocalFontProvider::class)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->defaultThemeMode(ThemeMode::System)
             ->darkMode(true)

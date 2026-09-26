@@ -1,12 +1,11 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "jeffersongoncalves/filakitv5",
+    "name": "jeffersongoncalves/website",
     "type": "project",
-    "description": "FilaKit starter kit built on Laravel 13.x and Filament 5.x with a ready-to-use multi-panel structure.",
+    "description": "Source of jeffersongoncalves.dev.br: a multi-language developer portfolio built on Laravel 13, Filament 5, Livewire 4 and Tailwind 4.",
     "keywords": [
-        "laravel-starter-kit",
-        "starter-kit",
-        "filament-starter-kit",
+        "portfolio",
+        "website",
         "laravel",
         "filament",
         "filament-v5",

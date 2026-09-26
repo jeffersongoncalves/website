@@ -33,3 +33,5 @@ phpstan.neon
 /.claude
 /CLAUDE.md
 /operations
+/docs
+/public/build

@@ -1,7 +1,7 @@
 # jeffersongoncalves.dev.br
 
-[![Tests](https://github.com/jeffersongoncalves/jeffersongoncalves.dev.br/actions/workflows/tests.yml/badge.svg)](https://github.com/jeffersongoncalves/jeffersongoncalves.dev.br/actions/workflows/tests.yml)
-[![PHPStan](https://github.com/jeffersongoncalves/jeffersongoncalves.dev.br/actions/workflows/phpstan.yml/badge.svg)](https://github.com/jeffersongoncalves/jeffersongoncalves.dev.br/actions/workflows/phpstan.yml)
+[![Tests](https://github.com/jeffersongoncalves/website/actions/workflows/tests.yml/badge.svg)](https://github.com/jeffersongoncalves/website/actions/workflows/tests.yml)
+[![PHPStan](https://github.com/jeffersongoncalves/website/actions/workflows/phpstan.yml/badge.svg)](https://github.com/jeffersongoncalves/website/actions/workflows/phpstan.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Source code of [jeffersongoncalves.dev.br](https://jeffersongoncalves.dev.br) — the personal
@@ -35,6 +35,14 @@ working together — see the `/stack` page for the full list.
 
 Requirements: PHP 8.4, Composer, [Bun](https://bun.sh), Redis (only for Horizon).
 
+Start a new project from this template:
+
+```bash
+composer create-project jeffersongoncalves/website my-site
+```
+
+Or from a clone:
+
 ```bash
 composer install
 bun install
@@ -61,8 +69,7 @@ composer pint      # code style
 
 ## Production notes
 
-`public/build` is committed — run `bun run build` and commit after any change under
-`resources/`. Production runs on PostgreSQL and needs Redis with `QUEUE_CONNECTION=redis`
+`public/build` is not committed — the deploy runs `bun install && bun run build`. Production runs on PostgreSQL and needs Redis with `QUEUE_CONNECTION=redis`
 (Horizon). Daily offsite backups (`.env` + database dump) go to Google Drive via
 `spatie/laravel-backup` and
 [`jeffersongoncalves/flysystem-google-drive`](https://github.com/jeffersongoncalves/flysystem-google-drive).
@@ -70,7 +77,7 @@ composer pint      # code style
 ## Security
 
 Found a vulnerability? Please don't open a public issue — report it privately through
-[GitHub Security Advisories](https://github.com/jeffersongoncalves/jeffersongoncalves.dev.br/security/advisories/new).
+[GitHub Security Advisories](https://github.com/jeffersongoncalves/website/security/advisories/new).
 
 ## License
 

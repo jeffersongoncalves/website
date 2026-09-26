@@ -6,8 +6,13 @@ namespace App\Filament\Admin\Pages\Auth;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Component;
+use JeffersonGoncalves\Filament\Admin\Pages\Auth\Login as BaseLogin;
 
-class Login extends \Filament\Auth\Pages\Login
+/**
+ * The status = true credential check comes from filament-admin's Login;
+ * this only restyles the page.
+ */
+class Login extends BaseLogin
 {
     protected string $view = 'filament.admin.pages.auth.login';
 
@@ -33,14 +38,5 @@ class Login extends \Filament\Auth\Pages\Login
     public function hasLogo(): bool
     {
         return false;
-    }
-
-    protected function getCredentialsFromFormData(array $data): array
-    {
-        return [
-            'email' => $data['email'],
-            'password' => $data['password'],
-            'status' => true,
-        ];
     }
 }

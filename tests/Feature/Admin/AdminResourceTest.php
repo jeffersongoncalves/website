@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Filament\Admin\Resources\Admins\AdminResource;
-use App\Filament\Admin\Resources\Admins\Pages\CreateAdmin;
-use App\Filament\Admin\Resources\Admins\Pages\ListAdmins;
 use App\Models\Admin;
 use Filament\Facades\Filament;
+use JeffersonGoncalves\Filament\Admin\Resources\Admins\AdminResource;
+use JeffersonGoncalves\Filament\Admin\Resources\Admins\Pages\CreateAdmin;
+use JeffersonGoncalves\Filament\Admin\Resources\Admins\Pages\ListAdmins;
 use Livewire\Livewire;
 
 beforeEach(function () {

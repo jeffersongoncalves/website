@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Filament\Admin\Resources\Users\Pages\CreateUser;
-use App\Filament\Admin\Resources\Users\Pages\ListUsers;
-use App\Filament\Admin\Resources\Users\UserResource;
 use App\Models\Admin;
 use App\Models\User;
 use Filament\Facades\Filament;
+use JeffersonGoncalves\Filament\User\Resources\Users\Pages\CreateUser;
+use JeffersonGoncalves\Filament\User\Resources\Users\Pages\ListUsers;
+use JeffersonGoncalves\Filament\User\Resources\Users\UserResource;
 use Livewire\Livewire;
 
 beforeEach(function () {

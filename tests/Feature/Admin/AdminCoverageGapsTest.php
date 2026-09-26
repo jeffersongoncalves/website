@@ -5,10 +5,8 @@ declare(strict_types=1);
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Filament\Admin\Pages\HorizonDashboard;
-use App\Filament\Admin\Resources\Admins\Pages\EditAdmin;
 use App\Filament\Admin\Resources\Projects\Pages\CreateProject;
 use App\Filament\Admin\Resources\Projects\Pages\ListProjects;
-use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Models\Admin;
 use App\Models\Project;
 use App\Models\User;
@@ -16,6 +14,8 @@ use Filament\Facades\Filament;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use JeffersonGoncalves\Filament\Admin\Resources\Admins\Pages\EditAdmin;
+use JeffersonGoncalves\Filament\User\Resources\Users\Pages\EditUser;
 use Livewire\Livewire;
 
 beforeEach(function () {

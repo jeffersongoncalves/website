@@ -8,9 +8,7 @@ use App\Models\Admin;
 use App\Models\Project;
 use App\Models\ProjectSlugAlias;
 use App\Models\User;
-use App\Observers\AdminObserver;
 use App\Observers\ProjectObserver;
-use App\Observers\UserObserver;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;
 
@@ -58,48 +56,6 @@ it('forgets the admins_count cache when an Admin is deleted', function () {
     $admin->delete();
 
     expect(Cache::has('admins_count'))->toBeFalse();
-});
-
-it('swallows an InvalidArgumentException from the cache store on User create/delete', function () {
-    $exception = new class extends Exception implements InvalidArgumentException {};
-    Cache::partialMock()->shouldReceive('delete')->with('users_count')->twice()->andThrow($exception);
-
-    $user = User::factory()->create(); // created() — must not bubble the exception
-    $user->delete(); // deleted() — same
-
-    expect($user->wasRecentlyCreated)->toBeTrue();
-});
-
-it('swallows an InvalidArgumentException from the cache store on Admin create/delete', function () {
-    $exception = new class extends Exception implements InvalidArgumentException {};
-    Cache::partialMock()->shouldReceive('delete')->with('admins_count')->twice()->andThrow($exception);
-
-    $admin = Admin::factory()->create();
-    $admin->delete();
-
-    expect($admin->wasRecentlyCreated)->toBeTrue();
-});
-
-it('has no-op updated/restored/forceDeleted handlers on UserObserver', function () {
-    $observer = new UserObserver;
-    $user = User::factory()->make();
-
-    $observer->updated($user);
-    $observer->restored($user);
-    $observer->forceDeleted($user);
-
-    expect(true)->toBeTrue();
-});
-
-it('has no-op updated/restored/forceDeleted handlers on AdminObserver', function () {
-    $observer = new AdminObserver;
-    $admin = Admin::factory()->make();
-
-    $observer->updated($admin);
-    $observer->restored($admin);
-    $observer->forceDeleted($admin);
-
-    expect(true)->toBeTrue();
 });
 
 // ---------------------------------------------------------------------------

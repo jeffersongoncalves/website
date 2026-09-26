@@ -5,11 +5,9 @@ declare(strict_types=1);
 use App\Enums\PackageType;
 use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
-use App\Filament\Admin\Resources\Admins\Pages\ViewAdmin;
 use App\Filament\Admin\Resources\Projects\Pages\CreateProject;
 use App\Filament\Admin\Resources\Projects\Pages\EditProject;
 use App\Filament\Admin\Resources\Projects\Pages\ViewProject;
-use App\Filament\Admin\Resources\Users\Pages\ViewUser;
 use App\Filament\Admin\Widgets\SiteCategoriesWidget;
 use App\Filament\Admin\Widgets\SiteDownloadsWidget;
 use App\Filament\Admin\Widgets\SiteLanguagesWidget;
@@ -20,6 +18,8 @@ use App\Models\Project;
 use App\Models\SiteStat;
 use App\Models\User;
 use Filament\Facades\Filament;
+use JeffersonGoncalves\Filament\Admin\Resources\Admins\Pages\ViewAdmin;
+use JeffersonGoncalves\Filament\User\Resources\Users\Pages\ViewUser;
 use Livewire\Livewire;
 
 beforeEach(function () {

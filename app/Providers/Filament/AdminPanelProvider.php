@@ -26,6 +26,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use JeffersonGoncalves\Filament\Admin\AdminPlugin;
 use JeffersonGoncalves\Filament\Gtag\GtagPlugin;
 use JeffersonGoncalves\Filament\Gtm\GtmPlugin;
 use JeffersonGoncalves\Filament\OneTimeOperations\OneTimeOperationsPlugin;
@@ -33,6 +34,7 @@ use JeffersonGoncalves\Filament\PageVisits\FilamentPageVisitsPlugin;
 use JeffersonGoncalves\Filament\Pwa\FilamentPwaPlugin;
 use JeffersonGoncalves\Filament\ScannerGuard\ScannerGuardPlugin;
 use JeffersonGoncalves\Filament\ShortUrl\FilamentShortUrlPlugin;
+use JeffersonGoncalves\Filament\User\UserPlugin;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 
@@ -126,6 +128,9 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()->label(fn () => __('admin.navigation.settings'))->collapsed(),
             ])
             ->plugins([
+                // Admin / User resources (jeffersongoncalves/filament-admin, filament-user).
+                AdminPlugin::make(),
+                UserPlugin::make(),
                 // Injects manifest link + theme-color + apple-touch-icon links
                 // into the panel <head>. theme-color mirrors the dark-default /
                 // light-cookie logic that components.favicon used to carry, so

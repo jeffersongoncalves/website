@@ -27,3 +27,9 @@ phpstan.neon
 .rnd
 .output.txt
 .claude/settings.local.json
+
+# Local-only (kept out of the public repo)
+/forge
+/.claude
+/CLAUDE.md
+/operations

@@ -18,6 +18,7 @@ use App\Livewire\Site\ProjectShowPage;
 use App\Livewire\Site\ProjectsPage;
 use App\Livewire\Site\SponsorsPage;
 use App\Livewire\Site\StackPage;
+use Daikazu\BladeWind\Http\InjectPageStyles;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -73,7 +74,11 @@ $localePattern = implode('|', array_map(
 
 Route::prefix('{locale}')
     ->where(['locale' => $localePattern])
-    ->middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class])
+    // InjectPageStyles also runs globally, but that pass sits outside CachePublicPage, so the
+    // cache would store BladeWind's placeholder links and a hit (which renders no views) would
+    // rebuild the page CSS from the HTML alone, missing classes Livewire adds on update.
+    // Running it inside the cache means the stored page already carries its page stylesheet.
+    ->middleware([SecurityHeaders::class, 'set.locale', CachePublicPage::class, InjectPageStyles::class])
     ->group(function () {
         Route::get('/', HomePage::class)->name('home');
         Route::get('/about', AboutPage::class)->name('about');

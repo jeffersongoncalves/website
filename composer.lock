@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "63ec32949b750d0af2e4cb530a65d239",
+    "content-hash": "5974240cb323e94cd59b0835844d815b",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -751,6 +751,64 @@
                 }
             ],
             "time": "2026-08-21T14:57:29+00:00"
+        },
+        {
+            "name": "daikazu/bladewind",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/daikazu/bladewind.git",
+                "reference": "8eb138e3f6576a6c8dddde8279d2dd8028b164d4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/daikazu/bladewind/zipball/8eb138e3f6576a6c8dddde8279d2dd8028b164d4",
+                "reference": "8eb138e3f6576a6c8dddde8279d2dd8028b164d4",
+                "shasum": ""
+            },
+            "require": {
+                "ext-zlib": "*",
+                "fortephp/forte": "^1.1",
+                "laravel/framework": "^13.0",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.11",
+                "laravel/pint": "^1.27",
+                "livewire/blaze": "^1.0",
+                "livewire/livewire": "^4.4",
+                "orchestra/testbench": "^11.2",
+                "pestphp/pest": "^5.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Daikazu\\BladeWind\\BladeWindServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Daikazu\\BladeWind\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mike Wall",
+                    "email": "daikazu@gmail.com"
+                }
+            ],
+            "description": "Laravel-aware compile-time analyzer and optimizer for Blade and Tailwind CSS.",
+            "support": {
+                "issues": "https://github.com/daikazu/bladewind/issues",
+                "source": "https://github.com/daikazu/bladewind/tree/v0.1.0"
+            },
+            "time": "2026-09-24T03:23:25+00:00"
         },
         {
             "name": "danharrin/date-format-converter",
@@ -2104,6 +2162,73 @@
                 "source": "https://github.com/googleapis/php-jwt/tree/v7.2.0"
             },
             "time": "2026-09-21T19:29:58+00:00"
+        },
+        {
+            "name": "fortephp/forte",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fortephp/forte.git",
+                "reference": "9c9597d0b7080d16c25f53a940a0449ff1aab19b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fortephp/forte/zipball/9c9597d0b7080d16c25f53a940a0449ff1aab19b",
+                "reference": "9c9597d0b7080d16c25f53a940a0449ff1aab19b",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "illuminate/support": "^10 || ^11 || ^12 || ^13",
+                "illuminate/view": "^10 || ^11 || ^12 || ^13",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.22",
+                "orchestra/testbench": "^8.0 || ^9.2 || ^10.0 || ^11.0",
+                "pestphp/pest": "^2.0 || ^3",
+                "phpstan/phpstan": "^2.1",
+                "rector/rector": "^2.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Forte\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Forte\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "John Koster",
+                    "email": "john@stillat.com"
+                }
+            ],
+            "description": "A fault-tolerant Blade template parser and AST toolkit.",
+            "keywords": [
+                "blade parser",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/fortephp/forte/issues",
+                "source": "https://github.com/fortephp/forte/tree/v1.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/johnathonkoster",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-22T21:13:36+00:00"
         },
         {
             "name": "fruitcake/php-cors",

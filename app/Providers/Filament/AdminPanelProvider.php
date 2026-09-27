@@ -27,6 +27,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use JeffersonGoncalves\Filament\Admin\AdminPlugin;
+use JeffersonGoncalves\Filament\BladeWind\BladeWindPlugin;
 use JeffersonGoncalves\Filament\Gtag\GtagPlugin;
 use JeffersonGoncalves\Filament\Gtm\GtmPlugin;
 use JeffersonGoncalves\Filament\OneTimeOperations\OneTimeOperationsPlugin;
@@ -82,7 +83,6 @@ class AdminPanelProvider extends PanelProvider
             ->font('DM Sans', url: fn (): string => Vite::asset('resources/css/fonts/dm-sans.css'), provider: LocalFontProvider::class)
             ->monoFont('JetBrains Mono', url: fn (): string => Vite::asset('resources/css/fonts/jetbrains-mono.css'), provider: LocalFontProvider::class)
             ->serifFont('Fraunces', url: fn (): string => Vite::asset('resources/css/fonts/fraunces.css'), provider: LocalFontProvider::class)
-            ->viteTheme('resources/css/filament/admin/theme.css')
             ->defaultThemeMode(ThemeMode::System)
             ->darkMode(true)
             ->maxContentWidth(Width::Full)
@@ -129,6 +129,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 // Admin / User resources (jeffersongoncalves/filament-admin, filament-user).
+                BladeWindPlugin::make()
+                    ->theme('resources/css/filament/admin/theme.css'),
                 AdminPlugin::make()
                     ->navigationGroup(__('admin.navigation.user')),
                 // The App panel (/app, the impersonation target) is disabled here.

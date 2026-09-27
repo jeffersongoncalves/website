@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5974240cb323e94cd59b0835844d815b",
+    "content-hash": "f396d8ecac9e86f4f4ff3c0c614fcff6",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -3369,6 +3369,84 @@
                 }
             ],
             "time": "2026-06-23T22:48:18+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/filament-bladewind",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/filament-bladewind.git",
+                "reference": "f7d006fdb51cd25df1c708a473f67c0b3e705ab9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-bladewind/zipball/f7d006fdb51cd25df1c708a473f67c0b3e705ab9",
+                "reference": "f7d006fdb51cd25df1c708a473f67c0b3e705ab9",
+                "shasum": ""
+            },
+            "require": {
+                "daikazu/bladewind": "~0.1.0",
+                "filament/filament": "^5.0",
+                "php": "^8.4",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.21",
+                "orchestra/testbench": "^11.0",
+                "pestphp/pest": "^4.0",
+                "pestphp/pest-plugin-laravel": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\Filament\\BladeWind\\FilamentBladeWindServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\Filament\\BladeWind\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Per-page CSS for Filament panels: splits the panel theme (fi-* components and utilities) with BladeWind and streams the missing rules to Livewire updates.",
+            "homepage": "https://github.com/jeffersongoncalves/filament-bladewind",
+            "keywords": [
+                "bladewind",
+                "filament",
+                "filament-plugin",
+                "laravel",
+                "performance",
+                "tailwindcss",
+                "unused-css"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/filament-bladewind/issues",
+                "source": "https://github.com/jeffersongoncalves/filament-bladewind/tree/3.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://buymeacoffee.com/jeffersongoncalves",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-09-27T20:59:50+00:00"
         },
         {
             "name": "jeffersongoncalves/filament-gtag",
@@ -9104,16 +9182,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "2.3.5",
+            "version": "2.3.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "148cefffaf0233e4c08cc13db8a195a56dd6dfe9"
+                "reference": "1427af4647235b4a73b13940b1f1258d3584f36e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/148cefffaf0233e4c08cc13db8a195a56dd6dfe9",
-                "reference": "148cefffaf0233e4c08cc13db8a195a56dd6dfe9",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/1427af4647235b4a73b13940b1f1258d3584f36e",
+                "reference": "1427af4647235b4a73b13940b1f1258d3584f36e",
                 "shasum": ""
             },
             "require": {
@@ -9145,9 +9223,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.3.5"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.3.6"
             },
-            "time": "2026-08-31T16:05:28+00:00"
+            "time": "2026-09-27T20:07:45+00:00"
         },
         {
             "name": "pragmarx/google2fa",

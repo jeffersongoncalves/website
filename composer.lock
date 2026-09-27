@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f396d8ecac9e86f4f4ff3c0c614fcff6",
+    "content-hash": "f9e8759a8f230b7b3b88fff3c30183fe",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -3372,16 +3372,16 @@
         },
         {
             "name": "jeffersongoncalves/filament-bladewind",
-            "version": "3.0.0",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-bladewind.git",
-                "reference": "f7d006fdb51cd25df1c708a473f67c0b3e705ab9"
+                "reference": "80141f24883c4f85a4198bc00fb490db9ba52f1e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-bladewind/zipball/f7d006fdb51cd25df1c708a473f67c0b3e705ab9",
-                "reference": "f7d006fdb51cd25df1c708a473f67c0b3e705ab9",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-bladewind/zipball/80141f24883c4f85a4198bc00fb490db9ba52f1e",
+                "reference": "80141f24883c4f85a4198bc00fb490db9ba52f1e",
                 "shasum": ""
             },
             "require": {
@@ -3434,7 +3434,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-bladewind/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-bladewind/tree/3.0.0"
+                "source": "https://github.com/jeffersongoncalves/filament-bladewind/tree/3.0.1"
             },
             "funding": [
                 {
@@ -3446,7 +3446,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-27T20:59:50+00:00"
+            "time": "2026-09-27T21:32:57+00:00"
         },
         {
             "name": "jeffersongoncalves/filament-gtag",

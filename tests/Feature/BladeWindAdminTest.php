@@ -81,6 +81,15 @@ it('streams the CSS an action modal needs to the Livewire update that opens it',
         expect($effects['bladewind'] ?? '')->toContain($selector($class));
     }
 
+    // A re-emitted rule must not jump ahead of page rules that override it outside the modal:
+    // the topbar hides its mobile close button (an .fi-icon-btn) on desktop.
+    $delta = (string) ($effects['bladewind'] ?? '');
+    $iconBtn = strpos($delta, '.fi-icon-btn{');
+
+    if ($iconBtn !== false) {
+        expect(strpos($delta, '.fi-topbar-close-sidebar-btn{display:none}'))->toBeGreaterThan($iconBtn);
+    }
+
     // The same modal again: the page now covers it, so nothing more is streamed.
     expect($update())->not->toHaveKey('bladewind');
 });

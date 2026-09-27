@@ -129,8 +129,12 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 // Admin / User resources (jeffersongoncalves/filament-admin, filament-user).
-                AdminPlugin::make(),
-                UserPlugin::make(),
+                AdminPlugin::make()
+                    ->navigationGroup(__('admin.navigation.user')),
+                // The App panel (/app, the impersonation target) is disabled here.
+                UserPlugin::make()
+                    ->navigationGroup(__('admin.navigation.user'))
+                    ->withoutImpersonation(),
                 // Injects manifest link + theme-color + apple-touch-icon links
                 // into the panel <head>. theme-color mirrors the dark-default /
                 // light-cookie logic that components.favicon used to carry, so

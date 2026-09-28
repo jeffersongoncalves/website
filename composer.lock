@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f9e8759a8f230b7b3b88fff3c30183fe",
+    "content-hash": "b94291ae8005517d527ab6deb35a1b96",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -3953,22 +3953,22 @@
         },
         {
             "name": "jeffersongoncalves/filament-scanner-guard",
-            "version": "3.1.0",
+            "version": "3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-scanner-guard.git",
-                "reference": "cc150c60a243f521e9bfb9331508329405debd8d"
+                "reference": "c1fd9049944df4ff20e8cd62c2b7295f430533e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-scanner-guard/zipball/cc150c60a243f521e9bfb9331508329405debd8d",
-                "reference": "cc150c60a243f521e9bfb9331508329405debd8d",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-scanner-guard/zipball/c1fd9049944df4ff20e8cd62c2b7295f430533e8",
+                "reference": "c1fd9049944df4ff20e8cd62c2b7295f430533e8",
                 "shasum": ""
             },
             "require": {
                 "filament/filament": "^5.3",
                 "jeffersongoncalves/filament-action-export": "^3.7",
-                "jeffersongoncalves/laravel-scanner-guard": "^1.0",
+                "jeffersongoncalves/laravel-scanner-guard": "^1.2",
                 "php": "^8.3",
                 "spatie/laravel-package-tools": "^1.16"
             },
@@ -4017,7 +4017,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-scanner-guard/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-scanner-guard/tree/3.1.0"
+                "source": "https://github.com/jeffersongoncalves/filament-scanner-guard/tree/3.2.0"
             },
             "funding": [
                 {
@@ -4029,7 +4029,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-22T18:01:21+00:00"
+            "time": "2026-09-27T21:16:55+00:00"
         },
         {
             "name": "jeffersongoncalves/filament-sensible-defaults",
@@ -5674,16 +5674,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-scanner-guard",
-            "version": "1.1.0",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-scanner-guard.git",
-                "reference": "5488323fec50bd37204977e702328fe8eff56614"
+                "reference": "1d5b0425232c662ce656ba8deabd821f7dcdeb8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-scanner-guard/zipball/5488323fec50bd37204977e702328fe8eff56614",
-                "reference": "5488323fec50bd37204977e702328fe8eff56614",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-scanner-guard/zipball/1d5b0425232c662ce656ba8deabd821f7dcdeb8a",
+                "reference": "1d5b0425232c662ce656ba8deabd821f7dcdeb8a",
                 "shasum": ""
             },
             "require": {
@@ -5738,7 +5738,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-scanner-guard/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-scanner-guard/tree/1.1.0"
+                "source": "https://github.com/jeffersongoncalves/laravel-scanner-guard/tree/1.2.0"
             },
             "funding": [
                 {
@@ -5750,7 +5750,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-14T21:25:58+00:00"
+            "time": "2026-09-27T20:53:11+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-security-headers",

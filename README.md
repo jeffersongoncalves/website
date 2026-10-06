@@ -37,15 +37,15 @@ app. The `/stack` page lists them all.
 
 ## Installation
 
-Requirements: PHP 8.4, Composer, [Bun](https://bun.sh), and Redis (only needed for Horizon).
+Requirements: PHP 8.4, Composer, [pnpm](https://pnpm.io), and Redis (only needed for Horizon).
 
 ```bash
 composer create-project jeffersongoncalves/website my-site
 cd my-site
 touch database/database.sqlite
 php artisan migrate
-bun install
-bun run build
+pnpm install
+pnpm run build
 ```
 
 `create-project` copies `.env.example` to `.env` and generates the app key for you. If you work
@@ -68,7 +68,7 @@ composer pint      # code style
 
 ## Deployment
 
-- `public/build` is not committed, so the deploy has to run `bun install && bun run build`.
+- `public/build` is not committed, so the deploy has to run `pnpm install && pnpm run build`.
 - Per-page CSS comes from [`daikazu/bladewind`](https://github.com/daikazu/bladewind): it splits
   the built `site.css` at request time and writes the page files to `public/bladewind`, so the
   web server needs write access there.

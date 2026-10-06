@@ -34,7 +34,6 @@ CHANGELOG.md export-ignore
 .styleci.yml export-ignore
 README.md export-ignore
 LICENSE.md export-ignore
-bun.lock export-ignore
-bun.lockb export-ignore
+pnpm-lock.yaml export-ignore
 /.github/workflows/auto-release-laravel.yml export-ignore
 /banners export-ignore

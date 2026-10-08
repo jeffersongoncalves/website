@@ -15,19 +15,6 @@ return [
         'title' => 'Mi Perfil',
     ],
 
-    'login' => [
-        'eyebrow' => 'acceso restringido',
-        'whoami_unauth' => 'guest · no autenticado',
-        'secure_connection' => 'conexión segura',
-        'back_to_site' => 'volver al sitio',
-    ],
-
-    'status' => [
-        'label' => 'estado',
-        'production' => 'producción',
-        'local' => 'local',
-    ],
-
     'actions' => [
         'import_from_github' => 'Importar desde GitHub',
         'import_from_github_help' => 'Pega la URL del repositorio. Solo rellena los campos vacíos.',

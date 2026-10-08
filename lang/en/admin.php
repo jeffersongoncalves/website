@@ -15,19 +15,6 @@ return [
         'title' => 'My Profile',
     ],
 
-    'login' => [
-        'eyebrow' => 'restricted access',
-        'whoami_unauth' => 'guest · not authenticated',
-        'secure_connection' => 'secure connection',
-        'back_to_site' => 'back to site',
-    ],
-
-    'status' => [
-        'label' => 'status',
-        'production' => 'production',
-        'local' => 'local',
-    ],
-
     'actions' => [
         'import_from_github' => 'Import from GitHub',
         'import_from_github_help' => 'Paste the repository URL. Only fills empty fields.',

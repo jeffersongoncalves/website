@@ -56,7 +56,7 @@
     <x-favicon/>
     {!! seo($resolvedSeo) !!}
     @livewireStyles
-    @bladewindStyles
+    @vite(['resources/css/site.css'])
     @stack('head')
 </head>
 <body>

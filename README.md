@@ -69,9 +69,6 @@ composer pint      # code style
 ## Deployment
 
 - `public/build` is not committed, so the deploy has to run `pnpm install && pnpm run build`.
-- Per-page CSS comes from [`daikazu/bladewind`](https://github.com/daikazu/bladewind): it splits
-  the built `site.css` at request time and writes the page files to `public/bladewind`, so the
-  web server needs write access there.
 - Production runs on PostgreSQL. It needs Redis with `QUEUE_CONNECTION=redis`, because Horizon
   manages the queues.
 - Daily offsite backups (`.env` plus a database dump) go to Google Drive, using

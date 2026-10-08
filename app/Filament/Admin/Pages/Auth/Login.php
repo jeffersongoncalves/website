@@ -14,7 +14,7 @@ use JeffersonGoncalves\Filament\Admin\Pages\Auth\Login as BaseLogin;
  */
 class Login extends BaseLogin
 {
-    protected string $view = 'filament.admin.pages.auth.login';
+    protected string $view = 'filament-editorial-theme::auth.login';
 
     protected function getEmailFormComponent(): Component
     {

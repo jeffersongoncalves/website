@@ -35,4 +35,3 @@ phpstan.neon
 /operations
 /docs
 /public/build
-/public/bladewind

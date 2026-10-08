@@ -6,9 +6,10 @@ namespace App\Providers\Filament;
 
 use AchyutN\FilamentLogViewer\FilamentLogViewer;
 use App\Filament\Admin\Pages\Auth\Login;
+use App\Models\Admin;
+use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 use Filament\Actions\Action;
 use Filament\Enums\ThemeMode;
-use Filament\FontProviders\LocalFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -18,16 +19,13 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Enums\Width;
-use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Support\Facades\Vite;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use JeffersonGoncalves\Filament\Admin\AdminPlugin;
-use JeffersonGoncalves\Filament\BladeWind\BladeWindPlugin;
 use JeffersonGoncalves\Filament\Gtag\GtagPlugin;
 use JeffersonGoncalves\Filament\Gtm\GtmPlugin;
 use JeffersonGoncalves\Filament\OneTimeOperations\OneTimeOperationsPlugin;
@@ -36,6 +34,7 @@ use JeffersonGoncalves\Filament\Pwa\FilamentPwaPlugin;
 use JeffersonGoncalves\Filament\ScannerGuard\ScannerGuardPlugin;
 use JeffersonGoncalves\Filament\ShortUrl\FilamentShortUrlPlugin;
 use JeffersonGoncalves\Filament\User\UserPlugin;
+use JeffersonGoncalves\FilamentEditorialTheme\EditorialThemePlugin;
 use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
 use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
 
@@ -48,57 +47,14 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(Login::class)
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->authGuard('admin')
-            ->colors([
-                'primary' => [
-                    50 => '#FFFBEB',
-                    100 => '#FEF3C7',
-                    200 => '#FDE68A',
-                    300 => '#FCD34D',
-                    400 => '#FBBF24',
-                    500 => '#F59E0B',
-                    600 => '#D97706',
-                    700 => '#B45309',
-                    800 => '#92400E',
-                    900 => '#78350F',
-                    950 => '#451A03',
-                ],
-                'gray' => [
-                    50 => '#F8F5EE',
-                    100 => '#F0EBDF',
-                    200 => '#D9D2C5',
-                    300 => '#B8B0A4',
-                    400 => '#8B8377',
-                    500 => '#5C5349',
-                    600 => '#3D362F',
-                    700 => '#2A2620',
-                    800 => '#1F1B17',
-                    900 => '#13110E',
-                    950 => '#0B0A09',
-                ],
-            ])
             ->brandLogo(fn () => view('filament.admin.logo'))
             ->favicon(asset('favicon.ico'))
-            // Closures: resolved at render, so boot (e.g. package:discover) works without a Vite build.
-            ->font('DM Sans', url: fn (): string => Vite::asset('resources/css/fonts/dm-sans.css'), provider: LocalFontProvider::class)
-            ->monoFont('JetBrains Mono', url: fn (): string => Vite::asset('resources/css/fonts/jetbrains-mono.css'), provider: LocalFontProvider::class)
-            ->serifFont('Fraunces', url: fn (): string => Vite::asset('resources/css/fonts/fraunces.css'), provider: LocalFontProvider::class)
             ->defaultThemeMode(ThemeMode::System)
             ->darkMode(true)
             ->maxContentWidth(Width::Full)
             ->sidebarCollapsibleOnDesktop()
-            ->renderHook(
-                PanelsRenderHook::SIDEBAR_FOOTER,
-                fn () => view('filament.partials.sidebar-status'),
-            )
-            ->renderHook(
-                PanelsRenderHook::BODY_END,
-                fn () => view('filament.partials.external-links'),
-            )
-            ->renderHook(
-                PanelsRenderHook::FOOTER,
-                fn () => view('filament.partials.footer'),
-            )
             ->discoverClusters(in: app_path('Filament/Admin/Clusters'), for: 'App\\Filament\\Admin\\Clusters')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
@@ -128,9 +84,18 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()->label(fn () => __('admin.navigation.settings'))->collapsed(),
             ])
             ->plugins([
+                // Editorial Terminal theme (jeffersongoncalves/filament-editorial-theme): palettes,
+                // footer, sidebar status and external links. The login stays App\Filament\Admin\Pages\Auth\Login
+                // (filament-admin's status check) and only borrows the theme's view.
+                EditorialThemePlugin::make()
+                    ->footerCopyright(fn (): string => '© '.date('Y').' · Jefferson Gonçalves · Assis/SP')
+                    ->footerRight(fn (): string => (string) config('app.name')),
+                // One-click login as any active admin, local environment only.
+                FilamentDeveloperLoginsPlugin::make()
+                    ->enabled(fn (): bool => app()->environment('local'))
+                    ->modelClass(Admin::class)
+                    ->users(fn (): array => Admin::query()->where('status', true)->orderBy('name')->pluck('email', 'name')->all()),
                 // Admin / User resources (jeffersongoncalves/filament-admin, filament-user).
-                BladeWindPlugin::make()
-                    ->theme('resources/css/filament/admin/theme.css'),
                 AdminPlugin::make()
                     ->navigationGroup(__('admin.navigation.user')),
                 // The App panel (/app, the impersonation target) is disabled here.

@@ -16,11 +16,6 @@ class OfflineController
      */
     public function __invoke(): View
     {
-        // The service worker precaches this page's HTML only. With BladeWind's
-        // default `link` delivery its per-page stylesheet would be a separate
-        // /bladewind file that is never cached for an offline hit, so embed it.
-        config(['bladewind.pages.delivery' => 'inline']);
-
         return view('site.offline');
     }
 }

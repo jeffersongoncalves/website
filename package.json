@@ -11,11 +11,11 @@
     "@tailwindcss/vite": "^4.2.4",
     "autoprefixer": "^10.5.0",
     "axios": "^1.15.2",
-    "concurrently": "^10.0.5",
+    "concurrently": "^10.0.6",
     "husky": "^9.1.7",
     "laravel-vite-plugin": "^3.1.0",
     "tailwindcss": "^4.2.4",
-    "vite": "^8.3.2",
+    "vite": "^8.3.4",
     "vite-plugin-compression2": "^2.5.3"
   },
   "dependencies": {

@@ -56,7 +56,7 @@
         "joaopaulolndev/filament-edit-profile": "^3.0",
         "laravel/framework": "^13.33",
         "laravel/horizon": "^5.50",
-        "laravel/mcp": "^0.9.5",
+        "laravel/mcp": "^1.1.1",
         "laravel/tinker": "^3.0",
         "livewire/blaze": "^1.0",
         "livewire/livewire": "^4.4",

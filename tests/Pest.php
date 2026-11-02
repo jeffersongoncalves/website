@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Redis;
 use Tests\TestCase;
 
 uses(TestCase::class)->in('Feature', 'Unit');
@@ -33,6 +34,20 @@ function createProject(array $attributes): Project
     return $project;
 }
 
+/**
+ * GithubQuota::reserve() keeps its slot in the real Redis: the key advances on
+ * every call and survives across tests/runs (48h TTL), so callers that sleep()
+ * on the delay (MergeDuplicateProjects) ended up sleeping for minutes and the
+ * suite looked hung. Give each test (per parallel worker) its own key prefix —
+ * also keeps tests off the dev app's quota — and start from a free slot.
+ */
+function resetGithubQuota(): void
+{
+    config(['database.redis.options.prefix' => 'testing_'.(getenv('TEST_TOKEN') ?: '0').'_']);
+    Redis::purge();
+    Redis::connection()->del('quota-slot:github-api', 'quota-slot:github-opengraph');
+}
+
 pest()->beforeEach(function () {
     Queue::fake();
 
@@ -45,6 +60,8 @@ pest()->beforeEach(function () {
     // Full-page response cache off by default so tests assert freshly-rendered
     // output; the dedicated CachePublicPageTest re-enables it explicitly.
     config(['page-cache.enabled' => false]);
+
+    resetGithubQuota();
 
     Http::preventStrayRequests();
     Http::fake([
@@ -69,5 +86,6 @@ pest()->beforeEach(function () {
 // Unit tests stub their own HTTP. Block stray requests so a test that forgets
 // to fake an endpoint fails loudly instead of silently receiving an empty 200.
 pest()->beforeEach(function () {
+    resetGithubQuota();
     Http::preventStrayRequests();
 })->in('Unit');

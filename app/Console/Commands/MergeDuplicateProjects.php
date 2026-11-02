@@ -12,6 +12,7 @@ use App\Support\ProjectMatcher;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Sleep;
 use JeffersonGoncalves\GitHubClient\Exceptions\GitHubRateLimitException;
 use JeffersonGoncalves\GitHubClient\GitHubClient;
 
@@ -205,7 +206,7 @@ class MergeDuplicateProjects extends Command
 
         $delay = GithubQuota::reserve(1);
         if ($delay > 0) {
-            sleep($delay);
+            Sleep::for($delay)->seconds();
         }
 
         try {

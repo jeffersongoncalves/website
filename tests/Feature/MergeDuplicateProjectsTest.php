@@ -7,6 +7,10 @@ use App\Enums\ProjectStatus;
 use App\Models\Project;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
+
+// The command waits for its GithubQuota slot; the wait itself isn't under test.
+beforeEach(fn () => Sleep::fake());
 
 /**
  * @param  array<string, mixed>  $attrs

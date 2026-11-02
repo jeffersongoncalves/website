@@ -105,6 +105,10 @@ it('swallows an InvalidArgumentException from the cache store during ProjectObse
     Cache::shouldReceive('delete')->once()->andThrow($exception);
     Cache::shouldReceive('add')->andReturn(true);
     Cache::shouldReceive('increment')->andReturn(1);
+    // laravel-page-cache v1.3+: PageCache::flush() also resets hit/miss stats
+    // and stamps the flushed-at time.
+    Cache::shouldReceive('forget')->andReturn(true);
+    Cache::shouldReceive('forever')->andReturn(true);
 
     (new ProjectObserver)->deleted($project);
 

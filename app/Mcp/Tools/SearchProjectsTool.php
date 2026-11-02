@@ -51,21 +51,12 @@ class SearchProjectsTool extends Tool
         }
 
         if ($query !== '') {
-            $isPostgres = $builder->getConnection() instanceof PostgresConnection;
-            $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $query).'%';
-            $operator = $isPostgres ? 'ilike' : 'like';
             // topics/stack are json(b) columns — Postgres needs an explicit
             // ::text cast before ILIKE/LIKE will accept them; sqlite stores
             // them as plain text already, so the cast would just be a no-op
             // there (skipped rather than emitting invalid sqlite syntax).
-            $topicsColumn = $isPostgres ? 'topics::text' : 'topics';
-            $stackColumn = $isPostgres ? 'stack::text' : 'stack';
-            $builder->where(function ($q) use ($like, $operator, $topicsColumn, $stackColumn): void {
-                $q->where('name', $operator, $like)
-                    ->orWhere('repo', $operator, $like)
-                    ->orWhereRaw("{$topicsColumn} {$operator} ?", [$like])
-                    ->orWhereRaw("{$stackColumn} {$operator} ?", [$like]);
-            });
+            $cast = $builder->getConnection() instanceof PostgresConnection ? '::text' : '';
+            $builder->searchLike($query, ['name', 'repo', "topics{$cast}", "stack{$cast}"]);
         }
 
         $projects = $builder->orderByDesc('stars')->orderBy('name')->limit($limit)->get();

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use JeffersonGoncalves\LocaleCookie\LocaleCookie;
@@ -381,6 +382,30 @@ class Project extends Model
     public function scopeByLanguage(Builder $query, string $language): Builder
     {
         return $query->where('language', $language);
+    }
+
+    /**
+     * Case-insensitive substring search with %/_ treated literally.
+     *
+     * Explicit ESCAPE '!': SQLite has no default LIKE escape char, and '!'
+     * reads the same in every driver's string literal (unlike '\'). Postgres
+     * LIKE is case-sensitive, so ILIKE there; MySQL/SQLite LIKE folds case.
+     * Columns are raw SQL expressions (e.g. `topics::text`) — never user input.
+     *
+     * @param  Builder<Project>  $query
+     * @param  list<literal-string>  $columns
+     * @return Builder<Project>
+     */
+    public function scopeSearchLike(Builder $query, string $search, array $columns = ['name', 'repo']): Builder
+    {
+        $like = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $search).'%';
+        $operator = $query->getConnection() instanceof PostgresConnection ? 'ilike' : 'like';
+
+        return $query->where(function (Builder $q) use ($columns, $operator, $like): void {
+            foreach ($columns as $column) {
+                $q->orWhereRaw("{$column} {$operator} ? escape '!'", [$like]);
+            }
+        });
     }
 
     /**

@@ -52,16 +52,16 @@ it('finds projects by free-text search on name and repo', function () {
 });
 
 it('escapes LIKE wildcards so _ is literal, not any-char', function () {
-    publishedProject('a_c', ['slug' => 'lit-underscore', 'repo' => 'a_c']);
-    // Decoy uses 'x' (never a hex char) so the assertion can't false-match the
-    // hex sha256 in Livewire's wire:snapshot checksum — 'abc' would flake there.
-    publishedProject('axc', ['slug' => 'axc-repo', 'repo' => 'axc']);
+    publishedProject('lit-a_c-tool', ['slug' => 'lit-underscore', 'repo' => 'lit-a_c-tool']);
+    // Decoy contains '-' so assertDontSee can't false-match random alnum tokens
+    // (CSRF, Livewire ids, wire:snapshot sha256) — a bare 'axc' flaked there.
+    publishedProject('lit-axc-tool', ['slug' => 'decoy-repo', 'repo' => 'lit-axc-tool']);
 
     // With _ escaped, "a_c" matches only the literal a_c, not the any-char axc.
     $this->get('/pt_BR/projects?search=a_c')
         ->assertOk()
-        ->assertSee('a_c')
-        ->assertDontSee('axc');
+        ->assertSee('lit-a_c-tool')
+        ->assertDontSee('lit-axc-tool');
 });
 
 it('shows the empty state when nothing matches', function () {

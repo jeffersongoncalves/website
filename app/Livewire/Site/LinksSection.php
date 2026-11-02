@@ -8,7 +8,6 @@ use App\Enums\ProjectCategory;
 use App\Enums\ProjectStatus;
 use App\Models\Project;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\PostgresConnection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -107,14 +106,7 @@ class LinksSection extends Component
 
         $search = trim($this->search);
         if ($search !== '') {
-            // Escape the backslash first (LIKE escape char) before %/_.
-            $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $search).'%';
-            // Postgres LIKE is case-sensitive — use ILIKE there.
-            $operator = $query->getConnection() instanceof PostgresConnection ? 'ilike' : 'like';
-            $query->where(function ($q) use ($like, $operator): void {
-                $q->where('name', $operator, $like)
-                    ->orWhere('repo', $operator, $like);
-            });
+            $query->searchLike($search);
         }
 
         $activeTopic = preg_match('/^[a-z0-9-]{1,50}$/', $this->topic) === 1 ? $this->topic : '';

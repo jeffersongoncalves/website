@@ -9,7 +9,6 @@ use App\Models\Project;
 use App\Support\SiteStats;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\MySqlConnection;
-use Illuminate\Database\PostgresConnection;
 use JeffersonGoncalves\LaravelPageVisits\Models\PageVisit;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -136,16 +135,7 @@ class ProjectsList extends Component
         }
 
         if ($search !== '') {
-            // Escape the backslash first (it's the LIKE escape char) so a user
-            // backslash can't turn the following %/_ into a literal/escape.
-            $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $search).'%';
-            // Postgres LIKE is case-sensitive — use ILIKE there so a search for
-            // "filament" matches "Filament". MySQL/SQLite LIKE already folds case.
-            $operator = $query->getConnection() instanceof PostgresConnection ? 'ilike' : 'like';
-            $query->where(function ($q) use ($like, $operator): void {
-                $q->where('name', $operator, $like)
-                    ->orWhere('repo', $operator, $like);
-            });
+            $query->searchLike($search);
         }
 
         match ($this->sort) {

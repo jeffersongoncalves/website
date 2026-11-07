@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\ProjectSlugAlias;
 use App\Models\User;
 use App\Observers\ProjectObserver;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;
 
@@ -109,6 +110,9 @@ it('swallows an InvalidArgumentException from the cache store during ProjectObse
     // and stamps the flushed-at time.
     Cache::shouldReceive('forget')->andReturn(true);
     Cache::shouldReceive('forever')->andReturn(true);
+    // laravel-page-cache v1.5+: flush() checks for a taggable store — hand it a
+    // non-taggable one so the tags()->flush() branch is skipped.
+    Cache::shouldReceive('getStore')->andReturn(Mockery::mock(Store::class));
 
     (new ProjectObserver)->deleted($project);
 

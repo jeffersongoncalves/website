@@ -8,14 +8,14 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.2.4",
+    "@tailwindcss/vite": "^4.3.5",
     "autoprefixer": "^10.6.2",
     "axios": "^1.21.0",
-    "concurrently": "^10.0.6",
+    "concurrently": "^10.0.7",
     "husky": "^9.1.7",
-    "laravel-vite-plugin": "^3.1.0",
-    "tailwindcss": "^4.2.4",
-    "vite": "^8.3.5",
+    "laravel-vite-plugin": "^3.2.1",
+    "tailwindcss": "^4.3.5",
+    "vite": "^8.3.6",
     "vite-plugin-compression2": "^2.5.4"
   },
   "dependencies": {

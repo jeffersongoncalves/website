@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## 13.42.0 - 2026-11-14
+
+Bump Laravel to v13.42.0
+
+### What's Changed
+
+* chore(deps): bump follow-redirects from 1.16.1 to 1.16.2 by @dependabot[bot] in https://github.com/jeffersongoncalves/website/pull/15
+* chore(deps): bump pnpm/action-setup from 6.1.0 to 6.1.1 in the actions-deps group by @dependabot[bot] in https://github.com/jeffersongoncalves/website/pull/16
+* chore(deps-dev): bump the npm-deps group with 5 updates by @dependabot[bot] in https://github.com/jeffersongoncalves/website/pull/17
+* chore(deps): bump the composer-deps group with 17 updates by @dependabot[bot] in https://github.com/jeffersongoncalves/website/pull/18
+
+**Full Changelog**: https://github.com/jeffersongoncalves/website/compare/13.40.0...13.42.0
+
 ## 13.35.0 - 2026-10-08
 
 Bump Laravel to v13.35.0

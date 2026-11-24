@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "22e8aebb114306e886996fe18b89d901",
+    "content-hash": "2d1acb87530006f5232d6e3f74389bd8",
     "packages": [
         {
             "name": "achyutn/filament-log-viewer",
@@ -3997,22 +3997,22 @@
         },
         {
             "name": "jeffersongoncalves/filament-scanner-guard",
-            "version": "3.6.0",
+            "version": "3.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/filament-scanner-guard.git",
-                "reference": "1663c9162969f864033583a7fdc999b37d226ceb"
+                "reference": "8ac781a83a57ac706b1673f460986ea04f0e2eec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/filament-scanner-guard/zipball/1663c9162969f864033583a7fdc999b37d226ceb",
-                "reference": "1663c9162969f864033583a7fdc999b37d226ceb",
+                "url": "https://api.github.com/repos/jeffersongoncalves/filament-scanner-guard/zipball/8ac781a83a57ac706b1673f460986ea04f0e2eec",
+                "reference": "8ac781a83a57ac706b1673f460986ea04f0e2eec",
                 "shasum": ""
             },
             "require": {
                 "filament/filament": "^5.3",
                 "jeffersongoncalves/filament-action-export": "^3.7",
-                "jeffersongoncalves/laravel-scanner-guard": "^1.7",
+                "jeffersongoncalves/laravel-scanner-guard": "^1.7|^2.0",
                 "php": "^8.3",
                 "spatie/laravel-package-tools": "^1.16"
             },
@@ -4062,7 +4062,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/filament-scanner-guard/issues",
-                "source": "https://github.com/jeffersongoncalves/filament-scanner-guard/tree/3.6.0"
+                "source": "https://github.com/jeffersongoncalves/filament-scanner-guard/tree/3.10.0"
             },
             "funding": [
                 {
@@ -4074,7 +4074,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-11-06T00:06:39+00:00"
+            "time": "2026-11-24T01:53:57+00:00",
+            "published-time": "2026-11-24T01:54:32+00:00"
         },
         {
             "name": "jeffersongoncalves/filament-sensible-defaults",
@@ -5760,16 +5761,16 @@
         },
         {
             "name": "jeffersongoncalves/laravel-scanner-guard",
-            "version": "1.7.2",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeffersongoncalves/laravel-scanner-guard.git",
-                "reference": "7fe72b1eab20ac09695144660f9e3fe70a551b85"
+                "reference": "86fc2602a8e75f61fe2df2da88d488e47697bff4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-scanner-guard/zipball/7fe72b1eab20ac09695144660f9e3fe70a551b85",
-                "reference": "7fe72b1eab20ac09695144660f9e3fe70a551b85",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-scanner-guard/zipball/86fc2602a8e75f61fe2df2da88d488e47697bff4",
+                "reference": "86fc2602a8e75f61fe2df2da88d488e47697bff4",
                 "shasum": ""
             },
             "require": {
@@ -5825,7 +5826,7 @@
             ],
             "support": {
                 "issues": "https://github.com/jeffersongoncalves/laravel-scanner-guard/issues",
-                "source": "https://github.com/jeffersongoncalves/laravel-scanner-guard/tree/1.7.2"
+                "source": "https://github.com/jeffersongoncalves/laravel-scanner-guard/tree/2.2.0"
             },
             "funding": [
                 {
@@ -5837,7 +5838,86 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-11-04T00:59:34+00:00"
+            "time": "2026-11-24T01:15:48+00:00",
+            "published-time": "2026-11-24T01:16:24+00:00"
+        },
+        {
+            "name": "jeffersongoncalves/laravel-scanner-guard-nginx",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeffersongoncalves/laravel-scanner-guard-nginx.git",
+                "reference": "c2f68b96a9c07d0d7f599c73f06df4bfea4c4c7b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeffersongoncalves/laravel-scanner-guard-nginx/zipball/c2f68b96a9c07d0d7f599c73f06df4bfea4c4c7b",
+                "reference": "c2f68b96a9c07d0d7f599c73f06df4bfea4c4c7b",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^12.0|^13.0",
+                "jeffersongoncalves/laravel-scanner-guard": "^2.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.24",
+                "orchestra/testbench": "^10.0|^11.0",
+                "pestphp/pest": "^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JeffersonGoncalves\\ScannerGuardNginx\\ScannerGuardNginxServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JeffersonGoncalves\\ScannerGuardNginx\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jefferson Gonçalves",
+                    "email": "gerson.simao.92@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "nginx denylist sink for laravel-scanner-guard: writes banned IPs as an included deny file and reloads nginx",
+            "homepage": "https://github.com/jeffersongoncalves/laravel-scanner-guard-nginx",
+            "keywords": [
+                "denylist",
+                "firewall",
+                "laravel",
+                "nginx",
+                "scanner-guard",
+                "security"
+            ],
+            "support": {
+                "issues": "https://github.com/jeffersongoncalves/laravel-scanner-guard-nginx/issues",
+                "source": "https://github.com/jeffersongoncalves/laravel-scanner-guard-nginx/tree/1.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://buymeacoffee.com/jeffersongoncalves",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/jeffersongoncalves",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-11-19T00:18:46+00:00",
+            "published-time": "2026-11-19T01:07:59+00:00"
         },
         {
             "name": "jeffersongoncalves/laravel-security-headers",
@@ -18772,5 +18852,5 @@
         "ext-pcntl": "7.1",
         "ext-posix": "7.1"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.11.0"
 }

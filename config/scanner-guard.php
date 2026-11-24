@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use JeffersonGoncalves\ScannerGuardNginx\NginxSink;
+
 return [
 
     /*
@@ -135,9 +137,9 @@ return [
     | Cache store used for hit-counting and the ban fast-path lookup. Null
     | uses the app's default store. Prefer a store that survives a plain
     | `cache:clear` invocation (e.g. redis, file) over "array" if you also
-    | plan to use the nginx denylist export (see README) — an evicted
-    | fast-path entry still leaves the app-layer ban intact (backed by the
-    | database), but an evicted raw-IP export entry cannot be recovered.
+    | plan to use a denylist sink (see README) — an evicted fast-path entry
+    | still leaves the app-layer ban intact (backed by the database), but an
+    | evicted raw IP only returns to the sinks once that IP comes back.
     |
     */
     'store' => env('SCANNER_GUARD_STORE'),
@@ -156,17 +158,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Sync to nginx
+    | Denylist Sinks
     |--------------------------------------------------------------------------
     |
-    | When true, self-schedules `scanner-guard:export-denylist` daily so your
-    | nginx `include`d denylist file stays current. Off by default: writing
-    | files to disk on a schedule is more deployment-specific (permissions,
-    | shared vs. per-instance storage, whether nginx even reloads the file)
-    | than a DB-only aggregate job, so this is left for you to opt into once
-    | you've wired the nginx side up (see README).
+    | Classes implementing Contracts\DenylistSink that block banned IPs before
+    | they reach PHP. `scanner-guard:sync-denylist` self-schedules every minute
+    | while this list is non-empty, and `sync_on_ban` also queues a sync on
+    | every new ban. NginxSink writes storage/app/scanner-guard/denylist.conf,
+    | `include`d by the vhost (forge/nginx-*.conf); see
+    | jeffersongoncalves/laravel-scanner-guard-nginx.
     |
     */
-    'sync_to_nginx' => env('SCANNER_GUARD_SYNC_TO_NGINX', false),
+    'sinks' => [
+        NginxSink::class,
+    ],
+
+    // Queued on the default queue; nginx itself only re-reads the file on reload
+    // (SCANNER_GUARD_NGINX_RELOAD_COMMAND).
+    'sync_on_ban' => env('SCANNER_GUARD_SYNC_ON_BAN', true),
 
 ];

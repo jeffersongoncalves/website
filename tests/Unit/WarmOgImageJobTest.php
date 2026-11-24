@@ -55,7 +55,12 @@ it('fetches and persists a github social card to disk', function () {
     (new WarmOgImageJob($project))->handle();
 
     Storage::disk('github')->assertExists('og-images/repo');
-    expect(Storage::disk('github')->get('og-images/repo.type'))->toBe('image/png');
+
+    // Through the cache API: the on-disk layout belongs to laravel-image-cache.
+    $response = OgImageCache::response('repo');
+
+    expect($response?->getContent())->toBe('PNGBYTES')
+        ->and($response?->headers->get('Content-Type'))->toBe('image/png');
 });
 
 it('does nothing for a project with no image source', function () {

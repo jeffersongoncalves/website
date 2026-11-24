@@ -16,10 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
  * App\Support\GithubReadme (fetch+cache) vs the page that renders it.
  *
  * The actual fetch/persist/serve mechanics (SSRF-pinned download, redirect
- * re-validation, image/* gate, TTL-based disk caching with a `.type`
- * sidecar) live in jeffersongoncalves/laravel-image-cache — this class only
- * keeps the app-specific bit: resolving *what* URL is the source for a
- * given project.
+ * re-validation, image/* gate, TTL-based disk caching) live in
+ * jeffersongoncalves/laravel-image-cache — this class only keeps the
+ * app-specific bit: resolving *what* URL is the source for a given project.
  */
 class OgImageCache
 {

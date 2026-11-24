@@ -12021,28 +12021,30 @@ function getNonce() {
   }
   return null;
 }
-function replaceNoncesInHtml(html) {
+function replaceNoncesInHtml(html, nonces) {
   let nonce2 = getNonce();
   if (!nonce2)
     return html;
-  let nonceMatch = html.match(/nonce="([^"]+)"/);
-  if (!nonceMatch)
-    return html;
-  let newNonce = nonceMatch[1];
-  if (newNonce === nonce2)
-    return html;
-  return html.replaceAll(`nonce="${newNonce}"`, `nonce="${nonce2}"`);
+  for (let newNonce of nonces) {
+    if (newNonce === nonce2)
+      continue;
+    html = html.replaceAll(`nonce="${newNonce}"`, `nonce="${nonce2}"`);
+  }
+  return html;
+}
+function getNoncesFromCspHeaders(headers) {
+  let policies = [
+    headers.get("Content-Security-Policy"),
+    headers.get("Content-Security-Policy-Report-Only")
+  ].join(" ");
+  return Array.from(policies.matchAll(/'nonce-([^']+)'/g), (match) => match[1]);
 }
 function cloneScriptTag(el) {
   let script = document.createElement("script");
   script.textContent = el.textContent;
   script.async = el.async;
   for (let attr of el.attributes) {
-    if (attr.name === "nonce") {
-      script.nonce = getNonce() || el.nonce;
-    } else {
-      script.setAttribute(attr.name, attr.value);
-    }
+    script.setAttribute(attr.name, attr.value);
   }
   return script;
 }
@@ -13860,7 +13862,7 @@ async function sendNavigateRequest(uri, callback, errorCallback) {
     let destination = getDestination(uri, response);
     let html = await response.text();
     let status = response.status;
-    callback(html, destination, status);
+    callback(html, destination, status, response.headers);
   } catch (error2) {
     errorCallback(error2);
     throw error2;
@@ -15571,7 +15573,10 @@ function fetchHtml(destination, callback, errorCallback) {
   }, errorCallback);
 }
 function performFetch(uri, callback, errorCallback) {
-  sendNavigateRequest(uri, callback, errorCallback).catch(() => {
+  sendNavigateRequest(uri, (html, destination, status, headers) => {
+    html = replaceNoncesInHtml(html, getNoncesFromCspHeaders(headers));
+    callback(html, destination, status);
+  }, errorCallback).catch(() => {
   });
 }
 
@@ -16101,8 +16106,8 @@ var attributesExemptFromScriptTagHashing = [
   "aria-hidden"
 ];
 function swapCurrentPageWithNewHtml(html, andThen) {
-  html = replaceNoncesInHtml(html);
   let newDocument = new DOMParser().parseFromString(html, "text/html");
+  newDocument.querySelectorAll("noscript").forEach((i) => i.textContent = i.innerHTML);
   let newHtml = newDocument.documentElement;
   let newBody = document.adoptNode(newDocument.body);
   let newHead = document.adoptNode(newDocument.head);
@@ -17017,7 +17022,9 @@ async function onlyIfAssetsHaventBeenLoadedAlreadyOnThisPage(key, callback) {
   await callback();
 }
 async function addAssetsToHeadTagOfPage(rawHtml) {
-  rawHtml = replaceNoncesInHtml(rawHtml);
+  let nonceMatch = rawHtml.match(/nonce="([^"]+)"/);
+  if (nonceMatch)
+    rawHtml = replaceNoncesInHtml(rawHtml, [nonceMatch[1]]);
   let newDocument = new DOMParser().parseFromString(rawHtml, "text/html");
   let newHead = document.adoptNode(newDocument.head);
   let children = [...newHead.children];

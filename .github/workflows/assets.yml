@@ -1,0 +1,56 @@
+name: Published assets
+
+# Livewire/Filament assets in public/ are committed, but Dependabot bumps the lock
+# without running post-update-cmd. Fails when they no longer match the lock.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'composer.json'
+      - 'composer.lock'
+      - 'public/**'
+      - '.github/workflows/assets.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'composer.json'
+      - 'composer.lock'
+      - 'public/**'
+      - '.github/workflows/assets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  assets:
+    name: assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@26d8a556604053a9612623447203a691f406fbe6 # v4
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Publish assets
+        run: composer run-script post-update-cmd
+
+      - name: Check for outdated assets
+        run: |
+          if [ -n "$(git status --porcelain -- public)" ]; then
+            git status --short -- public
+            echo "::error::Published assets are outdated. Run 'composer install && composer run-script post-update-cmd' and commit public/."
+            exit 1
+          fi

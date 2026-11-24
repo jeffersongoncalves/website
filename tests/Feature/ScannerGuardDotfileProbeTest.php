@@ -24,6 +24,7 @@ it('bans an ip that probes for .env and .git files, nested ones included', funct
 it('writes banned ips to the nginx denylist', function (): void {
     $path = 'storage/framework/testing/scanner-guard/denylist.conf';
     config()->set('scanner-guard-nginx.path', $path);
+    config()->set('scanner-guard-nginx.reload_command', null);
 
     foreach (['/laravel/.env', '/.git/config', '/.env'] as $probe) {
         $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.11'])->get($probe);
